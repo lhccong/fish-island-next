@@ -1,0 +1,1434 @@
+.container {
+  min-height: 78vh;
+  padding: 24px;
+  background: var(--color-surface);
+  color: var(--color-life-detail-1);
+}
+.home,
+.panel,
+.playPanel {
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+.home {
+  min-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.kicker {
+  color: var(--color-accent-text);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.home h1 {
+  margin: 12px 0 4px;
+  font-size: 48px;
+  color: var(--color-life-detail-1);
+}
+.home p {
+  color: var(--color-life-detail-3);
+  font-size: 1.1rem;
+}
+.primary,
+.disabled,
+.textButton {
+  border: 0;
+  cursor: pointer;
+}
+.primary {
+  padding: 12px 28px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px var(--color-life-detail-6);
+}
+.primary:hover:not(:disabled) {
+  background: var(--color-accent);
+}
+.primary:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+.disabled {
+  padding: 12px 28px;
+  background: var(--color-life-detail-8);
+  color: var(--color-life-detail-3);
+  border-radius: 8px;
+  cursor: not-allowed;
+}
+.textButton {
+  background: none;
+  color: var(--color-accent-text);
+  font-weight: 700;
+}
+.homeStats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 36px;
+  color: var(--color-life-detail-3);
+}
+.panel {
+  padding: clamp(18px, 4vw, 36px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-life-detail-10);
+  border-radius: 10px;
+  box-shadow: 0 14px 40px var(--color-life-detail-11);
+}
+.panel h2 {
+  margin-top: 0;
+}
+.sectionHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+.sectionHeading span {
+  color: var(--color-accent-text);
+  font-weight: 700;
+}
+.pickPanel {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: 12px 0 24px;
+}
+.pickPanel button {
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.pickHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-life-detail-10);
+}
+.pickHeader h2 {
+  font-size: 24px;
+  line-height: 1.4;
+  margin: 5px 0 0;
+  font-weight: 700;
+}
+.pickEyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent-text);
+}
+.progressSteps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.progressSteps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-life-detail-12);
+  font-size: 13px;
+}
+.progressSteps b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-life-detail-13);
+  border-radius: 50%;
+  font-size: 12px;
+}
+.progressSteps [aria-current] {
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+.progressSteps [aria-current] b {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.drawStage {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 12px;
+  gap: 24px;
+}
+.drawStage h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-life-detail-14);
+}
+.cardDeck {
+  width: min(410px, 100%);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.cardBack {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--color-life-detail-15);
+  border-radius: 6px;
+  background: var(--color-accent-soft);
+  color: var(--color-life-detail-17);
+  box-shadow: 0 3px 0 var(--color-life-detail-18);
+}
+.cardBack::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--color-life-detail-19);
+  border-radius: 3px;
+}
+.cardBack:nth-child(4n) {
+  background: var(--color-life-detail-20);
+  border-color: var(--color-life-detail-21);
+  color: var(--color-life-detail-22);
+}
+.cardBack:nth-child(4n)::before {
+  border-color: var(--color-life-detail-23);
+}
+.cardBack:nth-child(5n) {
+  background: var(--color-life-detail-24);
+  border-color: var(--color-life-detail-25);
+  color: var(--color-life-detail-26);
+}
+.cardBack:nth-child(5n)::before {
+  border-color: var(--color-life-detail-27);
+}
+.drawButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 48px;
+  min-width: 192px;
+}
+.pickStatus {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+.pickStatus h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.pickStatus span {
+  color: var(--color-life-detail-3);
+  font-size: 14px;
+  var(--color-surface)-space: nowrap;
+}
+.pickStatus span b {
+  color: var(--color-accent-text);
+}
+.talentGrid.pickGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.talentGrid.pickGrid .talent {
+  min-height: 126px;
+  overflow-wrap: anywhere;
+}
+.talentGrid.pickGrid .talent:hover:not(.selected) {
+  box-shadow: 0 4px 12px var(--color-life-detail-28);
+}
+.pickFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-life-detail-10);
+}
+.pickFooter > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.pickedSlots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.pickedSlots span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--color-life-detail-12);
+  border-bottom: 2px solid var(--color-life-detail-29);
+}
+.pickedSlots .filledSlot {
+  color: var(--color-accent-text);
+  border-color: var(--color-accent);
+}
+@media (max-width: 800px) {
+  .talentGrid.pickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .pickHeader {
+    align-items: flex-start;
+    gap: 16px;
+    flex-direction: column;
+    padding-bottom: 18px;
+  }
+  .pickHeader h2 {
+    font-size: 22px;
+  }
+  .progressSteps {
+    gap: 20px;
+  }
+  .drawStage {
+    padding: 28px 0;
+    min-height: 360px;
+  }
+  .cardDeck {
+    gap: 7px;
+    width: min(330px, 100%);
+  }
+  .pickFooter > button {
+    width: 100%;
+  }
+}
+.modeGrid,
+.characterGrid,
+.talentGrid,
+.allocateGrid {
+  display: grid;
+  gap: 12px;
+}
+.modeGrid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.lifeModes {
+  margin-top: 28px;
+}
+.lifeModes button {
+  position: relative;
+  min-height: 215px;
+  color: var(--color-life-detail-30);
+  background: var(--color-surface);
+}
+.lifeModes button > svg:first-child {
+  color: var(--color-accent-text);
+  margin-bottom: 20px;
+}
+.lifeModes button > svg:last-child {
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  color: var(--color-accent-text);
+}
+.lifeModes button strong {
+  font-size: 19px;
+}
+.lifeModes button small {
+  display: block;
+  margin-top: 10px;
+  color: var(--color-life-detail-3);
+  padding-right: 20px;
+}
+.lifeModes button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--color-life-detail-31);
+  border-color: var(--color-life-detail-32);
+}
+.lifeModes button:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+.lifeModes .cultivationMode {
+  border-color: var(--color-accent);
+  border-top: 3px solid var(--color-accent);
+}
+.cultivationPanel {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: 12px 0 24px;
+}
+.cultivationWorld {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--color-life-detail-33);
+}
+.cultivationAllocation {
+  padding-top: 12px;
+}
+.cultivationTalentReadOnly {
+  cursor: default;
+}
+.realmRoad {
+  margin: 28px 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--color-life-detail-10);
+}
+.realmRoad h3 {
+  font-size: 14px;
+  margin: 0 0 16px;
+  color: var(--color-life-detail-34);
+}
+.realmRoad ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 0;
+  margin: 0;
+}
+.realmRoad li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--color-life-detail-35);
+  var(--color-surface)-space: nowrap;
+}
+.realmRoad li span {
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  font-size: 11px;
+  border: 1px solid var(--color-life-detail-29);
+  border-radius: 50%;
+}
+.realmRoad .realmReached {
+  color: var(--color-accent-text);
+}
+.realmStatus {
+  padding: 22px 0 16px;
+}
+.realmTitle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.realmTitle h2 {
+  margin: 4px 0 0;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--color-life-detail-1);
+}
+.realmTitle > div > span {
+  font-size: 12px;
+  color: var(--color-life-detail-3);
+}
+.realmEmblem {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  border-radius: 8px;
+}
+.rootLabel {
+  margin-left: auto;
+  padding: 5px 0;
+  font-size: 13px;
+  color: var(--color-life-detail-37);
+  var(--color-surface)-space: nowrap;
+}
+.cultivationMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0 18px;
+}
+.cultivationMetrics span,
+.cultivationMetrics b {
+  display: block;
+}
+.cultivationMetrics span {
+  color: var(--color-life-detail-12);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.cultivationMetrics b {
+  font-size: 17px;
+  color: var(--color-life-detail-14);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.cultivationMetrics small {
+  font-weight: 400;
+  font-size: 12px;
+}
+.cultivationProgress > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--color-life-detail-12);
+}
+.cultivationProgress > div b {
+  margin-left: 5px;
+  color: var(--color-accent-text);
+}
+.cultivationProgress progress {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 7px;
+  background: var(--color-life-detail-10);
+  border: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.cultivationProgress progress::-webkit-progress-bar {
+  background: var(--color-life-detail-10);
+}
+.cultivationProgress progress::-webkit-progress-value {
+  background: var(--color-accent);
+}
+.cultivationProgress progress::-moz-progress-bar {
+  background: var(--color-accent);
+}
+.cultivationAttributes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.cultivationAttributes > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  border-bottom: 2px solid var(--color-life-detail-38);
+  padding: 8px 4px;
+}
+.cultivationAttributes span {
+  font-size: 12px;
+  color: var(--color-life-detail-39);
+}
+.cultivationAttributes b {
+  color: var(--color-life-detail-37);
+  font-variant-numeric: tabular-nums;
+}
+.logs.cultivationLogs {
+  min-height: 220px;
+  height: 36vh;
+  max-height: 460px;
+}
+.logs.cultivationLogs article {
+  grid-template-columns: minmax(58px, 85px) minmax(0, 1fr);
+}
+.logs.cultivationLogs article > b {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.cultivationRealmLog {
+  color: var(--color-life-detail-40);
+  font-weight: 600;
+}
+.cultivationError {
+  padding: 14px 0;
+  color: var(--color-life-detail-41);
+}
+.cultivationEnding {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  color: var(--color-accent-text);
+}
+.cultivationEnding h2 {
+  margin: 4px 0 0;
+  font-size: 24px;
+}
+.cultivationEnding span {
+  color: var(--color-life-detail-39);
+  font-size: 12px;
+}
+.cultivationSectionTitle {
+  font-size: 16px;
+  margin: 24px 0 16px;
+}
+.cultivationBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-bottom: 28px;
+}
+.cultivationBadges span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-accent-text);
+}
+.cultivationPanel > .primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .cultivationPanel .pickHeader {
+    flex-direction: row;
+    align-items: center;
+  }
+  .realmTitle {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .realmTitle h2 {
+    font-size: 21px;
+  }
+  .rootLabel {
+    font-size: 12px;
+  }
+  .cultivationMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cultivationAttributes > div {
+    flex-direction: column;
+    align-items: center;
+  }
+  .logs.cultivationLogs article {
+    grid-template-columns: 62px minmax(0, 1fr);
+  }
+}
+.modeGrid button,
+.character {
+  padding: 22px;
+  border: 1px solid var(--color-life-detail-32);
+  background: var(--color-surface);
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.modeGrid button:hover,
+.character:hover,
+.selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+.modeGrid strong,
+.modeGrid span,
+.character strong,
+.character > span {
+  display: block;
+}
+.modeGrid span,
+.character > span {
+  margin-top: 8px;
+  color: var(--color-life-detail-3);
+  font-size: 0.9rem;
+}
+.talentGrid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 22px;
+}
+.talent {
+  position: relative;
+  min-height: 104px;
+  padding: 14px 36px 14px 14px;
+  border: 1px solid var(--color-life-detail-32);
+  background: var(--color-surface);
+  text-align: left;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--color-life-detail-1);
+}
+.talent strong,
+.talent span {
+  display: block;
+}
+.talent span {
+  margin-top: 8px;
+  color: var(--color-life-detail-3);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.grade-0 {
+  border-color: var(--color-life-detail-43);
+  color: var(--color-life-detail-44);
+}
+.grade-1 {
+  border-color: var(--color-life-detail-45);
+  color: var(--color-life-detail-46);
+}
+.grade-2 {
+  border-color: var(--color-life-detail-47);
+  color: var(--color-life-detail-48);
+}
+.grade-3 {
+  border-color: var(--color-life-detail-49);
+  color: var(--color-life-detail-50);
+}
+.talent.selected,
+.character.selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+.selectionMark {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--color-accent-text);
+}
+.talent:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.propertyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.property {
+  padding: 10px;
+  border: 1px solid currentColor;
+  text-align: center;
+  background: var(--color-surface);
+}
+.property span,
+.property b,
+.property small {
+  display: block;
+}
+.property b {
+  font-size: 1.3rem;
+}
+.property small {
+  font-size: 0.72rem;
+  margin-top: 3px;
+}
+.allocateGrid {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin: 16px 0 22px;
+}
+.allocateGrid label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-life-detail-32);
+}
+.allocateGrid input {
+  width: 60px;
+  padding: 5px;
+  border: 1px solid var(--color-life-detail-13);
+  text-align: center;
+}
+.allocateGrid input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.randomButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-accent-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+.randomButton:hover {
+  background: var(--color-accent-soft);
+}
+.randomButton:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.good {
+  color: var(--color-life-detail-51);
+}
+.bad {
+  color: var(--color-life-detail-41);
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  var(--color-surface)-space: nowrap;
+  border: 0;
+}
+.characterDeck {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: min(360px, 100%);
+}
+.celebrityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  margin: 0 0 24px;
+  min-width: 0;
+}
+.celebrityOption {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  cursor: pointer;
+}
+.celebrityOption > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.celebrityOption:hover .celebrityCard {
+  border-color: var(--color-accent);
+}
+.celebrityOption > input:checked + .celebrityCard {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+  background: var(--color-surface)bf7;
+}
+.celebrityOption > input:checked + .celebrityCard .celebrityCheck {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.celebrityOption > input:checked + .celebrityCard .celebrityEmblem {
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.celebrityOption > input:focus-visible + .celebrityCard {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+.celebrityCard {
+  width: 100%;
+  min-width: 0;
+  padding: 22px 18px;
+  border: 1px solid var(--color-life-detail-53);
+  border-radius: 8px;
+  background: var(--color-surface);
+  transition: border-color 0.18s, background 0.18s;
+}
+.celebrityIdentity {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 52px;
+}
+.celebrityIdentity > div {
+  flex: 1;
+  min-width: 0;
+}
+.celebrityIdentity > div > span {
+  font-size: 11px;
+  color: var(--color-life-detail-12);
+}
+.celebrityIdentity h3 {
+  margin: 3px 0 0;
+  font-size: 21px;
+  line-height: 1.4;
+  color: var(--color-life-detail-1);
+  overflow-wrap: anywhere;
+}
+.celebrityEmblem {
+  width: 46px;
+  height: 50px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-life-detail-54);
+  background: var(--color-life-detail-55);
+  border-radius: 6px;
+}
+.celebrityCheck {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-life-detail-56);
+}
+.celebrityProperties {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 24px 0;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--color-life-detail-57);
+}
+.celebrityProperties > div {
+  min-width: 0;
+}
+.celebrityProperties > div > span:first-child {
+  font-size: 12px;
+  color: var(--color-life-detail-39);
+}
+.celebrityProperties b {
+  display: block;
+  color: var(--color-life-detail-14);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0 8px;
+}
+.celebrityMeter {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: var(--color-life-detail-58);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.celebrityMeter i {
+  display: block;
+  height: 100%;
+  background: var(--color-life-detail-59);
+}
+.celebrityTalentHeading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-accent-text);
+  font-size: 12px;
+}
+.celebrityTalentHeading small {
+  margin-left: auto;
+  color: var(--color-life-detail-12);
+  font-size: 11px;
+}
+.celebrityTalents {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: grid;
+  gap: 15px;
+}
+.celebrityTalents li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+.celebrityTalents li > div {
+  min-width: 0;
+}
+.celebrityTalents strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-life-detail-60);
+}
+.celebrityTalents p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--color-life-detail-61);
+  overflow-wrap: anywhere;
+}
+.celebrityGrade {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.celebrityFooter {
+  justify-content: space-between;
+}
+.celebrityFooter > span {
+  font-size: 13px;
+  color: var(--color-life-detail-12);
+}
+.celebrityFooter > span b {
+  margin-left: 8px;
+  color: var(--color-accent-text);
+}
+@media (max-width: 800px) {
+  .celebrityGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .celebrityCard {
+    padding: 20px;
+  }
+  .celebrityTalents {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 22px;
+  }
+}
+@media (max-width: 420px) {
+  .celebrityTalents {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.playPanel {
+  min-height: 78vh;
+  display: flex;
+  flex-direction: column;
+}
+.logs {
+  flex: 1;
+  min-height: 300px;
+  max-height: 58vh;
+  overflow: auto;
+  padding: 16px;
+  background: var(--color-life-detail-62);
+  color: var(--color-life-detail-63);
+  border-radius: 8px;
+}
+.logs article {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+  line-height: 1.55;
+}
+.logs article > b {
+  color: var(--color-accent);
+}
+.logs p {
+  margin: 0 0 5px;
+}
+.talentLog {
+  color: var(--color-life-detail-64);
+}
+.achievementLog {
+  color: var(--color-life-detail-65);
+}
+.logs .grade-0 {
+  color: var(--color-life-detail-66);
+}
+.logs .grade-1 {
+  color: var(--color-life-detail-67);
+}
+.logs .grade-2 {
+  color: var(--color-life-detail-68);
+}
+.logs .grade-3 {
+  color: var(--color-life-detail-64);
+}
+.playPanel > button {
+  align-self: center;
+  margin-top: 16px;
+}
+.playControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.playControls > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.playControls > button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.playbackModes {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+  padding: 3px;
+  margin: 0;
+  border: 1px solid var(--color-life-detail-32);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+.playbackModes label {
+  position: relative;
+  cursor: pointer;
+}
+.playbackModes input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.playbackModes span {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 5px;
+  line-height: 20px;
+  var(--color-surface)-space: nowrap;
+}
+.playbackModes input:checked + span {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.playbackModes input:focus-visible + span {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.playbackModes:disabled {
+  opacity: 0.45;
+}
+.playbackModes:disabled label {
+  cursor: not-allowed;
+}
+.muted {
+  color: var(--color-life-detail-3);
+}
+.achievementsPanel {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: 12px 0 28px;
+}
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  cursor: pointer;
+}
+.backButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+.collectionStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 26px 0;
+  gap: 24px;
+  border-bottom: 1px solid var(--color-life-detail-10);
+}
+.collectionStat {
+  min-width: 0;
+}
+.collectionStat > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-life-detail-69);
+}
+.collectionStat > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+}
+.collectionStat b {
+  font-size: 30px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-life-detail-1);
+}
+.collectionStat small {
+  font-size: 13px;
+  color: var(--color-life-detail-12);
+}
+.collectionStat:last-child svg,
+.collectionStat:last-child b {
+  color: var(--color-accent-text);
+}
+.collectionProgress {
+  margin: 20px 0 28px;
+}
+.collectionProgress > div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  font-size: 12px;
+  color: var(--color-life-detail-69);
+}
+.collectionProgress > div b {
+  color: var(--color-accent-text);
+}
+.collectionProgress progress {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--color-life-detail-70);
+}
+.collectionProgress progress::-webkit-progress-bar {
+  background: var(--color-life-detail-70);
+}
+.collectionProgress progress::-webkit-progress-value {
+  background: var(--color-accent);
+  border-radius: 3px;
+}
+.collectionProgress progress::-moz-progress-bar {
+  background: var(--color-accent);
+  border-radius: 3px;
+}
+.achievementToolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.achievementFilters {
+  display: flex;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  gap: 4px;
+}
+.achievementFilters label {
+  position: relative;
+  cursor: pointer;
+}
+.achievementFilters input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.achievementFilters span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  color: var(--color-life-detail-69);
+  var(--color-surface)-space: nowrap;
+}
+.achievementFilters b {
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.achievementFilters input:checked + span {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+.achievementFilters input:focus-visible + span {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.achievementSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 220px;
+  max-width: 100%;
+  padding: 8px 11px;
+  border: 1px solid var(--color-life-detail-53);
+  background: var(--color-surface);
+  border-radius: 6px;
+  color: var(--color-life-detail-12);
+}
+.achievementSearch input {
+  border: 0;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  font-size: 13px;
+  color: var(--color-life-detail-1);
+}
+.achievementSearch:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+.achievementResults {
+  margin: 16px 0 12px;
+  font-size: 12px;
+  color: var(--color-life-detail-12);
+}
+.achievementGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.achievementCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  min-width: 0;
+  min-height: 144px;
+  padding: 18px 16px;
+  border: 1px solid var(--color-life-detail-72);
+  border-radius: 8px;
+  background: var(--color-life-detail-73);
+  color: var(--color-life-detail-74);
+}
+.achievementIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--color-life-detail-57);
+  color: var(--color-life-detail-75);
+  border-radius: 8px;
+}
+.achievementBody {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+.achievementBody h3 {
+  margin: 1px 0 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--color-life-detail-76);
+  overflow-wrap: anywhere;
+}
+.achievementBody p {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--color-life-detail-74);
+  overflow-wrap: anywhere;
+}
+.achievementMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  font-size: 11px;
+}
+.achievementMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.achievementMeta span:last-child {
+  color: var(--color-life-detail-12);
+}
+.achievementCard.achievementUnlocked {
+  background: var(--color-surface);
+  border-color: var(--color-life-detail-77);
+}
+.achievementCard.achievementUnlocked .achievementIcon {
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.achievementCard.achievementUnlocked h3 {
+  color: var(--color-life-detail-1);
+}
+.achievementCard.achievementUnlocked .achievementMeta span:last-child {
+  color: var(--color-life-detail-78);
+}
+.achievementEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 56px 16px;
+  color: var(--color-life-detail-75);
+}
+.achievementEmpty h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-life-detail-69);
+}
+@media (max-width: 900px) {
+  .achievementGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .collectionStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
+    padding: 22px 0;
+  }
+  .collectionStat b {
+    font-size: 26px;
+  }
+  .achievementGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .achievementSearch {
+    width: 100%;
+  }
+  .achievementFilters {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .achievementFilters span {
+    padding: 9px 8px;
+  }
+  .achievementCard {
+    min-height: 128px;
+  }
+  .achievementsPanel .pickHeader {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+@media (max-width: 600px) {
+  .home h1 {
+    font-size: 30px;
+  }
+}
+@media (max-width: 600px) {
+  .container {
+    padding: 12px;
+  }
+  .homeStats {
+    flex-direction: column;
+  }
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .logs article {
+    grid-template-columns: 42px 1fr;
+    gap: 8px;
+  }
+}
+
+.container { min-height: 100%; background: var(--color-canvas); color: var(--color-text); }
+.container button { min-height: 44px; }
+.container input { font-size: 16px; }
+@media(max-width:760px) { .container { padding: 16px 12px max(24px, env(safe-area-inset-bottom)); } .home h1 { font-size: 30px; } }

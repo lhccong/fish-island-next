@@ -1,0 +1,1 @@
+export { LifeGame } from './LifeGame';

@@ -1,14 +1,12 @@
 import { MessageCircle } from 'lucide-react';
 import { Link } from 'react-router';
-import { WechatShell } from '@/shells/wechat';
-import { WorkspaceNavigation } from '@/app/components/WorkspaceNavigation';
+import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import styles from './ChatPlaceholderPage.module.css';
 
 export function ChatPlaceholderPage() {
   return (
-    <WechatShell
+    <WorkspaceLayout
       slots={{
-        navigation: <WorkspaceNavigation />,
         sidebar: (
           <div className={styles.sidebar}>
             <h2>聊天</h2>

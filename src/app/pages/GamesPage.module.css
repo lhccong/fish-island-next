@@ -1,0 +1,22 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 70px;
+  padding: var(--space-3) var(--space-5);
+}
+.header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+.header span {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .header {
+    min-height: 60px;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+  }
+}

@@ -12,10 +12,15 @@ describe('built-in skin contracts', () => {
         '--color-accent',
         '--color-accent-soft',
         '--color-accent-text',
+        '--color-canvas',
+        '--color-hover',
+        '--color-message-incoming',
         '--color-message-outgoing',
         '--color-rail',
+        '--color-rail-active',
         '--color-selected-muted',
         '--color-sidebar',
+        '--color-surface',
       ]);
       for (const color of Object.values(skin.tokens)) expect(color).toMatch(/^#[0-9a-f]{6}$/i);
     }

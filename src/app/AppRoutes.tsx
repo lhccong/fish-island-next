@@ -4,6 +4,12 @@ import { HotBoardPage } from '@/app/pages/HotBoardPage';
 import { RequireAuth } from '@/app/components/RequireAuth';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
+const GamesPage = lazy(() =>
+  import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
+);
+const FishCirclePage = lazy(() =>
+  import('@/app/pages/FishCirclePage').then((module) => ({ default: module.FishCirclePage })),
+);
 const LoginPage = lazy(() =>
   import('@/app/pages/LoginPage').then((module) => ({ default: module.LoginPage })),
 );
@@ -37,6 +43,7 @@ export function AppRoutes() {
         <Suspense fallback={<p role="status">正在打开页面…</p>}>
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
+            <Route path="/discover/games" element={<GamesPage />} />
             <Route
               path="/oauth2/authorize"
               element={
@@ -50,6 +57,14 @@ export function AppRoutes() {
               element={
                 <RequireAuth>
                   <ChatPlaceholderPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/moments/fish-circle"
+              element={
+                <RequireAuth>
+                  <FishCirclePage />
                 </RequireAuth>
               }
             />

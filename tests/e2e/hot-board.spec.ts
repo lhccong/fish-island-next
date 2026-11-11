@@ -85,7 +85,9 @@ test('fixed cards scroll internally and open a conversation with demo composer',
   await expect(zhihu).toHaveCount(0);
   await page.getByRole('button', { name: '全部', exact: true }).click();
   if (testInfo.project.name.startsWith('mobile')) {
+    await expect(page.getByRole('complementary', { name: '热榜来源', exact: true })).toBeHidden();
     const trigger = page.getByRole('button', { name: '热榜来源：全部热榜', exact: true });
+    await expect(page.getByRole('heading').filter({ has: trigger })).toBeVisible();
     await trigger.click();
     const picker = page.getByRole('dialog', { name: '选择热榜来源', exact: true });
     await expect(picker).toBeVisible();
@@ -95,6 +97,7 @@ test('fixed cards scroll internally and open a conversation with demo composer',
     await picker.getByRole('button', { name: '知乎热榜', exact: true }).click();
     await expect(picker).toHaveCount(0);
     const selectedTrigger = page.getByRole('button', { name: '热榜来源：知乎热榜', exact: true });
+    await expect(page.getByRole('heading').filter({ has: selectedTrigger })).toBeVisible();
     await expect(selectedTrigger).toBeFocused();
     await selectedTrigger.click();
     await expect(picker.getByRole('button', { name: '知乎热榜', exact: true })).toHaveAttribute(

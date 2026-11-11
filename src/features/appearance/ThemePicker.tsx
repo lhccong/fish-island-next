@@ -5,7 +5,7 @@ import { Dialog } from '@/shared/ui/Dialog';
 import { useAppearanceStore } from './model/appearance-store';
 import styles from './ThemePicker.module.css';
 
-export function ThemePicker() {
+export function ThemePicker({ presentation = 'rail' }: { presentation?: 'rail' | 'ribbon' }) {
   const [open, setOpen] = useState(false);
   const skinId = useAppearanceStore((state) => state.skinId);
   const setSkinId = useAppearanceStore((state) => state.setSkinId);
@@ -19,7 +19,13 @@ export function ThemePicker() {
       title="主题模式"
       description="选择后立即生效，刷新后保留。"
       trigger={
-        <button className={styles.trigger} type="button" aria-label="切换主题" title="切换主题">
+        <button
+          className={styles.trigger}
+          data-presentation={presentation}
+          type="button"
+          aria-label="切换主题"
+          title="切换主题"
+        >
           <Palette size={21} aria-hidden="true" />
           <span>主题</span>
         </button>

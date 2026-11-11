@@ -1,0 +1,137 @@
+.cover {
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-circle-cover);
+  border-radius: var(--radius-circle-card);
+  margin-bottom: var(--space-5);
+}
+.background {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 12%;
+  transform: translateY(-50%);
+  color: var(--color-circle-muted);
+  opacity: 0.18;
+}
+.shade {
+  position: absolute;
+  inset: 35% 0 0;
+  background: linear-gradient(transparent, var(--color-circle-cover-shade));
+  pointer-events: none;
+}
+.profile {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  left: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+.info {
+  min-width: 0;
+  text-align: right;
+}
+.info h2 {
+  color: var(--color-circle-card);
+  font-size: 20px;
+  margin: 0 0 var(--space-2);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 8px var(--color-circle-cover-shade);
+}
+.avatarButton {
+  display: block;
+  flex-shrink: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.back,
+.retry {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: 24px;
+  background: var(--color-circle-cover-control);
+  color: var(--color-circle-card);
+  cursor: pointer;
+  font-size: 13px;
+}
+.retry {
+  top: var(--space-4);
+  bottom: auto;
+  left: auto;
+  right: var(--space-4);
+  max-width: 48%;
+}
+.loading {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  font-size: 12px;
+  color: var(--color-circle-text);
+}
+.follow button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 24px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-circle-accent);
+  color: var(--color-circle-accent-text);
+  cursor: pointer;
+}
+.follow [role='alert'] {
+  display: block;
+  color: var(--color-circle-card);
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .cover {
+    height: 180px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-panel);
+  }
+  .profile {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+  }
+  .info h2 {
+    font-size: 18px;
+  }
+  .back {
+    top: var(--space-2);
+    left: var(--space-2);
+  }
+  .retry {
+    top: var(--space-2);
+    bottom: auto;
+    left: auto;
+    right: var(--space-2);
+    max-width: 48%;
+    font-size: 11px;
+  }
+  .loading {
+    top: var(--space-3);
+    right: var(--space-3);
+    max-width: 42%;
+  }
+}

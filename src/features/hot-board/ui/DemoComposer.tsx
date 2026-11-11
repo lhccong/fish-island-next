@@ -25,7 +25,7 @@ export function DemoComposer() {
           <Volume2 size={19} aria-hidden="true" />
         </button>
         <button className={styles.send} type="button" disabled>
-          发送
+          <span>发送</span>
         </button>
       </div>
     </section>

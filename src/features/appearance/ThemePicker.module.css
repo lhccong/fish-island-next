@@ -17,6 +17,17 @@
 .trigger:hover {
   background: var(--color-rail-active);
 }
+.trigger[data-presentation='ribbon'] {
+  width: 100%;
+  min-width: 44px;
+  max-width: 100%;
+  flex-direction: column;
+  color: var(--color-text);
+  font-size: 11px;
+}
+.trigger[data-presentation='ribbon'] > span {
+  display: inline;
+}
 .dialog {
   width: min(480px, calc(100% - 32px));
   padding: var(--space-5);
@@ -123,7 +134,7 @@
 .incoming {
   width: 58%;
   height: 12px;
-  background: var(--color-message-surface);
+  background: var(--color-message-incoming);
   border: 1px solid var(--color-border);
 }
 .outgoing {
@@ -136,7 +147,7 @@
   align-self: stretch;
   height: 9px;
   margin-top: auto;
-  background: var(--color-message-surface);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
 }
 .caption {
@@ -197,5 +208,8 @@
   .trigger {
     flex-direction: row;
     font-size: 12px;
+  }
+  .trigger > span {
+    display: none;
   }
 }

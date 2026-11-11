@@ -1,0 +1,207 @@
+.card {
+  position: relative;
+  padding: 20px;
+  margin-bottom: var(--space-4);
+  background: var(--color-circle-card);
+  border: 1px solid transparent;
+  border-radius: var(--radius-circle-card);
+  box-shadow: var(--shadow-circle-card);
+  color: var(--color-circle-text);
+  scroll-margin-top: var(--space-4);
+  min-width: 0;
+}
+.card[data-pinned='true'] {
+  border-color: var(--color-circle-pin-border);
+}
+.card:focus {
+  outline: 2px solid var(--color-circle-accent);
+  outline-offset: 2px;
+}
+.pin {
+  position: absolute;
+  right: -1px;
+  top: -1px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 0 var(--radius-circle-card) 0 var(--radius-circle-card);
+  background: var(--color-circle-accent);
+  color: var(--color-circle-card);
+}
+.author {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.author > div {
+  min-width: 0;
+}
+.avatar {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.name {
+  display: inline;
+  border: 0;
+  padding: 0;
+  min-height: 44px;
+  color: var(--color-circle-text);
+  font-weight: 600;
+  font-size: 14px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.private {
+  color: var(--color-circle-muted);
+  font-size: 11px;
+  margin-left: var(--space-2);
+}
+.body {
+  margin-left: 58px;
+  min-width: 0;
+}
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.85;
+  font-size: 14px;
+  margin: calc(-1 * var(--space-1)) 0 var(--space-3);
+}
+.body > button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--color-circle-author);
+  cursor: pointer;
+}
+.location {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 24px;
+  background: var(--color-circle-location);
+  color: var(--color-circle-location-text);
+  font-size: 12px;
+  margin: 0 0 var(--space-3);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.location svg {
+  flex-shrink: 0;
+}
+.likes {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  background: var(--color-circle-likes);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--color-circle-author);
+  margin: 0 0 var(--space-3);
+}
+.likes svg {
+  flex-shrink: 0;
+  margin-top: var(--space-1);
+  color: var(--color-circle-heart);
+}
+.likes span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  border-top: 1px dashed var(--color-circle-divider);
+  min-height: 44px;
+}
+.time {
+  color: var(--color-circle-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+.actions > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-circle-muted);
+  cursor: pointer;
+  border-radius: var(--radius-control);
+  font-size: 12px;
+}
+.actions > button[aria-pressed='true'] {
+  color: var(--color-circle-heart);
+}
+.actions > button:hover {
+  background: var(--color-circle-likes);
+}
+.actions > button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.meta {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.body [role='alert'] {
+  color: var(--color-danger);
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .card {
+    padding: var(--space-4);
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-panel);
+  }
+  .body {
+    margin-left: 0;
+  }
+  .author {
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .text {
+    margin-top: 0;
+  }
+  .actions {
+    gap: 0;
+  }
+  .time {
+    max-width: 45%;
+    font-size: 11px;
+  }
+  .footer {
+    margin-top: var(--space-2);
+  }
+}

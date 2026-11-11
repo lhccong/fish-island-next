@@ -1,4 +1,3 @@
-import { ArrowUpRight } from 'lucide-react';
 import type { HotSource } from '@/domain/hot-board';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import styles from './HotSourceConversation.module.css';
@@ -46,7 +45,6 @@ export function HotSourceConversation({ source }: { source: HotSource }) {
                     referrerPolicy="no-referrer"
                   >
                     {entry.title}
-                    <ArrowUpRight size={12} aria-hidden="true" />
                   </a>
                 ) : (
                   <p className={styles.title}>{entry.title}</p>

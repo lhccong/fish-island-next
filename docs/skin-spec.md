@@ -12,9 +12,15 @@
 
 ADR-008 新增 `wecom` 企业微信主题，工作台“主题”按钮与初始化页共享选择，刷新后恢复。企业微信主题复用微信工作台结构。
 
-内置配置完整提供 `--color-accent`、`--color-accent-soft`、`--color-accent-text`、`--color-selected-muted`、`--color-rail`、`--color-sidebar`、`--color-message-outgoing` 七个颜色 token。第三方导入仍只开放前两个，其他字段只用于受信任的内置配置。
+ADR-013 新增 `wps`（WPS 表格）内置主题，参考 WPS 表格的浅灰导航、白色工作区和绿色强调色，提供完整十二个 token。复用现有主题预览、选择和持久化流程及响应式工作台，不增加表格编辑能力或新的 shellId。
+
+ADR-016 根据后续需求新增独立 `wps` shellId；app 目前将选择 wps 主题显式映射至该外壳，其余主题映射至微信工作台。受信任的组合规则不属于皮肤 token 权限。共用布局组件接收 `navigationLayout="ribbon"`，导航占据顶端，现有业务 slots 和草稿保持挂载。聊天、热榜、鱼小圈在文档标签行各占一个路由标签，白底与 aria-current 标识当前页；工具区不重复这些入口。手机隐藏次要办公示意，保留可触达的顶部标签、账号与主题入口。装饰工具不提供虚假的编辑能力。
+
+内置配置完整提供 `--color-accent`、`--color-accent-soft`、`--color-accent-text`、`--color-selected-muted`、`--color-rail`、`--color-sidebar`、`--color-message-outgoing`，以及 ADR-011 新增的 `--color-message-incoming`、`--color-rail-active`、`--color-hover`、`--color-canvas`、`--color-surface`，共十二个颜色 token。全部为六位十六进制颜色，默认值与微信主题一致；主题预览和实际界面使用同一组变量。第三方导入仍只开放前两个，其他字段只用于受信任的内置配置。
 
 ## 2. 第一版导入包设计
+
+ADR-017 的 WPS 热榜为 app 显式注入的 table 呈现变体，不由皮肤配置操作业务。采用现有白底、灰色边框、绿色标签变量复现多维表格；手机将来源移入标题单元格，隐藏次要列。主题入口在工具栏内预留至少 60px，控件不超出容器。
 
 第一阶段只导入声明式文件，不执行 JavaScript、不接收任意 HTML 或 CSS。ZIP 解包依赖在导入功能实施时经 ADR 选择。
 
@@ -49,7 +55,9 @@ tokens.json v1 示例：
 }
 ```
 
-现阶段第三方可导入白名单只有上述两个颜色 token；内置配置使用 ADR-008 规定的七个颜色变量。global.css 中的外壳、状态色、--color-selected-muted、--color-accent-text、--color-divider 等是工作台默认设计变量，当前不对导入包开放。微信参考配色：导航 #dfdfdf、来源列表 #e8e8e8、内容 #fafafa、选中行 #10b46c。选中行文字使用 on-accent/selected-muted，普通链接使用更深的 accent-text 保持可读。后续开放画布、文字、气泡、间距等变量时，必须同步类型、schema、边界值、默认值、兼容说明和测试；不能直接放行所有 CSS 变量。
+现阶段第三方可导入白名单只有上述两个颜色 token；内置配置使用 ADR-008 与 ADR-011 规定的十二个颜色变量。global.css 中的外壳、状态色、--color-selected-muted、--color-accent-text、--color-divider 等是工作台默认设计变量，当前不对导入包开放。微信参考配色：导航 #dfdfdf、来源列表 #e8e8e8、内容 #fafafa、选中行 #10b46c。选中行文字使用 on-accent/selected-muted，普通链接使用更深的 accent-text 保持可读。后续开放画布、文字、气泡、间距等变量时，必须同步类型、schema、边界值、默认值、兼容说明和测试；不能直接放行所有 CSS 变量。
+
+ADR-012 的鱼小圈右侧使用默认 `--color-circle-*`、`--shadow-circle-*` 与 `--radius-circle-*`，保留旧版白卡、浅灰底、蓝灰文字、暖橙置顶和发布按钮；封面读取账号图片。ADR-015 仅改变左侧发现栏，选中行使用当前主题 accent/on-accent；不改变右侧局部配色，不扩大第三方导入白名单。
 
 ## 3. 校验与生命周期（导入实现时必须满足）
 

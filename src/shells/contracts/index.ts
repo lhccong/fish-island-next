@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type ShellId = 'wechat' | 'feishu' | 'dingtalk';
+export type ShellId = 'wechat' | 'feishu' | 'dingtalk' | 'wps';
 
 export interface ChatShellSlots {
   navigation: ReactNode;

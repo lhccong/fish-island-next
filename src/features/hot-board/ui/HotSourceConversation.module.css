@@ -51,11 +51,6 @@
   text-decoration: none;
   overflow-wrap: anywhere;
 }
-.title svg {
-  margin-left: var(--space-1);
-  vertical-align: middle;
-  color: var(--color-muted);
-}
 .title:hover {
   color: var(--color-accent-text);
 }

@@ -1,0 +1,39 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-circle-muted);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+.trigger:hover {
+  background: var(--color-circle-likes);
+}
+.menu {
+  display: grid;
+  gap: var(--space-2);
+}
+.menu button {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--color-circle-text);
+  background: var(--color-circle-likes);
+  cursor: pointer;
+  text-align: left;
+}
+.menu button:hover {
+  background: var(--color-accent-soft);
+}
+.menu .danger {
+  color: var(--color-danger);
+}

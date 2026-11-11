@@ -1,11 +1,13 @@
 import { ArrowLeft, MessageCircle, MoreHorizontal, Phone } from 'lucide-react';
+import type { ReactNode } from 'react';
 import styles from './HotBoardHeader.module.css';
 
 interface HotBoardHeaderProps {
   title: string;
   onBack: (() => void) | null;
+  sourcePicker: ReactNode;
 }
-export function HotBoardHeader({ title, onBack }: HotBoardHeaderProps) {
+export function HotBoardHeader({ title, onBack, sourcePicker }: HotBoardHeaderProps) {
   return (
     <div className={styles.header}>
       <div className={styles.title}>
@@ -14,7 +16,8 @@ export function HotBoardHeader({ title, onBack }: HotBoardHeaderProps) {
             <ArrowLeft size={19} aria-hidden="true" />
           </button>
         )}
-        <h1>{title}</h1>
+        <h1 className={styles.desktopTitle}>{title}</h1>
+        <h1 className={styles.mobileTitle}>{sourcePicker}</h1>
       </div>
       {onBack ? (
         <div className={styles.actions} aria-label="会话工具（演示）">

@@ -1,4 +1,4 @@
-import { useRef, type ReactElement, type ReactNode } from 'react';
+import { useRef, type ReactElement, type ReactNode, type RefObject } from 'react';
 import { X } from 'lucide-react';
 import * as Primitive from '@radix-ui/react-dialog';
 import { Button } from '@/shared/ui/Button';
@@ -6,6 +6,7 @@ import styles from './Dialog.module.css';
 
 interface DialogProps {
   trigger?: ReactElement;
+  returnFocusRef?: RefObject<HTMLElement | null>;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   showCloseAction?: boolean;
@@ -19,6 +20,7 @@ interface DialogProps {
 
 export function Dialog({
   trigger,
+  returnFocusRef,
   title,
   description,
   children,
@@ -45,9 +47,10 @@ export function Dialog({
               document.activeElement instanceof HTMLElement ? document.activeElement : null;
           }}
           onCloseAutoFocus={(event) => {
-            if (!trigger && returnFocus.current?.isConnected) {
+            const target = returnFocusRef?.current ?? (!trigger ? returnFocus.current : null);
+            if (target?.isConnected) {
               event.preventDefault();
-              returnFocus.current.focus();
+              target.focus();
             }
           }}
         >

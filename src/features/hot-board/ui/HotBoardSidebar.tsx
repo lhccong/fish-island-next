@@ -3,7 +3,6 @@ import { Flame, Search } from 'lucide-react';
 import type { HotSource } from '@/domain/hot-board';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
-import { MobileSourcePicker } from './MobileSourcePicker';
 import styles from './HotBoardSidebar.module.css';
 
 interface HotBoardSidebarProps {
@@ -33,15 +32,6 @@ export function HotBoardSidebar({ sources, selectedId, onSelect, loading }: HotB
           onChange={(event) => setQuery(event.target.value)}
         />
       </label>
-      <div className={styles.mobileSelect}>
-        <span>热榜来源</span>
-        <MobileSourcePicker
-          sources={sources}
-          selectedId={selectedId}
-          onSelect={onSelect}
-          loading={loading}
-        />
-      </div>
       <ScrollArea className={styles.listContainer ?? ''} label="热榜来源滚动区">
         <nav className={styles.list} aria-label="选择热榜来源">
           <button

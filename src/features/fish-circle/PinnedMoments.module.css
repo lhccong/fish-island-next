@@ -1,0 +1,115 @@
+.desktop,
+.mobile {
+  background: var(--color-circle-card);
+  border-radius: var(--radius-circle-card);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-circle-card);
+}
+.desktop {
+  grid-column: 2;
+  grid-row: 1;
+  position: sticky;
+  top: var(--space-5);
+}
+.desktop h2,
+.mobile summary {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 14px;
+  color: var(--color-circle-text);
+}
+.desktop h2 {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-circle-divider);
+}
+.desktop h2 svg,
+.mobile summary svg {
+  color: var(--color-circle-accent);
+}
+.desktop h2 span,
+.mobile summary span {
+  margin-left: auto;
+  color: var(--color-circle-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+.list button {
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 60px;
+  border: 0;
+  background: transparent;
+  color: var(--color-circle-text);
+  padding: var(--space-4) 0 0;
+  text-align: left;
+  cursor: pointer;
+}
+.list button:hover {
+  color: var(--color-circle-author);
+}
+.copy {
+  min-width: 0;
+  flex: 1;
+}
+.author {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.author time {
+  flex-shrink: 0;
+  color: var(--color-circle-muted);
+  font-size: 10px;
+}
+.excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: var(--space-1);
+  overflow-wrap: anywhere;
+}
+.empty {
+  color: var(--color-circle-muted);
+  font-size: 12px;
+  margin-bottom: 0;
+}
+.mobile {
+  display: none;
+}
+@media (max-width: 1180px) {
+  .desktop {
+    display: none;
+  }
+  .mobile {
+    display: block;
+    margin-bottom: var(--space-3);
+    padding: 0 var(--space-4);
+  }
+  .mobile summary {
+    min-height: 48px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .mobile summary::after {
+    content: '+';
+    color: var(--color-circle-muted);
+    font-size: 18px;
+  }
+  .mobile[open] summary::after {
+    content: '−';
+  }
+  .mobile[open] {
+    padding-bottom: var(--space-4);
+  }
+  .mobile summary::-webkit-details-marker {
+    display: none;
+  }
+}

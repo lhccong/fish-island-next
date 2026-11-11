@@ -47,11 +47,6 @@ export function MobileSourcePicker({
           className={styles.trigger}
           aria-label={`热榜来源：${selected?.name ?? '全部热榜'}`}
         >
-          {selected ? (
-            <SourceAvatar name={selected.name} src={selected.iconUrl} />
-          ) : (
-            <Flame size={19} aria-hidden="true" />
-          )}
           <span>{selected?.name ?? '全部热榜'}</span>
           <ChevronDown size={16} aria-hidden="true" />
         </button>
