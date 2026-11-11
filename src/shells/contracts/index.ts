@@ -15,3 +15,12 @@ export interface ChatShellSlots {
 export interface ChatShellProps {
   slots: ChatShellSlots;
 }
+
+export interface WorkspaceShellSlots {
+  footer?: ReactNode;
+  contentKey?: string;
+  navigation: ReactNode;
+  sidebar: ReactNode;
+  header: ReactNode;
+  content: ReactNode;
+}

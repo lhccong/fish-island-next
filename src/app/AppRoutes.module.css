@@ -1,0 +1,10 @@
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 81;
+  display: grid;
+  place-items: center;
+  background: var(--color-overlay);
+  color: var(--color-on-accent);
+  font-size: 14px;
+}

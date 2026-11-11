@@ -1,0 +1,201 @@
+.trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-rail-text);
+  font-size: 10px;
+  cursor: pointer;
+}
+.trigger:hover {
+  background: var(--color-rail-active);
+}
+.dialog {
+  width: min(480px, calc(100% - 32px));
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-panel) + var(--space-2));
+  background: var(--color-message-surface);
+}
+.dialog > h2 {
+  margin: 0 var(--space-6) var(--space-2) 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.dialog > p {
+  margin: 0;
+  font-size: 13px;
+}
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-block: var(--space-5);
+}
+.option {
+  display: block;
+  min-width: 0;
+  min-height: 48px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-message-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+.option:hover {
+  border-color: var(--color-accent);
+  background: var(--color-canvas);
+}
+.option[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+.preview {
+  display: grid;
+  grid-template-columns: 16px 35px minmax(0, 1fr);
+  height: 82px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-control) - 2px);
+  background: var(--color-canvas);
+  pointer-events: none;
+}
+.preview i {
+  display: block;
+  border-radius: 2px;
+}
+.previewRail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding-top: 9px;
+  background: var(--color-rail);
+}
+.previewRail i {
+  width: 6px;
+  height: 6px;
+  background: var(--color-message-surface);
+}
+.previewRail i:first-child {
+  background: var(--color-accent);
+}
+.previewSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 5px;
+  background: var(--color-sidebar);
+}
+.previewSidebar i {
+  height: 5px;
+  background: var(--color-message-surface);
+}
+.previewSidebar i:nth-child(2) {
+  background: var(--color-accent);
+}
+.previewChat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 8px 6px;
+}
+.previewHeading {
+  width: 45%;
+  height: 4px;
+  background: var(--color-border);
+}
+.incoming {
+  width: 58%;
+  height: 12px;
+  background: var(--color-message-surface);
+  border: 1px solid var(--color-border);
+}
+.outgoing {
+  align-self: flex-end;
+  width: 65%;
+  height: 12px;
+  background: var(--color-message-outgoing);
+}
+.previewInput {
+  align-self: stretch;
+  height: 9px;
+  margin-top: auto;
+  background: var(--color-message-surface);
+  border: 1px solid var(--color-border);
+}
+.caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-1) var(--space-1);
+  font-size: 13px;
+  font-weight: 500;
+}
+.selection {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+}
+.option[aria-pressed='true'] .selection {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+.footer > span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.close {
+  min-height: 44px;
+  min-width: 80px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 500;
+  cursor: pointer;
+}
+.close:hover {
+  background: var(--color-accent-text);
+}
+@media (max-width: 760px) {
+  .dialog {
+    padding: var(--space-5) var(--space-4) var(--space-4);
+  }
+  .trigger {
+    flex-direction: row;
+    font-size: 12px;
+  }
+}

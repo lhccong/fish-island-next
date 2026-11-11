@@ -1,0 +1,133 @@
+.conversation {
+  width: 100%;
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+.timestamp {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  margin-bottom: var(--space-5);
+}
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.messageBody {
+  min-width: 0;
+  max-width: min(620px, 75%);
+  padding-top: var(--space-1);
+}
+.bubble {
+  position: relative;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 6px;
+  background: var(--color-message-incoming);
+}
+.bubble::before {
+  position: absolute;
+  top: 12px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  content: '';
+  background: inherit;
+  transform: rotate(45deg);
+}
+.title {
+  display: block;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.title svg {
+  margin-left: var(--space-1);
+  vertical-align: middle;
+  color: var(--color-muted);
+}
+.title:hover {
+  color: var(--color-accent-text);
+}
+.rank {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.end {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 11px;
+  margin: var(--space-5) 0 0;
+}
+.outgoing {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.outgoing > div {
+  max-width: 75%;
+  text-align: right;
+}
+.demo {
+  display: block;
+  color: var(--color-muted);
+  font-size: 10px;
+  margin-bottom: var(--space-1);
+}
+.outgoing p {
+  position: relative;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-message-outgoing);
+  color: var(--color-text);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: left;
+}
+.outgoing p::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 12px;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.myAvatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-control);
+  background: var(--color-sidebar);
+  color: var(--color-muted);
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .conversation {
+    padding: var(--space-4) var(--space-3);
+  }
+  .message {
+    gap: var(--space-2);
+  }
+  .messageBody {
+    max-width: calc(100% - 48px);
+  }
+  .title {
+    padding: var(--space-1) 0;
+  }
+}

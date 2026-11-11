@@ -8,7 +8,15 @@ describe('built-in skin contracts', () => {
   });
   it('gives every skin the supported token set and valid hex colors', () => {
     for (const skin of builtinSkins) {
-      expect(Object.keys(skin.tokens).sort()).toEqual(['--color-accent', '--color-accent-soft']);
+      expect(Object.keys(skin.tokens).sort()).toEqual([
+        '--color-accent',
+        '--color-accent-soft',
+        '--color-accent-text',
+        '--color-message-outgoing',
+        '--color-rail',
+        '--color-selected-muted',
+        '--color-sidebar',
+      ]);
       for (const color of Object.values(skin.tokens)) expect(color).toMatch(/^#[0-9a-f]{6}$/i);
     }
   });

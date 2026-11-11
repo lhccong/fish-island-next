@@ -1,0 +1,1 @@
+export { SourceAvatar } from './SourceAvatar';

@@ -1,0 +1,1 @@
+export { createHotBoardClient } from './client';

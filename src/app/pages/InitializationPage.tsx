@@ -12,7 +12,11 @@ const foundations = [
     title: '可扩展的外观',
     description: '配色预览已就绪，完整外壳与皮肤导入待实现。',
   },
-  { icon: Radio, title: '独立的实时通信', description: '后端尚未接入，后续按统一协议边界开发。' },
+  {
+    icon: Radio,
+    title: '独立的实时通信',
+    description: '热榜已接通，聊天服务将按统一协议边界接入。',
+  },
 ];
 
 export function InitializationPage() {

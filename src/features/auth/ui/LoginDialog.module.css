@@ -1,0 +1,41 @@
+.modal {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: var(--space-7) var(--space-8) var(--space-6);
+  background: var(--color-surface);
+}
+.logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-3);
+  object-fit: contain;
+}
+.modal > h2 {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+}
+.modal > p {
+  text-align: center;
+  margin: 0 0 var(--space-5);
+  font-size: 14px;
+}
+.tab {
+  width: max-content;
+  margin: 0 auto var(--space-5);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 2px solid var(--color-accent);
+  color: var(--color-accent-text);
+  font-size: 14px;
+}
+@media (max-width: 760px) {
+  .modal {
+    padding: var(--space-7) var(--space-5) var(--space-5);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
+  }
+  .modal > h2 {
+    font-size: 27px;
+  }
+}

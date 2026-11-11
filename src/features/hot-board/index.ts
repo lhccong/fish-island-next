@@ -1,0 +1,1 @@
+export { HotBoardWorkspace } from './HotBoardWorkspace';

@@ -1,6 +1,6 @@
 # 外壳与皮肤协议
 
-状态：基础配色预览已实现；完整协议、导入器和三套外壳待实现。不得混淆。
+状态：基础配色和微信工作台外壳已实现；完整聊天外壳、导入器和其他平台布局待实现。
 
 ## 1. 两个独立维度
 
@@ -8,7 +8,11 @@
 - skinId 决定 token、字体、背景和图标资源。
 - 外壳支持的区域：navigation、conversations、header、messages、composer、auxiliary。
 - app 组合功能区域并传入外壳 slots；皮肤选择不持有消息，不建立连接，不触发历史重取。
-- 当前初始化页的三个 ID 只是颜色预览；真正接入外壳时新增独立 shellId，不能让相同名称隐式绑定布局。
+- 当前内置 ID 决定配色；真正接入外壳时新增独立 shellId，不能让相同名称隐式绑定布局。
+
+ADR-008 新增 `wecom` 企业微信主题，工作台“主题”按钮与初始化页共享选择，刷新后恢复。企业微信主题复用微信工作台结构。
+
+内置配置完整提供 `--color-accent`、`--color-accent-soft`、`--color-accent-text`、`--color-selected-muted`、`--color-rail`、`--color-sidebar`、`--color-message-outgoing` 七个颜色 token。第三方导入仍只开放前两个，其他字段只用于受信任的内置配置。
 
 ## 2. 第一版导入包设计
 
@@ -40,12 +44,12 @@ tokens.json v1 示例：
 
 ```json
 {
-  "--color-accent": "#087d51",
-  "--color-accent-soft": "#e6f4ec"
+  "--color-accent": "#10b46c",
+  "--color-accent-soft": "#e9f5ee"
 }
 ```
 
-现阶段白名单只有上述两个颜色 token，内置配置同样遵守。后续开放画布、文字、气泡、间距等变量时，必须同步类型、schema、边界值、默认值、兼容说明和测试；不能直接放行所有 CSS 变量。
+现阶段第三方可导入白名单只有上述两个颜色 token；内置配置使用 ADR-008 规定的七个颜色变量。global.css 中的外壳、状态色、--color-selected-muted、--color-accent-text、--color-divider 等是工作台默认设计变量，当前不对导入包开放。微信参考配色：导航 #dfdfdf、来源列表 #e8e8e8、内容 #fafafa、选中行 #10b46c。选中行文字使用 on-accent/selected-muted，普通链接使用更深的 accent-text 保持可读。后续开放画布、文字、气泡、间距等变量时，必须同步类型、schema、边界值、默认值、兼容说明和测试；不能直接放行所有 CSS 变量。
 
 ## 3. 校验与生命周期（导入实现时必须满足）
 
@@ -58,6 +62,14 @@ tokens.json v1 示例：
 7. 缺失可选 token 使用默认值；未知 schemaVersion 或不兼容外壳给出明确反馈，不能静默部分应用。
 
 ## 4. 设计与兼容验收
+
+ADR-009 的独立 SSO 页使用默认 `--color-sso-*` 与 `--shadow-sso-*` 语义变量复现旧版灰色点阵、白卡片与黑色主按钮，不随工作台主题变色；暂不开放第三方皮肤导入。
+
+旧热榜总览的颜色统一使用 --color-hot-*，阴影使用 --shadow-hot-card/--shadow-hot-tab。这些局部表现变量用于复刻旧模块，不修改微信外壳配色，也暂不开放第三方导入。
+
+按用户后续调整，分类选中态采用 accent-soft 背景与 accent-text 文字；hot-ribbon 引用 accent，hot-ribbon-fold 和 hot-link 引用 accent-text。旧模块蓝色缎带与橙色选中态已改为微信主题色。
+
+只读热榜消息使用 --color-message-surface，滚动滑块使用 --color-scrollbar/--color-scrollbar-hover；这些是默认设计变量，暂不属于导入包白名单。
 
 - 覆盖普通文字、链接、选中、禁用、聚焦、失败、未读、图片占位等状态。
 - 皮肤无法改变业务权限、请求地址、消息内容或连接行为。
