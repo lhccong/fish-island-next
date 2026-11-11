@@ -1,0 +1,59 @@
+:root {
+  font-family: Inter, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  color: var(--color-text);
+  background: var(--color-canvas);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --color-canvas: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-text: #172d36;
+  --color-muted: #596b75;
+  --color-border: #dce4e7;
+  --color-accent: #087d51;
+  --color-accent-soft: #e6f4ec;
+  --color-on-accent: #ffffff;
+  --color-overlay: rgb(16 30 39 / 45%);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-control: 10px;
+  --radius-panel: 24px;
+  --shadow-panel: 0 20px 70px rgb(26 48 57 / 7%);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+a {
+  color: inherit;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

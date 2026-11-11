@@ -1,0 +1,26 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+}
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(540px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  padding: var(--space-6);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+}
+.title {
+  margin-top: 0;
+}
+.description {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--color-muted);
+}
