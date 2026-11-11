@@ -7,6 +7,9 @@ import styles from './AppRoutes.module.css';
 const GamesPage = lazy(() =>
   import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
 );
+const LifeGamePage = lazy(() =>
+  import('@/app/pages/LifeGamePage').then((module) => ({ default: module.LifeGamePage })),
+);
 const FishCirclePage = lazy(() =>
   import('@/app/pages/FishCirclePage').then((module) => ({ default: module.FishCirclePage })),
 );
@@ -44,6 +47,7 @@ export function AppRoutes() {
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
             <Route path="/discover/games" element={<GamesPage />} />
+            <Route path="/game/life" element={<LifeGamePage />} />
             <Route
               path="/oauth2/authorize"
               element={

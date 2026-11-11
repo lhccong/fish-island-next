@@ -13,4 +13,5 @@ export const judge = (key: string, value: number) => {
   return 0;
 };
 
-export const judgeGradeByValue = (key: string, value: number) => Math.min(3, Math.floor(judge(key, value) / 2));
+export const judgeGradeByValue = (key: string, value: number) =>
+  Math.min(3, Math.floor(judge(key, value) / 2));

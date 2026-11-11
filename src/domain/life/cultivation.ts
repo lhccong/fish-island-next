@@ -4,9 +4,12 @@ import type { Allocation, GameState, ProfileState } from './core.state';
 import { trigger as unlockAchievements } from './core.achievement';
 import { AchievementOpportunity } from './data.achievement.types';
 import { pickWeight, random, shuffle, type RNG } from './vitex';
-import { cultivationEvents, cultivationEventPool, formatCultivationEvent, type CultivationEventKind } from './cultivation.event';
-
-
+import {
+  cultivationEvents,
+  cultivationEventPool,
+  formatCultivationEvent,
+  type CultivationEventKind,
+} from './cultivation.event';
 
 interface Realm {
   name: string;
@@ -44,7 +47,11 @@ export const roots = [
 ] as const;
 
 export const cultivationProperties: Record<keyof Allocation, string> = {
-  charm: '机缘', intelligence: '悟性', strength: '根骨', money: '家资', spirit: '心性',
+  charm: '机缘',
+  intelligence: '悟性',
+  strength: '根骨',
+  money: '家资',
+  spirit: '心性',
 };
 
 interface CultivationTalent {
@@ -65,16 +72,57 @@ export const cultivationTalents: readonly CultivationTalent[] = [
   { id: 4, name: '仙缘眷顾', description: '机缘 +3', grade: 2, effect: { charm: 3 } },
   { id: 5, name: '修仙世家', description: '家资 +3', grade: 2, effect: { money: 3 } },
   { id: 6, name: '苦修之士', description: '修炼速度 +20%', grade: 1, training: 0.2 },
-  { id: 7, name: '丹道入门', description: '修炼速度 +10%，家资 +1', grade: 1, training: 0.1, effect: { money: 1 } },
+  {
+    id: 7,
+    name: '丹道入门',
+    description: '修炼速度 +10%，家资 +1',
+    grade: 1,
+    training: 0.1,
+    effect: { money: 1 },
+  },
   { id: 8, name: '阵法传承', description: '渡劫成功率 +10%', grade: 2, protection: 10 },
-  { id: 9, name: '剑心通明', description: '突破成功率 +8%，心性 +1', grade: 2, breakthrough: 8, effect: { spirit: 1 } },
+  {
+    id: 9,
+    name: '剑心通明',
+    description: '突破成功率 +8%，心性 +1',
+    grade: 2,
+    breakthrough: 8,
+    effect: { spirit: 1 },
+  },
   { id: 10, name: '长春功', description: '有限寿元阶段，寿元上限 +30 年', grade: 1, lifespan: 30 },
-  { id: 11, name: '散修出身', description: '根骨 +1，心性 +1', grade: 0, effect: { strength: 1, spirit: 1 } },
+  {
+    id: 11,
+    name: '散修出身',
+    description: '根骨 +1，心性 +1',
+    grade: 0,
+    effect: { strength: 1, spirit: 1 },
+  },
   { id: 12, name: '灵药亲和', description: '修炼速度 +15%', grade: 1, training: 0.15 },
-  { id: 13, name: '大器晚成', description: '有限寿元阶段，寿元上限 +20 年；悟性 +1', grade: 1, lifespan: 20, effect: { intelligence: 1 } },
-  { id: 14, name: '福缘深厚', description: '机缘 +2，渡劫成功率 +5%', grade: 2, protection: 5, effect: { charm: 2 } },
+  {
+    id: 13,
+    name: '大器晚成',
+    description: '有限寿元阶段，寿元上限 +20 年；悟性 +1',
+    grade: 1,
+    lifespan: 20,
+    effect: { intelligence: 1 },
+  },
+  {
+    id: 14,
+    name: '福缘深厚',
+    description: '机缘 +2，渡劫成功率 +5%',
+    grade: 2,
+    protection: 5,
+    effect: { charm: 2 },
+  },
   { id: 15, name: '道心坚固', description: '突破成功率 +12%', grade: 3, breakthrough: 12 },
-  { id: 16, name: '五行通感', description: '修炼速度 +25%，悟性 +1', grade: 3, training: 0.25, effect: { intelligence: 1 } },
+  {
+    id: 16,
+    name: '五行通感',
+    description: '修炼速度 +25%，悟性 +1',
+    grade: 3,
+    training: 0.25,
+    effect: { intelligence: 1 },
+  },
 ];
 
 export interface CultivationState {
@@ -104,14 +152,21 @@ export interface CultivationResult {
   achievements: number[];
 }
 export const endingNames = {
-  lifespan: '寿元耗尽', tribulation: '陨落天劫', encounter: '仙途陨落', dao: '证道永恒', seclusion: '归隐山海',
+  lifespan: '寿元耗尽',
+  tribulation: '陨落天劫',
+  encounter: '仙途陨落',
+  dao: '证道永恒',
+  seclusion: '归隐山海',
 };
 
 export function drawCultivationTalents(rng?: RNG) {
-  return shuffle(cultivationTalents.map(talent => talent.id), rng).slice(0, 10);
+  return shuffle(
+    cultivationTalents.map((talent) => talent.id),
+    rng,
+  ).slice(0, 10);
 }
 function selectedTalents(state: CultivationGame) {
-  return cultivationTalents.filter(talent => state.cultivation.talents.includes(talent.id));
+  return cultivationTalents.filter((talent) => state.cultivation.talents.includes(talent.id));
 }
 export function realmLabel(state: CultivationState) {
   const realm = realms[state.realm]!;
@@ -121,7 +176,9 @@ export function realmLabel(state: CultivationState) {
 }
 export function lifespan(state: CultivationGame) {
   const base = realms[state.cultivation.realm]!.lifespan;
-  return base === null ? null : base + selectedTalents(state).reduce((sum, talent) => sum + (talent.lifespan || 0), 0);
+  return base === null
+    ? null
+    : base + selectedTalents(state).reduce((sum, talent) => sum + (talent.lifespan || 0), 0);
 }
 export function requiredProgress(state: CultivationState) {
   return Math.ceil(realms[state.realm]!.required * (1 + state.stage * 0.04));
@@ -129,15 +186,39 @@ export function requiredProgress(state: CultivationState) {
 export function breakthroughChance(state: CultivationGame) {
   const { intelligence, spirit, money } = state.props.current;
   const bonus = selectedTalents(state).reduce((sum, talent) => sum + (talent.breakthrough || 0), 0);
-  return Math.max(25, Math.min(95, Math.round(49 + intelligence * 1.1 + spirit + money * 0.4 + bonus + state.cultivation.failures * 7)));
+  return Math.max(
+    25,
+    Math.min(
+      95,
+      Math.round(
+        49 + intelligence * 1.1 + spirit + money * 0.4 + bonus + state.cultivation.failures * 7,
+      ),
+    ),
+  );
 }
 function tribulationChance(state: CultivationGame) {
   const { strength, spirit } = state.props.current;
-  return Math.max(40, Math.min(97, Math.round(72 + strength * 0.8 + spirit * 0.6 +
-    selectedTalents(state).reduce((sum, talent) => sum + (talent.protection || 0), 0))));
+  return Math.max(
+    40,
+    Math.min(
+      97,
+      Math.round(
+        72 +
+          strength * 0.8 +
+          spirit * 0.6 +
+          selectedTalents(state).reduce((sum, talent) => sum + (talent.protection || 0), 0),
+      ),
+    ),
+  );
 }
-function finalize(state: CultivationGame, profile: ProfileState, logs: CultivationLog[]): CultivationResult {
-  const result = unlockAchievements(AchievementOpportunity.Trajectory, state, profile, id => cultivationEvents.has(id));
+function finalize(
+  state: CultivationGame,
+  profile: ProfileState,
+  logs: CultivationLog[],
+): CultivationResult {
+  const result = unlockAchievements(AchievementOpportunity.Trajectory, state, profile, (id) =>
+    cultivationEvents.has(id),
+  );
   return { state: result.state as CultivationGame, logs, achievements: result.triggers };
 }
 export function startCultivation(
@@ -147,27 +228,56 @@ export function startCultivation(
   rng?: RNG,
 ): CultivationResult {
   const values = Object.values(allocation);
-  if (values.length !== 5 || values.some(value => !Number.isInteger(value) || value < 0 || value > 10) ||
-      values.reduce((sum, value) => sum + value, 0) !== 20) throw new Error('Invalid cultivation allocation');
-  if (talentIds.length !== 3 || new Set(talentIds).size !== 3 ||
-      talentIds.some(id => !cultivationTalents.some(talent => talent.id === id))) throw new Error('Invalid cultivation talents');
-  const root = pickWeight(roots.map((item, index) => [index, item.weight] as [number, number]), rng) ?? 0;
+  if (
+    values.length !== 5 ||
+    values.some((value) => !Number.isInteger(value) || value < 0 || value > 10) ||
+    values.reduce((sum, value) => sum + value, 0) !== 20
+  )
+    throw new Error('Invalid cultivation allocation');
+  if (
+    talentIds.length !== 3 ||
+    new Set(talentIds).size !== 3 ||
+    talentIds.some((id) => !cultivationTalents.some((talent) => talent.id === id))
+  )
+    throw new Error('Invalid cultivation talents');
+  const root =
+    pickWeight(
+      roots.map((item, index) => [index, item.weight] as [number, number]),
+      rng,
+    ) ?? 0;
   let state: CultivationGame = {
     ...createState(allocation),
-    cultivation: { realm: 0, stage: 0, root, progress: 0, failures: 0, tribulations: 0, nextTribulation: null, turns: 0, talents: [...talentIds] },
+    cultivation: {
+      realm: 0,
+      stage: 0,
+      root,
+      progress: 0,
+      failures: 0,
+      tribulations: 0,
+      nextTribulation: null,
+      turns: 0,
+      talents: [...talentIds],
+    },
   };
-  state = produce(state, draft => {
+  state = produce(state, (draft) => {
     draft.props = propsEffect(draft.props, { age: 1 });
-    for (const talent of selectedTalents(state)) draft.props = propsEffect(draft.props, talent.effect || {});
+    for (const talent of selectedTalents(state))
+      draft.props = propsEffect(draft.props, talent.effect || {});
     draft.events.add(910000);
   });
-  return finalize(state, profile, [{ age: 0, eventId: 910000, text: formatCultivationEvent(910000), kind: 'normal' }]);
+  return finalize(state, profile, [
+    { age: 0, eventId: 910000, text: formatCultivationEvent(910000), kind: 'normal' },
+  ]);
 }
 
-export function nextCultivation(state: CultivationGame, profile: ProfileState, rng?: RNG): CultivationResult {
+export function nextCultivation(
+  state: CultivationGame,
+  profile: ProfileState,
+  rng?: RNG,
+): CultivationResult {
   if (state.life <= 0 || state.cultivation.ending) return { state, logs: [], achievements: [] };
   const logs: CultivationLog[] = [];
-  const updated = produce(state, draft => {
+  const updated = produce(state, (draft) => {
     const c = draft.cultivation;
     const currentRealm = realms[c.realm]!;
     const previousAge = draft.props.current.age;
@@ -183,8 +293,15 @@ export function nextCultivation(state: CultivationGame, profile: ProfileState, r
       const event = cultivationEvents.get(eventId)!;
       draft.events.add(eventId);
       logs.push({
-        age, eventId, kind: event.kind,
-        text: formatCultivationEvent(eventId, { realm: realmLabel(c), root: roots[c.root].name, lifespan: lifespan(draft) ?? '无限', years }),
+        age,
+        eventId,
+        kind: event.kind,
+        text: formatCultivationEvent(eventId, {
+          realm: realmLabel(c),
+          root: roots[c.root]!.name,
+          lifespan: lifespan(draft) ?? '无限',
+          years,
+        }),
       });
     };
     const end = (ending: NonNullable<CultivationState['ending']>, eventId: number) => {
@@ -224,8 +341,11 @@ export function nextCultivation(state: CultivationGame, profile: ProfileState, r
 
     const p = draft.props.current;
     const bonus = selectedTalents(draft).reduce((sum, talent) => sum + (talent.training || 0), 0);
-    const rate = roots[c.root].rate * (0.65 + Math.max(0, p.intelligence) * 0.07 + Math.max(0, p.strength) * 0.025) * (1 + bonus);
-    let gain = years * rate * random(85, 65, rng) / 100;
+    const rate =
+      roots[c.root]!.rate *
+      (0.65 + Math.max(0, p.intelligence) * 0.07 + Math.max(0, p.strength) * 0.025) *
+      (1 + bonus);
+    let gain = (years * rate * random(85, 65, rng)) / 100;
     const eventId = pickWeight(cultivationEventPool(c.realm, p.charm, draft.events, age), rng);
     if (eventId === null) throw new Error('No cultivation encounter available');
     const encounter = cultivationEvents.get(eventId)!;
@@ -281,7 +401,10 @@ export function finishCultivation(state: CultivationGame, profile: ProfileState)
   return {
     ...profile,
     times: profile.times + 1,
-    achievements: new Set([...profile.achievements, ...Array.from(state.achievements).filter(id => cultivationEvents.has(id))]),
+    achievements: new Set([
+      ...profile.achievements,
+      ...Array.from(state.achievements).filter((id) => cultivationEvents.has(id)),
+    ]),
     cultivation: {
       times: (profile.cultivation?.times || 0) + 1,
       bestRealm: Math.max(profile.cultivation?.bestRealm || 0, state.cultivation.realm),

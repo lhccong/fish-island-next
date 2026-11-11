@@ -31,7 +31,11 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
           to="/moments/fish-circle"
           className={styles.item ?? ''}
           aria-label="鱼小圈"
-          aria-current={location.pathname.startsWith('/discover/') ? 'page' : undefined}
+          aria-current={
+            location.pathname.startsWith('/discover/') || location.pathname === '/game/life'
+              ? 'page'
+              : undefined
+          }
         >
           <Compass size={23} aria-hidden="true" />
           <span>鱼小圈</span>
