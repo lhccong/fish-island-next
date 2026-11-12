@@ -2,7 +2,7 @@ import { talents } from '@/domain/life';
 import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
 import styles from './Life.module.css';
 
-import { TalentCard } from './LifeParts';
+import { TalentCard } from './TalentCard';
 import type { LifeController } from './useLife';
 const CONFIG = { points: 20, spirit: 5, pull: 10, min: 3, max: 3, allocate: 10 };
 

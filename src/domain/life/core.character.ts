@@ -1,7 +1,7 @@
+import type { Allocation } from './core.state';
 import type { Character, CharacterProperty, Talent } from './data';
 import { characters, talents } from './data';
 import { type RNG, type WeightItem, pick, pickWeight } from './vitex';
-import type { Allocation } from './core.state';
 
 export type BaseChara = Omit<Character, 'id' | 'name'>;
 export type BaseAlloc = Omit<Allocation, 'spirit'>;

@@ -1,8 +1,8 @@
-import { type Event, events } from './data';
-import type { Properties, GameState, ProfileState } from './core.state';
-import { propsEffect, createFlatState } from './core.state';
 import { check as checkCondition } from './condition';
 import type { TriggerResult } from './core.game';
+import type { GameState, ProfileState, Properties } from './core.state';
+import { createFlatState, propsEffect } from './core.state';
+import { type Event, events } from './data';
 import { produce } from './produce';
 import { pickWeight, type RNG } from './vitex';
 

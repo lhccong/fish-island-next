@@ -1,6 +1,6 @@
 import styles from './Life.module.css';
 
-import { Home } from './LifeParts';
+import { Home } from './LifeWelcome';
 import type { LifeController } from './useLife';
 
 export function LifeHome({ profile, setStep, begin }: LifeController) {

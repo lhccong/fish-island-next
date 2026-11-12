@@ -1,12 +1,11 @@
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { GameCatalog } from '@/features/games';
+import { useNavigate } from 'react-router';
 import styles from './GamesPage.module.css';
 
-// 旧项目 README 的稳定版域名与 config/routes.ts 中的游戏路由。
-const lifeGameUrl = 'https://yucoder.cn/game/life';
-
 export function GamesPage() {
+  const navigate = useNavigate();
   return (
     <WorkspaceLayout
       sidebarLabel="发现导航"
@@ -21,7 +20,7 @@ export function GamesPage() {
             <DiscoveryNavigation mobile />
           </>
         ),
-        content: <GameCatalog lifeGameUrl={lifeGameUrl} />,
+        content: <GameCatalog onPlay={() => navigate('/game/life')} />,
       }}
     />
   );

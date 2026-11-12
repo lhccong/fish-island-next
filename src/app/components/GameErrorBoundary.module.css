@@ -1,0 +1,25 @@
+.error {
+  padding: var(--space-5);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+.error h1 {
+  font-size: 20px;
+}
+.error p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.error button,
+.error a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-3);
+  margin-right: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  cursor: pointer;
+}

@@ -2,7 +2,7 @@
   min-height: 78vh;
   padding: 24px;
   background: var(--color-surface);
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .home,
 .panel,
@@ -26,10 +26,10 @@
 .home h1 {
   margin: 12px 0 4px;
   font-size: 48px;
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .home p {
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
   font-size: 1.1rem;
 }
 .primary,
@@ -44,7 +44,7 @@
   color: var(--color-on-accent);
   font-weight: 700;
   border-radius: 8px;
-  box-shadow: 0 8px 18px var(--color-life-detail-6);
+  box-shadow: 0 8px 18px var(--shadow-life-action);
 }
 .primary:hover:not(:disabled) {
   background: var(--color-accent);
@@ -55,8 +55,8 @@
 }
 .disabled {
   padding: 12px 28px;
-  background: var(--color-life-detail-8);
-  color: var(--color-life-detail-3);
+  background: var(--color-hover);
+  color: var(--color-muted);
   border-radius: 8px;
   cursor: not-allowed;
 }
@@ -71,14 +71,14 @@
   justify-content: center;
   gap: 16px;
   margin-top: 36px;
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
 }
 .panel {
   padding: clamp(18px, 4vw, 36px);
   background: var(--color-surface);
-  border: 1px solid var(--color-life-detail-10);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  box-shadow: 0 14px 40px var(--color-life-detail-11);
+  box-shadow: 0 14px 40px var(--shadow-life-panel);
 }
 .panel h2 {
   margin-top: 0;
@@ -111,7 +111,7 @@
   justify-content: space-between;
   gap: 20px;
   padding-bottom: 24px;
-  border-bottom: 1px solid var(--color-life-detail-10);
+  border-bottom: 1px solid var(--color-border);
 }
 .pickHeader h2 {
   font-size: 24px;
@@ -136,7 +136,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
   font-size: 13px;
 }
 .progressSteps b {
@@ -144,7 +144,7 @@
   place-items: center;
   width: 24px;
   height: 24px;
-  border: 1px solid var(--color-life-detail-13);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   font-size: 12px;
 }
@@ -170,7 +170,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: var(--color-life-detail-14);
+  color: var(--color-text);
 }
 .cardDeck {
   width: min(410px, 100%);
@@ -184,34 +184,34 @@
   display: grid;
   place-items: center;
   aspect-ratio: 3 / 4;
-  border: 1px solid var(--color-life-detail-15);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   background: var(--color-accent-soft);
-  color: var(--color-life-detail-17);
-  box-shadow: 0 3px 0 var(--color-life-detail-18);
+  color: var(--color-accent-text);
+  box-shadow: 0 3px 0 var(--color-border);
 }
 .cardBack::before {
   content: '';
   position: absolute;
   inset: 6px;
-  border: 1px solid var(--color-life-detail-19);
+  border: 1px solid var(--color-border);
   border-radius: 3px;
 }
 .cardBack:nth-child(4n) {
-  background: var(--color-life-detail-20);
-  border-color: var(--color-life-detail-21);
-  color: var(--color-life-detail-22);
+  background: var(--color-life-epic-soft);
+  border-color: var(--color-border);
+  color: var(--color-life-epic);
 }
 .cardBack:nth-child(4n)::before {
-  border-color: var(--color-life-detail-23);
+  border-color: var(--color-border);
 }
 .cardBack:nth-child(5n) {
-  background: var(--color-life-detail-24);
-  border-color: var(--color-life-detail-25);
-  color: var(--color-life-detail-26);
+  background: var(--color-accent-soft);
+  border-color: var(--color-border);
+  color: var(--color-accent-text);
 }
 .cardBack:nth-child(5n)::before {
-  border-color: var(--color-life-detail-27);
+  border-color: var(--color-border);
 }
 .drawButton {
   display: inline-flex;
@@ -233,9 +233,9 @@
   font-size: 16px;
 }
 .pickStatus span {
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
   font-size: 14px;
-  var(--color-surface)-space: nowrap;
+  white-space: nowrap;
 }
 .pickStatus span b {
   color: var(--color-accent-text);
@@ -248,7 +248,7 @@
   overflow-wrap: anywhere;
 }
 .talentGrid.pickGrid .talent:hover:not(.selected) {
-  box-shadow: 0 4px 12px var(--color-life-detail-28);
+  box-shadow: 0 4px 12px var(--shadow-life-hover);
 }
 .pickFooter {
   display: flex;
@@ -256,7 +256,7 @@
   align-items: center;
   gap: 24px;
   padding-top: 20px;
-  border-top: 1px solid var(--color-life-detail-10);
+  border-top: 1px solid var(--color-border);
 }
 .pickFooter > button {
   display: inline-flex;
@@ -277,8 +277,8 @@
   gap: 5px;
   padding: 7px 10px;
   font-size: 12px;
-  color: var(--color-life-detail-12);
-  border-bottom: 2px solid var(--color-life-detail-29);
+  color: var(--color-muted);
+  border-bottom: 2px solid var(--color-border);
 }
 .pickedSlots .filledSlot {
   color: var(--color-accent-text);
@@ -330,7 +330,7 @@
 .lifeModes button {
   position: relative;
   min-height: 215px;
-  color: var(--color-life-detail-30);
+  color: var(--color-text);
   background: var(--color-surface);
 }
 .lifeModes button > svg:first-child {
@@ -349,14 +349,14 @@
 .lifeModes button small {
   display: block;
   margin-top: 10px;
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
   padding-right: 20px;
 }
 .lifeModes button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  background: var(--color-life-detail-31);
-  border-color: var(--color-life-detail-32);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 .lifeModes button:focus-visible {
   outline: 2px solid var(--color-accent-text);
@@ -376,7 +376,7 @@
   align-items: center;
   gap: 7px;
   font-size: 13px;
-  color: var(--color-life-detail-33);
+  color: var(--color-accent-text);
 }
 .cultivationAllocation {
   padding-top: 12px;
@@ -387,12 +387,12 @@
 .realmRoad {
   margin: 28px 0;
   padding-top: 22px;
-  border-top: 1px solid var(--color-life-detail-10);
+  border-top: 1px solid var(--color-border);
 }
 .realmRoad h3 {
   font-size: 14px;
   margin: 0 0 16px;
-  color: var(--color-life-detail-34);
+  color: var(--color-text);
 }
 .realmRoad ol {
   list-style: none;
@@ -407,8 +407,8 @@
   align-items: center;
   gap: 7px;
   font-size: 13px;
-  color: var(--color-life-detail-35);
-  var(--color-surface)-space: nowrap;
+  color: var(--color-muted);
+  white-space: nowrap;
 }
 .realmRoad li span {
   display: grid;
@@ -416,7 +416,7 @@
   width: 21px;
   height: 21px;
   font-size: 11px;
-  border: 1px solid var(--color-life-detail-29);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
 }
 .realmRoad .realmReached {
@@ -434,11 +434,11 @@
   margin: 4px 0 0;
   font-size: 24px;
   line-height: 1.4;
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .realmTitle > div > span {
   font-size: 12px;
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
 }
 .realmEmblem {
   width: 52px;
@@ -454,8 +454,8 @@
   margin-left: auto;
   padding: 5px 0;
   font-size: 13px;
-  color: var(--color-life-detail-37);
-  var(--color-surface)-space: nowrap;
+  color: var(--color-accent-text);
+  white-space: nowrap;
 }
 .cultivationMetrics {
   display: grid;
@@ -468,13 +468,13 @@
   display: block;
 }
 .cultivationMetrics span {
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
   font-size: 12px;
   margin-bottom: 6px;
 }
 .cultivationMetrics b {
   font-size: 17px;
-  color: var(--color-life-detail-14);
+  color: var(--color-text);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
@@ -489,7 +489,7 @@
   gap: 6px;
   font-size: 12px;
   margin-bottom: 8px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .cultivationProgress > div b {
   margin-left: 5px;
@@ -500,13 +500,13 @@
   display: block;
   width: 100%;
   height: 7px;
-  background: var(--color-life-detail-10);
+  background: var(--color-border);
   border: 0;
   border-radius: 4px;
   overflow: hidden;
 }
 .cultivationProgress progress::-webkit-progress-bar {
-  background: var(--color-life-detail-10);
+  background: var(--color-border);
 }
 .cultivationProgress progress::-webkit-progress-value {
   background: var(--color-accent);
@@ -524,15 +524,15 @@
   display: flex;
   justify-content: space-between;
   gap: 6px;
-  border-bottom: 2px solid var(--color-life-detail-38);
+  border-bottom: 2px solid var(--color-border);
   padding: 8px 4px;
 }
 .cultivationAttributes span {
   font-size: 12px;
-  color: var(--color-life-detail-39);
+  color: var(--color-muted);
 }
 .cultivationAttributes b {
-  color: var(--color-life-detail-37);
+  color: var(--color-accent-text);
   font-variant-numeric: tabular-nums;
 }
 .logs.cultivationLogs {
@@ -548,12 +548,12 @@
   overflow-wrap: anywhere;
 }
 .cultivationRealmLog {
-  color: var(--color-life-detail-40);
+  color: var(--color-accent);
   font-weight: 600;
 }
 .cultivationError {
   padding: 14px 0;
-  color: var(--color-life-detail-41);
+  color: var(--color-danger);
 }
 .cultivationEnding {
   display: flex;
@@ -567,7 +567,7 @@
   font-size: 24px;
 }
 .cultivationEnding span {
-  color: var(--color-life-detail-39);
+  color: var(--color-muted);
   font-size: 12px;
 }
 .cultivationSectionTitle {
@@ -621,7 +621,7 @@
 .modeGrid button,
 .character {
   padding: 22px;
-  border: 1px solid var(--color-life-detail-32);
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
   text-align: left;
   border-radius: 8px;
@@ -642,7 +642,7 @@
 .modeGrid span,
 .character > span {
   margin-top: 8px;
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
   font-size: 0.9rem;
 }
 .talentGrid {
@@ -653,12 +653,12 @@
   position: relative;
   min-height: 104px;
   padding: 14px 36px 14px 14px;
-  border: 1px solid var(--color-life-detail-32);
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
   text-align: left;
   border-radius: 7px;
   cursor: pointer;
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .talent strong,
 .talent span {
@@ -666,25 +666,25 @@
 }
 .talent span {
   margin-top: 8px;
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
   font-size: 0.82rem;
   line-height: 1.5;
 }
 .grade-0 {
-  border-color: var(--color-life-detail-43);
-  color: var(--color-life-detail-44);
+  border-color: var(--color-border);
+  color: var(--color-muted);
 }
 .grade-1 {
-  border-color: var(--color-life-detail-45);
-  color: var(--color-life-detail-46);
+  border-color: var(--color-life-rare);
+  color: var(--color-life-rare);
 }
 .grade-2 {
-  border-color: var(--color-life-detail-47);
-  color: var(--color-life-detail-48);
+  border-color: var(--color-life-epic);
+  color: var(--color-life-epic);
 }
 .grade-3 {
-  border-color: var(--color-life-detail-49);
-  color: var(--color-life-detail-50);
+  border-color: var(--color-life-legendary);
+  color: var(--color-life-legendary);
 }
 .talent.selected,
 .character.selected {
@@ -736,12 +736,12 @@
   justify-content: space-between;
   gap: 8px;
   padding: 10px 12px;
-  border: 1px solid var(--color-life-detail-32);
+  border: 1px solid var(--color-border);
 }
 .allocateGrid input {
   width: 60px;
   padding: 5px;
-  border: 1px solid var(--color-life-detail-13);
+  border: 1px solid var(--color-border);
   text-align: center;
 }
 .allocateGrid input:focus-visible {
@@ -774,10 +774,10 @@
   outline-offset: 3px;
 }
 .good {
-  color: var(--color-life-detail-51);
+  color: var(--color-accent-text);
 }
 .bad {
-  color: var(--color-life-detail-41);
+  color: var(--color-danger);
 }
 .visuallyHidden {
   position: absolute;
@@ -787,7 +787,7 @@
   margin: -1px;
   overflow: hidden;
   clip-path: inset(50%);
-  var(--color-surface)-space: nowrap;
+  white-space: nowrap;
   border: 0;
 }
 .characterDeck {
@@ -842,7 +842,7 @@
   width: 100%;
   min-width: 0;
   padding: 22px 18px;
-  border: 1px solid var(--color-life-detail-53);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-surface);
   transition:
@@ -861,13 +861,13 @@
 }
 .celebrityIdentity > div > span {
   font-size: 11px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .celebrityIdentity h3 {
   margin: 3px 0 0;
   font-size: 21px;
   line-height: 1.4;
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
   overflow-wrap: anywhere;
 }
 .celebrityEmblem {
@@ -876,8 +876,8 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  color: var(--color-life-detail-54);
-  background: var(--color-life-detail-55);
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
   border-radius: 6px;
 }
 .celebrityCheck {
@@ -887,7 +887,7 @@
   height: 22px;
   flex-shrink: 0;
   border-radius: 50%;
-  border: 1px solid var(--color-life-detail-56);
+  border: 1px solid var(--color-border);
 }
 .celebrityProperties {
   display: grid;
@@ -895,18 +895,18 @@
   gap: 10px;
   margin: 24px 0;
   padding-bottom: 22px;
-  border-bottom: 1px solid var(--color-life-detail-57);
+  border-bottom: 1px solid var(--color-hover);
 }
 .celebrityProperties > div {
   min-width: 0;
 }
 .celebrityProperties > div > span:first-child {
   font-size: 12px;
-  color: var(--color-life-detail-39);
+  color: var(--color-muted);
 }
 .celebrityProperties b {
   display: block;
-  color: var(--color-life-detail-14);
+  color: var(--color-text);
   font-size: 22px;
   font-variant-numeric: tabular-nums;
   margin: 4px 0 8px;
@@ -915,14 +915,14 @@
   display: block;
   width: 100%;
   height: 3px;
-  background: var(--color-life-detail-58);
+  background: var(--color-border);
   border-radius: 2px;
   overflow: hidden;
 }
 .celebrityMeter i {
   display: block;
   height: 100%;
-  background: var(--color-life-detail-59);
+  background: var(--color-accent-text);
 }
 .celebrityTalentHeading {
   display: flex;
@@ -933,7 +933,7 @@
 }
 .celebrityTalentHeading small {
   margin-left: auto;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
   font-size: 11px;
 }
 .celebrityTalents {
@@ -955,13 +955,13 @@
 .celebrityTalents strong {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-life-detail-60);
+  color: var(--color-text);
 }
 .celebrityTalents p {
   margin: 4px 0 0;
   font-size: 12px;
   line-height: 1.65;
-  color: var(--color-life-detail-61);
+  color: var(--color-muted);
   overflow-wrap: anywhere;
 }
 .celebrityGrade {
@@ -977,7 +977,7 @@
 }
 .celebrityFooter > span {
   font-size: 13px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .celebrityFooter > span b {
   margin-left: 8px;
@@ -1011,8 +1011,8 @@
   max-height: 58vh;
   overflow: auto;
   padding: 16px;
-  background: var(--color-life-detail-62);
-  color: var(--color-life-detail-63);
+  background: var(--color-message-incoming);
+  color: var(--color-text);
   border-radius: 8px;
 }
 .logs article {
@@ -1023,28 +1023,28 @@
   line-height: 1.55;
 }
 .logs article > b {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 .logs p {
   margin: 0 0 5px;
 }
 .talentLog {
-  color: var(--color-life-detail-64);
+  color: var(--color-life-legendary);
 }
 .achievementLog {
-  color: var(--color-life-detail-65);
+  color: var(--color-danger);
 }
 .logs .grade-0 {
-  color: var(--color-life-detail-66);
+  color: var(--color-text);
 }
 .logs .grade-1 {
-  color: var(--color-life-detail-67);
+  color: var(--color-life-rare);
 }
 .logs .grade-2 {
-  color: var(--color-life-detail-68);
+  color: var(--color-life-epic);
 }
 .logs .grade-3 {
-  color: var(--color-life-detail-64);
+  color: var(--color-life-legendary);
 }
 .playPanel > button {
   align-self: center;
@@ -1076,7 +1076,7 @@
   min-width: 0;
   padding: 3px;
   margin: 0;
-  border: 1px solid var(--color-life-detail-32);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-surface);
 }
@@ -1095,7 +1095,7 @@
   padding: 9px 14px;
   border-radius: 5px;
   line-height: 20px;
-  var(--color-surface)-space: nowrap;
+  white-space: nowrap;
 }
 .playbackModes input:checked + span {
   background: var(--color-accent);
@@ -1112,7 +1112,7 @@
   cursor: not-allowed;
 }
 .muted {
-  color: var(--color-life-detail-3);
+  color: var(--color-muted);
 }
 .achievementsPanel {
   width: min(980px, 100%);
@@ -1138,7 +1138,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   padding: 26px 0;
   gap: 24px;
-  border-bottom: 1px solid var(--color-life-detail-10);
+  border-bottom: 1px solid var(--color-border);
 }
 .collectionStat {
   min-width: 0;
@@ -1148,7 +1148,7 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: var(--color-life-detail-69);
+  color: var(--color-muted);
 }
 .collectionStat > div {
   display: flex;
@@ -1160,11 +1160,11 @@
   font-size: 30px;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .collectionStat small {
   font-size: 13px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .collectionStat:last-child svg,
 .collectionStat:last-child b {
@@ -1178,7 +1178,7 @@
   justify-content: space-between;
   margin-bottom: 9px;
   font-size: 12px;
-  color: var(--color-life-detail-69);
+  color: var(--color-muted);
 }
 .collectionProgress > div b {
   color: var(--color-accent-text);
@@ -1191,10 +1191,10 @@
   border: 0;
   border-radius: 3px;
   overflow: hidden;
-  background: var(--color-life-detail-70);
+  background: var(--color-border);
 }
 .collectionProgress progress::-webkit-progress-bar {
-  background: var(--color-life-detail-70);
+  background: var(--color-border);
 }
 .collectionProgress progress::-webkit-progress-value {
   background: var(--color-accent);
@@ -1236,8 +1236,8 @@
   padding: 9px 12px;
   font-size: 13px;
   border-radius: 6px;
-  color: var(--color-life-detail-69);
-  var(--color-surface)-space: nowrap;
+  color: var(--color-muted);
+  white-space: nowrap;
 }
 .achievementFilters b {
   font-size: 11px;
@@ -1260,10 +1260,10 @@
   width: 220px;
   max-width: 100%;
   padding: 8px 11px;
-  border: 1px solid var(--color-life-detail-53);
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
   border-radius: 6px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .achievementSearch input {
   border: 0;
@@ -1272,7 +1272,7 @@
   min-width: 0;
   background: transparent;
   font-size: 13px;
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .achievementSearch:focus-within {
   border-color: var(--color-accent);
@@ -1281,7 +1281,7 @@
 .achievementResults {
   margin: 16px 0 12px;
   font-size: 12px;
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .achievementGrid {
   display: grid;
@@ -1295,10 +1295,10 @@
   min-width: 0;
   min-height: 144px;
   padding: 18px 16px;
-  border: 1px solid var(--color-life-detail-72);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-life-detail-73);
-  color: var(--color-life-detail-74);
+  background: var(--color-canvas);
+  color: var(--color-muted);
 }
 .achievementIcon {
   flex-shrink: 0;
@@ -1306,8 +1306,8 @@
   height: 40px;
   display: grid;
   place-items: center;
-  background: var(--color-life-detail-57);
-  color: var(--color-life-detail-75);
+  background: var(--color-hover);
+  color: var(--color-muted);
   border-radius: 8px;
 }
 .achievementBody {
@@ -1322,14 +1322,14 @@
   font-size: 14px;
   line-height: 1.5;
   font-weight: 600;
-  color: var(--color-life-detail-76);
+  color: var(--color-muted);
   overflow-wrap: anywhere;
 }
 .achievementBody p {
   margin: 0 0 16px;
   font-size: 12px;
   line-height: 1.7;
-  color: var(--color-life-detail-74);
+  color: var(--color-muted);
   overflow-wrap: anywhere;
 }
 .achievementMeta {
@@ -1346,21 +1346,21 @@
   gap: 4px;
 }
 .achievementMeta span:last-child {
-  color: var(--color-life-detail-12);
+  color: var(--color-muted);
 }
 .achievementCard.achievementUnlocked {
   background: var(--color-surface);
-  border-color: var(--color-life-detail-77);
+  border-color: var(--color-border);
 }
 .achievementCard.achievementUnlocked .achievementIcon {
   color: var(--color-accent-text);
   background: var(--color-accent-soft);
 }
 .achievementCard.achievementUnlocked h3 {
-  color: var(--color-life-detail-1);
+  color: var(--color-text);
 }
 .achievementCard.achievementUnlocked .achievementMeta span:last-child {
-  color: var(--color-life-detail-78);
+  color: var(--color-accent-text);
 }
 .achievementEmpty {
   display: flex;
@@ -1368,12 +1368,12 @@
   align-items: center;
   gap: 14px;
   padding: 56px 16px;
-  color: var(--color-life-detail-75);
+  color: var(--color-muted);
 }
 .achievementEmpty h3 {
   margin: 0;
   font-size: 15px;
-  color: var(--color-life-detail-69);
+  color: var(--color-muted);
 }
 @media (max-width: 900px) {
   .achievementGrid {

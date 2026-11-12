@@ -1,16 +1,14 @@
+import { trigger as atr } from './core.achievement';
+import { check as ec, trigger as etr } from './core.event';
+import type { GameState, ProfileState } from './core.state';
+import { createState, nextProfile, propsEffect, summary as stateSummary } from './core.state';
+import type { AdditionalPoints, ReplacementResult } from './core.talent';
+import { additionalPoints, exclude, pull, replacement, trigger as ttr } from './core.talent';
 import type { Achievement, Event, Talent } from './data';
 import { ages, AchievementOpportunity as Ao } from './data';
-import type { GameState, ProfileState } from './core.state';
-import { createState, nextProfile, propsEffect } from './core.state';
-import { summary as stateSummary } from './core.state';
-import type { ReplacementResult, AdditionalPoints } from './core.talent';
-import { pull, exclude, replacement, additionalPoints } from './core.talent';
-import { trigger as ttr } from './core.talent';
-import { trigger as atr } from './core.achievement';
-import { trigger as etr, check as ec } from './core.event';
+import { produce } from './produce';
 import type { RNG } from './vitex';
 import { pickWeight } from './vitex';
-import { produce } from './produce';
 
 export interface TriggerResult<T> {
   state: GameState;
@@ -107,4 +105,4 @@ export function end(state: GameState, profile: ProfileState, locked?: Talent['id
   return { profile: p, achievements: ar.triggers };
 }
 
-export { pull, exclude };
+export { exclude, pull };

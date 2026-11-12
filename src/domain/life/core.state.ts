@@ -1,6 +1,6 @@
 import type { Achievement, Event, Talent } from './data';
 import { produce } from './produce';
-import { sum, keys } from './vitex';
+import { keys, sum } from './vitex';
 
 /** 基础的属性 */
 export interface Properties {

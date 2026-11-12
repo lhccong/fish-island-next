@@ -1,5 +1,5 @@
 import { Aperture, Gamepad2 } from 'lucide-react';
-import { NavLink, useLocation } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import styles from './DiscoveryNavigation.module.css';
 
 export function DiscoveryNavigation({ mobile = false }: { mobile?: boolean }) {
@@ -18,13 +18,17 @@ export function DiscoveryNavigation({ mobile = false }: { mobile?: boolean }) {
 export function DiscoveryGameLink() {
   const location = useLocation();
   return (
-    <NavLink
+    <Link
       to="/discover/games"
       className={styles.game ?? ''}
-      aria-current={location.pathname === '/game/life' ? 'page' : undefined}
+      aria-current={
+        location.pathname === '/game/life' || location.pathname === '/discover/games'
+          ? 'page'
+          : undefined
+      }
     >
       <Gamepad2 size={19} aria-hidden="true" />
       游戏
-    </NavLink>
+    </Link>
   );
 }

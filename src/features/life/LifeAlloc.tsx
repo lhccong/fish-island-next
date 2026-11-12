@@ -3,7 +3,7 @@ import { Shuffle } from 'lucide-react';
 import { properties } from './display';
 import styles from './Life.module.css';
 
-import { TalentCard } from './LifeParts';
+import { TalentCard } from './TalentCard';
 import type { LifeController } from './useLife';
 const CONFIG = { points: 20, spirit: 5, pull: 10, min: 3, max: 3, allocate: 10 };
 const propertyKeys = ['charm', 'intelligence', 'strength', 'money', 'spirit'] as const;

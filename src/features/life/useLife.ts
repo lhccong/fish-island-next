@@ -9,7 +9,9 @@ import {
   summary as summarize,
   talents,
 } from '@/domain/life';
+import type { SetStateAction } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { readProfile, saveProfile } from './profile';
 
 type Step =
   | 'home'
@@ -32,41 +34,15 @@ type Log = {
 };
 
 const CONFIG = { points: 20, spirit: 5, pull: 10, min: 3, max: 3, allocate: 10 };
-const freshProfile = (): ProfileState => ({
-  times: 0,
-  talents: new Set(),
-  events: new Set(),
-  achievements: new Set(),
-});
-
-const readProfile = (): ProfileState => {
-  try {
-    const saved = JSON.parse(localStorage.getItem('life-remake-profile') || 'null');
-    if (!saved) return freshProfile();
-    return {
-      ...saved,
-      talents: new Set(saved.talents || []),
-      events: new Set(saved.events || []),
-      achievements: new Set(saved.achievements || []),
-    };
-  } catch {
-    return freshProfile();
-  }
-};
-
-const saveProfile = (profile: ProfileState) =>
-  localStorage.setItem(
-    'life-remake-profile',
-    JSON.stringify({
-      ...profile,
-      talents: Array.from(profile.talents),
-      events: Array.from(profile.events),
-      achievements: Array.from(profile.achievements),
-    }),
-  );
-
 export function useLife() {
-  const [profile, setProfile] = useState<ProfileState>(readProfile);
+  const [initial] = useState(readProfile);
+  const [profile, updateProfile] = useState<ProfileState>(initial.profile);
+  const [storageNotice, setStorageNotice] = useState(initial.notice);
+  const setProfile = (update: SetStateAction<ProfileState>) => {
+    const next = typeof update === 'function' ? update(profile) : update;
+    updateProfile(next);
+    setStorageNotice(saveProfile(next));
+  };
   const [step, setStep] = useState<Step>('home');
   const [mode, setMode] = useState<Mode>('classic');
   const [pulled, setPulled] = useState<number[]>([]);
@@ -93,7 +69,6 @@ export function useLife() {
   const [achievementQuery, setAchievementQuery] = useState('');
   const logRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => saveProfile(profile), [profile]);
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [logs]);
@@ -247,6 +222,7 @@ export function useLife() {
 
   return {
     profile,
+    storageNotice,
     setProfile,
     step,
     setStep,

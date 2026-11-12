@@ -8,8 +8,7 @@ import { LifePick } from './LifePick';
 import { LifePlay } from './LifePlay';
 import { LifeSummary } from './LifeSummary';
 import { useLife } from './useLife';
-export function LifeGame() {
-  const life = useLife();
+function LifeSteps({ life }: { life: ReturnType<typeof useLife> }) {
   if (life.step === 'home') return <LifeHome {...life} />;
   if (life.step === 'cultivation') return <LifeCultivation {...life} />;
   if (life.step === 'mode') return <LifeMode {...life} />;
@@ -19,4 +18,14 @@ export function LifeGame() {
   if (life.step === 'play') return <LifePlay {...life} />;
   if (life.step === 'summary') return <LifeSummary {...life} />;
   return <LifeAchievements {...life} />;
+}
+
+export function LifeGame() {
+  const life = useLife();
+  return (
+    <>
+      {life.storageNotice && <p role="status">{life.storageNotice}</p>}
+      <LifeSteps life={life} />
+    </>
+  );
 }

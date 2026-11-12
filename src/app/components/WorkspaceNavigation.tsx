@@ -1,5 +1,5 @@
 import { Compass, MessageCircle, Camera } from 'lucide-react';
-import { NavLink, useLocation, useNavigate } from 'react-router';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { AccountControl } from '@/features/auth';
 import { ThemePicker } from '@/features/appearance';
 import type { ShellId } from '@/shells/contracts';
@@ -27,19 +27,21 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
           <Camera size={23} aria-hidden="true" />
           <span>热榜</span>
         </NavLink>
-        <NavLink
+        <Link
           to="/moments/fish-circle"
           className={styles.item ?? ''}
           aria-label="鱼小圈"
           aria-current={
-            location.pathname.startsWith('/discover/') || location.pathname === '/game/life'
+            location.pathname.startsWith('/discover/') ||
+            location.pathname === '/game/life' ||
+            location.pathname === '/moments/fish-circle'
               ? 'page'
               : undefined
           }
         >
           <Compass size={23} aria-hidden="true" />
           <span>鱼小圈</span>
-        </NavLink>
+        </Link>
       </nav>
       <div className={styles.bottom}>
         <ThemePicker presentation={shellId === 'wps' ? 'ribbon' : 'rail'} />

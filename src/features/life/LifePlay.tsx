@@ -2,7 +2,7 @@ import { achievements, events, talents } from '@/domain/life';
 import { SkipForward } from 'lucide-react';
 import styles from './Life.module.css';
 
-import { PropertyList } from './LifeParts';
+import { PropertyList } from './PropertyList';
 import type { LifeController } from './useLife';
 const playbackModes = [
   { value: 'manual', label: '手动' },

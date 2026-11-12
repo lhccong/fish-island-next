@@ -4,6 +4,7 @@ import { HotBoardPage } from '@/app/pages/HotBoardPage';
 import { RequireAuth } from '@/app/components/RequireAuth';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
+import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
 const GamesPage = lazy(() =>
   import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
 );
@@ -47,7 +48,14 @@ export function AppRoutes() {
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
             <Route path="/discover/games" element={<GamesPage />} />
-            <Route path="/game/life" element={<LifeGamePage />} />
+            <Route
+              path="/game/life"
+              element={
+                <GameErrorBoundary>
+                  <LifeGamePage />
+                </GameErrorBoundary>
+              }
+            />
             <Route
               path="/oauth2/authorize"
               element={

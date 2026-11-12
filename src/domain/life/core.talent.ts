@@ -1,10 +1,10 @@
-import { type Talent, type TalentGrade, talents } from './data';
-import type { Properties, GameState, ProfileState } from './core.state';
-import { propsEffect, createFlatState } from './core.state';
 import { check } from './condition';
-import { pick, pickWeight, type RNG } from './vitex';
-import { produce } from './produce';
 import type { TriggerResult } from './core.game';
+import type { GameState, ProfileState, Properties } from './core.state';
+import { createFlatState, propsEffect } from './core.state';
+import { type Talent, type TalentGrade, talents } from './data';
+import { produce } from './produce';
+import { pick, pickWeight, type RNG } from './vitex';
 
 const Grades: TalentGrade[] = [0, 1, 2, 3] as const;
 const GradeMap = new Map<TalentGrade, number[]>(
@@ -31,11 +31,17 @@ export interface RateOptions {
   additions: PullRateAdditions;
 }
 const AddidtionInit = Grades.map((g) => [g, 1]) as [TalentGrade, number][];
+function profileRateAddition<K extends keyof ProfileState>(
+  key: K,
+  additions: PullRateAdditions,
+  profile: ProfileState,
+) {
+  return additions[key]?.(profile[key]);
+}
 function talentRateWithAddition({ base, additions }: RateOptions, profile: ProfileState) {
   const rate = new Map(AddidtionInit);
-  for (const [key, getAddition] of Object.entries(additions)) {
-    const value = profile[key as keyof ProfileState];
-    for (const [k, v] of getAddition(value as never).entries()) {
+  for (const key of Object.keys(additions) as (keyof ProfileState)[]) {
+    for (const [k, v] of profileRateAddition(key, additions, profile) ?? []) {
       const current = rate.get(k)!;
       if (v.mode === 'add') {
         rate.set(k, current + v.value);

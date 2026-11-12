@@ -1,6 +1,7 @@
 import styles from './Life.module.css';
 
-import { PropertyList, TalentCard } from './LifeParts';
+import { PropertyList } from './PropertyList';
+import { TalentCard } from './TalentCard';
 import type { LifeController } from './useLife';
 
 export function LifeSummary({

@@ -1,4 +1,11 @@
 :root {
+  --color-game-sky: #d8edeb;
+  --color-game-horizon: #f0dbc2;
+  --color-game-sun: #f2c979;
+  --color-game-meadow: #9cb6a2;
+  --color-game-ink: #294a45;
+  --color-game-frame: #fff9e9;
+  --color-game-shadow: #adc8bd;
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
   color: var(--color-text);
   background: var(--color-canvas);
@@ -130,75 +137,12 @@ textarea:focus-visible {
   }
 }
 
-/* Life simulation rarity and decorative colors; primary actions follow the active skin. */
 :root {
-  --color-life-detail-1: #303030;
-  --color-life-detail-3: #757575;
-  --color-life-detail-6: rgba(255, 167, 104, 0.2);
-  --color-life-detail-8: #e5e5e5;
-  --color-life-detail-10: #e8e8e8;
-  --color-life-detail-11: rgba(0, 0, 0, 0.05);
-  --color-life-detail-12: #858585;
-  --color-life-detail-13: #d9d9d9;
-  --color-life-detail-14: #404040;
-  --color-life-detail-15: #f2c69f;
-  --color-life-detail-17: #bd651f;
-  --color-life-detail-18: #f1e4d8;
-  --color-life-detail-19: #f5d9bd;
-  --color-life-detail-20: #f5f2fc;
-  --color-life-detail-21: #cfc3e6;
-  --color-life-detail-22: #9475b8;
-  --color-life-detail-23: #dfd5ef;
-  --color-life-detail-24: #eff5f9;
-  --color-life-detail-25: #c1d8e8;
-  --color-life-detail-26: #6c96b3;
-  --color-life-detail-27: #d4e3ee;
-  --color-life-detail-28: rgba(0, 0, 0, 0.06);
-  --color-life-detail-29: #ddd;
-  --color-life-detail-30: #505050;
-  --color-life-detail-31: #f3f3f3;
-  --color-life-detail-32: #e0e0e0;
-  --color-life-detail-33: #608079;
-  --color-life-detail-34: #606060;
-  --color-life-detail-35: #888;
-  --color-life-detail-37: #397569;
-  --color-life-detail-38: #d4e2dd;
-  --color-life-detail-39: #777;
-  --color-life-detail-40: #8be0cf;
-  --color-life-detail-41: #c43d42;
-  --color-life-detail-43: #cbd7da;
-  --color-life-detail-44: #536b72;
-  --color-life-detail-45: #59a5d5;
-  --color-life-detail-46: #24709b;
-  --color-life-detail-47: #9b79d5;
-  --color-life-detail-48: #7149aa;
-  --color-life-detail-49: #e6a34b;
-  --color-life-detail-50: #b56d14;
-  --color-life-detail-51: #198754;
-  --color-life-detail-52: #fffbf7;
-  --color-life-detail-53: #dedede;
-  --color-life-detail-54: #56847a;
-  --color-life-detail-55: #edf5f2;
-  --color-life-detail-56: #d5d5d5;
-  --color-life-detail-57: #ededed;
-  --color-life-detail-58: #ecefec;
-  --color-life-detail-59: #74a398;
-  --color-life-detail-60: #454545;
-  --color-life-detail-61: #7a7a7a;
-  --color-life-detail-62: #242424;
-  --color-life-detail-63: #f0f0f0;
-  --color-life-detail-64: #f0c66d;
-  --color-life-detail-65: #ff9b9b;
-  --color-life-detail-66: #e9f3f4;
-  --color-life-detail-67: #8dcdf5;
-  --color-life-detail-68: #c8adfa;
-  --color-life-detail-69: #707070;
-  --color-life-detail-70: #eaeaea;
-  --color-life-detail-72: #e4e4e4;
-  --color-life-detail-73: #f7f7f7;
-  --color-life-detail-74: #808080;
-  --color-life-detail-75: #999;
-  --color-life-detail-76: #626262;
-  --color-life-detail-77: #edc7a9;
-  --color-life-detail-78: #237953;
+  --color-life-rare: #24709b;
+  --color-life-epic: #7149aa;
+  --color-life-epic-soft: #f5f2fc;
+  --color-life-legendary: #986018;
+  --shadow-life-action: rgb(0 0 0 / 8%);
+  --shadow-life-panel: rgb(0 0 0 / 5%);
+  --shadow-life-hover: rgb(0 0 0 / 6%);
 }

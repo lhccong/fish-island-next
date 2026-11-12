@@ -1,6 +1,6 @@
-import { random, shuffle } from './vitex';
-import type { RNG } from './vitex';
 import type { Allocation } from './core.state';
+import type { RNG } from './vitex';
+import { random, shuffle } from './vitex';
 
 // Same bounded allocation strategy as remake/hooks/alloc, for the page's five attributes.
 export function randomAllocation(total: number, limit = 10, rng?: RNG): Allocation {

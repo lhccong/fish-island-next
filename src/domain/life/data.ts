@@ -1,10 +1,10 @@
-export * from './data.achievement.types';
-export * from './data.age.types';
-export * from './data.character.types';
-export * from './data.event.types';
-export * from './data.talent.types';
 export { default as achievements } from './data.achievement';
+export * from './data.achievement.types';
 export { default as ages } from './data.age';
-export { default as events } from './data.event';
+export * from './data.age.types';
 export { default as characters } from './data.character';
+export * from './data.character.types';
+export { default as events } from './data.event';
+export * from './data.event.types';
 export { default as talents } from './data.talent';
+export * from './data.talent.types';

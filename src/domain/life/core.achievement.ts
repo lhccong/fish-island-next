@@ -1,10 +1,10 @@
-import type { Achievement, AchievementOpportunity } from './data';
-import { achievements } from './data';
+import { check } from './condition';
+import type { TriggerResult } from './core.game';
 import type { GameState, ProfileState } from './core.state';
 import { createFlatState } from './core.state';
-import { check } from './condition';
+import type { Achievement, AchievementOpportunity } from './data';
+import { achievements } from './data';
 import { produce } from './produce';
-import type { TriggerResult } from './core.game';
 
 const OpportunityMap = new Map<AchievementOpportunity, number[]>();
 for (const achievement of achievements.values()) {
