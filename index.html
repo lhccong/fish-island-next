@@ -2,10 +2,49 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      try {
+        document.documentElement.dataset.colorMode =
+          localStorage.getItem('fish-island:color-mode') === 'dark' ? 'dark' : 'light';
+      } catch {
+        document.documentElement.dataset.colorMode = 'light';
+      }
+      document.documentElement.style.colorScheme = document.documentElement.dataset.colorMode;
+    </script>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=moyudao" />
+    <link rel="canonical" href="https://yucoder.cn/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="鱼岛 Next · 模块化、可换肤的聊天客户端" />
-    <title>鱼岛 Next</title>
+    <meta
+      name="description"
+      content="摸鱼岛，工作之余的轻松一站。聚合热门榜单，浏览鱼小圈动态，享受在线阅读与休闲小游戏，发现每天的新鲜事。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="摸鱼岛" />
+    <meta property="og:url" content="https://yucoder.cn/" />
+    <meta property="og:title" content="摸鱼岛" />
+    <meta
+      property="og:description"
+      content="摸鱼岛，工作之余的轻松一站。聚合热门榜单，浏览鱼小圈动态，享受在线阅读与休闲小游戏，发现每天的新鲜事。"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="摸鱼岛" />
+    <meta
+      name="twitter:description"
+      content="摸鱼岛，工作之余的轻松一站。聚合热门榜单，浏览鱼小圈动态，享受在线阅读与休闲小游戏，发现每天的新鲜事。"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "摸鱼岛",
+        "url": "https://yucoder.cn/",
+        "inLanguage": "zh-CN",
+        "description": "摸鱼岛，工作之余的轻松一站。聚合热门榜单，浏览鱼小圈动态，享受在线阅读与休闲小游戏，发现每天的新鲜事。"
+      }
+    </script>
+    <title>摸鱼岛</title>
   </head>
   <body>
     <div id="root"></div>

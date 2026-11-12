@@ -8,7 +8,11 @@ export function useAuth() {
   const session = useStore(controller.store, (state) => state.session);
   const pending = useStore(controller.store, (state) => state.pending);
   const notice = useStore(controller.store, (state) => state.notice);
+  const emailCodeRetryAt = useStore(controller.store, (state) => state.emailCodeRetryAt);
+  const emailCodeTarget = useStore(controller.store, (state) => state.emailCodeTarget);
   return {
+    emailCodeRetryAt,
+    emailCodeTarget,
     notice,
     notify: controller.notify,
     session,
@@ -16,5 +20,12 @@ export function useAuth() {
     restore: controller.restore,
     login: controller.login,
     logout: controller.logout,
+    updateProfile: controller.updateProfile,
+    uploadProfileImage: controller.uploadProfileImage,
+    titles: controller.titles,
+    membership: controller.membership,
+    sendEmailCode: controller.sendEmailCode,
+    bindEmail: controller.bindEmail,
+    setTitle: controller.setTitle,
   };
 }

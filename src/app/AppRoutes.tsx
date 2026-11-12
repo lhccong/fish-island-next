@@ -1,10 +1,25 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Route, Routes, useLocation, type Location } from 'react-router';
 import { HotBoardPage } from '@/app/pages/HotBoardPage';
 import { RequireAuth } from '@/app/components/RequireAuth';
+import { PageLoading } from '@/app/components/PageLoading';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
+const AboutPage = lazy(() =>
+  import('@/app/pages/AboutPage').then((module) => ({ default: module.AboutPage })),
+);
+const PetPage = lazy(() =>
+  import('@/app/pages/PetPage').then((module) => ({ default: module.PetPage })),
+);
+const ReaderPage = lazy(() =>
+  Promise.all([import('@/app/pages/ReaderPage'), import('@/app/components/GlobalReader')]).then(
+    ([module]) => ({ default: module.ReaderPage }),
+  ),
+);
+const GlobalReader = lazy(() =>
+  import('@/app/components/GlobalReader').then((module) => ({ default: module.GlobalReader })),
+);
 const GamesPage = lazy(() =>
   import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
 );
@@ -32,6 +47,7 @@ const ChatPlaceholderPage = lazy(() =>
 );
 
 export function AppRoutes() {
+  const [readerEnabled, setReaderEnabled] = useState(false);
   const location = useLocation();
   const isLogin = location.pathname === '/user/login';
   const state = location.state as { backgroundLocation?: Location } | null;
@@ -44,10 +60,20 @@ export function AppRoutes() {
   return (
     <>
       <div aria-hidden={isLogin ? true : undefined}>
-        <Suspense fallback={<p role="status">正在打开页面…</p>}>
+        <Suspense fallback={<PageLoading />}>
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/discover/games" element={<GamesPage />} />
+            <Route
+              path="/pet"
+              element={
+                <RequireAuth>
+                  <PetPage />
+                </RequireAuth>
+              }
+            />
+            <Route path="/reader" element={<ReaderPage onOpen={() => setReaderEnabled(true)} />} />
             <Route
               path="/game/life"
               element={
@@ -105,6 +131,11 @@ export function AppRoutes() {
         </Suspense>
       )}
       {!isLogin && <AuthNotice />}
+      {readerEnabled && (
+        <Suspense fallback={null}>
+          <GlobalReader />
+        </Suspense>
+      )}
     </>
   );
 }

@@ -1,0 +1,618 @@
+.dialog {
+  width: min(620px, calc(100% - 32px));
+  padding: 28px;
+}
+.editorDialog {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(800px, calc(100% - 40px));
+  height: min(920px, calc(100dvh - 48px));
+  max-height: calc(100dvh - 48px);
+  padding: 28px 28px 0;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.editorDialog > h2 {
+  margin: 0 40px 6px 0;
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+  line-height: 1.5;
+}
+.editorDialog > p {
+  margin: 0 0 24px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.editorScroll {
+  flex: 1;
+  min-height: 0;
+}
+.editorBody {
+  display: grid;
+  gap: 24px;
+  padding: var(--space-1) 0 var(--space-6) var(--space-1);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+.label {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.label input,
+.label textarea,
+.uploadRow > input,
+.emailActions > input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.label input:hover:not(:disabled),
+.label textarea:hover:not(:disabled),
+.uploadRow > input:hover:not(:disabled),
+.emailActions > input:hover:not(:disabled) {
+  border-color: var(--color-muted);
+}
+.label input:disabled,
+.label textarea:disabled,
+.uploadRow > input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.label input::placeholder,
+.label textarea::placeholder,
+.uploadRow > input::placeholder {
+  color: var(--color-muted);
+}
+.label textarea {
+  min-height: 100px;
+  max-height: 200px;
+  resize: vertical;
+}
+.countedInput {
+  position: relative;
+}
+.countedInput input {
+  padding-right: 64px;
+}
+.countedInput > span {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+  pointer-events: none;
+}
+.required {
+  color: var(--color-danger);
+}
+.help {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin-left: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 11px;
+  cursor: help;
+}
+.ruleHint,
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.75;
+  font-weight: 400;
+}
+.counter {
+  margin-top: -4px;
+  text-align: right;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.confirmed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--color-profile-success-border);
+  border-radius: var(--radius-control);
+  background: var(--color-profile-success-bg);
+  color: var(--color-profile-success-text);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.confirmed span {
+  min-width: 0;
+}
+.confirmed svg {
+  flex-shrink: 0;
+}
+.imageSection,
+.titleSection,
+.milestoneSection {
+  min-width: 0;
+}
+.imageSection h3,
+.titleSection h3,
+.milestoneSection h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.imageField {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-canvas);
+}
+.previewColumn {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.imagePreview {
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-surface);
+  color: var(--color-muted);
+}
+.imagePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.imageControls {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.uploadRow {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.uploadRow > input {
+  font-size: 12px;
+  text-overflow: ellipsis;
+}
+.upload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.upload:hover {
+  border-color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.upload:focus-within {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.upload[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: inherit;
+}
+.presets {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+.imageField > .error,
+.imageField > .hint {
+  grid-column: 1 / -1;
+}
+.presets > span {
+  margin-right: 4px;
+}
+.presets button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  padding: 3px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.presets button[aria-pressed='true'] {
+  border-color: var(--color-accent-text);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+.presets button:hover:not(:disabled) {
+  border-color: var(--color-accent-text);
+}
+.presets button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.presets img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.presets button span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.backgroundRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 20px;
+}
+.imageField[data-cover='true'] {
+  grid-template-columns: 88px minmax(0, 1fr);
+  padding: 16px;
+  gap: 14px;
+}
+.imagePreview[data-cover='true'] {
+  width: 88px;
+  height: 68px;
+  border-radius: 8px;
+}
+.titleSection {
+  display: flex;
+  flex-direction: column;
+}
+.backgroundRow > .imageSection {
+  display: flex;
+  flex-direction: column;
+}
+.backgroundRow .imageField {
+  flex: 1;
+}
+.titleCard {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-canvas);
+}
+.titleSection .label {
+  gap: 8px;
+}
+.titleSection .confirmed {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-color: transparent;
+}
+.emailSection {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+}
+.emailActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+.emailActions button {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.emailActions button:last-child {
+  grid-column: 1 / -1;
+}
+.sectionError {
+  display: grid;
+  gap: 8px;
+  color: var(--color-danger);
+  font-size: 12px;
+  line-height: 1.75;
+}
+.sectionError button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.memberCard,
+.birthdayCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 96px;
+  height: calc(100% - 33px);
+  padding: 16px;
+  border: 1px solid var(--color-profile-warm-border);
+  border-radius: 12px;
+  background: var(--color-profile-warm-bg);
+  color: var(--color-profile-accent);
+}
+.memberCard > div,
+.birthdayCard > div {
+  min-width: 0;
+}
+.memberCard strong,
+.birthdayCard strong {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.memberCard p,
+.birthdayCard p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.milestoneIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-profile-icon-bg);
+  font-size: 21px;
+}
+.badge {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+.dayBadge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--color-profile-badge-bg);
+  color: var(--color-profile-badge-text);
+  font-weight: 600;
+}
+.editorActions {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.form > .error,
+.form > .hint {
+  flex-shrink: 0;
+  padding: 12px 0;
+}
+.success {
+  padding: 12px;
+  border-radius: var(--radius-control);
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  font-size: 13px;
+}
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.avatar {
+  flex-shrink: 0;
+  transform: scale(1.5);
+  margin: 12px;
+}
+.identityText {
+  min-width: 0;
+}
+.identityText h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.identityText span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.details {
+  display: grid;
+  gap: 16px;
+  margin: 20px 0;
+}
+.details div {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.details dt {
+  color: var(--color-muted);
+}
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.logout {
+  margin-right: auto;
+  color: var(--color-danger);
+}
+@media (max-width: 760px) {
+  .dialog {
+    padding: 20px;
+  }
+  .editorDialog {
+    width: calc(100% - 24px);
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 20px 20px 0;
+    border-radius: 16px;
+  }
+  .editorDialog > h2 {
+    font-size: 20px;
+  }
+  .editorDialog > p {
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+  .grid,
+  .backgroundRow,
+  .milestones {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .editorBody {
+    gap: 22px;
+  }
+  .label input,
+  .label textarea,
+  .uploadRow > input,
+  .emailActions > input {
+    font-size: 16px;
+  }
+  .imageField {
+    grid-template-columns: 64px minmax(0, 1fr);
+    padding: 14px;
+    gap: 12px;
+  }
+  .imagePreview {
+    width: 60px;
+    height: 60px;
+  }
+  .presets {
+    gap: 6px;
+  }
+  .presets > span {
+    flex-basis: 100%;
+  }
+  .presets button {
+    width: 44px;
+    height: 44px;
+  }
+  .imageField[data-cover='true'] {
+    grid-template-columns: 72px minmax(0, 1fr);
+    padding: 14px;
+    gap: 12px;
+  }
+  .imagePreview[data-cover='true'] {
+    width: 72px;
+    height: 64px;
+  }
+  .titleSection {
+    margin-top: 0;
+  }
+  .editorActions {
+    padding: 14px 0 max(16px, env(safe-area-inset-bottom));
+  }
+  .editorActions > button {
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+  .memberCard,
+  .birthdayCard {
+    min-height: 90px;
+    height: auto;
+  }
+}

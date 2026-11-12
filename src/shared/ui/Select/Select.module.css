@@ -1,0 +1,102 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 44px;
+  min-width: 0;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.trigger > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+.trigger:hover:not(:disabled),
+.trigger[data-state='open'] {
+  border-color: var(--color-accent-text);
+}
+.trigger:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.trigger:disabled {
+  color: var(--color-muted);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.content {
+  z-index: 90;
+  min-width: var(--radix-select-trigger-width);
+  max-width: calc(100vw - var(--space-4));
+  max-height: min(320px, var(--radix-select-content-available-height));
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-panel);
+}
+.viewport {
+  padding: var(--space-1);
+}
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-3);
+  border-radius: var(--space-1);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+.option[data-state='checked'] {
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  font-weight: 600;
+}
+.option[data-highlighted] {
+  outline: 1px solid var(--color-accent-text);
+  outline-offset: -1px;
+  background: var(--color-accent-soft);
+}
+.option[data-disabled] {
+  color: var(--color-muted);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.indicator {
+  position: absolute;
+  right: var(--space-2);
+  display: inline-flex;
+}
+.scroll {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+  color: var(--color-muted);
+}
+@media (max-width: 760px) {
+  .trigger {
+    font-size: 16px;
+  }
+}

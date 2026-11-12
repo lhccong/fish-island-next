@@ -1,6 +1,6 @@
 import { CircleError, type FishCirclePort } from '@/domain/fish-circle';
 import type { SessionToken } from '@/domain/auth';
-import { record, moment, comment, page, id, safeUrl, text } from './decode';
+import { record, moment, comment, page, id, safeUrl, text, reminder } from './decode';
 export function createFishCircleClient(
   baseUrl: string,
   token: () => SessionToken | null,
@@ -46,6 +46,35 @@ export function createFishCircleClient(
     return true;
   }
   return {
+    async reminders(current, signal) {
+      return page(
+        await request(
+          'event_remind/my/list/page',
+          {
+            current,
+            pageSize: 10,
+            sortField: 'createTime',
+            sortOrder: 'descend',
+          },
+          signal,
+        ),
+        reminder,
+      );
+    },
+    async reminderAction(action, ids, signal) {
+      return confirmed(
+        await request(
+          `event_remind/batch/${action === 'read' ? 'set/read' : 'delete'}`,
+          { ids },
+          signal,
+        ),
+      );
+    },
+    async detail(momentId, signal) {
+      return moment(
+        await request(`moments/detail?id=${encodeURIComponent(momentId)}`, null, signal),
+      );
+    },
     async profile(userId, signal) {
       const user = record(
         await request(`user/get/vo?id=${encodeURIComponent(userId)}`, null, signal),

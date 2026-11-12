@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowLeft, Camera } from 'lucide-react';
 import type { CircleProfile, FishCirclePort } from '@/domain/fish-circle';
 import { CircleAvatar } from './CircleAvatar';
 import { FollowControl } from './FollowControl';
 import styles from './CircleCover.module.css';
 interface Props {
+  actions: ReactNode;
   service: FishCirclePort;
   userId: string;
   fallbackName: string;
@@ -17,6 +18,7 @@ interface Props {
 type State =
   { status: 'loading' } | { status: 'ready'; profile: CircleProfile } | { status: 'error' };
 export function CircleCover({
+  actions,
   service,
   userId,
   fallbackName,
@@ -64,10 +66,11 @@ export function CircleCover({
         <Camera className={styles.watermark} size={100} strokeWidth={1} aria-hidden="true" />
       )}
       <div className={styles.shade} />
+      <div className={styles.actions}>{actions}</div>
       {filtered && (
-        <button className={styles.back} type="button" onClick={onBack}>
+        <button aria-label="返回全部动态" className={styles.back} type="button" onClick={onBack}>
           <ArrowLeft size={16} aria-hidden="true" />
-          返回全部动态
+          <span className={styles.backLabel}>返回全部动态</span>
         </button>
       )}
       {state.status === 'error' && (

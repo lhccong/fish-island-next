@@ -100,6 +100,14 @@ export default defineConfig([
           selector: 'ImportDeclaration[source.value=/^\\.\\.\\//]',
           message: '跨目录使用 @/ 别名和公开入口，避免相对路径绕过依赖检查。',
         },
+        {
+          selector: "JSXOpeningElement[name.name='select']",
+          message: '禁止原生 select 系统下拉列表；请从 shared/ui/Select 公开入口使用统一选择器。',
+        },
+        {
+          selector: "JSXOpeningElement[name.name='datalist']",
+          message: '禁止原生 datalist 系统选项面板；请使用统一的可访问选择组件。',
+        },
       ],
     },
   },

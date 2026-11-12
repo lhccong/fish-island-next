@@ -151,3 +151,52 @@ describe('fish circle compatibility', () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
 });
+
+describe('legacy interaction reminders', () => {
+  it('maps reminders, validates state and preserves source IDs', async () => {
+    const fetcher = respond({
+      total: '11',
+      records: [
+        {
+          id: '9007199254740993',
+          state: 0,
+          action: 'like',
+          sourceType: 4,
+          sourceId: '42',
+          sourceContent: '[img]https://example.com/a.png[/img]',
+          senderUser: { userName: '合成通知' },
+          createTime: '2026-11-12',
+        },
+      ],
+    });
+    const result = await createFishCircleClient('', token, vi.fn()).reminders(2, signal());
+    expect(JSON.parse(fetcher.mock.calls[0]![1].body)).toEqual({
+      current: 2,
+      pageSize: 10,
+      sortField: 'createTime',
+      sortOrder: 'descend',
+    });
+    expect(result.items[0]).toMatchObject({
+      id: '9007199254740993',
+      momentId: '42',
+      read: false,
+      image: 'https://example.com/a.png',
+      content: '',
+    });
+    respond({ total: 1, records: [{ id: 1, state: 9 }] });
+    await expect(createFishCircleClient('', token, vi.fn()).reminders(1, signal())).rejects.toThrow(
+      '通知已读状态异常',
+    );
+  });
+  it('uses legacy batch routes and rejects unconfirmed mutations', async () => {
+    const fetcher = respond(true);
+    const client = createFishCircleClient('', token, vi.fn());
+    await client.reminderAction('read', ['12'], signal());
+    expect(fetcher.mock.calls[0]![0]).toBe('/api/event_remind/batch/set/read');
+    expect(JSON.parse(fetcher.mock.calls[0]![1].body)).toEqual({ ids: ['12'] });
+    await client.reminderAction('delete', ['12'], signal());
+    expect(fetcher.mock.calls[1]![0]).toBe('/api/event_remind/batch/delete');
+    respond(false);
+    await expect(client.reminderAction('read', ['12'], signal())).rejects.toThrow('服务器未确认');
+  });
+});

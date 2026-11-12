@@ -98,7 +98,7 @@ test('login opens over the current page and closes with focus restored', async (
   await page.getByRole('textbox', { name: '账号或邮箱', exact: true }).fill('unsaved-account');
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
-  await expect(page).toHaveURL('http://127.0.0.1:4173/');
+  await expect(page).toHaveURL('/');
   await expect(trigger).toBeFocused();
   await trigger.click();
   await expect(page.getByRole('textbox', { name: '账号或邮箱', exact: true })).toHaveValue('');
@@ -156,7 +156,7 @@ test('email login persists and synchronizes logout across tabs', async ({
   await page.getByRole('button', { name: '显示密码' }).click();
   await expect(page.getByLabel('密码', { exact: true })).toHaveAttribute('type', 'text');
   await page.getByRole('button', { name: '登录', exact: true }).click();
-  await expect(page).toHaveURL('http://127.0.0.1:4173/');
+  await expect(page).toHaveURL('/');
   expect(server.loginPath).toBe('/api/user/email/login');
   expect(server.lastBody).toEqual({
     email: 'test@example.com',

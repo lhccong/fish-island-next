@@ -1,7 +1,7 @@
-import { useState, type RefObject } from 'react';
+import type { RefObject } from 'react';
 import { EllipsisVertical, Gift, Trophy, Pencil, Trash2, Pin } from 'lucide-react';
 import type { MomentAction } from '@/domain/fish-circle';
-import { Dialog } from '@/shared/ui/Dialog';
+import { DropdownMenu } from '@/shared/ui/DropdownMenu';
 import styles from './MomentMenu.module.css';
 interface Props {
   triggerRef: RefObject<HTMLButtonElement | null>;
@@ -23,19 +23,9 @@ export function MomentMenu({
   onAction,
   onToggleTop,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  function select(action: () => void) {
-    setOpen(false);
-    action();
-  }
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-      title="动态操作"
-      description="选择要进行的操作"
-      dismissLabel="关闭动态操作"
-      showCloseAction={false}
+    <DropdownMenu
+      label="动态操作"
       trigger={
         <button
           ref={triggerRef}
@@ -47,43 +37,46 @@ export function MomentMenu({
           <EllipsisVertical size={16} aria-hidden="true" />
         </button>
       }
-    >
-      <div className={styles.menu}>
-        {!owner && (
-          <button type="button" onClick={() => select(() => onAction('reward'))}>
-            <Gift size={18} aria-hidden="true" />
-            打赏
-          </button>
-        )}
-        {owner && (
-          <button type="button" onClick={() => select(() => onAction('lottery/start'))}>
-            <Trophy size={18} aria-hidden="true" />
-            点赞抽奖
-          </button>
-        )}
-        {(owner || admin) && (
-          <>
-            <button type="button" onClick={() => select(onEdit)}>
-              <Pencil size={18} aria-hidden="true" />
-              编辑动态
-            </button>
-            <button
-              className={styles.danger}
-              type="button"
-              onClick={() => select(() => onAction('delete'))}
-            >
-              <Trash2 size={18} aria-hidden="true" />
-              删除动态
-            </button>
-          </>
-        )}
-        {admin && (
-          <button type="button" disabled={pending} onClick={() => select(onToggleTop)}>
-            <Pin size={18} aria-hidden="true" />
-            {top ? '取消置顶' : '置顶动态'}
-          </button>
-        )}
-      </div>
-    </Dialog>
+      items={[
+        {
+          label: owner ? '发起抽奖' : '打赏',
+          icon: owner ? (
+            <Trophy size={14} aria-hidden="true" />
+          ) : (
+            <Gift size={14} aria-hidden="true" />
+          ),
+          disabled: pending,
+          onSelect: () => onAction(owner ? 'lottery/start' : 'reward'),
+        },
+        ...(admin
+          ? [
+              {
+                label: top ? '取消置顶' : '置顶动态',
+                icon: <Pin size={14} aria-hidden="true" />,
+                tone: 'highlight' as const,
+                disabled: pending,
+                onSelect: onToggleTop,
+              },
+            ]
+          : []),
+        ...(owner || admin
+          ? [
+              {
+                label: '修改',
+                icon: <Pencil size={14} aria-hidden="true" />,
+                disabled: pending,
+                onSelect: onEdit,
+              },
+              {
+                label: '删除',
+                icon: <Trash2 size={14} aria-hidden="true" />,
+                tone: 'danger' as const,
+                disabled: pending,
+                onSelect: () => onAction('delete'),
+              },
+            ]
+          : []),
+      ]}
+    />
   );
 }

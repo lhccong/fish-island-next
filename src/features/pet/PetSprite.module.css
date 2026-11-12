@@ -1,0 +1,45 @@
+.sprite,
+.static,
+.placeholder {
+  display: inline-block;
+  width: var(--sprite-size);
+  height: var(--sprite-height);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.sprite {
+  position: relative;
+  overflow: hidden;
+}
+.sprite img {
+  position: absolute;
+  width: calc(var(--sprite-size) * 8);
+  height: calc(var(--sprite-height) * 9);
+  max-width: none;
+  top: var(--sprite-row);
+  left: 0;
+  animation: frames 1.1s steps(var(--sprite-frames)) infinite;
+  image-rendering: pixelated;
+}
+.static img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.placeholder {
+  display: inline-grid;
+  place-items: center;
+  color: var(--color-muted);
+  background: var(--color-canvas);
+  border-radius: 50%;
+}
+@keyframes frames {
+  to {
+    transform: translateX(var(--sprite-end));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sprite img {
+    animation-name: none;
+  }
+}

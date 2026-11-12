@@ -1,0 +1,63 @@
+.page {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  padding: max(var(--space-5), env(safe-area-inset-top))
+    max(var(--space-5), env(safe-area-inset-right)) max(var(--space-5), env(safe-area-inset-bottom))
+    max(var(--space-5), env(safe-area-inset-left));
+  background: var(--color-canvas);
+  color: var(--color-text);
+}
+
+.content {
+  display: grid;
+  justify-items: center;
+  max-width: 100%;
+  text-align: center;
+}
+
+.mark {
+  position: relative;
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--space-5);
+  place-items: center;
+  color: var(--color-accent-text);
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--color-accent-soft);
+  border-top-color: var(--color-accent-text);
+  border-radius: 50%;
+  animation: turn 1.2s linear infinite;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.hint {
+  margin: var(--space-2) 0 0;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring {
+    animation: none;
+  }
+}

@@ -1,6 +1,7 @@
 import {
   CircleError,
   type Moment,
+  type CircleReminder,
   type Comment,
   type Page,
   type Media,
@@ -97,4 +98,23 @@ export function page<T>(value: unknown, decode: (v: unknown) => T): Page<T> {
   )
     throw new CircleError('分页数据格式异常');
   return { items: p.records.map((item: unknown) => decode(item)), total };
+}
+
+export function reminder(value: unknown): CircleReminder {
+  const r = record(value);
+  const sender = r.senderUser == null ? {} : record(r.senderUser);
+  const raw = text(r.sourceContent);
+  const imageMatch = /\[img\]([^[]+)\[\/img\]|\[img:([^\]]+)\]/.exec(raw);
+  if (r.state !== 0 && r.state !== 1) throw new CircleError('通知已读状态异常');
+  return {
+    id: id(r.id),
+    senderName: text(sender.userName) || '系统通知',
+    avatar: safeUrl(sender.userAvatar),
+    content: raw.replace(/\[img\][^[]+\[\/img\]|\[img:[^\]]+\]/g, '').trim(),
+    image: safeUrl(imageMatch?.[1] || imageMatch?.[2]),
+    action: text(r.action),
+    createdAt: text(r.createTime),
+    read: r.state === 1,
+    momentId: r.sourceType === 4 && r.sourceId != null ? id(r.sourceId) : '',
+  };
 }

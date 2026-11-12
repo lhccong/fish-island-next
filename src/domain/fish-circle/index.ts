@@ -45,7 +45,21 @@ export interface Draft {
   media: Media[];
 }
 export type MomentAction = 'delete' | 'top' | 'reward' | 'lottery/start';
+export interface CircleReminder {
+  id: string;
+  senderName: string;
+  avatar: string;
+  content: string;
+  image: string;
+  action: string;
+  createdAt: string;
+  read: boolean;
+  momentId: string;
+}
 export interface FishCirclePort {
+  reminders(page: number, signal: AbortSignal): Promise<Page<CircleReminder>>;
+  reminderAction(action: 'read' | 'delete', ids: string[], signal: AbortSignal): Promise<boolean>;
+  detail(id: string, signal: AbortSignal): Promise<Moment>;
   profile(id: string, signal: AbortSignal): Promise<CircleProfile>;
   list(page: number, userId: string, signal: AbortSignal): Promise<Page<Moment>>;
   save(draft: Draft, original: Moment | null, signal: AbortSignal): Promise<boolean>;

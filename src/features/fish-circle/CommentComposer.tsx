@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { ImagePlus } from 'lucide-react';
 import type { Comment, FishCirclePort, Media } from '@/domain/fish-circle';
+import { Button } from '@/shared/ui/Button';
 import { useOperation } from './use-operation';
 import styles from './Circle.module.css';
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 export function CommentComposer({ service, momentId, reply, onCancelReply, onSent }: Props) {
   const [content, setContent] = useState('');
   const [images, setImages] = useState<Media[]>([]);
+  const picker = useRef<HTMLInputElement>(null);
   const send = useOperation();
   const upload = useOperation();
   const busy = send.pending || upload.pending;
@@ -63,11 +66,12 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
           </div>
         ))}
       </div>
-      <label>
-        评论图片（最多 3 张）
+      <div className={styles.commentUpload}>
         <input
+          ref={picker}
           aria-label="评论图片"
           type="file"
+          hidden
           accept="image/jpeg,image/png,image/gif,image/webp"
           disabled={busy || images.length >= 3}
           onChange={(e) => {
@@ -81,7 +85,16 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
                 });
           }}
         />
-      </label>
+        <Button
+          variant="secondary"
+          disabled={busy || images.length >= 3}
+          onClick={() => picker.current?.click()}
+        >
+          <ImagePlus size={16} aria-hidden="true" />
+          添加评论图片
+        </Button>
+        <span>{images.length}/3 张图片</span>
+      </div>
       {upload.pending && <p role="status">正在上传评论图片…</p>}
       <button type="submit" disabled={busy || (!content.trim() && !images.length)}>
         {send.pending ? '正在发送…' : '发送评论'}

@@ -1,4 +1,5 @@
 import type { HotSource } from '@/domain/hot-board';
+import type { AuthUser } from '@/domain/auth';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import styles from './HotSourceConversation.module.css';
 
@@ -11,7 +12,12 @@ const timeFormat = new Intl.DateTimeFormat('zh-CN', {
   timeZone: 'Asia/Shanghai',
 });
 
-export function HotSourceConversation({ source }: { source: HotSource }) {
+interface HotSourceConversationProps {
+  source: HotSource;
+  currentUser: Pick<AuthUser, 'name' | 'avatarUrl'> | null;
+}
+
+export function HotSourceConversation({ source, currentUser }: HotSourceConversationProps) {
   return (
     <section className={styles.conversation} aria-label={`${source.name}消息`}>
       <div className={styles.timestamp}>
@@ -23,12 +29,9 @@ export function HotSourceConversation({ source }: { source: HotSource }) {
       </div>
       <div className={styles.outgoing} aria-label="演示消息">
         <div>
-          <span className={styles.demo}>我 · 界面演示</span>
           <p>看看今天的热榜</p>
         </div>
-        <span className={styles.myAvatar} aria-hidden="true">
-          我
-        </span>
+        <SourceAvatar name={currentUser?.name ?? '我'} src={currentUser?.avatarUrl ?? null} />
       </div>
       <ol className={styles.messages} aria-label="热榜消息列表">
         {source.entries.map((entry) => (

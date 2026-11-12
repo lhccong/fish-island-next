@@ -1,13 +1,15 @@
 import { useState, type CSSProperties } from 'react';
 import { Check, Palette } from 'lucide-react';
-import { builtinSkins } from '@/skins/builtin';
+import { builtinSkins, getSkinTokens } from '@/skins/builtin';
 import { Dialog } from '@/shared/ui/Dialog';
 import { useAppearanceStore } from './model/appearance-store';
 import styles from './ThemePicker.module.css';
+import { ColorModePicker } from './ColorModePicker';
 
 export function ThemePicker({ presentation = 'rail' }: { presentation?: 'rail' | 'ribbon' }) {
   const [open, setOpen] = useState(false);
   const skinId = useAppearanceStore((state) => state.skinId);
+  const colorMode = useAppearanceStore((state) => state.colorMode);
   const setSkinId = useAppearanceStore((state) => state.setSkinId);
   return (
     <Dialog
@@ -31,6 +33,7 @@ export function ThemePicker({ presentation = 'rail' }: { presentation?: 'rail' |
         </button>
       }
     >
+      <ColorModePicker />
       <div className={styles.options} role="group" aria-label="主题选择">
         {builtinSkins.map((skin) => (
           <button
@@ -43,7 +46,7 @@ export function ThemePicker({ presentation = 'rail' }: { presentation?: 'rail' |
           >
             <span
               className={styles.preview}
-              style={skin.tokens as CSSProperties}
+              style={getSkinTokens(skin.id, colorMode) as CSSProperties}
               aria-hidden="true"
             >
               <span className={styles.previewRail}>

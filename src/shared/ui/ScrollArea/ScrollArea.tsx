@@ -6,11 +6,22 @@ interface ScrollAreaProps {
   children: ReactNode;
   label: string;
   className?: string;
+  gutter?: 'overlay' | 'reserved';
 }
 
-export function ScrollArea({ children, label, className = '' }: ScrollAreaProps) {
+export function ScrollArea({
+  children,
+  label,
+  className = '',
+  gutter = 'overlay',
+}: ScrollAreaProps) {
   return (
-    <Primitive.Root type="auto" scrollHideDelay={650} className={`${styles.root} ${className}`}>
+    <Primitive.Root
+      type="auto"
+      scrollHideDelay={650}
+      data-gutter={gutter}
+      className={`${styles.root} ${className}`}
+    >
       <Primitive.Viewport className={styles.viewport} tabIndex={0} role="region" aria-label={label}>
         {children}
       </Primitive.Viewport>

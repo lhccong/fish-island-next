@@ -12,6 +12,15 @@
   overscroll-behavior: contain;
   border-radius: inherit;
 }
+.root[data-gutter='reserved'] .viewport {
+  box-sizing: border-box;
+  padding-inline-end: var(--space-6);
+}
+@media (max-width: 760px) {
+  .root[data-gutter='reserved'] .viewport {
+    padding-inline-end: var(--space-5);
+  }
+}
 .viewport > div {
   width: 100%;
   table-layout: fixed;

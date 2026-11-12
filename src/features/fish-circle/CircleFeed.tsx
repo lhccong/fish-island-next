@@ -3,7 +3,8 @@ import type { AuthUser } from '@/domain/auth';
 import type { FishCirclePort } from '@/domain/fish-circle';
 import { MomentCard } from './MomentCard';
 import { MomentEditor } from './MomentEditor';
-import { Camera, RefreshCw } from 'lucide-react';
+import { Camera, RefreshCw, Images, UserRound } from 'lucide-react';
+import { CircleNotifications } from './CircleNotifications';
 import { CircleCover } from './CircleCover';
 import { PinnedMoments } from './PinnedMoments';
 import { usePage } from './use-page';
@@ -27,6 +28,49 @@ export function CircleFeed({ service, user, userId, name, onViewUser, renderLayo
   const content = (
     <div className={styles.feed}>
       <CircleCover
+        actions={
+          <>
+            <button
+              type="button"
+              aria-label="全部动态"
+              title="全部动态"
+              aria-pressed={!userId}
+              onClick={() => onViewUser('', '')}
+            >
+              <Images size={19} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="我的鱼小圈"
+              title="我的鱼小圈"
+              aria-pressed={userId === user.id}
+              onClick={() => onViewUser(user.id, user.name)}
+            >
+              <UserRound size={19} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              title="刷新动态"
+              aria-label="刷新动态"
+              disabled={result.status === 'loading'}
+              onClick={() => {
+                if (page !== 1) setPage(1);
+                else refresh();
+              }}
+            >
+              <RefreshCw size={16} aria-hidden="true" />
+            </button>
+            <CircleNotifications service={service} user={user} onViewUser={onViewUser} />
+            <button
+              type="button"
+              aria-label="发布动态"
+              title="发布动态"
+              onClick={() => setPublishing(true)}
+            >
+              <Camera size={16} aria-hidden="true" />
+            </button>
+          </>
+        }
         service={service}
         userId={userId || user.id}
         fallbackName={name || user.name}
@@ -36,38 +80,6 @@ export function CircleFeed({ service, user, userId, name, onViewUser, renderLayo
         onBack={() => onViewUser('', '')}
         onViewSelf={() => onViewUser(user.id, user.name)}
       />
-      <div className={styles.toolbar}>
-        <div className={styles.tabs} aria-label="动态筛选">
-          <button type="button" aria-pressed={!userId} onClick={() => onViewUser('', '')}>
-            全部动态
-          </button>
-          <button
-            type="button"
-            aria-pressed={userId === user.id}
-            onClick={() => onViewUser(user.id, user.name)}
-          >
-            我的鱼小圈
-          </button>
-        </div>
-        <div className={styles.tools}>
-          <button
-            className={styles.refresh}
-            type="button"
-            aria-label="刷新动态"
-            disabled={result.status === 'loading'}
-            onClick={() => {
-              if (page !== 1) setPage(1);
-              else refresh();
-            }}
-          >
-            <RefreshCw size={16} aria-hidden="true" />
-          </button>
-          <button className={styles.publish} type="button" onClick={() => setPublishing(true)}>
-            <Camera size={16} aria-hidden="true" />
-            发布动态
-          </button>
-        </div>
-      </div>
       <div className={styles.layout}>
         {result.status === 'ready' && (
           <PinnedMoments

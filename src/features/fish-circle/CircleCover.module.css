@@ -42,7 +42,7 @@
   text-align: right;
 }
 .info h2 {
-  color: var(--color-circle-card);
+  color: var(--color-circle-cover-text);
   font-size: 20px;
   margin: 0 0 var(--space-2);
   line-height: 1.4;
@@ -71,7 +71,7 @@
   border: 0;
   border-radius: 24px;
   background: var(--color-circle-cover-control);
-  color: var(--color-circle-card);
+  color: var(--color-circle-cover-text);
   cursor: pointer;
   font-size: 13px;
 }
@@ -87,7 +87,10 @@
   top: var(--space-4);
   right: var(--space-4);
   font-size: 12px;
-  color: var(--color-circle-text);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--color-circle-cover-shade);
+  color: var(--color-circle-cover-text);
 }
 .follow button {
   min-height: 44px;
@@ -100,7 +103,7 @@
 }
 .follow [role='alert'] {
   display: block;
-  color: var(--color-circle-card);
+  color: var(--color-circle-cover-text);
   font-size: 12px;
 }
 @media (max-width: 760px) {
@@ -133,5 +136,61 @@
     top: var(--space-3);
     right: var(--space-3);
     max-width: 42%;
+  }
+}
+
+.actions {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: var(--radius-panel);
+  background: var(--color-circle-cover-control);
+  color: var(--color-circle-cover-text);
+}
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.actions button:hover,
+.actions button[aria-pressed='true'] {
+  background: var(--color-circle-cover-shade);
+}
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.loading,
+.retry {
+  top: 72px;
+}
+@media (max-width: 760px) {
+  .actions {
+    top: var(--space-2);
+    right: var(--space-2);
+  }
+  .back {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  .backLabel {
+    display: none;
+  }
+  .loading,
+  .retry {
+    top: 64px;
+    max-width: 80%;
   }
 }

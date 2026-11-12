@@ -63,7 +63,7 @@
   display: grid;
   place-items: center;
   background: var(--color-sso-dot);
-  color: var(--color-sso-surface);
+  color: var(--color-sso-placeholder-text);
 }
 .userInfo {
   display: flex;

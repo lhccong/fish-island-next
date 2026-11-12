@@ -1,6 +1,6 @@
 import { BookOpen, Check, Layers3, MessageCircle, Palette, Radio } from 'lucide-react';
 import { Dialog } from '@/shared/ui/Dialog';
-import { useAppearanceStore } from '@/features/appearance';
+import { ColorModePicker, useAppearanceStore } from '@/features/appearance';
 import { builtinSkins } from '@/skins/builtin';
 import { Button } from '@/shared/ui/Button';
 import styles from './InitializationPage.module.css';
@@ -79,6 +79,7 @@ export function InitializationPage() {
             </div>
             <h2 id="preview-title">一套内核，多种表达</h2>
             <p>切换基础配色，预览设计变量的统一应用。</p>
+            <ColorModePicker />
             <div className={styles.skinOptions} role="group" aria-label="基础配色预览">
               {builtinSkins.map((skin) => (
                 <button

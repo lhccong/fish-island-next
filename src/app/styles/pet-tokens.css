@@ -1,0 +1,38 @@
+:root {
+  --color-pet-meadow: #9dbd78;
+  --color-pet-grass-detail: #799d5e;
+  --color-pet-flower: #f3d99b;
+  --color-pet-path: #e6d4aa;
+  --color-pet-path-edge: #b3ab7c;
+  --color-pet-path-detail: #b7a47e;
+  --color-pet-water: #82c4cc;
+  --color-pet-water-edge: #c7d9bc;
+  --color-pet-water-glint: #d9eeeb;
+  --color-pet-tree: #5b8b59;
+  --color-pet-tree-light: #83ab64;
+  --color-pet-tree-dark: #3d6c4c;
+  --color-pet-wood: #80674f;
+  --color-pet-rock: #b1b4a1;
+  --color-pet-rock-dark: #7c897a;
+  --color-pet-shadow: rgb(29 65 44 / 24%);
+  --color-pet-stripe: rgb(255 255 255 / 12%);
+  --color-pet-panel: color-mix(in srgb, var(--color-life-epic-soft) 65%, var(--color-surface));
+}
+:root[data-color-mode='dark'] {
+  --color-pet-meadow: #354c3b;
+  --color-pet-grass-detail: #45634a;
+  --color-pet-flower: #aaad87;
+  --color-pet-path: #6c6952;
+  --color-pet-path-edge: #4a5440;
+  --color-pet-path-detail: #878169;
+  --color-pet-water: #315d65;
+  --color-pet-water-edge: #4c6b5a;
+  --color-pet-water-glint: #7eabaa;
+  --color-pet-tree: #35583f;
+  --color-pet-tree-light: #53724d;
+  --color-pet-tree-dark: #233f32;
+  --color-pet-wood: #655646;
+  --color-pet-rock: #737e74;
+  --color-pet-rock-dark: #49564e;
+  --color-pet-shadow: rgb(0 0 0 / 30%);
+}

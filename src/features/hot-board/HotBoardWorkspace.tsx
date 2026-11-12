@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { SearchX } from 'lucide-react';
 import type { HotBoardPort } from '@/domain/hot-board';
+import type { AuthUser } from '@/domain/auth';
 import { Button } from '@/shared/ui/Button';
 import { useHotBoard } from './model/use-hot-board';
 import { HotBoardSidebar } from './ui/HotBoardSidebar';
@@ -15,6 +16,7 @@ import styles from './ui/HotBoard.module.css';
 
 interface HotBoardWorkspaceProps {
   service: HotBoardPort;
+  currentUser: Pick<AuthUser, 'name' | 'avatarUrl'> | null;
   presentation?: 'cards' | 'table';
   renderLayout: (slots: {
     sidebar: ReactNode;
@@ -27,6 +29,7 @@ interface HotBoardWorkspaceProps {
 
 export function HotBoardWorkspace({
   service,
+  currentUser,
   renderLayout,
   presentation = 'cards',
 }: HotBoardWorkspaceProps) {
@@ -55,7 +58,7 @@ export function HotBoardWorkspace({
   }
 
   return renderLayout({
-    contentKey: effectiveSourceId,
+    contentKey: presentation === 'table' ? 'hot-table' : effectiveSourceId,
     footer: selected ? (
       <div hidden={presentation === 'table'}>
         <DemoComposer key={selected.id} />
@@ -147,7 +150,7 @@ export function HotBoardWorkspace({
           ) : null}
           {visible.length > 0 ? (
             selected && visible[0] ? (
-              <HotSourceConversation source={visible[0]} />
+              <HotSourceConversation source={visible[0]} currentUser={currentUser} />
             ) : (
               <div className={styles.grid}>
                 {visible.map((source) => (

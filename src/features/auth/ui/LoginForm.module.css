@@ -74,7 +74,7 @@
   padding: var(--space-3);
   border: 0;
   border-radius: var(--radius-control);
-  background: var(--color-accent-text);
+  background: var(--color-action);
   color: var(--color-on-accent);
   font-size: 15px;
   cursor: pointer;

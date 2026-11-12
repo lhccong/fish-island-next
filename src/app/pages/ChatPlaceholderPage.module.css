@@ -27,7 +27,7 @@
   color: var(--color-muted);
 }
 .empty > svg {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 .empty h2 {
   color: var(--color-text);
@@ -41,7 +41,7 @@
 }
 .empty a {
   margin-top: var(--space-5);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   min-height: 44px;
 }
 @media (max-width: 760px) {

@@ -1,0 +1,485 @@
+.workspace {
+  height: 100%;
+  min-height: 0;
+}
+.shelf {
+  padding: var(--space-5);
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.shelfHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.shelfHeader h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 22px;
+}
+.shelfHeader p,
+.bookCard p,
+.hint {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.empty {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  padding: var(--space-6);
+  gap: var(--space-3);
+  min-height: 220px;
+  color: var(--color-muted);
+}
+.empty h3 {
+  color: var(--color-text);
+  margin: 0;
+}
+.bookGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--space-5);
+}
+.bookCard {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.bookCard h3 {
+  font-size: 16px;
+  margin: var(--space-3) 0 var(--space-2);
+}
+.bookCard small {
+  color: var(--color-muted);
+  display: block;
+  margin-bottom: var(--space-3);
+}
+.cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 190px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-4);
+  cursor: pointer;
+}
+.cover img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+}
+.cover span {
+  max-width: 100%;
+  font-size: 19px;
+  line-height: 1.6;
+}
+.wideDialog {
+  width: min(700px, calc(100vw - 24px));
+  max-height: calc(100dvh - 32px);
+}
+.error {
+  color: var(--color-danger);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+.settings {
+  display: grid;
+  gap: var(--space-4);
+}
+.settings fieldset {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+}
+.settings label {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: 14px;
+}
+.settings summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: var(--space-3) 0;
+}
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.workspace input,
+.settings input,
+.wideDialog > input,
+.findBar input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  min-height: 44px;
+  font: inherit;
+}
+.preview {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--reader-paper);
+  color: var(--reader-ink);
+}
+.chapterList {
+  height: min(52dvh, 480px);
+}
+.chapter {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-3);
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.chapter:hover {
+  background: var(--color-hover);
+}
+.chapter[aria-current='true'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+.chapter:disabled {
+  color: var(--color-muted);
+  cursor: default;
+  font-weight: 600;
+}
+.host {
+  position: relative;
+  z-index: 80;
+}
+.reader {
+  left: var(--reader-x);
+  top: var(--reader-y);
+  width: var(--reader-width);
+  height: var(--reader-height);
+  opacity: var(--reader-opacity);
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100vw;
+  max-height: 100dvh;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  background: var(--reader-paper);
+  color: var(--reader-ink);
+}
+.reader[data-maximized='true'] {
+  inset: 12px;
+  width: auto;
+  height: auto;
+}
+.readerTitle,
+.toolbar,
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-1) var(--space-2);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: normal;
+  line-height: 1.4;
+}
+.readerTitle button,
+.toolbar button,
+.notice button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  min-width: 40px;
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.readerTitle button:hover,
+.toolbar button:hover {
+  background: var(--color-hover);
+}
+.toolbar button[aria-pressed='true'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+.toolbar button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.readerTitle .drag {
+  flex: 1;
+  justify-content: flex-start;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0 var(--space-2);
+  cursor: move;
+  touch-action: none;
+}
+.toolbar {
+  flex-wrap: wrap;
+}
+.pageControls {
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
+  padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
+}
+.pageControls span {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.bodyWrap {
+  min-height: 0;
+  flex: 1;
+}
+.bodyScroll {
+  height: 100%;
+}
+.prose {
+  padding: var(--space-5);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.prose h2 {
+  font-size: 1.1em;
+  text-align: center;
+}
+.prose p {
+  text-indent: var(--reader-indent);
+  margin: 0.8em 0;
+}
+.prose p[data-highlight='true'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  border-radius: var(--radius-control);
+}
+.findBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  font-size: 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  letter-spacing: normal;
+}
+.findBar input {
+  flex: 1;
+  width: 0;
+}
+.findBar button {
+  padding-inline: var(--space-2);
+}
+.reader > .actions {
+  padding: var(--space-2);
+  background: var(--color-surface);
+}
+.notice {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  align-items: center;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-2);
+  font-size: 13px;
+}
+.resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  width: 18px;
+  border: 0;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: var(--color-overlay);
+  cursor: default;
+}
+.resume {
+  position: fixed;
+  right: var(--space-4);
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.documentRibbon {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font:
+    13px/1.8 system-ui,
+    sans-serif;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  letter-spacing: normal;
+}
+.documentRibbon span {
+  color: var(--color-muted);
+  display: block;
+  font-size: 11px;
+}
+.reader[data-study='true'] .prose {
+  max-width: 780px;
+  margin: var(--space-3) auto;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-panel);
+}
+.host[data-pip='true'] .reader {
+  left: var(--reader-x);
+  top: var(--reader-y);
+  width: var(--reader-width);
+  height: var(--reader-height);
+  opacity: var(--reader-opacity);
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  border-radius: 0;
+  opacity: 1;
+}
+.host[data-pip='true'] .resize {
+  display: none;
+}
+@media (max-width: 760px) {
+  .shelf {
+    padding: var(--space-4);
+  }
+  .shelfHeader {
+    align-items: flex-start;
+  }
+  .shelfHeader > .actions {
+    width: 100%;
+  }
+  .bookGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .bookCard {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: var(--space-2) var(--space-3);
+  }
+  .cover {
+    width: 90px;
+    height: 130px;
+    grid-row: span 5;
+    padding: var(--space-2);
+  }
+  .cover span {
+    font-size: 13px;
+  }
+  .bookCard h3,
+  .bookCard p,
+  .bookCard small {
+    margin: 0;
+  }
+  .bookCard .actions {
+    grid-column: 1 / -1;
+    margin-top: var(--space-2);
+  }
+  .reader,
+  .reader[data-maximized='true'] {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+    opacity: 1;
+  }
+  .readerTitle .drag {
+    cursor: default;
+  }
+  .resize {
+    display: none;
+  }
+  .prose {
+    padding: var(--space-4);
+  }
+  .formGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .toolbar {
+    justify-content: space-between;
+  }
+  .toolbar button {
+    min-width: 40px;
+  }
+}

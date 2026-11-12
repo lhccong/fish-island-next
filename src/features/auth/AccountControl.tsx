@@ -1,6 +1,4 @@
-import { Dialog } from '@/shared/ui/Dialog';
-import { Button } from '@/shared/ui/Button';
-import { SourceAvatar } from '@/shared/ui/SourceAvatar';
+import { AccountDialog } from './AccountDialog';
 import { useAuth } from './use-auth';
 import styles from './ui/AccountControl.module.css';
 
@@ -16,26 +14,12 @@ export function AccountControl({ onLogin }: { onLogin: () => void }) {
   return (
     <div className={styles.account}>
       {session.status === 'authenticated' ? (
-        <Dialog
-          title={session.user.name}
-          description="已登录摸鱼岛，可在本设备退出账号。"
-          trigger={
-            <button className={styles.trigger} type="button" aria-label="用户菜单">
-              <SourceAvatar name={session.user.name} src={session.user.avatarUrl} />
-            </button>
-          }
-        >
-          <p className={styles.id}>账号 ID：{session.user.id}</p>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              void leave();
-            }}
-            disabled={pending !== null}
-          >
-            退出登录
-          </Button>
-        </Dialog>
+        <AccountDialog
+          user={session.user}
+          onLogout={() => {
+            void leave();
+          }}
+        />
       ) : (
         <button
           className={styles.trigger}

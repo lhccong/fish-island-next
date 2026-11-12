@@ -1,4 +1,13 @@
 :root {
+  --color-profile-accent: #b94700;
+  --color-profile-badge-bg: #ffa45e;
+  --color-profile-badge-text: #492100;
+  --color-profile-warm-bg: #fff7e8;
+  --color-profile-warm-border: #ffc983;
+  --color-profile-icon-bg: #ffd18b;
+  --color-profile-success-bg: #f6ffed;
+  --color-profile-success-border: #b7eb8f;
+  --color-profile-success-text: #397d16;
   --color-game-sky: #d8edeb;
   --color-game-horizon: #f0dbc2;
   --color-game-sun: #f2c979;
@@ -84,8 +93,9 @@
   --color-circle-pin-border: #ffdcc0;
   --color-circle-heart: #ff5b63;
   --color-circle-cover: #e8e8e8;
+  --color-circle-cover-text: #ffffff;
   --color-circle-cover-shade: rgb(0 0 0 / 68%);
-  --color-circle-cover-control: rgb(0 0 0 / 26%);
+  --color-circle-cover-control: rgb(0 0 0 / 58%);
   --shadow-circle-card: 0 2px 12px rgb(0 0 0 / 5%);
   --shadow-circle-avatar: 0 4px 16px rgb(0 0 0 / 18%);
   --radius-circle-card: 16px;

@@ -1,0 +1,356 @@
+.scroll {
+  background: var(--color-canvas);
+}
+.workspace {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px 28px 32px;
+  color: var(--color-text);
+}
+.intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.eyebrow {
+  color: var(--color-muted);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.intro h1 {
+  margin: 6px 0;
+  font-size: 28px;
+  letter-spacing: 2px;
+}
+.intro p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  background: var(--color-surface);
+}
+.tag > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent-text);
+}
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 14px 20px;
+  border: 3px solid var(--color-surface);
+  border-radius: 18px;
+  background:
+    repeating-linear-gradient(135deg, var(--color-pet-stripe) 0 9px, transparent 9px 18px),
+    linear-gradient(100deg, var(--color-accent-soft), var(--color-pet-panel));
+  box-shadow: var(--shadow-panel);
+}
+.portrait {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+.identity {
+  min-width: 0;
+  flex: 1;
+}
+.identity h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 10px;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+.identity h2 small {
+  font-size: 12px;
+  color: var(--color-accent-text);
+  white-space: nowrap;
+}
+.vitals {
+  display: flex;
+  gap: 20px;
+}
+.vitals > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.vitals meter {
+  width: clamp(40px, 9vw, 130px);
+  height: 9px;
+  appearance: none;
+  border-radius: 20px;
+  background: var(--color-border);
+}
+.vitals meter::-webkit-meter-bar {
+  border: 0;
+  border-radius: 20px;
+  background: var(--color-border);
+}
+.vitals meter::-webkit-meter-optimum-value {
+  border-radius: 20px;
+  background: var(--color-accent-text);
+}
+.vitals meter::-moz-meter-bar {
+  border-radius: 20px;
+  background: var(--color-accent-text);
+}
+.experience {
+  display: grid;
+  gap: 4px;
+  min-width: 70px;
+  text-align: center;
+  padding-left: 16px;
+  border-left: 1px solid var(--color-border);
+}
+.experience strong {
+  font-size: 24px;
+}
+.experience span {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.careBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 4px 20px;
+}
+.careBar > span {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.careBar > div {
+  display: flex;
+  gap: 8px;
+}
+.tools {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.tool {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
+  min-height: 84px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+.tool:hover:not(:disabled) {
+  border-color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.tool:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.toolIcon {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+.toolIcon[data-tone='1'] {
+  color: var(--color-warning);
+  background: var(--color-profile-warm-bg);
+}
+.toolIcon[data-tone='2'] {
+  color: var(--color-life-epic);
+  background: var(--color-life-epic-soft);
+}
+.tool strong {
+  align-self: end;
+  font-size: 14px;
+}
+.tool small {
+  align-self: start;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.footnote {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.welcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+}
+.welcome h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.welcome p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.welcome form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+.welcome input {
+  width: 180px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+}
+@media (max-width: 1100px) {
+  .tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vitals {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .workspace {
+    padding: 18px 12px max(24px, env(safe-area-inset-bottom));
+  }
+  .intro {
+    margin-bottom: 16px;
+  }
+  .intro h1 {
+    font-size: 24px;
+  }
+  .eyebrow {
+    letter-spacing: 1px;
+    font-size: 9px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  .summary {
+    gap: 10px;
+    padding: 10px;
+    border-width: 2px;
+  }
+  .portrait {
+    width: 60px;
+    height: 66px;
+  }
+  .identity h2 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+  .identity .eyebrow {
+    display: none;
+  }
+  .experience {
+    min-width: 44px;
+    padding-left: 8px;
+  }
+  .experience strong {
+    font-size: 18px;
+  }
+  .experience span {
+    font-size: 10px;
+  }
+  .vitals {
+    display: grid;
+    gap: 4px;
+  }
+  .vitals > span {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .vitals meter {
+    width: 58px;
+  }
+  .careBar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 0 16px;
+    gap: 10px;
+  }
+  .careBar > div {
+    justify-content: flex-end;
+  }
+  .tools {
+    gap: 8px;
+  }
+  .tool {
+    padding: 12px 10px;
+    column-gap: 8px;
+    min-height: 78px;
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+  .toolIcon {
+    width: 34px;
+    height: 38px;
+    border-radius: 10px;
+  }
+  .tool small {
+    font-size: 10px;
+  }
+  .welcome {
+    padding: 14px;
+    gap: 10px;
+  }
+  .welcome form {
+    margin-left: 0;
+    width: 100%;
+  }
+  .welcome input {
+    height: 44px;
+    flex: 1;
+  }
+  .welcome h2 {
+    font-size: 16px;
+  }
+  .footnote {
+    font-size: 10px;
+    line-height: 1.8;
+  }
+}

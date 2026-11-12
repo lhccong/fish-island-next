@@ -55,11 +55,11 @@ test('wechat sidebar preserves legacy cover and cards on desktop and mobile', as
   await expect(card.getByText('第四条合成评论', { exact: true })).toBeVisible();
   const more = card.getByRole('button', { name: '更多动态操作' });
   await more.click();
-  await expect(page.getByRole('dialog', { name: '动态操作' })).toBeVisible();
+  await expect(page.getByRole('menu', { name: '动态操作' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(more).toBeFocused();
   await more.click();
-  await page.getByRole('button', { name: '编辑动态', exact: true }).click();
+  await page.getByRole('menuitem', { name: '修改', exact: true }).click();
   await page.getByRole('button', { name: '关闭编辑器', exact: true }).click();
   await expect(more).toBeFocused();
   await expect(page.getByRole('dialog')).toHaveCount(0);

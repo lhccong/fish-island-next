@@ -1,12 +1,23 @@
 import { create } from 'zustand';
-import { builtinSkins, type BuiltinSkinId } from '@/skins/builtin';
+import { builtinSkins, type BuiltinSkinId, type ColorMode } from '@/skins/builtin';
 
 interface AppearanceState {
   skinId: BuiltinSkinId;
+  colorMode: ColorMode;
+  setColorMode: (mode: ColorMode) => void;
   setSkinId: (skinId: BuiltinSkinId) => void;
 }
 
 const storageKey = 'fish-island:skin';
+const modeStorageKey = 'fish-island:color-mode';
+
+function readColorMode(): ColorMode {
+  try {
+    return localStorage.getItem(modeStorageKey) === 'dark' ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
 
 function readSkinId(): BuiltinSkinId {
   try {
@@ -19,6 +30,15 @@ function readSkinId(): BuiltinSkinId {
 
 export const useAppearanceStore = create<AppearanceState>((set) => ({
   skinId: readSkinId(),
+  colorMode: readColorMode(),
+  setColorMode: (colorMode) => {
+    set({ colorMode });
+    try {
+      localStorage.setItem(modeStorageKey, colorMode);
+    } catch {
+      /* 存储受限时仍保留当前会话选择。 */
+    }
+  },
   setSkinId: (skinId) => {
     set({ skinId });
     try {

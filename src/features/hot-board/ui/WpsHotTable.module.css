@@ -33,13 +33,15 @@
   border-bottom: 1px solid var(--color-border);
 }
 .toolbar button,
-.toolbar label {
+.toolbar label,
+.source,
+.category {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-height: 44px;
 }
-.sheet button {
+.sheet button:not([role='combobox']) {
   padding: var(--space-2) var(--space-3);
   min-height: 44px;
   border: 0;
@@ -48,22 +50,21 @@
   color: var(--color-text);
   cursor: pointer;
 }
-.sheet button:hover {
+.sheet button:not([role='combobox']):hover {
   background: var(--color-hover);
 }
-.sheet button:disabled {
+.sheet button:not([role='combobox']):disabled {
   color: var(--color-muted);
   cursor: wait;
 }
-.toolbar select {
+.source,
+.category {
   min-width: 0;
-  max-width: 180px;
-  min-height: 44px;
-  border: 0;
-  background: transparent;
-  color: var(--color-text);
-  font: inherit;
-  cursor: pointer;
+  width: 200px;
+}
+.source > svg,
+.category > svg {
+  flex-shrink: 0;
 }
 .search {
   margin-left: auto;
@@ -202,10 +203,9 @@
   .toolbar label {
     min-width: 0;
   }
-  .toolbar select {
+  .source,
+  .category {
     width: 100%;
-    max-width: 100%;
-    font-size: 16px;
   }
   .search {
     grid-column: 1 / -1;

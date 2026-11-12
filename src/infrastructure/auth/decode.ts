@@ -46,7 +46,26 @@ export function decodeUser(value: unknown): AuthUser {
     name: typeof user.userName === 'string' && user.userName.trim() ? user.userName : '鱼岛用户',
     avatarUrl,
     role: typeof user.userRole === 'string' ? user.userRole : 'user',
+    profile: typeof user.userProfile === 'string' ? user.userProfile : '',
+    coverUrl: safeImageUrl(user.momentsBgUrl),
+    email: typeof user.email === 'string' ? user.email : '',
+    titleId:
+      typeof user.titleId === 'string' || typeof user.titleId === 'number'
+        ? String(user.titleId)
+        : '0',
+    vip: user.vip === true,
+    createdAt: typeof user.createTime === 'string' ? user.createTime : '',
   };
+}
+
+export function safeImageUrl(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  try {
+    const url = new URL(value);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
 }
 
 export function unwrap(payload: unknown): unknown {

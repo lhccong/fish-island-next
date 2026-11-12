@@ -6,6 +6,7 @@ import {
   type LoginCredentials,
   type SessionToken,
   type SessionVault,
+  type ProfileUpdate,
 } from '@/domain/auth';
 
 type Session =
@@ -14,13 +15,17 @@ type Session =
   | { status: 'authenticated'; user: AuthUser }
   | { status: 'error'; message: string };
 interface AuthState {
+  emailCodeRetryAt: number;
+  emailCodeTarget: string;
   notice: string | null;
   session: Session;
-  pending: 'login' | 'logout' | null;
+  pending: 'login' | 'logout' | 'profile' | null;
 }
 
 export function createAuthController(service: AuthPort, vault: SessionVault) {
   const store = createStore<AuthState>(() => ({
+    emailCodeRetryAt: 0,
+    emailCodeTarget: '',
     session: { status: 'checking' },
     pending: null,
     notice: null,
@@ -120,7 +125,12 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
       throw new Error('无法清除登录信息，请检查浏览器存储权限');
     }
     credential = null;
-    store.setState({ session: { status: 'anonymous' }, pending: 'logout' });
+    store.setState({
+      session: { status: 'anonymous' },
+      pending: 'logout',
+      emailCodeRetryAt: 0,
+      emailCodeTarget: '',
+    });
     const controller = new AbortController();
     request = controller;
     try {
@@ -133,7 +143,101 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
     }
   }
 
+  async function mutateProfile(
+    change: (token: SessionToken, signal: AbortSignal) => Promise<void>,
+    patch: Partial<AuthUser>,
+  ): Promise<boolean> {
+    const session = store.getState().session;
+    if (store.getState().pending || session.status !== 'authenticated' || !credential) return false;
+    const version = epoch;
+    const controller = new AbortController();
+    request = controller;
+    store.setState({ pending: 'profile' });
+    try {
+      await change(credential, controller.signal);
+      if (version !== epoch) return false;
+      store.setState({
+        session: {
+          status: 'authenticated',
+          user: { ...session.user, ...patch },
+        },
+      });
+      try {
+        const user = await service.current(credential, controller.signal);
+        if (version === epoch) store.setState({ session: { status: 'authenticated', user } });
+      } catch (error) {
+        if (error instanceof AuthError && error.kind === 'unauthorized') throw error;
+        if (version === epoch)
+          store.setState({ notice: '资料已保存，但重新读取失败，请稍后重新打开页面确认。' });
+      }
+      return version === epoch;
+    } catch (error) {
+      if (version !== epoch) return false;
+      if (error instanceof AuthError && error.kind === 'unauthorized') {
+        store.setState({ notice: error.message });
+        await restore(true);
+      }
+      throw error;
+    } finally {
+      if (version === epoch) store.setState({ pending: null });
+    }
+  }
+
+  function updateProfile(values: ProfileUpdate) {
+    return mutateProfile((token, signal) => service.updateProfile(values, token, signal), {
+      ...values,
+      avatarUrl: values.avatarUrl || null,
+    });
+  }
+
+  async function withCredential<T>(action: (token: SessionToken) => Promise<T>): Promise<T> {
+    if (!credential) throw new AuthError('unauthorized', '请先登录');
+    const version = epoch;
+    try {
+      const result = await action(credential);
+      if (version !== epoch) throw new AuthError('unauthorized', '账号已改变，请重新打开资料');
+      return result;
+    } catch (error) {
+      if (version === epoch && error instanceof AuthError && error.kind === 'unauthorized') {
+        store.setState({ notice: error.message });
+        await restore(true);
+      }
+      throw error;
+    }
+  }
+
+  async function uploadProfileImage(file: File, signal: AbortSignal): Promise<string> {
+    if (!credential) throw new AuthError('unauthorized', '请先登录');
+    const version = epoch;
+    try {
+      const url = await service.uploadProfileImage(file, credential, signal);
+      if (version !== epoch) throw new AuthError('unauthorized', '账号已改变，请重新打开资料');
+      return url;
+    } catch (error) {
+      if (version === epoch && error instanceof AuthError && error.kind === 'unauthorized') {
+        store.setState({ notice: error.message });
+        await restore(true);
+      }
+      throw error;
+    }
+  }
+
   return {
+    titles: (signal: AbortSignal) => withCredential((token) => service.titles(token, signal)),
+    membership: (signal: AbortSignal) =>
+      withCredential((token) => service.membership(token, signal)),
+    sendEmailCode: async (email: string, signal: AbortSignal) => {
+      if (store.getState().emailCodeRetryAt > Date.now())
+        throw new AuthError('rejected', '请稍后再获取验证码');
+      await withCredential((token) => service.sendEmailCode(email, token, signal));
+      store.setState({ emailCodeRetryAt: Date.now() + 60_000, emailCodeTarget: email });
+    },
+    bindEmail: (email: string, code: string) =>
+      mutateProfile((token, signal) => service.bindEmail(email, code, token, signal), { email }),
+    setTitle: (titleId: string) =>
+      mutateProfile((token, signal) => service.setTitle(titleId, token, signal), { titleId }),
+    updateProfile,
+    uploadProfileImage,
     notify: (notice: string | null) => store.setState({ notice }),
     store,
     restore,

@@ -1,10 +1,19 @@
-import { useRef, type ReactElement, type ReactNode, type RefObject } from 'react';
+import {
+  useRef,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { X } from 'lucide-react';
 import * as Primitive from '@radix-ui/react-dialog';
 import { Button } from '@/shared/ui/Button';
 import styles from './Dialog.module.css';
 
 interface DialogProps {
+  modal?: boolean;
+  hideDescription?: boolean;
+  style?: CSSProperties;
   trigger?: ReactElement;
   returnFocusRef?: RefObject<HTMLElement | null>;
   open?: boolean;
@@ -19,6 +28,9 @@ interface DialogProps {
 }
 
 export function Dialog({
+  modal = true,
+  hideDescription = false,
+  style,
   trigger,
   returnFocusRef,
   title,
@@ -34,14 +46,16 @@ export function Dialog({
   const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <Primitive.Root
+      modal={modal}
       {...(open !== undefined ? { open } : {})}
       {...(onOpenChange ? { onOpenChange } : {})}
     >
       {trigger && <Primitive.Trigger asChild>{trigger}</Primitive.Trigger>}
       <Primitive.Portal>
-        <Primitive.Overlay className={styles.overlay} />
+        {modal && <Primitive.Overlay className={styles.overlay} />}
         <Primitive.Content
           className={`${styles.content} ${className}`}
+          style={style}
           onOpenAutoFocus={() => {
             returnFocus.current =
               document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -63,7 +77,9 @@ export function Dialog({
           )}
           {illustration}
           <Primitive.Title className={styles.title}>{title}</Primitive.Title>
-          <Primitive.Description className={styles.description}>
+          <Primitive.Description
+            className={hideDescription ? styles.hiddenDescription : styles.description}
+          >
             {description}
           </Primitive.Description>
           {children}

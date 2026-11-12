@@ -69,24 +69,24 @@ test('publish, like, comment, edit, lottery, top and delete on touch and desktop
   await page.getByRole('button', { name: '删除评论', exact: true }).click();
   await expect(page.getByText('暂无评论，来聊两句吧')).toBeVisible();
   await page.getByRole('button', { name: '更多动态操作' }).click();
-  await page.getByRole('button', { name: '编辑动态', exact: true }).click();
+  await page.getByRole('menuitem', { name: '修改', exact: true }).click();
   await dialog.getByRole('textbox', { name: '动态内容' }).fill('合成编辑内容');
   await dialog.getByRole('button', { name: '保存修改' }).click();
   await expect(page.getByRole('article').getByText('合成编辑内容', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '更多动态操作' }).click();
-  await page.getByRole('button', { name: '点赞抽奖', exact: true }).click();
+  await page.getByRole('menuitem', { name: '发起抽奖', exact: true }).click();
   await dialog.getByRole('button', { name: '确认' }).click();
   await expect(dialog.getByRole('status')).toContainText('合成中奖岛友');
   await dialog.getByRole('button', { name: '完成' }).click();
   await page.getByRole('button', { name: '更多动态操作' }).click();
-  await page.getByRole('button', { name: '置顶动态', exact: true }).click();
+  await page.getByRole('menuitem', { name: '置顶动态', exact: true }).click();
   await expect.poll(() => state.actions.includes('top')).toBe(true);
   await page.getByRole('button', { name: '更多动态操作' }).click();
-  await page.getByRole('button', { name: '删除动态', exact: true }).click();
+  await page.getByRole('menuitem', { name: '删除', exact: true }).click();
   await dialog.getByRole('button', { name: '取消', exact: true }).click();
   await expect(page.getByRole('article').getByText('合成编辑内容', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '更多动态操作' }).click();
-  await page.getByRole('button', { name: '删除动态', exact: true }).click();
+  await page.getByRole('menuitem', { name: '删除', exact: true }).click();
   await dialog.getByRole('button', { name: '确认' }).click();
   await dialog.getByRole('button', { name: '完成' }).click();
   await expect(page.getByText('还没有动态，分享第一条摸鱼日常吧')).toBeVisible();
@@ -137,7 +137,7 @@ test('image upload, preview, image comment, reward and follow', async ({ page },
       .getByRole('button', { name: '查看图片 1', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: '更多动态操作' }).click();
-  await page.getByRole('button', { name: '打赏', exact: true }).click();
+  await page.getByRole('menuitem', { name: '打赏', exact: true }).click();
   await dialog.getByLabel('打赏积分').fill('5');
   await dialog.getByRole('button', { name: '确认' }).click();
   await expect(dialog.getByRole('status')).toContainText('操作成功');

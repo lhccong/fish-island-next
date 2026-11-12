@@ -9,6 +9,7 @@ import {
   Type,
 } from 'lucide-react';
 import type { HotSource } from '@/domain/hot-board';
+import { Select } from '@/shared/ui/Select';
 import { formatHeat, relativeUpdate } from './legacy-format';
 import styles from './WpsHotTable.module.css';
 
@@ -64,36 +65,30 @@ export function WpsHotTable({
         <span>只读数据表</span>
       </header>
       <div className={styles.toolbar} aria-label="热榜表格工具">
-        <label className={styles.source}>
+        <div className={styles.source}>
           <Table2 size={15} aria-hidden="true" />
-          <select
-            aria-label="筛选热榜来源"
+          <Select
+            label="筛选热榜来源"
             value={selectedId}
-            onChange={(event) => onSelect(event.target.value)}
-          >
-            <option value="all">全部来源</option>
-            {sources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.category}>
+            onValueChange={onSelect}
+            options={[
+              { value: 'all', label: '全部来源' },
+              ...sources.map((source) => ({ value: source.id, label: source.name })),
+            ]}
+          />
+        </div>
+        <div className={styles.category}>
           <ListFilter size={15} aria-hidden="true" />
-          <select
-            aria-label="筛选热榜分类"
+          <Select
+            label="筛选热榜分类"
             value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            <option value="all">全部分类</option>
-            {categories.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
+            onValueChange={setCategory}
+            options={[
+              { value: 'all', label: '全部分类' },
+              ...categories.map((name) => ({ value: name, label: name })),
+            ]}
+          />
+        </div>
         <button
           type="button"
           onClick={() => setSort(sort === 'rank' ? 'heat' : 'rank')}

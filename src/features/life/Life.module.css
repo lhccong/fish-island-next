@@ -548,7 +548,7 @@
   overflow-wrap: anywhere;
 }
 .cultivationRealmLog {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-weight: 600;
 }
 .cultivationError {
