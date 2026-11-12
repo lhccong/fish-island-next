@@ -4,6 +4,7 @@ import type { AuthUser } from '@/domain/auth';
 import type { FishCirclePort, Moment, MomentAction } from '@/domain/fish-circle';
 import { MediaGrid } from './MediaGrid';
 import { Comments } from './Comments';
+import type { CommentTarget } from './comment-target';
 import { MomentEditor } from './MomentEditor';
 import { MomentActionDialog } from './MomentActionDialog';
 import { useOperation } from './use-operation';
@@ -17,8 +18,18 @@ interface Props {
   service: FishCirclePort;
   onRefresh: () => void;
   onViewUser: (id: string, name: string) => void;
+  variant?: 'feed' | 'detail';
+  commentTarget?: CommentTarget | null;
 }
-export function MomentCard({ moment, user, service, onRefresh, onViewUser }: Props) {
+export function MomentCard({
+  moment,
+  user,
+  service,
+  onRefresh,
+  onViewUser,
+  variant = 'feed',
+  commentTarget = null,
+}: Props) {
   const [likes, setLikes] = useState({ liked: moment.liked, count: moment.likes });
   const [commentCount, setCommentCount] = useState(moment.comments);
   const [comments, setComments] = useState(false);
@@ -39,13 +50,14 @@ export function MomentCard({ moment, user, service, onRefresh, onViewUser }: Pro
   const admin = user.role === 'admin';
   return (
     <article
-      id={`circle-moment-${moment.id}`}
+      id={`${variant === 'detail' ? 'circle-detail' : 'circle'}-moment-${moment.id}`}
       tabIndex={-1}
       data-pinned={moment.top}
+      data-variant={variant}
       className={styles.card}
       aria-label={`${moment.userName}的动态`}
     >
-      {moment.top && (
+      {moment.top && variant === 'feed' && (
         <span className={styles.pin} aria-label="置顶">
           <Pin size={12} aria-hidden="true" />
         </span>
@@ -153,8 +165,9 @@ export function MomentCard({ moment, user, service, onRefresh, onViewUser }: Pro
             {notice}
           </p>
         )}
-        {(comments || moment.comments > 0) && (
+        {(comments || moment.comments > 0 || commentTarget) && (
           <Comments
+            target={commentTarget}
             composerOpen={comments}
             service={service}
             momentId={moment.id}

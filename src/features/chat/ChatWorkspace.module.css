@@ -1,0 +1,330 @@
+.workspace {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  background: var(--color-canvas);
+}
+.conversation {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.messages {
+  flex: 1;
+  min-height: 0;
+}
+.empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 260px;
+  padding: 64px 24px;
+  color: var(--color-muted);
+  text-align: center;
+}
+.empty > svg {
+  color: var(--color-accent-text);
+  margin-bottom: 16px;
+}
+.empty h2 {
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  margin: 0 0 12px;
+  color: var(--color-text);
+  font-size: 18px;
+  font-weight: 500;
+}
+.empty p {
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.empty > span {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.composer {
+  flex-shrink: 0;
+  padding: 6px 24px 16px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.tools {
+  display: flex;
+  gap: 4px;
+}
+.tools button,
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-muted);
+}
+.tools button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.iconButton {
+  cursor: pointer;
+}
+.iconButton:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+.composer textarea {
+  display: block;
+  width: 100%;
+  height: 86px;
+  padding: 8px 4px;
+  border: 0;
+  resize: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.6;
+  border-radius: var(--radius-control);
+}
+.composer textarea::placeholder {
+  color: var(--color-muted);
+}
+.composer textarea:focus-visible {
+  outline-offset: 0;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+.actions > span {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.members {
+  --member-gutter: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  flex-shrink: 0;
+  min-height: 0;
+  min-width: 0;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.memberHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px 0 20px;
+}
+.memberHeader h2 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+.search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 20px 16px;
+  padding: 0 10px;
+  min-height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  color: var(--color-muted);
+  background: var(--color-canvas);
+}
+.search input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 12px;
+}
+.search input:focus-visible {
+  outline-offset: 0;
+}
+.search:focus-within {
+  border-color: var(--color-accent-text);
+}
+.memberScroll {
+  flex: 1;
+  min-height: 0;
+  padding-left: 16px;
+}
+.memberBody {
+  padding: 4px 0 16px 4px;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.memberBody p {
+  color: var(--color-muted);
+}
+.memberList {
+  margin-inline-end: 12px;
+}
+.memberPreview {
+  padding: 4px var(--member-gutter) 4px 0;
+}
+.memberControls {
+  padding-inline-end: var(--member-gutter);
+}
+.memberState,
+.groupInfo {
+  margin-inline-end: var(--member-gutter);
+}
+.memberGrid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+}
+.memberGrid li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  gap: 4px;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-control);
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  font-size: 18px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.avatar img {
+  display: block;
+  aspect-ratio: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar[data-size='list'] {
+  width: 40px;
+  height: 40px;
+}
+.memberName {
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--color-muted);
+}
+.groupInfo {
+  margin-top: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-divider);
+}
+.expandedMembers {
+  height: min(304px, 40dvh);
+  min-height: 0;
+}
+.expandedBody {
+  padding: 4px 0;
+}
+.expandMembers {
+  display: flex;
+  gap: 4px;
+  margin: 4px auto 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+}
+.expandMembers:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+.groupInfo h3 {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 16px 0 6px;
+}
+.groupInfo p {
+  font-size: 12px;
+  margin: 0;
+}
+.memberFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-divider);
+}
+.memberFooter > span {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+@media (max-width: 760px) {
+  .workspace[data-members-open='true'] .conversation {
+    visibility: hidden;
+  }
+  .members {
+    --member-gutter: var(--space-5);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border-left: 0;
+    z-index: 2;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .memberHeader {
+    padding-left: 16px;
+  }
+  .search {
+    margin: 8px 16px 16px;
+    min-height: 44px;
+  }
+  .search input {
+    font-size: 16px;
+  }
+  .memberGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .avatar {
+    width: 44px;
+    height: 44px;
+  }
+  .composer {
+    padding: 4px 16px max(12px, env(safe-area-inset-bottom));
+  }
+  .composer textarea {
+    height: 76px;
+    font-size: 16px;
+  }
+  .actions {
+    gap: 8px;
+  }
+  .actions > span {
+    font-size: 11px;
+  }
+  .empty {
+    padding: 36px 20px;
+    min-height: 220px;
+  }
+}

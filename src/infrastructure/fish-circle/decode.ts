@@ -108,6 +108,7 @@ export function reminder(value: unknown): CircleReminder {
   if (r.state !== 0 && r.state !== 1) throw new CircleError('通知已读状态异常');
   return {
     id: id(r.id),
+    senderId: r.senderId != null ? id(r.senderId) : sender.id != null ? id(sender.id) : '',
     senderName: text(sender.userName) || '系统通知',
     avatar: safeUrl(sender.userAvatar),
     content: raw.replace(/\[img\][^[]+\[\/img\]|\[img:[^\]]+\]/g, '').trim(),

@@ -1,4 +1,8 @@
 :root {
+  --color-chat-cover-blue: #1677cc;
+  --color-chat-cover-orange: #d95e13;
+  --color-chat-cover-ink: #ffffff;
+  --color-chat-cover-dot: #e84a4a;
   --color-profile-accent: #b94700;
   --color-profile-badge-bg: #ffa45e;
   --color-profile-badge-text: #492100;
@@ -117,6 +121,16 @@
 }
 * {
   box-sizing: border-box;
+}
+@media (max-width: 760px) {
+  * {
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 body {
   margin: 0;

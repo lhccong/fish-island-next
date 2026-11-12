@@ -9,7 +9,8 @@
   font-weight: 400;
 }
 .sidebar a,
-.game {
+.game,
+.about {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -20,18 +21,31 @@
   font-size: 14px;
 }
 .sidebar a:hover,
-.game:hover {
+.game:hover,
+.about:hover {
   background: var(--color-hover);
 }
 .sidebar a[aria-current='page'],
-.game[aria-current='page'] {
+.game[aria-current='page'],
+.about[data-active='true'] {
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
 .mobile {
   display: none;
 }
+.about {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
 @media (max-width: 760px) {
+  .sidebar .desktopHeading {
+    display: none;
+  }
   .mobile {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -39,7 +53,8 @@
     padding: var(--space-2) var(--space-3);
     border-top: 1px solid var(--color-border);
   }
-  .mobile a {
+  .mobile a,
+  .mobile .about {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -52,7 +67,8 @@
     color: var(--color-text);
     font-size: 14px;
   }
-  .mobile a[aria-current='page'] {
+  .mobile a[aria-current='page'],
+  .mobile .about[data-active='true'] {
     background: var(--color-accent-soft);
     color: var(--color-accent-text);
   }

@@ -1,57 +1,101 @@
 .sidebar {
-  padding: var(--space-5);
-}
-.sidebar h2 {
-  font-size: 19px;
-  margin: 0 0 var(--space-5);
-}
-.sidebar p {
-  font-size: 12px;
-  color: var(--color-muted);
-}
-.title {
-  font-size: 19px;
-  font-weight: 600;
-  padding: var(--space-5) var(--space-6);
-  margin: 0;
-}
-.empty {
-  height: 100%;
-  min-height: 300px;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding-top: var(--space-5);
+}
+.sidebar h2 {
+  margin: 0 20px 24px;
+  font-size: 18px;
+  font-weight: 500;
+}
+.selected {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-6);
-  text-align: center;
+  gap: 12px;
+  padding: 18px 16px;
+  background: var(--color-rail-active);
+}
+.selected > div {
+  min-width: 0;
+}
+.selected strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+}
+.selected p,
+.note {
   color: var(--color-muted);
+  font-size: 12px;
 }
-.empty > svg {
+.selected p {
+  margin: 6px 0 0;
+}
+.groupIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
   color: var(--color-accent-text);
 }
-.empty h2 {
+.note {
+  margin: 20px;
+}
+.header {
+  min-height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+}
+.header h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0;
+}
+.headerActions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.onlineUsers {
+  flex: 1;
+  min-height: 0;
+}
+.more {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
   color: var(--color-text);
-  font-size: 21px;
-  font-weight: 550;
-  margin-top: var(--space-5);
+  cursor: pointer;
 }
-.empty p {
-  font-size: 13px;
-  line-height: 1.9;
-}
-.empty a {
-  margin-top: var(--space-5);
-  color: var(--color-accent-text);
-  min-height: 44px;
+.more:hover,
+.more[aria-expanded='true'] {
+  background: var(--color-hover);
 }
 @media (max-width: 760px) {
-  .sidebar {
-    padding: var(--space-3) var(--space-4);
-  }
-  .sidebar h2 {
-    display: none;
-  }
-  .sidebar p {
-    margin: 0;
+  .header {
+    min-height: 56px;
+    padding: 4px 12px;
   }
 }

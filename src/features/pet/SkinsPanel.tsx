@@ -1,7 +1,9 @@
-import { useCallback, useState } from 'react';
+import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
+import { usePetPages } from './use-pet-pages';
+import { useCallback } from 'react';
 import type { PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
-import { usePetOperation, usePetResource } from './resource';
+import { usePetOperation } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
 import { PetSprite } from './PetSprite';
@@ -16,12 +18,11 @@ export function SkinsPanel({
   currentUrl: string;
   onChange: () => void;
 }) {
-  const [current, setCurrent] = useState(1);
   const load = useCallback(
-    (signal: AbortSignal) => service.skins(current, signal),
-    [service, current],
+    (page: number, signal: AbortSignal) => service.skins(page, signal),
+    [service],
   );
-  const resource = usePetResource(load);
+  const resource = usePetPages(load);
   const operation = usePetOperation();
   function refresh() {
     resource.reload();
@@ -70,25 +71,13 @@ export function SkinsPanel({
                 </article>
               ))}
             </div>
-            <div className={styles.pagination}>
-              <Button
-                variant="secondary"
-                disabled={current === 1}
-                onClick={() => setCurrent(current - 1)}
-              >
-                上一页
-              </Button>
-              <span>
-                第 {current} 页 · 共 {data.total} 款
-              </span>
-              <Button
-                variant="secondary"
-                disabled={current * 12 >= data.total}
-                onClick={() => setCurrent(current + 1)}
-              >
-                下一页
-              </Button>
-            </div>
+            <InfiniteScroll
+              label="外观"
+              hasMore={resource.hasMore}
+              loading={resource.loadingMore}
+              error={resource.error}
+              onLoadMore={resource.loadMore}
+            />
           </>
         )}
       </ResourceView>

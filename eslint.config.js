@@ -28,7 +28,7 @@ function restrict(files, groups) {
 }
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', 'playwright-report', 'test-results']),
+  globalIgnores(['dist', 'coverage', 'playwright-report', 'test-results*']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

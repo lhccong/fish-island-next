@@ -1,7 +1,9 @@
+import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
+import { usePetPages } from './use-pet-pages';
 import { useCallback, useState } from 'react';
 import { equipmentSlots, type Companion, type PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
-import { usePetResource, usePetOperation } from './resource';
+import { usePetOperation } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
 import { ItemIcon } from './ItemIcon';
@@ -18,12 +20,11 @@ export function ItemsPanel({
   pet: Companion;
   onChange: () => void;
 }) {
-  const [current, setCurrent] = useState(1);
   const load = useCallback(
-    (signal: AbortSignal) => service.items(kind, current, signal),
-    [service, kind, current],
+    (page: number, signal: AbortSignal) => service.items(kind, page, signal),
+    [service, kind],
   );
-  const resource = usePetResource(load);
+  const resource = usePetPages(load);
   const operation = usePetOperation();
   const [batchResult, setBatchResult] = useState<number | null>(null);
   function refresh() {
@@ -141,25 +142,13 @@ export function ItemsPanel({
                 </article>
               ))}
             </div>
-            <div className={styles.pagination}>
-              <Button
-                variant="secondary"
-                disabled={current === 1}
-                onClick={() => setCurrent(current - 1)}
-              >
-                上一页
-              </Button>
-              <span>
-                第 {current} 页 · 共 {data.total} 件
-              </span>
-              <Button
-                variant="secondary"
-                disabled={current * 12 >= data.total}
-                onClick={() => setCurrent(current + 1)}
-              >
-                下一页
-              </Button>
-            </div>
+            <InfiniteScroll
+              label="物品"
+              hasMore={resource.hasMore}
+              loading={resource.loadingMore}
+              error={resource.error}
+              onLoadMore={resource.loadMore}
+            />
           </>
         )}
       </ResourceView>

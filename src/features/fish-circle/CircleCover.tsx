@@ -13,6 +13,7 @@ interface Props {
   own: boolean;
   filtered: boolean;
   onBack: () => void;
+  onExit: () => void;
   onViewSelf: () => void;
 }
 type State =
@@ -26,6 +27,7 @@ export function CircleCover({
   own,
   filtered,
   onBack,
+  onExit,
   onViewSelf,
 }: Props) {
   const [state, setState] = useState<State>({ status: 'loading' });
@@ -67,6 +69,16 @@ export function CircleCover({
       )}
       <div className={styles.shade} />
       <div className={styles.actions}>{actions}</div>
+      {!filtered && (
+        <button
+          aria-label="返回发现"
+          className={`${styles.back} ${styles.mobileBack}`}
+          type="button"
+          onClick={onExit}
+        >
+          <ArrowLeft size={20} aria-hidden="true" />
+        </button>
+      )}
       {filtered && (
         <button aria-label="返回全部动态" className={styles.back} type="button" onClick={onBack}>
           <ArrowLeft size={16} aria-hidden="true" />

@@ -16,6 +16,31 @@ function response(chunks: string[]) {
   );
 }
 describe('reader protocol', () => {
+  it('normalizes minified CSS colors and preserves themes through repository reloads', () => {
+    const settings = decodeSettings({
+      theme: 'personal',
+      customThemes: [{ id: 'personal', name: '个人', backgroundColor: '#FFF', color: '#3aB' }],
+    });
+    expect(settings.customThemes[0]).toMatchObject({
+      backgroundColor: '#ffffff',
+      fontColor: '#33aabb',
+    });
+    const data = new Map<string, string>();
+    const repo = createReaderRepository({
+      getItem: (key) => data.get(key) ?? null,
+      setItem: (key, value) => {
+        data.set(key, value);
+      },
+    });
+    repo.save({ books: [], settings });
+    expect(repo.load().settings).toEqual(settings);
+    expect(decodeSettings({ backgroundColor: '#fff', fontColor: '#DDD' }).theme).toBe(
+      'legacy-custom',
+    );
+    expect(() =>
+      decodeSettings({ customThemes: [{ backgroundColor: 'url(x)', fontColor: '#333' }] }),
+    ).toThrow('自定义阅读主题格式错误');
+  });
   it('keeps legacy source and author fallbacks for empty metadata', () => {
     const book = decodeBook(
       { name: '测试书', author: '', originName: '', origin: 'source-name', bookUrl: 'book' },

@@ -16,7 +16,9 @@ for (const skin of builtinSkins) {
           Object.defineProperty(navigator, 'clipboard', {
             value: {
               writeText: async (text: string) => {
-                await new Promise((resolve) => setTimeout(resolve, 450));
+                await new Promise<void>((resolve) => {
+                  (window as unknown as { releaseCopy: () => void }).releaseCopy = resolve;
+                });
                 if (localStorage.getItem('about-copy-fail')) throw new Error('denied');
                 localStorage.setItem('about-copied-text', text);
               },
@@ -37,14 +39,24 @@ for (const skin of builtinSkins) {
         if (failImage) await route.abort();
         else await route.continue();
       });
-      await page.goto('/discover/games');
+      await page.goto('/discover');
       const nav = page.getByRole('navigation', { name: '发现菜单' }).filter({ visible: true });
       await expect(nav.getByRole('link')).toHaveText(['朋友圈', '游戏', '阅读', '关于', '伙伴']);
       const aboutLink = nav.getByRole('link', { name: '关于', exact: true });
       if (isMobile) await aboutLink.tap();
       else await aboutLink.click();
-      await expect(page).toHaveURL(/\/about$/);
-      await expect(nav.getByRole('link', { name: '关于', exact: true })).toHaveAttribute(
+      const menu = page.getByRole('navigation', { name: '关于模块' });
+      await expect(menu.getByRole('link')).toHaveText([
+        '赞助榜',
+        '外卖福利',
+        '共建与反馈',
+        '其他产品',
+        '狠狠点个 star',
+      ]);
+      await page.screenshot({ path: info.outputPath('menu.png') });
+      await menu.getByRole('link', { name: '共建与反馈', exact: true }).click();
+      await expect(page).toHaveURL(/\/rank\/about$/);
+      await expect(menu.getByRole('link', { name: '共建与反馈', exact: true })).toHaveAttribute(
         'aria-current',
         'page',
       );
@@ -70,6 +82,7 @@ for (const skin of builtinSkins) {
       else await copy.click();
       await expect(page.getByRole('button', { name: '复制中…' })).toBeDisabled();
       await page.screenshot({ path: info.outputPath('copy-pending.png') });
+      await page.evaluate(() => (window as unknown as { releaseCopy: () => void }).releaseCopy());
       await expect(page.getByRole('status')).toContainText('QQ群号已复制');
       expect(await page.evaluate(() => localStorage.getItem('about-copied-text'))).toBe(
         '695425036',
@@ -111,21 +124,24 @@ for (const skin of builtinSkins) {
       await copy.scrollIntoViewIfNeeded();
       await page.evaluate(() => localStorage.setItem('about-copy-fail', 'true'));
       await copy.click();
+      await page.evaluate(() => (window as unknown as { releaseCopy: () => void }).releaseCopy());
       await expect(page.getByRole('alert')).toContainText('复制失败，请手动复制');
       await page.screenshot({ path: info.outputPath('copy-error.png') });
-      await page.getByRole('button', { name: '切换主题', exact: true }).click();
-      const dialog = page.getByRole('dialog', { name: '主题模式' });
-      const alternate = builtinSkins.find((item) => item.id !== skin.id)!;
-      await dialog.getByRole('button', { name: alternate.name, exact: true }).click();
-      await dialog
-        .getByRole('button', { name: mode === 'light' ? '暗夜模式' : '明亮模式', exact: true })
-        .click();
-      await dialog.getByRole('button', { name: skin.name, exact: true }).click();
-      await dialog
-        .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
-        .click();
-      await page.keyboard.press('Escape');
-      await expect(page.getByRole('alert')).toContainText('复制失败，请手动复制');
+      if (!isMobile) {
+        await page.getByRole('button', { name: '切换主题', exact: true }).click();
+        const dialog = page.getByRole('dialog', { name: '主题模式' });
+        const alternate = builtinSkins.find((item) => item.id !== skin.id)!;
+        await dialog.getByRole('button', { name: alternate.name, exact: true }).click();
+        await dialog
+          .getByRole('button', { name: mode === 'light' ? '暗夜模式' : '明亮模式', exact: true })
+          .click();
+        await dialog.getByRole('button', { name: skin.name, exact: true }).click();
+        await dialog
+          .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
+          .click();
+        await page.keyboard.press('Escape');
+        await expect(page.getByRole('alert')).toContainText('复制失败，请手动复制');
+      }
       await expect(page.locator('html')).toHaveAttribute('data-skin', skin.id);
       await expect(page.locator('html')).toHaveAttribute('data-color-mode', mode);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(

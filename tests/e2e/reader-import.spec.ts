@@ -37,9 +37,10 @@ for (const skin of builtinSkins)
           await route.fulfill({ status: 503, body: '{}' });
           return;
         }
-        const more = params.get('page') === '2';
+        const more = Number(params.get('page')) >= 2;
+        const last = params.get('page') === '3';
         if (more) {
-          expect(params.get('lastIndex')).toBe('5');
+          expect(params.get('lastIndex')).toBe(last ? '8' : '5');
           moreAttempt++;
           if (moreAttempt === 1) {
             await route.fulfill({
@@ -53,7 +54,13 @@ for (const skin of builtinSkins)
           state === 'empty'
             ? []
             : more
-              ? [{ name: '分页新增书', bookUrl: 'book-more', origin: 'source' }]
+              ? [
+                  {
+                    name: last ? '分页最后书' : '分页新增书',
+                    bookUrl: last ? 'book-last' : 'book-more',
+                    origin: 'source',
+                  },
+                ]
               : Array.from({ length: 12 }, (_, index) => ({
                   name: `书籍${index + 1}：一段足够长的小说名字用于窄屏换行验证`,
                   bookUrl: `book-${index}`,
@@ -68,7 +75,7 @@ for (const skin of builtinSkins)
                 }));
         await route.fulfill({
           contentType: 'text/event-stream',
-          body: `data: ${JSON.stringify({ data, lastIndex: more ? 8 : 5 })}\n\nevent: end\ndata: ${JSON.stringify({ lastIndex: more ? 8 : 5, isEnd: more })}\n\n`,
+          body: `data: ${JSON.stringify({ data, lastIndex: more ? 8 : 5 })}\n\nevent: end\ndata: ${JSON.stringify({ lastIndex: more ? 8 : 5, isEnd: last })}\n\n`,
         });
       });
       await page.goto('/reader');
@@ -118,10 +125,15 @@ for (const skin of builtinSkins)
           .evaluate((element) => element.scrollHeight > element.clientHeight),
       ).toBe(true);
       await page.screenshot({ path: testInfo.outputPath('import-results.png') });
-      await dialog.getByRole('button', { name: '加载更多' }).click();
+      await dialog.locator('[data-scroll-pagination="搜索结果"]').scrollIntoViewIfNeeded();
       await expect(dialog.getByRole('alert')).toContainText('书源搜索失败');
       await dialog.getByRole('button', { name: '重试搜索' }).click();
       await expect(dialog.getByRole('heading', { name: '分页新增书', exact: true })).toHaveCount(1);
+      await dialog.locator('[data-scroll-pagination="搜索结果"]').scrollIntoViewIfNeeded();
+      await expect(dialog.getByRole('heading', { name: '分页最后书', exact: true })).toHaveCount(1);
+      await expect(dialog.locator('[data-scroll-pagination="搜索结果"]')).toContainText(
+        '已全部加载',
+      );
       await expect(dialog.getByRole('button', { name: '加载更多' })).toHaveCount(0);
       await page
         .locator('input[type="file"]')

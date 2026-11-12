@@ -86,6 +86,8 @@
 }
 .location {
   display: inline-flex;
+  align-self: flex-start;
+  width: fit-content;
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-1) var(--space-2);
@@ -177,6 +179,73 @@
 .body [role='alert'] {
   color: var(--color-danger);
   font-size: 13px;
+}
+.card[data-variant='detail'] {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 12px;
+  padding: 4px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.card[data-variant='detail'] .author {
+  display: contents;
+}
+.card[data-variant='detail'] .author > div {
+  grid-column: 2;
+}
+.card[data-variant='detail'] .avatar {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  border-radius: var(--radius-control);
+}
+.card[data-variant='detail'] .name {
+  min-height: 28px;
+  color: var(--color-circle-author);
+}
+.card[data-variant='detail'] .body {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+.card[data-variant='detail'] .text {
+  margin: 0;
+  line-height: 1.65;
+}
+.card[data-variant='detail'] .footer {
+  border: 0;
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+.card[data-variant='detail'] .time {
+  max-width: none;
+  font-size: 12px;
+}
+.card[data-variant='detail'] .likes {
+  order: 1;
+  margin: var(--space-2) 0 0;
+  min-height: 44px;
+  align-items: center;
+}
+.card[data-variant='detail'] .body > section {
+  order: 2;
+}
+.card[data-variant='detail'] .name:hover {
+  text-decoration: underline;
+}
+@media (max-width: 760px) {
+  .card[data-variant='detail'] .name {
+    min-height: 44px;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 4px;
+  }
+  .card[data-variant='detail'] .body {
+    margin-top: 0;
+  }
 }
 @media (max-width: 760px) {
   .card {

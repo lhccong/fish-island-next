@@ -163,6 +163,7 @@ describe('legacy interaction reminders', () => {
           action: 'like',
           sourceType: 4,
           sourceId: '42',
+          senderId: '9007199254740994',
           sourceContent: '[img]https://example.com/a.png[/img]',
           senderUser: { userName: '合成通知' },
           createTime: '2026-11-12',
@@ -179,6 +180,7 @@ describe('legacy interaction reminders', () => {
     expect(result.items[0]).toMatchObject({
       id: '9007199254740993',
       momentId: '42',
+      senderId: '9007199254740994',
       read: false,
       image: 'https://example.com/a.png',
       content: '',

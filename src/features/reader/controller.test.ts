@@ -20,6 +20,28 @@ function setup(books: Book[] = [local()]) {
   return { controller, service, repository };
 }
 describe('reader controller', () => {
+  it('retries the requested chapter after a failed switch instead of reloading the previous chapter', async () => {
+    const book = {
+      ...local(),
+      source: 'online' as const,
+      url: 'https://books.test/retry',
+      chapters: [
+        { index: 0, title: '第一章', url: '', isVolume: false, content: '已读正文' },
+        { index: 2, title: '第二章', url: '', isVolume: false },
+      ],
+    };
+    const { controller, service } = setup([book]);
+    await controller.getState().open(book.id);
+    vi.mocked(service.content)
+      .mockRejectedValueOnce(new Error('章节失败'))
+      .mockResolvedValueOnce('第二章正文');
+    await controller.getState().jump(2);
+    expect(controller.getState().status).toBe('error');
+    expect(controller.getState().books[0]!.lastReadChapter).toBe(0);
+    await controller.getState().retry();
+    expect(controller.getState().books[0]!.lastReadChapter).toBe(2);
+    expect(vi.mocked(service.content).mock.calls.map((call) => call[2].index)).toEqual([2, 2]);
+  });
   it('injects the configured token, supports session overrides and restores the default when cleared', async () => {
     const book = {
       ...local(),

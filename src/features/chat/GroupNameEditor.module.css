@@ -1,0 +1,63 @@
+.section {
+  min-width: 0;
+}
+.valueRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.valueRow > p {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.valueRow > button {
+  flex-shrink: 0;
+}
+.label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--color-muted);
+}
+.section input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 8px;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-size: 14px;
+}
+.section input:focus-visible {
+  outline-color: var(--color-accent-text);
+  outline-offset: 1px;
+}
+.section input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+.section .help {
+  color: var(--color-muted);
+  font-size: 12px;
+  margin-top: 8px;
+  line-height: 1.7;
+}
+.section .error {
+  color: var(--color-danger);
+  font-size: 12px;
+  margin-top: 8px;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+@media (max-width: 760px) {
+  .section input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

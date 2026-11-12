@@ -3,7 +3,7 @@ import type { ReaderSettings } from '@/domain/reader';
 import { Button } from '@/shared/ui/Button';
 import type { ReaderController } from './controller';
 import { useReader } from './use-reader';
-import styles from './Reader.module.css';
+import styles from './ReaderSettings.module.css';
 
 export function CustomThemeEditor({ controller }: { controller: ReaderController }) {
   const themes = useReader(controller, (state) => state.settings.customThemes);
@@ -14,7 +14,7 @@ export function CustomThemeEditor({ controller }: { controller: ReaderController
   const update = (settings: Partial<ReaderSettings>) =>
     controller.getState().configure({ ...controller.getState().settings, ...settings });
   return (
-    <details>
+    <details className={styles.themeEditor}>
       <summary>自定义正文主题</summary>
       <p className={styles.hint}>自选颜色仅影响正文，输入六位十六进制颜色。</p>
       <div className={styles.formGrid}>
@@ -76,6 +76,14 @@ export function CustomThemeEditor({ controller }: { controller: ReaderController
               setName(theme.name);
               setPaper(theme.backgroundColor);
               setInk(theme.fontColor);
+              const current = controller.getState().settings;
+              update({
+                theme: theme.id,
+                fontSize: theme.fontSize ?? current.fontSize,
+                fontFamily: theme.fontFamily || current.fontFamily,
+                lineHeight: theme.lineHeight ?? current.lineHeight,
+                letterSpacing: theme.letterSpacing ?? current.letterSpacing,
+              });
             }}
           >
             编辑
@@ -85,7 +93,10 @@ export function CustomThemeEditor({ controller }: { controller: ReaderController
             onClick={() =>
               update({
                 customThemes: themes.filter((item) => item.id !== theme.id),
-                theme: 'default',
+                theme:
+                  controller.getState().settings.theme === theme.id
+                    ? 'default'
+                    : controller.getState().settings.theme,
               })
             }
           >

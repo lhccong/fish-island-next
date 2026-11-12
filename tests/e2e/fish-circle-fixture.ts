@@ -15,7 +15,13 @@ export const post = {
 export async function setup(
   page: Page,
   other = false,
-  options: { visual?: boolean; profileFailure?: boolean; brokenCover?: boolean } = {},
+  options: {
+    visual?: boolean;
+    profileFailure?: boolean;
+    brokenCover?: boolean;
+    commentTotal?: number;
+    paginate?: boolean;
+  } = {},
 ) {
   const state = {
     commentTotal: options.commentTotal ?? (options.visual ? 5 : 0),
@@ -127,7 +133,7 @@ export async function setup(
                       likeNum: state.liked ? 1 : 0,
                     },
                   ],
-            total: state.empty || state.removed ? '0' : '11',
+            total: state.empty || state.removed ? '0' : options.paginate ? '2' : '1',
           },
         },
       });

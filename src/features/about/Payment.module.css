@@ -1,0 +1,247 @@
+.supportButton.supportButton {
+  min-height: 44px;
+  gap: 10px;
+  padding-inline: var(--space-4);
+  border-radius: 999px;
+  transition:
+    outline-color 180ms,
+    transform 180ms;
+  outline: 4px solid var(--color-accent-soft);
+  outline-offset: 3px;
+}
+.supportHeart {
+  fill: currentColor;
+  transition: transform 180ms;
+}
+.supportButton:hover .supportHeart {
+  transform: rotate(-12deg) scale(1.12);
+}
+.supportButton:active {
+  transform: translateY(1px);
+}
+.supportButton:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 4px;
+}
+.dialogShell.dialogShell {
+  width: min(600px, calc(100% - 24px));
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-accent-text);
+  height: min(820px, calc(100dvh - 32px));
+}
+.dialogShell > h2 {
+  font-size: 19px;
+}
+.dialogShell > p {
+  margin: 0 0 var(--space-4);
+  font-size: 12px;
+}
+.intro {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-3);
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-panel);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+.art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  flex-shrink: 0;
+}
+.orbit {
+  position: absolute;
+  inset: 0;
+}
+.heart {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--color-accent-text);
+  border-radius: 50%;
+}
+.heart svg {
+  fill: currentColor;
+}
+.sparkle {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  background: var(--color-accent-soft);
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.intro h3 {
+  margin: var(--space-2) 0;
+  font-size: 20px;
+  line-height: 1.5;
+  letter-spacing: -0.5px;
+}
+.intro p {
+  margin: 0;
+  font-size: 12px;
+}
+.amounts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-1) 0 var(--space-5);
+}
+.amountCard.amountCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 78px;
+  padding: var(--space-3) var(--space-2);
+  transition:
+    border-color 150ms,
+    background-color 150ms;
+}
+.amountCard strong {
+  font-size: 23px;
+  line-height: 1.2;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.amountCard > span {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.amountCard[aria-pressed='true'],
+.amountCard[aria-pressed='true']:hover:not(:disabled) {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  border-color: var(--color-accent-text);
+}
+.amountCard[aria-pressed='true'] > span {
+  color: var(--color-accent-text);
+}
+.selectedMark {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+.benefits {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+.benefits h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  font-size: 14px;
+}
+.benefits svg {
+  flex-shrink: 0;
+  color: var(--color-accent-text);
+}
+.benefits ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.benefits li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.benefits li div {
+  display: grid;
+  gap: 4px;
+}
+.benefits strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.benefits span,
+.benefits p {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.benefits p {
+  margin-bottom: 0;
+}
+.stateIcon {
+  display: block;
+  margin: var(--space-5) auto var(--space-3);
+  color: var(--color-accent-text);
+}
+.spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 760px) {
+  .supportButton.supportButton {
+    margin: 4px;
+  }
+  .intro {
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+  .art {
+    width: 64px;
+    height: 80px;
+  }
+  .orbit {
+    width: 64px;
+    height: 80px;
+  }
+  .heart {
+    width: 44px;
+    height: 44px;
+  }
+  .heart svg {
+    width: 24px;
+  }
+  .sparkle {
+    width: 16px;
+  }
+  .intro h3 {
+    font-size: 16px;
+  }
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  .intro p {
+    font-size: 11px;
+  }
+  .amounts {
+    gap: var(--space-2);
+  }
+  .amountCard strong {
+    font-size: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .supportButton,
+  .supportHeart,
+  .amountCard {
+    transition: none;
+  }
+  .supportButton:hover .supportHeart,
+  .supportButton:active {
+    transform: none;
+  }
+  .spinner {
+    animation: none;
+  }
+}

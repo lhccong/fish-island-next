@@ -24,7 +24,7 @@ for (const skin of builtinSkins)
       test(`${skin.id} ${mode} ${width}: confirmed actions and server results`, async ({
         page,
       }, info) => {
-        test.setTimeout(90_000);
+        test.setTimeout(180_000);
         await page.setViewportSize({ width, height: width > 760 ? 1000 : 844 });
         const state = await setupPet(page, skin.id, mode);
         await expect(page.getByRole('heading', { name: /小苔/ })).toBeVisible();

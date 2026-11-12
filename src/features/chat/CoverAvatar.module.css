@@ -1,0 +1,32 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: var(--color-chat-cover-blue);
+  color: var(--color-chat-cover-ink);
+}
+.avatar[data-kind='notice'] {
+  background: var(--color-chat-cover-orange);
+}
+.avatar[data-kind='group'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  padding: 2px;
+  background: var(--color-border);
+  color: var(--color-accent-text);
+}
+.glyph {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-accent-soft);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}

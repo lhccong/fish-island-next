@@ -74,7 +74,6 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     forgeLevel: 1,
     failBattle: false,
   };
-  let gate = Promise.resolve();
   await page.addInitScript(
     ({ skin, mode }) => {
       localStorage.setItem('fish-island:skin', skin);
@@ -106,10 +105,9 @@ export async function setupPet(page: Page, skin: string, mode: string) {
       if (path === 'pet/my/get') {
         state.mineRequests++;
         if (state.hold) {
-          gate = new Promise<void>((resolve) => {
+          await new Promise<void>((resolve) => {
             state.release = resolve;
           });
-          await gate;
         }
         if (state.fail)
           return route.fulfill({ json: { code: 40000, message: '合成读取失败，请重试' } });
@@ -295,5 +293,8 @@ export async function setupPet(page: Page, skin: string, mode: string) {
   await page.getByRole('button', { name: '登录', exact: true }).last().click();
   await expect(page).toHaveURL('/pet');
   await page.goto('/pet');
+  await expect(page.getByRole('heading', { name: '伙伴营地', exact: true })).toBeVisible({
+    timeout: 90000,
+  });
   return state;
 }

@@ -29,7 +29,7 @@ function PinnedList({ moments, onSelect }: Props) {
           </button>
         ))
       ) : (
-        <p className={styles.empty}>本页暂无置顶动态</p>
+        <p className={styles.empty}>已加载的动态中暂无置顶</p>
       )}
     </div>
   );
@@ -37,17 +37,17 @@ function PinnedList({ moments, onSelect }: Props) {
 export function PinnedMoments(props: Props) {
   return (
     <>
-      <aside className={styles.desktop} aria-label="本页置顶动态">
+      <aside className={styles.desktop} aria-label="已加载置顶动态">
         <h2>
           <Pin size={15} aria-hidden="true" />
-          置顶动态<span>本页</span>
+          置顶动态<span>已加载</span>
         </h2>
         <PinnedList {...props} />
       </aside>
       <details className={styles.mobile}>
         <summary>
           <Pin size={15} aria-hidden="true" />
-          置顶动态<span>本页 {props.moments.length} 条</span>
+          置顶动态<span>已加载 {props.moments.length} 条</span>
         </summary>
         <PinnedList {...props} />
       </details>

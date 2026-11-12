@@ -133,6 +133,9 @@
   }
 }
 @media (max-width: 760px) {
+  .chrome {
+    display: none;
+  }
   .documents {
     height: 44px;
   }

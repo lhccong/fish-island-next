@@ -25,6 +25,7 @@ export interface ReaderState {
   open: (id: string, chapter?: number, contents?: boolean) => Promise<void>;
   jump: (index: number, refresh?: boolean) => Promise<void>;
   refresh: () => Promise<void>;
+  retry: () => Promise<void>;
   progress: (position: number, bookId?: string, chapterIndex?: number) => void;
   configure: (settings: ReaderSettings) => void;
   setAccessToken: (token: string) => void;
@@ -41,6 +42,7 @@ export function createReaderController(
   let pending: AbortController | null = null;
   let generation = 0;
   let storageReadable = true;
+  let lastRequest: { id: string; index: number | undefined; refresh: boolean } | null = null;
   return createStore<ReaderState>((set, get) => {
     const save = () => {
       if (!storageReadable) return;
@@ -60,6 +62,7 @@ export function createReaderController(
       accessToken: get().accessToken,
     });
     const load = async (id: string, index: number | undefined, refresh: boolean) => {
+      lastRequest = { id, index, refresh };
       pending?.abort();
       const abort = new AbortController();
       pending = abort;
@@ -162,6 +165,11 @@ export function createReaderController(
         const id = get().activeId;
         if (id) await load(id, undefined, true);
       },
+      async retry() {
+        const request = lastRequest;
+        if (request && request.id === get().activeId)
+          await load(request.id, request.index, request.refresh);
+      },
       progress(position, bookId, chapterIndex) {
         const id = bookId ?? get().activeId;
         if (id && Number.isFinite(position))
@@ -185,6 +193,7 @@ export function createReaderController(
         set({ hidden: false, launch: { ...get().launch, contents: false } });
       },
       close() {
+        lastRequest = null;
         pending?.abort();
         ++generation;
         set({ activeId: null, hidden: false, status: 'idle' });

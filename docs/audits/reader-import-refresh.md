@@ -26,10 +26,12 @@
 
 ## 验证入口
 
+最终 `npm run check` 通过：格式、lint、类型检查、101 项单元测试和生产构建均通过。阅读相关浏览器流程覆盖 76 项（包含修复后的复跑）；补齐结果信息后，又按完整主题/模式/视口矩阵复核 30 项导入流程及 3 项阅读重载流程。移动端桌面文档画中画 20 项按设计跳过。加载态测试改为控制响应完成时机，避免快响应使 loading 瞬间消失而造成误报。结果与简介的键盘展开、无封面回退、长内容换行、分页部分失败重试均通过。
+
 - `reader-import.spec.ts`：WPS、微信、企业微信、飞书、钉钉 × 明暗 × 桌面/375px/390px，覆盖 Portal 输入样式、初始/loading/empty/error/success、长标题和书源换行、滚动、分页失败重试、添加状态、TXT 错误、触屏关闭和焦点返回。
 - `reader.spec.ts`：同一完整矩阵验证搜索/目录/正文均携带合成默认 accessToken，并回归阅读进度、换肤、刷新恢复与删除。
 - `reader-settings.spec.ts`：会话覆盖不落盘、刷新恢复项目默认值；`reader-pip.spec.ts` 回归真实桌面 Chromium 文档画中画。
 - 单元测试覆盖默认注入、覆盖与清空恢复；生产构建使用独立 `node_modules/.cache/reader-dist`，避免开发热更新干扰。
 - 本地真实效果截图位于 `node_modules/.cache/reader-refresh/`；矩阵截图保存在 `matrix-final/`，后续 Playwright 产物写入独立的 `node_modules/.cache/reader-test-results/`，避免与并行任务清理同一个 `test-results` 目录。
 
-未验证：物理手机软键盘、Safari/Firefox、其他第三方书源和系统真实发声；手机使用 Chromium 触屏视口验证，画中画仅在桌面浏览器验证。
+未验证：物理手机软键盘、Safari/Firefox、其他第三方书源和系统真实发声；手机使用 Chromium 移动设备视口与点击流程验证，画中画仅在桌面浏览器验证。额外的原生 tap 文件选择补测因浏览器会话启动未完成而停止，不作为通过证据。

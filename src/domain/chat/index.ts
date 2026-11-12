@@ -2,6 +2,21 @@
 export type MessageId = string;
 export type ConversationId = string;
 
+export interface ChatPreferencesPort {
+  readGroupName(): string | null;
+  writeGroupName(name: string): void;
+}
+
+export interface OnlineMember {
+  id: string;
+  name: string;
+  avatar: string | null;
+}
+
+export interface OnlineMembersPort {
+  loadOnlineMembers(signal: AbortSignal): Promise<readonly OnlineMember[]>;
+}
+
 export interface TextMessage {
   id: MessageId;
   conversationId: ConversationId;

@@ -1,0 +1,1 @@
+export { createAboutClient } from './client';

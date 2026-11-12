@@ -15,7 +15,7 @@ test('theme and mode changes preserve notification page without requests', async
       json: {
         code: 0,
         data: {
-          total: 11,
+          total: 2,
           records: [
             {
               id: String(current),
@@ -33,10 +33,12 @@ test('theme and mode changes preserve notification page without requests', async
   });
   await page.getByRole('button', { name: '消息通知', exact: true }).click();
   const panel = page.getByRole('dialog', { name: '全部互动消息', exact: true });
-  await expect(panel.getByText('换肤测试岛友', { exact: true })).toBeVisible();
-  await panel.getByRole('button', { name: '下一页通知' }).click();
-  await expect(panel.getByText('第 2 页', { exact: true })).toBeVisible();
-  await expect(panel.getByText('换肤测试岛友', { exact: true })).toBeVisible();
+  await expect(panel.getByText('换肤测试岛友', { exact: true }).first()).toBeVisible();
+  await panel.locator('[data-scroll-pagination="通知"]').scrollIntoViewIfNeeded();
+  await expect(
+    panel.locator('[data-scroll-pagination="通知"]').getByText('已全部加载'),
+  ).toBeVisible();
+  await expect(panel.getByText('换肤测试岛友', { exact: true }).first()).toBeVisible();
   await page.keyboard.press('Escape');
   const before = requests;
   for (const skin of builtinSkins)
@@ -59,5 +61,7 @@ test('theme and mode changes preserve notification page without requests', async
       expect(requests).toBe(before);
     }
   await page.getByRole('button', { name: '消息通知', exact: true }).click();
-  await expect(panel.getByText('第 2 页', { exact: true })).toBeVisible();
+  await expect(
+    panel.locator('[data-scroll-pagination="通知"]').getByText('已全部加载'),
+  ).toBeVisible();
 });

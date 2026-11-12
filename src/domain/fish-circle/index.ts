@@ -47,6 +47,7 @@ export interface Draft {
 export type MomentAction = 'delete' | 'top' | 'reward' | 'lottery/start';
 export interface CircleReminder {
   id: string;
+  senderId: string;
   senderName: string;
   avatar: string;
   content: string;

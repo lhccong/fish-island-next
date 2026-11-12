@@ -33,7 +33,7 @@ for (const skin of builtinSkins)
         const confirm = page.getByRole('dialog', { name: '批量分解', exact: true });
         await expect(confirm).toContainText('操作无法恢复');
         await confirm.getByRole('button', { name: '确认', exact: true }).click();
-        await expect(bag.getByRole('status')).toContainText('获得 20 积分');
+        await expect(bag.getByText('批量分解完成，获得 20 积分', { exact: true })).toBeVisible();
         await expect(bag.getByRole('heading', { name: '行囊还是空的', exact: true })).toBeVisible();
         expect(state.actions.filter((action) => action === 'batch')).toHaveLength(1);
         await assertPetLayout(page);

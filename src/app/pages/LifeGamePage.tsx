@@ -12,13 +12,16 @@ export function LifeGamePage() {
       slots={{
         sidebar: <DiscoveryNavigation />,
         header: (
-          <div className={styles.header}>
-            <Link className={styles.back ?? ''} to="/discover/games">
-              <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
-              返回游戏
-            </Link>
-            <h1>人生重开模拟器</h1>
-          </div>
+          <>
+            <div className={styles.header}>
+              <Link className={styles.back ?? ''} to="/discover/games">
+                <ArrowLeft size={18} strokeWidth={1.8} aria-hidden="true" />
+                返回游戏
+              </Link>
+              <h1>人生重开模拟器</h1>
+            </div>
+            <DiscoveryNavigation mobile />
+          </>
         ),
         content: <LifeGame />,
       }}

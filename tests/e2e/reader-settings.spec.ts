@@ -60,14 +60,19 @@ test('custom reading themes, credential isolation, speech cleanup and window geo
   }
   await reader.getByRole('button', { name: '阅读器设置' }).click();
   const settings = page.getByRole('dialog', { name: '阅读设置', exact: true });
+  await settings.getByRole('tab', { name: '主题设置', exact: true }).click();
   await settings.getByText('自定义正文主题', { exact: true }).click();
   await settings.getByLabel('主题名称', { exact: true }).fill('自定义验收主题');
   await settings.getByLabel('背景颜色', { exact: true }).fill('#263238');
   await settings.getByLabel('文字颜色', { exact: true }).fill('#eeeeee');
   await settings.getByRole('button', { name: '保存并应用主题' }).click();
-  await expect(settings.getByRole('combobox', { name: '阅读主题' })).toHaveText('自定义验收主题');
-  await settings.getByRole('combobox', { name: '朗读功能' }).click();
-  await page.getByRole('option', { name: '启用朗读功能', exact: true }).click();
+  await expect(
+    settings.getByRole('button', { name: '自定义验收主题', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await settings.getByRole('tab', { name: '朗读设置', exact: true }).click();
+  await settings.getByRole('switch', { name: '启用朗读功能' }).click();
+  await settings.getByRole('tab', { name: '阅读设置', exact: true }).click();
+  await settings.getByText('窗口、快捷键与阅读服务', { exact: true }).click();
   await settings
     .getByLabel('阅读服务凭证（当前会话覆盖）', { exact: true })
     .fill('synthetic-test-only');
@@ -92,8 +97,12 @@ test('custom reading themes, credential isolation, speech cleanup and window geo
   expect(calls.at(-1)).toBe('cancel');
   await page.reload();
   await page.getByRole('button', { name: '阅读设置', exact: true }).click();
+  await settings.getByText('窗口、快捷键与阅读服务', { exact: true }).click();
   await expect(settings.getByLabel('阅读服务凭证（当前会话覆盖）', { exact: true })).toHaveValue(
     'synthetic-reader-default',
   );
-  await expect(settings.getByRole('combobox', { name: '阅读主题' })).toHaveText('自定义验收主题');
+  await settings.getByRole('tab', { name: '主题设置', exact: true }).click();
+  await expect(
+    settings.getByRole('button', { name: '自定义验收主题', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
 });

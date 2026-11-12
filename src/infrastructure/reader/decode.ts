@@ -1,5 +1,6 @@
 import {
   defaultReaderSettings,
+  normalizeReaderColor,
   type Book,
   type Chapter,
   type ReaderSettings,
@@ -105,18 +106,14 @@ export function decodeSettings(value: unknown): ReaderSettings {
   if (Array.isArray(row.customThemes))
     settings.customThemes = row.customThemes.slice(0, 30).map((item) => {
       const theme = record(item);
-      const fontColor = theme.fontColor ?? theme.color;
-      if (
-        ![theme.backgroundColor, fontColor].every(
-          (color) => typeof color === 'string' && /^#[\da-f]{6}$/i.test(color),
-        )
-      )
-        throw new Error('自定义阅读主题格式错误');
+      const fontColor = normalizeReaderColor(theme.fontColor ?? theme.color);
+      const backgroundColor = normalizeReaderColor(theme.backgroundColor);
+      if (!fontColor || !backgroundColor) throw new Error('自定义阅读主题格式错误');
       return {
         id: string(theme.id),
         name: string(theme.name),
-        backgroundColor: string(theme.backgroundColor),
-        fontColor: string(fontColor),
+        backgroundColor,
+        fontColor,
         ...(typeof theme.fontSize === 'number'
           ? { fontSize: Math.max(12, Math.min(40, theme.fontSize)) }
           : {}),
@@ -129,19 +126,16 @@ export function decodeSettings(value: unknown): ReaderSettings {
           : {}),
       };
     });
-  if (
-    !row.theme &&
-    [row.backgroundColor, row.fontColor].every(
-      (color) => typeof color === 'string' && /^#[\da-f]{6}$/i.test(color),
-    )
-  ) {
+  const legacyPaper = normalizeReaderColor(row.backgroundColor);
+  const legacyInk = normalizeReaderColor(row.fontColor);
+  if (!row.theme && legacyPaper && legacyInk) {
     settings.customThemes = [
       ...settings.customThemes,
       {
         id: 'legacy-custom',
         name: '旧版阅读配色',
-        backgroundColor: string(row.backgroundColor),
-        fontColor: string(row.fontColor),
+        backgroundColor: legacyPaper,
+        fontColor: legacyInk,
       },
     ];
     settings.theme = 'legacy-custom';

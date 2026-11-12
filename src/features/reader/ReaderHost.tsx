@@ -7,6 +7,7 @@ import {
   Maximize2,
   Minimize2,
   PictureInPicture2,
+  LoaderCircle,
   RefreshCw,
   Settings,
   X,
@@ -225,15 +226,14 @@ function ReaderSurface({ controller }: { controller: ReaderController }) {
               </div>
             )}
             {status === 'loading' ? (
-              <p role="status" className={styles.empty}>
-                正在加载章节…
-              </p>
+              <div role="status" className={styles.readerState}>
+                <LoaderCircle size={24} aria-hidden="true" />
+                <p>正在加载章节…</p>
+              </div>
             ) : status === 'error' ? (
-              <div role="alert" className={styles.empty}>
+              <div role="alert" className={styles.readerState}>
                 <p>{error}</p>
-                <Button onClick={() => void controller.getState().jump(book.lastReadChapter, true)}>
-                  重试章节
-                </Button>
+                <Button onClick={() => void controller.getState().retry()}>重试章节</Button>
               </div>
             ) : (
               <ReaderBody

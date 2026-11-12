@@ -75,6 +75,12 @@
   cursor: pointer;
   font-size: 13px;
 }
+.mobileBack {
+  display: none;
+}
+.back:hover {
+  background: var(--color-circle-cover-shade);
+}
 .retry {
   top: var(--space-4);
   bottom: auto;
@@ -184,6 +190,9 @@
     width: 44px;
     padding: 0;
     justify-content: center;
+  }
+  .mobileBack {
+    display: inline-flex;
   }
   .backLabel {
     display: none;

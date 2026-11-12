@@ -1,7 +1,8 @@
+import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
+import { usePetPages } from './use-pet-pages';
 import { useCallback, useState } from 'react';
 import type { PetPort, SupplyPrize } from '@/domain/pet';
 import { Select } from '@/shared/ui/Select';
-import { Button } from '@/shared/ui/Button';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
@@ -107,12 +108,11 @@ function SupplyDetail({
   );
 }
 function SupplyRecords({ service }: { service: PetPort }) {
-  const [current, setCurrent] = useState(1);
   const load = useCallback(
-    (signal: AbortSignal) => service.drawRecords(current, signal),
-    [service, current],
+    (page: number, signal: AbortSignal) => service.drawRecords(page, signal),
+    [service],
   );
-  const resource = usePetResource(load);
+  const resource = usePetPages(load);
   return (
     <section className={styles.section}>
       <h3 data-tone="violet">领取记录</h3>
@@ -126,23 +126,13 @@ function SupplyRecords({ service }: { service: PetPort }) {
                 <small> · {prize.time}</small>
               </div>
             ))}
-            <div className={styles.pagination}>
-              <Button
-                variant="secondary"
-                disabled={current === 1}
-                onClick={() => setCurrent(current - 1)}
-              >
-                上一页
-              </Button>
-              <span>第 {current} 页</span>
-              <Button
-                variant="secondary"
-                disabled={current * 12 >= data.total}
-                onClick={() => setCurrent(current + 1)}
-              >
-                下一页
-              </Button>
-            </div>
+            <InfiniteScroll
+              label="领取记录"
+              hasMore={resource.hasMore}
+              loading={resource.loadingMore}
+              error={resource.error}
+              onLoadMore={resource.loadMore}
+            />
           </div>
         )}
       </ResourceView>

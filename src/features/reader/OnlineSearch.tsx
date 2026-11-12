@@ -1,3 +1,4 @@
+import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { useEffect, useRef, useState } from 'react';
 import { AlertCircle, BookOpen, LoaderCircle, Search } from 'lucide-react';
 import type { Book, ReaderService, SearchPage } from '@/domain/reader';
@@ -24,17 +25,21 @@ export function OnlineSearch({
   const [error, setError] = useState('');
   const [retryMore, setRetryMore] = useState(false);
   const books = useReader(controller, (state) => state.books);
+  const busy = useRef(false);
+  const completedCount = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   useEffect(() => () => abortRef.current?.abort(), []);
   const search = async (more: boolean) => {
     const key = more ? query : keyword.trim();
-    if (!key) return;
+    if (!key || (more && busy.current)) return;
+    busy.current = true;
     abortRef.current?.abort();
     const abort = new AbortController();
     abortRef.current = abort;
     const previous = more ? result.books : [];
     const nextPage = more ? page + 1 : 1;
     if (!more) {
+      completedCount.current = 0;
       setQuery(key);
       setResult({ books: [], lastIndex: -1, hasMore: false });
     }
@@ -57,7 +62,13 @@ export function OnlineSearch({
         },
       );
       if (abort.signal.aborted) return;
-      setResult({ ...response, books: merge(response.books) });
+      const merged = merge(response.books);
+      setResult({
+        ...response,
+        books: merged,
+        hasMore: response.hasMore && merged.length > completedCount.current,
+      });
+      completedCount.current = merged.length;
       setPage(nextPage);
       setLastIndex(response.lastIndex);
       setStatus('ready');
@@ -66,6 +77,8 @@ export function OnlineSearch({
         setStatus('error');
         setError(error instanceof Error ? error.message : '搜索失败，请稍后重试');
       }
+    } finally {
+      if (abortRef.current === abort) busy.current = false;
     }
   };
   const hasResults = result.books.length > 0;
@@ -127,17 +140,13 @@ export function OnlineSearch({
                 />
               );
             })}
-            {result.hasMore && (
-              <div className={styles.more}>
-                <Button
-                  variant="secondary"
-                  disabled={status === 'loading'}
-                  onClick={() => void search(true)}
-                >
-                  加载更多
-                </Button>
-              </div>
-            )}
+            <InfiniteScroll
+              label="搜索结果"
+              enabled={status === 'ready'}
+              hasMore={result.hasMore}
+              loading={status === 'loading'}
+              onLoadMore={() => void search(true)}
+            />
           </ScrollArea>
         </>
       ) : (

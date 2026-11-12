@@ -46,11 +46,21 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-030 接入微信风格公共群聊界面及在线成员 HTTP 快照，domain/chat 定义端口、infrastructure/chat 解码、features/chat 管理成员与独立草稿，app 注入。WorkspaceShellSlots 的可选 contentScroll=false 允许聊天内部独立滚动及固定输入区；其他页面默认行为保持一致。消息通信尚未接入，详见 ADR-030。
+
+ADR-030 补充本地群聊名称偏好端口：infrastructure/chat 适配 localStorage，app 注入，feature 管理编辑与名称状态并共享到标题、会话栏和详情。写入成功才更新界面，仅影响当前浏览器显示，不接入服务端群管理。
+
+ADR-030 补充 ChatMembersProvider：按账号作用域统一获取在线快照，供微信式左侧在线用户行与右侧成员面板共用；页面进入时加载，替代首次展开加载。手机通过页头在线用户 Dialog 使用相同列表，不新增私聊能力或虚构消息摘要。
+
+ADR-030 的聊天会话栏采用 sidebarVariant="chat"：桌面与 WPS 为 300px，列表背景铺满、行内保留滑轨间距；其他页面宽度和手机弹层布局沿用原有规则。
+
 ADR-027 新增懒加载伙伴营地 `/pet`：domain/pet、infrastructure/pet、features/pet 分离，app 注入账号与服务。原生 SVG/CSS 分层场景复用旧二维精灵，保留养成、装备与服务端回合结算；营地移动仅为本地互动，不新增实时战斗协议。详见 ADR-027。
 
 ADR-025 迁移独立阅读模块：domain/reader 端口、infrastructure/reader 协议与存储、features/reader 控制器及单一阅读内核；app 注入并挂载跨路由宿主，发现区提供 `/reader`。画中画与悬浮窗共享同一 DOM 和业务状态，不新增依赖，见 ADR-025。
 
 ADR-028 按用户明确授权在 app/config 注入旧版阅读服务默认 accessToken，覆盖 ADR-025 的仅手动配置决策；搜索、目录和正文共用。独立导入弹窗修复 Portal 控件样式与状态布局，详见 ADR-028。
+
+ADR-031 修复阅读 loading/error 的弹性布局，并按旧版重做阅读/主题/朗读设置三页签，shared/ui 提供统一 Slider/Switch，无新增依赖；见 ADR-031。
 
 ADR-018 在发现区增加独立懒加载的游戏目录；app 组合朋友圈和游戏导航，游戏介绍由独立 feature 展示，手机在页头提供发现菜单。首个人生重开入口沿用旧版 `/game/life` 约定。详见 ADR-018。
 
@@ -88,7 +98,7 @@ src/
     auth/                  会话控制器、表单、头像入口及全局提示
     appearance/            内置外观选择状态与皮肤 ID 本地持久化
     hot-board/             热榜请求生命周期、筛选与业务展示
-    chat/                  后续：消息 store、用例、列表、输入、消息渲染器
+    chat/                  群聊界面、在线成员、独立草稿；后续消息 store 与通信
     conversations/         后续：会话列表、选中态、分页
     skin-import/           后续：校验、预览、应用、回滚流程
   infrastructure/          已有热榜 HTTP 适配；后续 WebSocket、缓存
@@ -194,4 +204,16 @@ ADR-022 将鱼小圈筛选与操作收拢为封面右上角图标，复用鱼小
 
 ADR-023 将通知优化为非模态紧凑浮层，发布弹窗参考旧版 PublishMomentModal 重建；共享 Dialog 默认行为保持不变，详见 ADR-023。
 
+ADR-022 的关联动态详情改为工作台主内容区内切换，由 CircleFeed 持有选择，复用 contentScroll=false 与独立 ScrollArea；列表保持挂载并隐藏，返回恢复原滚动、草稿及数据。详情不使用弹窗，图片预览等独立任务沿用现有 Dialog。
+
+ADR-022 补充评论通知定位：infrastructure 保留通知发送者编号，feature 按已有评论分页匹配通知内容、展开祖先回复并定位高亮；定位状态与分页由评论功能拥有，不进入页面或外壳。旧协议缺少评论编号时显式处理无法唯一匹配与找不到的情况，自动查找有界且可取消。
+
 ADR-029 迁移公开关于页 /about，app 组合发现导航，features/about 管理复制与图片状态，保留旧版反馈及功能介绍并注明旧版能力范围；详见 ADR-029。
+
+ADR-029 补齐关于五项菜单和旧 /rank/* 路由，domain/about 与 infrastructure/about 分离打赏分页及订单协议，app 注入会话；福利图片与其他产品仍由 about feature 展示。
+
+ADR-032 手机工作台采用分层导航：外层热榜与发现使用底部 Tabbar，内层隐藏全局菜单并提供返回；朋友圈隐藏手机页头，返回入口位于封面左上角，发现根页隐藏手机菜单内的重复标题。外壳通过 hideMobileHeader 纯布局属性呈现，返回发现由 app 注入，桌面布局不变。见 ADR-032。
+
+ADR-033 手机视口统一隐藏原生与 Radix 可视滑轨，保留滚动逻辑、焦点和 gutter；桌面保持原行为。见 ADR-033。
+
+ADR-034 统一全系统滚动分页：shared/ui/InfiniteScroll 提供边界观察器和通用分页 Hook，feature 负责领域适配与请求生命周期；后端页码协议保留，界面移除页码及翻页/加载更多按钮。详见 ADR-034。

@@ -1,28 +1,68 @@
-import { MessageCircle } from 'lucide-react';
-import { Link } from 'react-router';
+import { useRef, useState } from 'react';
+import { MoreHorizontal } from 'lucide-react';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
+import { chatService, chatPreferences } from '@/app/config/chat';
+import { useAuth } from '@/features/auth';
+import {
+  ChatWorkspace,
+  useLocalGroupName,
+  ChatMembersProvider,
+  ChatOnlineUsers,
+  MobileOnlineUsers,
+} from '@/features/chat';
 import styles from './ChatPlaceholderPage.module.css';
 
 export function ChatPlaceholderPage() {
+  const { session } = useAuth();
+  const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
+  const [membersOpen, setMembersOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const closeMembers = () => {
+    setMembersOpen(false);
+    trigger.current?.focus();
+  };
+  if (session.status !== 'authenticated') return null;
   return (
-    <WorkspaceLayout
-      slots={{
-        sidebar: (
-          <div className={styles.sidebar}>
-            <h2>聊天</h2>
-            <p>暂无已连接的会话</p>
-          </div>
-        ),
-        header: <h1 className={styles.title}>鱼岛聊天</h1>,
-        content: (
-          <div className={styles.empty}>
-            <MessageCircle size={52} strokeWidth={1.2} aria-hidden="true" />
-            <h2>聊天空间，准备就绪</h2>
-            <p>聊天服务尚未接入，会话与消息将在后续开放。</p>
-            <Link to="/">先去看看今日热榜</Link>
-          </div>
-        ),
-      }}
-    />
+    <ChatMembersProvider key={session.user.id} service={chatService}>
+      <WorkspaceLayout
+        sidebarLabel="聊天会话"
+        sidebarVariant="chat"
+        slots={{
+          contentScroll: false,
+          sidebar: <ChatOnlineUsers groupName={groupName} />,
+          header: (
+            <div className={styles.header}>
+              <h1 title={groupName}>{groupName}</h1>
+              <div className={styles.headerActions}>
+                <MobileOnlineUsers groupName={groupName} />
+                <button
+                  type="button"
+                  ref={trigger}
+                  className={styles.more}
+                  aria-label="群聊详情"
+                  aria-expanded={membersOpen}
+                  aria-controls={membersOpen ? 'chat-online-members' : undefined}
+                  onClick={() => setMembersOpen((open) => !open)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape' && membersOpen) closeMembers();
+                  }}
+                >
+                  <MoreHorizontal size={23} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          ),
+          content: (
+            <ChatWorkspace
+              key={session.user.id}
+              membersOpen={membersOpen}
+              onCloseMembers={closeMembers}
+              groupName={groupName}
+              onRenameGroup={saveGroupName}
+            />
+          ),
+        }}
+      />
+    </ChatMembersProvider>
   );
 }

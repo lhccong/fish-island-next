@@ -48,7 +48,12 @@ for (const skin of builtinSkins)
         const pip = (window as unknown as { documentPictureInPicture: { window: Window } })
           .documentPictureInPicture.window;
         const element = pip.document.querySelector('[aria-label="阅读器"]')!;
+        const bounds = element.getBoundingClientRect();
+        const footer = [...element.querySelectorAll('button')]
+          .find((button) => button.textContent === '下一章')!
+          .parentElement!.getBoundingClientRect();
         return {
+          footerGap: Math.abs(bounds.bottom - footer.bottom),
           skin: pip.document.documentElement.dataset.skin,
           mode: pip.document.documentElement.dataset.colorMode,
           background: pip.getComputedStyle(element).backgroundColor,
@@ -58,6 +63,7 @@ for (const skin of builtinSkins)
       expect(pipState.skin).toBe(skin.id);
       expect(pipState.mode).toBe(mode);
       expect(pipState.width).toBe(true);
+      expect(pipState.footerGap).toBeLessThanOrEqual(2);
       expect(pipState.background).toBe(mode === 'dark' ? 'rgb(25, 26, 28)' : 'rgb(245, 245, 245)');
       await page.evaluate(() => {
         const pip = (window as unknown as { documentPictureInPicture: { window: Window } })

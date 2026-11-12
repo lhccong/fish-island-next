@@ -1,3 +1,5 @@
+export { normalizeReaderColor } from './colors';
+
 export interface Chapter {
   index: number;
   title: string;

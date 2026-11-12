@@ -1,0 +1,11 @@
+.heading {
+  margin: 0;
+  padding: 18px 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.menu {
+  max-width: 640px;
+  margin: 16px auto;
+  padding: 0 16px;
+}

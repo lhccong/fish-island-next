@@ -1,4 +1,6 @@
-import { useCallback, useState } from 'react';
+import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
+import { Button } from '@/shared/ui/Button';
+import { useCallback, useRef, useState } from 'react';
 import type { Comment, FishCirclePort } from '@/domain/fish-circle';
 import { usePage } from './use-page';
 import { useOperation } from './use-operation';
@@ -6,8 +8,11 @@ import { CommentComposer } from './CommentComposer';
 import { MediaGrid } from './MediaGrid';
 import { CircleAvatar } from './CircleAvatar';
 import { formatMomentTime } from './format-time';
+import type { CommentTarget } from './comment-target';
+import { useCommentTarget } from './use-comment-target';
 import styles from './Comments.module.css';
 interface Props {
+  target?: CommentTarget | null;
   composerOpen: boolean;
   momentId: string;
   userId: string;
@@ -24,25 +29,48 @@ export function Comments({
   admin,
   onCountChange,
   service,
+  target = null,
 }: Props) {
   const load = useCallback(
     (p: number, signal: AbortSignal) => service.comments(momentId, p, signal),
     [service, momentId],
   );
-  const { result, page, setPage, refresh } = usePage(load);
-  const [expanded, setExpanded] = useState(false);
-  const [expandedReplies, setExpandedReplies] = useState<ReadonlySet<string>>(new Set());
+  const { result, refresh, loadMore, loadingMore, error: pageError, hasMore } = usePage(load);
+  const [expanded, setExpanded] = useState(!!target);
+  const [replyOverrides, setReplyOverrides] = useState<ReadonlyMap<string, boolean>>(new Map());
   const [reply, setReply] = useState<Comment | null>(null);
   const operation = useOperation();
   const [notice, setNotice] = useState('');
+  const container = useRef<HTMLElement>(null);
+  const anchor = useCommentTarget({
+    container,
+    target,
+    items: result.status === 'ready' ? result.data.items : [],
+    ready: result.status === 'ready',
+    hasMore,
+    loadingMore,
+    error: pageError,
+    loadMore,
+  });
   function commentCount(c: Comment): number {
     return 1 + c.children.reduce((n, child) => n + commentCount(child), 0);
   }
   function renderComment(c: Comment, root: Comment = c) {
+    const highlighted = anchor.match?.status === 'found' && anchor.match.id === c.id;
+    const repliesOpen =
+      replyOverrides.get(c.id) ??
+      (anchor.match?.status === 'found' && anchor.match.ancestors.includes(c.id));
     return (
-      <li key={c.id} className={styles.comment}>
+      <li
+        key={c.id}
+        className={styles.comment}
+        data-comment-target={highlighted}
+        data-comment-id={c.id}
+        tabIndex={highlighted ? -1 : undefined}
+      >
         <CircleAvatar name={c.userName} src={c.avatar} size="small" />
         <div className={styles.content}>
+          {highlighted && <span className={styles.targetLabel}>通知中的评论</span>}
           <p className={styles.author}>
             <strong>{c.userName}</strong>
             {c.replyName && ` 回复 ${c.replyName}`} {c.top && ' · 置顶'}
@@ -101,19 +129,18 @@ export function Comments({
               <button
                 className={styles.more}
                 type="button"
-                aria-expanded={expandedReplies.has(c.id)}
+                aria-expanded={repliesOpen}
                 onClick={() =>
-                  setExpandedReplies((old) => {
-                    const next = new Set(old);
-                    if (next.has(c.id)) next.delete(c.id);
-                    else next.add(c.id);
+                  setReplyOverrides((old) => {
+                    const next = new Map(old);
+                    next.set(c.id, !repliesOpen);
                     return next;
                   })
                 }
               >
-                {expandedReplies.has(c.id) ? '收起回复' : `查看 ${c.children.length} 条回复`}
+                {repliesOpen ? '收起回复' : `查看 ${c.children.length} 条回复`}
               </button>
-              {expandedReplies.has(c.id) && (
+              {repliesOpen && (
                 <ul className={styles.replies}>
                   {c.children.map((child) => renderComment(child, root))}
                 </ul>
@@ -125,7 +152,17 @@ export function Comments({
     );
   }
   return (
-    <section className={styles.comments} aria-label="评论区">
+    <section ref={container} className={styles.comments} aria-label="评论区">
+      {anchor.message && (
+        <p className={styles.targetNotice} role="status">
+          {anchor.message}
+        </p>
+      )}
+      {anchor.paused && (
+        <Button variant="secondary" onClick={anchor.continueSearch}>
+          继续查找该评论
+        </Button>
+      )}
       {result.status === 'loading' && <p role="status">正在加载评论…</p>}
       {result.status === 'error' && (
         <p role="alert">
@@ -151,21 +188,17 @@ export function Comments({
               查看更多 {result.data.total - 3} 条评论
             </button>
           )}
-          {(expanded || result.data.total > 10) && (
-            <div className={styles.pagination}>
-              <button type="button" disabled={page === 1} onClick={() => setPage(page - 1)}>
-                上一页评论
-              </button>
-              <span>第 {page} 页</span>
-              <button
-                type="button"
-                disabled={page * 10 >= result.data.total}
-                onClick={() => setPage(page + 1)}
-              >
-                下一页评论
-              </button>
-            </div>
-          )}
+          <InfiniteScroll
+            enabled={
+              (!target || anchor.match?.status === 'found') &&
+              (expanded || result.data.items.length <= 3)
+            }
+            label="评论"
+            hasMore={hasMore}
+            loading={loadingMore}
+            error={pageError}
+            onLoadMore={loadMore}
+          />
         </>
       )}
       {(composerOpen || reply) && (
@@ -178,8 +211,7 @@ export function Comments({
             setReply(null);
             onCountChange(1);
             setNotice('评论成功');
-            if (page !== 1) setPage(1);
-            else refresh();
+            refresh();
           }}
         />
       )}

@@ -53,6 +53,9 @@
   color: var(--color-muted);
 }
 @media (max-width: 760px) {
+  .caption {
+    display: none;
+  }
   .desktopTitle {
     display: none;
   }

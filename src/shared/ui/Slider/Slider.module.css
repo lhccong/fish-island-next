@@ -1,0 +1,100 @@
+.root {
+  min-width: 0;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 13px;
+  color: var(--color-text);
+}
+.heading output {
+  min-width: 38px;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.input {
+  display: block;
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-accent-text);
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.input:focus,
+.input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--radius-control);
+  background: linear-gradient(
+    to right,
+    var(--color-accent-text) 0%,
+    var(--color-accent-text) var(--slider-progress),
+    var(--color-border) var(--slider-progress),
+    var(--color-border) 100%
+  );
+}
+.input::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: 2px solid var(--color-accent-text);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+.input::-moz-range-track {
+  height: 4px;
+  border-radius: var(--radius-control);
+  background: var(--color-border);
+}
+.input::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-text);
+}
+.input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-accent-text);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+.input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+.input:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+.root[data-disabled='true'] {
+  opacity: 0.5;
+}
+.input:disabled {
+  cursor: not-allowed;
+}
+@media (max-width: 760px) {
+  .input {
+    height: 44px;
+  }
+  .heading {
+    font-size: 14px;
+  }
+}

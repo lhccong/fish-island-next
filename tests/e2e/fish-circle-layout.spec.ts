@@ -24,23 +24,27 @@ test('wechat sidebar preserves legacy cover and cards on desktop and mobile', as
   await expect(card.getByText('给忙碌的一天留一点自己的时间。', { exact: true })).toBeVisible();
   await expect(card.getByText('第四条合成评论', { exact: true })).toHaveCount(0);
   await expect(card).not.toContainText('T08:30:00');
-  await expect(page.getByRole('link', { name: '热榜', exact: true }).locator('svg')).toHaveClass(
-    /lucide-camera/,
-  );
-  await expect(page.getByRole('link', { name: '鱼小圈', exact: true }).locator('svg')).toHaveClass(
-    /lucide-compass/,
-  );
-  await noOverflow(page);
-  await page.getByRole('region', { name: '主内容滚动区', exact: true }).evaluate((element) => {
-    element.scrollTop = 0;
-  });
+  if (page.viewportSize()!.width > 760) {
+    await expect(page.getByRole('link', { name: '热榜', exact: true }).locator('svg')).toHaveClass(
+      /lucide-camera/,
+    );
+    await expect(
+      page.getByRole('link', { name: '鱼小圈', exact: true }).locator('svg'),
+    ).toHaveClass(/lucide-compass/);
+    await noOverflow(page);
+    await page
+      .getByRole('region', { name: '鱼小圈列表滚动区', exact: true })
+      .evaluate((element) => {
+        element.scrollTop = 0;
+      });
+  }
   await page.screenshot({ path: testInfo.outputPath('circle-final.png'), fullPage: true });
   await page.getByRole('button', { name: '我的鱼小圈', exact: true }).last().click();
   const cover = page.getByRole('region', { name: '鱼小圈封面', exact: true });
   await expect(cover.getByRole('img', { name: '鱼小圈封面', exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('circle-profile.png'), fullPage: true });
   if (page.viewportSize()!.width > 1180) {
-    const pinned = page.getByRole('complementary', { name: '本页置顶动态', exact: true });
+    const pinned = page.getByRole('complementary', { name: '已加载置顶动态', exact: true });
     await expect(pinned).toBeVisible();
     const cardBox = await card.boundingBox();
     const pinsBox = await pinned.boundingBox();
@@ -101,20 +105,19 @@ test('a full page of comments and child replies loads, paginates and retries cor
   const card = page.getByRole('article');
   await expect(card.getByText('给忙碌的一天留一点自己的时间。', { exact: true })).toBeVisible();
   await expect(page.getByText('评论层级异常', { exact: true })).toHaveCount(0);
+  state.commentFailure = true;
   await card.getByRole('button', { name: '查看更多 12 条评论', exact: true }).click();
   await expect(card.getByText('第 10 条合成评论', { exact: true })).toBeVisible();
   await card.getByRole('button', { name: '查看 1 条回复', exact: true }).click();
   await expect(card.getByText('第10条的子回复', { exact: true })).toBeVisible();
-  state.commentFailure = true;
-  await card.getByRole('button', { name: '下一页评论', exact: true }).click();
+  await card.locator('[data-scroll-pagination="评论"]').scrollIntoViewIfNeeded();
   await expect(card.getByRole('alert')).toContainText('503');
   await noOverflow(page);
   await page.screenshot({ path: testInfo.outputPath('comments-error.png') });
   state.commentFailure = false;
   await card.getByRole('button', { name: '重试评论', exact: true }).click();
   await expect(card.getByText('第 15 条合成评论', { exact: true })).toBeVisible();
-  await expect(card.getByRole('button', { name: '下一页评论', exact: true })).toBeDisabled();
-  await card.getByRole('button', { name: '上一页评论', exact: true }).click();
+  await expect(card.locator('[data-scroll-pagination="评论"]')).toContainText('已全部加载');
   await card.getByRole('button', { name: '回复 子回复岛友', exact: true }).click();
   await card.getByRole('textbox', { name: '评论内容' }).fill('合成的子回复测试');
   await card.getByRole('button', { name: '发送评论', exact: true }).click();

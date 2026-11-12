@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { Route, Routes, useLocation, type Location } from 'react-router';
+import { Navigate, Route, Routes, useLocation, type Location } from 'react-router';
 import { HotBoardPage } from '@/app/pages/HotBoardPage';
 import { RequireAuth } from '@/app/components/RequireAuth';
 import { PageLoading } from '@/app/components/PageLoading';
@@ -8,6 +8,9 @@ import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
 const AboutPage = lazy(() =>
   import('@/app/pages/AboutPage').then((module) => ({ default: module.AboutPage })),
+);
+const DiscoveryPage = lazy(() =>
+  import('@/app/pages/DiscoveryPage').then((module) => ({ default: module.DiscoveryPage })),
 );
 const PetPage = lazy(() =>
   import('@/app/pages/PetPage').then((module) => ({ default: module.PetPage })),
@@ -63,7 +66,13 @@ export function AppRoutes() {
         <Suspense fallback={<PageLoading />}>
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
-            <Route path="/about" element={<AboutPage />} />
+            <Route path="/discover" element={<DiscoveryPage />} />
+            <Route path="/about" element={<Navigate to="/rank/reward" replace />} />
+            <Route path="/rank" element={<Navigate to="/rank/reward" replace />} />
+            <Route path="/rank/about" element={<AboutPage section="about" />} />
+            <Route path="/rank/reward" element={<AboutPage section="reward" />} />
+            <Route path="/rank/welfare" element={<AboutPage section="welfare" />} />
+            <Route path="/rank/other" element={<AboutPage section="other" />} />
             <Route path="/discover/games" element={<GamesPage />} />
             <Route
               path="/pet"

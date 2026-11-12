@@ -232,15 +232,7 @@
   background: var(--color-pet-panel);
   border-radius: 12px;
 }
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px 0 4px;
-  font-size: 12px;
-}
+
 .rankRow {
   display: flex;
   align-items: center;
@@ -351,10 +343,7 @@
     padding: 10px;
     font-size: 13px;
   }
-  .pagination {
-    gap: 8px;
-    justify-content: space-between;
-  }
+
   .form input:not([type='checkbox']),
   .card input {
     min-height: 44px;

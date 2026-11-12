@@ -1,3 +1,13 @@
+.workspace,
+.feedPane {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+.workspace {
+  display: flex;
+  flex-direction: column;
+}
 .feed {
   max-width: 1100px;
   margin: 0 auto;
@@ -32,7 +42,6 @@
 }
 .tabs button,
 .tools button,
-.pagination button,
 .state button {
   display: inline-flex;
   align-items: center;
@@ -184,16 +193,7 @@
   align-items: center;
   gap: var(--space-2);
 }
-.pagination {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-4) 0;
-  font-size: 12px;
-  color: var(--color-circle-muted);
-}
+
 .state {
   padding: var(--space-7) var(--space-4);
   text-align: center;
@@ -203,21 +203,7 @@
   font-size: 14px;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-}
-.sidebar h2 {
-  height: 70px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 400;
-  margin: 0;
-  padding: 0 var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
-.sidebar button {
+.circleEntry {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -232,18 +218,18 @@
   text-align: left;
   font-size: 14px;
 }
-.sidebar button > span:first-of-type {
+.circleEntry > span:first-of-type {
   flex: 1;
 }
-.sidebar button:hover {
+.circleEntry:hover {
   background: var(--color-hover);
 }
-.sidebar button[aria-pressed='true'] {
+.circleEntry[aria-pressed='true'] {
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
 
-.sidebar button > span:last-child {
+.circleEntry > span:last-child {
   border-radius: 4px;
 }
 .header {
@@ -304,13 +290,7 @@
   .header span {
     max-width: 60%;
   }
-  .pagination {
-    gap: var(--space-1);
-  }
-  .pagination button {
-    padding: var(--space-2);
-    font-size: 12px;
-  }
+
   .form {
     padding-bottom: env(safe-area-inset-bottom);
   }

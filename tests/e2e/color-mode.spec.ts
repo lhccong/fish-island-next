@@ -181,7 +181,7 @@ for (const skin of builtinSkins)
       ).toHaveAttribute('aria-pressed', 'true');
       await capture(page, info, 'foundation');
       await page.goto('/chat');
-      await expect(page.getByRole('heading', { name: '聊天空间，准备就绪' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
       await capture(page, info, 'chat-empty');
 
       await page.route('**/api/auth/app/info?*', (route) =>

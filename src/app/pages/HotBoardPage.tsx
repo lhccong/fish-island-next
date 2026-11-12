@@ -15,7 +15,13 @@ export function HotBoardPage() {
       service={hotBoardClient}
       currentUser={session.status === 'authenticated' ? session.user : null}
       presentation={isTable ? 'table' : 'cards'}
-      renderLayout={(slots) => <WorkspaceLayout slots={slots} hideSidebar={isTable} />}
+      renderLayout={(slots) => (
+        <WorkspaceLayout
+          slots={slots}
+          hideSidebar={isTable}
+          mobileNavigation={slots.contentKey === 'all' || isTable ? 'tabs' : 'hidden'}
+        />
+      )}
     />
   );
 }

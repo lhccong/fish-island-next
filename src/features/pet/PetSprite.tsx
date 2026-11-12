@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import { PawPrint } from 'lucide-react';
+import { petSpriteAction, type PetSpriteAction } from './pet-sprite-actions';
 import styles from './PetSprite.module.css';
 
 export function PetSprite({
@@ -11,7 +12,7 @@ export function PetSprite({
   url: string;
   name: string;
   size?: number;
-  action?: 'idle' | 'run' | 'run-left' | 'pat';
+  action?: PetSpriteAction;
 }) {
   return <SpriteImage key={url} url={url} name={name} size={size} action={action} />;
 }
@@ -24,13 +25,11 @@ function SpriteImage({
   url: string;
   name: string;
   size: number;
-  action: 'idle' | 'run' | 'run-left' | 'pat';
+  action: PetSpriteAction;
 }) {
   const [failed, setFailed] = useState(false);
-  const sprite = /\/moyu\/pet\/[^/?]+\.webp(?:\?|$)/i.test(url);
-  const running = action === 'run' || action === 'run-left';
-  const frames = running ? 8 : action === 'pat' ? 4 : 6;
-  const row = action === 'run-left' ? 2 : action === 'run' ? 1 : action === 'pat' ? 3 : 0;
+  const [layout, setLayout] = useState<'loading' | 'sheet' | 'static'>('loading');
+  const { row, frames } = petSpriteAction(url, action);
   const style = {
     '--sprite-size': `${size}px`,
     '--sprite-height': `${(size * 208) / 192}px`,
@@ -51,13 +50,28 @@ function SpriteImage({
     );
   return (
     <span
-      className={sprite ? styles.sprite : styles.static}
+      className={
+        layout === 'sheet' ? styles.sprite : layout === 'loading' ? styles.loading : styles.static
+      }
       data-action={action}
+      data-layout={layout}
       style={style}
       role="img"
       aria-label={name}
     >
-      <img src={url} alt="" onError={() => setFailed(true)} draggable={false} />
+      {layout === 'loading' && <PawPrint size={Math.min(size / 2, 48)} aria-hidden="true" />}
+      <img
+        src={url}
+        alt=""
+        onLoad={(event) => {
+          const image = event.currentTarget;
+          setLayout(
+            image.naturalWidth === 1536 && image.naturalHeight === 1872 ? 'sheet' : 'static',
+          );
+        }}
+        onError={() => setFailed(true)}
+        draggable={false}
+      />
     </span>
   );
 }

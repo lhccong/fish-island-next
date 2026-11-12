@@ -126,7 +126,7 @@ for (const skin of builtinSkins)
       await add.getByRole('button', { name: '搜索', exact: true }).click();
       await add.getByRole('button', { name: '加入书架' }).click();
       await expect(add.getByRole('button', { name: '已在书架' })).toBeDisabled();
-      await add.getByRole('button', { name: '加载更多' }).click();
+      await add.locator('[data-scroll-pagination="搜索结果"]').scrollIntoViewIfNeeded();
       await expect(add.getByRole('heading', { name: '迁移验收书' })).toHaveCount(1);
       await add.getByRole('button', { name: '关闭', exact: true }).click();
       await page.getByRole('button', { name: '阅读《迁移验收书》' }).click();
@@ -156,9 +156,10 @@ for (const skin of builtinSkins)
       await expect(reader.getByText('起点正文', { exact: true })).toBeVisible();
       await reader.getByRole('button', { name: '阅读器设置' }).click();
       const settings = page.getByRole('dialog', { name: '阅读设置', exact: true });
-      await settings.getByRole('combobox', { name: '阅读主题' }).click();
-      await page.getByRole('option', { name: '纸张', exact: true }).click();
-      await settings.getByLabel('字号', { exact: true }).fill('21');
+      await settings.getByRole('tab', { name: '主题设置', exact: true }).click();
+      await settings.getByRole('button', { name: '纸张', exact: true }).click();
+      await settings.getByRole('tab', { name: '阅读设置', exact: true }).click();
+      await settings.getByRole('slider', { name: '字号', exact: true }).press('ArrowRight');
       await page.screenshot({ path: testInfo.outputPath('settings.png') });
       await settings.getByRole('button', { name: '关闭阅读设置', exact: true }).click();
       await expect(reader).toBeVisible();

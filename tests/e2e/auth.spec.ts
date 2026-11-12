@@ -3,6 +3,9 @@ import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 const syntheticUser = { id: '123', userName: '测试岛友', userAvatar: null, userRole: 'user' };
 const syntheticToken = { tokenName: 'test-session', tokenValue: 'synthetic-test-value' };
 async function mockAuth(context: BrowserContext) {
+  await context.route('**/api/chat/online/user', (route) =>
+    route.fulfill({ json: { code: 0, data: [] } }),
+  );
   const state = {
     rejectLogin: false,
     restoreFailure: false,
@@ -125,7 +128,7 @@ test('account login handles failure, protected redirect, refresh and logout', as
   server.rejectLogin = false;
   await fillLogin(page);
   await page.getByRole('button', { name: '登录', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '聊天空间，准备就绪' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
   await expectAccountAtStart(page, '用户菜单');
   expect(server.lastBody).toEqual({
     userAccount: 'test-account',
@@ -133,7 +136,7 @@ test('account login handles failure, protected redirect, refresh and logout', as
   });
   expect(await storedSessions(page)).toEqual({ local: 0, session: 1 });
   await page.reload();
-  await expect(page.getByRole('heading', { name: '聊天空间，准备就绪' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
   expect(server.restores).toBeGreaterThan(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('authenticated.png'), fullPage: true });
@@ -165,7 +168,7 @@ test('email login persists and synchronizes logout across tabs', async ({
   expect(await storedSessions(page)).toEqual({ local: 1, session: 0 });
   const second = await context.newPage();
   await second.goto('/chat');
-  await expect(second.getByRole('heading', { name: '聊天空间，准备就绪' })).toBeVisible();
+  await expect(second.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
   await page.getByRole('button', { name: '用户菜单' }).click();
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await expect(second.getByRole('dialog', { name: '摸鱼岛', exact: true })).toBeVisible();
@@ -180,14 +183,14 @@ test('recovery network failure keeps the session, expired sessions clear it', as
   await page.goto('/user/login?redirect=/chat');
   await fillLogin(page);
   await page.getByRole('button', { name: '登录', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '聊天空间，准备就绪' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
   server.restoreFailure = true;
   await page.reload();
   await expect(page.getByRole('heading', { name: '登录状态暂时无法确认' })).toBeVisible();
   expect(await storedSessions(page)).toEqual({ local: 1, session: 0 });
   server.restoreFailure = false;
   await page.getByRole('button', { name: '重试恢复登录' }).click();
-  await expect(page.getByRole('heading', { name: '聊天空间，准备就绪' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
   server.expired = true;
   await page.reload();
   await expect(page.getByRole('dialog', { name: '摸鱼岛', exact: true })).toBeVisible();

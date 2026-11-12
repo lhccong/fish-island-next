@@ -1,0 +1,14 @@
+.end {
+  min-width: 0;
+  padding: 12px 4px;
+  color: var(--color-muted);
+  font-size: 13px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.end p {
+  margin: 4px 0;
+}
+.sentinel {
+  height: 1px;
+}

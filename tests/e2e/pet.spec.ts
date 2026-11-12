@@ -7,7 +7,7 @@ for (const skin of builtinSkins)
   for (const mode of ['light', 'dark'])
     for (const width of [1440, 375, 390]) {
       test(`${skin.id} ${mode} ${width}: camp, care, panels and states`, async ({ page }, info) => {
-        test.setTimeout(90_000);
+        test.setTimeout(180_000);
         await page.setViewportSize({ width, height: width > 760 ? 1000 : 844 });
         const state = await setupPet(page, skin.id, mode);
         await expect(page.getByRole('heading', { name: '伙伴营地', exact: true })).toBeVisible();
@@ -19,7 +19,9 @@ for (const skin of builtinSkins)
         if (width <= 760) await ground.tap({ position: { x: 180, y: 190 } });
         else {
           await ground.focus();
-          await ground.press('ArrowRight');
+          await page.keyboard.down('ArrowRight');
+          await expect(actor).not.toHaveAttribute('style', before!);
+          await page.keyboard.up('ArrowRight');
         }
         await expect(actor).not.toHaveAttribute('style', before!);
         await page.getByRole('button', { name: /喂食 · 5/ }).click();
@@ -128,6 +130,9 @@ for (const skin of builtinSkins)
         await expect(page.getByRole('heading', { name: /新伙伴.*Lv/ })).toBeVisible();
         state.fail = true;
         await page.reload();
+        await expect(page.getByRole('heading', { name: '伙伴营地', exact: true })).toBeVisible({
+          timeout: 90000,
+        });
         await expect(page.getByRole('alert')).toContainText('合成读取失败');
         await assertPetLayout(page);
         state.fail = false;

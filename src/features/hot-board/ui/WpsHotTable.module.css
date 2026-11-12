@@ -24,6 +24,11 @@
   color: var(--color-muted);
   font-size: 11px;
 }
+@media (max-width: 760px) {
+  .heading {
+    display: none;
+  }
+}
 .toolbar {
   display: flex;
   align-items: center;

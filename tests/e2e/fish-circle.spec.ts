@@ -2,14 +2,15 @@ import { expect, test } from '@playwright/test';
 import { setup, post, noOverflow } from './fish-circle-fixture';
 
 test('feed, loading, pagination, profile filter, empty and retry', async ({ page }, testInfo) => {
-  const state = await setup(page);
+  const state = await setup(page, false, { paginate: true });
   await expect(page.getByText(post.content, { exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('feed.png') });
   await noOverflow(page);
-  await page.getByRole('button', { name: '下一页动态' }).click();
+  await page.locator('[data-scroll-pagination="动态"]').scrollIntoViewIfNeeded();
   await expect(page.getByText('第二页的动态', { exact: true })).toBeVisible();
   expect(state.page).toBe(2);
-  await page.getByRole('button', { name: '上一页动态' }).click();
+  await expect(page.getByRole('article')).toHaveCount(2);
+  await page.getByText(post.content, { exact: true }).scrollIntoViewIfNeeded();
   await expect(page.getByText(post.content, { exact: true })).toBeVisible();
   state.delay = 400;
   await page.getByRole('button', { name: '刷新动态' }).click();
