@@ -63,6 +63,8 @@ features/chat/
 
 ## 6. 交互和可访问性
 
+输入框内联候选使用 shared/ui/InlineAutocomplete：Radix 非模态锚定面板保留编辑焦点，listbox 与 aria-activedescendant 表达候选，统一方向键、Enter、Esc/Tab、触屏选择及边界避让；组合输入不拦截。候选保持 44px 触控高度、reserved gutter 与语义颜色。聊天 @ 仅使用共享在线快照，见 ADR-048。
+
 ADR-031 的 shared/ui/Slider 完整统一 range 滑轨、滑块、焦点与禁用态，保留原生方向键/Home/End/触屏语义；Switch 使用 button 的 switch 语义。阅读设置使用可键盘切换的三页签，颜色选择不使用原生系统 color 弹窗。
 
 ### 统一控件外观

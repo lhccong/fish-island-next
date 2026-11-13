@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { ChevronsUp } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import styles from './MessageMedia.module.css';
 import ImagePreview from './ChatImagePreview';
@@ -15,24 +16,42 @@ export function MessageImage({ url }: { url: string }) {
 
 function DeferredMessageImage({ url }: { url: string }) {
   const [revealed, setRevealed] = useState(false);
-  return revealed ? (
-    <LoadedMessageImage url={url} />
-  ) : (
+  const revealButton = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+  useLayoutEffect(() => {
+    if (!revealed && restoreFocus.current) {
+      revealButton.current?.focus({ preventScroll: true });
+      restoreFocus.current = false;
+    }
+  }, [revealed]);
+  return (
     <span className={styles.deferredImage}>
-      <Button
-        variant="secondary"
-        onClick={(event) => {
-          event.stopPropagation();
-          setRevealed(true);
-        }}
-      >
-        点击显示图片
-      </Button>
+      {revealed ? (
+        <LoadedMessageImage
+          url={url}
+          onCollapse={() => {
+            restoreFocus.current = true;
+            setRevealed(false);
+          }}
+        />
+      ) : (
+        <Button
+          ref={revealButton}
+          variant="secondary"
+          aria-expanded={false}
+          onClick={(event) => {
+            event.stopPropagation();
+            setRevealed(true);
+          }}
+        >
+          点击显示图片
+        </Button>
+      )}
     </span>
   );
 }
 
-function LoadedMessageImage({ url }: { url: string }) {
+function LoadedMessageImage({ url, onCollapse }: { url: string; onCollapse?: () => void }) {
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [ratio, setRatio] = useState<number | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -44,6 +63,7 @@ function LoadedMessageImage({ url }: { url: string }) {
       <span
         className={styles.imageFrame}
         data-image-state={state}
+        data-collapsible={!!onCollapse}
         style={ratio ? { width: Math.min(214, 160.5 * ratio), aspectRatio: ratio } : undefined}
       >
         <button
@@ -99,6 +119,23 @@ function LoadedMessageImage({ url }: { url: string }) {
               重新加载图片
             </Button>
           </span>
+        )}
+        {onCollapse && (
+          <Button
+            variant="secondary"
+            className={styles.collapseImage}
+            aria-label="收起图片"
+            title="收起图片"
+            aria-expanded={true}
+            onClick={(event) => {
+              event.stopPropagation();
+              onCollapse();
+            }}
+          >
+            <span className={styles.collapseGlyph}>
+              <ChevronsUp size={16} aria-hidden="true" />
+            </span>
+          </Button>
         )}
       </span>
       {preview && (

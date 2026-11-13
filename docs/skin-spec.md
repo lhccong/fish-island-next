@@ -73,6 +73,8 @@ ADR-012 的鱼小圈右侧使用默认 `--color-circle-*`、`--shadow-circle-*` 
 
 ## 4. 设计与兼容验收
 
+ADR-047 的用户备注使用全部主题共用的 Dialog、reserved ScrollArea 与紧凑 Button；名称入口、输入、反馈复用 text/muted/surface/canvas/border/hover/danger 语义变量，手机保持 44px 触控与安全区。切换主题或模式保留备注、编辑输入和请求状态，不修改消息原名或草稿。
+
 ADR-046 的图片查看器使用 canvas 画布、sidebar 工具栏及 text/muted/border/hover/accent 语义变量，全部主题和明暗模式共享布局；图片不染色。桌面保留窗口边距，手机全屏并将工具栏重排两行，安全区保留。主题切换不改变当前图片、缩放、旋转或业务状态。
 
 ADR-042 的发送红包弹窗复用 ADR-040 的红包封面变量，正文、Select 和普通操作均使用当前主题语义变量；各外壳共享同一入口与业务逻辑，手机重排为单栏，正文保留 reserved gutter，标题/反馈/操作固定。主题或模式切换保留表单、创建与发布进度。

@@ -1,0 +1,83 @@
+.name {
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.name:hover {
+  background: var(--color-hover);
+}
+.dialog {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.scroll {
+  min-height: 0;
+  max-height: 40dvh;
+  display: flex;
+}
+.body {
+  padding: 4px;
+  min-width: 0;
+}
+.body label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.body input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-size: 14px;
+}
+.body input:disabled {
+  opacity: 0.6;
+}
+.original {
+  overflow-wrap: anywhere;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+.feedback {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.feedback [role='alert'] {
+  color: var(--color-danger);
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+@media (max-width: 760px) {
+  .body input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

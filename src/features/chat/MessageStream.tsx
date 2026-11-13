@@ -34,14 +34,14 @@ export function MessageStream() {
   const [viewport, setViewport] = useState<HTMLDivElement | null>(null);
   const [atBottom, setAtBottom] = useState(true);
   const list = useRef<VirtuosoHandle>(null);
-  const follow = useRef(true);
+  const [following, setFollow] = useState(true);
   useEffect(() => {
     if (!target || !viewport) return;
     const state = controller.store.getState();
     const index = state.visibleIds.indexOf(target);
     if (index < 0) return;
-    follow.current = false;
     const frame = requestAnimationFrame(() => {
+      setFollow(false);
       list.current?.scrollToIndex({
         index,
         align: 'center',
@@ -49,14 +49,14 @@ export function MessageStream() {
       });
     });
     return () => cancelAnimationFrame(frame);
-  }, [target, revision, controller, viewport]);
+  }, [target, revision, controller, viewport, setFollow]);
   useEffect(() => {
     let frame: number | undefined;
     const unsubscribe = controller.store.subscribe((state, previous) => {
       if (
         state.ids.some((id) => !previous.messages[id] && state.messages[id]?.delivery === 'sending')
       ) {
-        follow.current = true;
+        setFollow(true);
         if (frame !== undefined) cancelAnimationFrame(frame);
         frame = requestAnimationFrame(() =>
           list.current?.scrollToIndex({ index: 'LAST', align: 'end' }),
@@ -67,7 +67,7 @@ export function MessageStream() {
       unsubscribe();
       if (frame !== undefined) cancelAnimationFrame(frame);
     };
-  }, [controller]);
+  }, [controller, setFollow]);
   useLayoutEffect(() => {
     if (!viewport) return;
     let previousTop = viewport.scrollTop;
@@ -78,32 +78,15 @@ export function MessageStream() {
       const height = viewport.scrollHeight;
       const clientHeight = viewport.clientHeight;
       const resized = height !== previousHeight || clientHeight !== previousClientHeight;
-      if (height - top - clientHeight <= 64) follow.current = true;
-      else if (top < previousTop && (!resized || top === 0)) follow.current = false;
+      if (height - top - clientHeight <= 64) setFollow(true);
+      else if (top < previousTop && (!resized || top === 0)) setFollow(false);
       previousTop = top;
       previousHeight = height;
       previousClientHeight = clientHeight;
     };
     viewport.addEventListener('scroll', trackPosition);
-    let resizeFrame: number | undefined;
-    const observer = new ResizeObserver(() => {
-      if (resizeFrame !== undefined) cancelAnimationFrame(resizeFrame);
-      // Apply scroll writes after measurement, including menu/composer size changes.
-      resizeFrame = requestAnimationFrame(() => {
-        trackPosition();
-        if (follow.current) {
-          viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'instant' });
-          previousTop = viewport.scrollTop;
-        }
-      });
-    });
-    if (viewport.firstElementChild) observer.observe(viewport.firstElementChild);
-    return () => {
-      viewport.removeEventListener('scroll', trackPosition);
-      observer.disconnect();
-      if (resizeFrame !== undefined) cancelAnimationFrame(resizeFrame);
-    };
-  }, [viewport]);
+    return () => viewport.removeEventListener('scroll', trackPosition);
+  }, [viewport, setFollow]);
   return (
     <section className={styles.stream} aria-label="群聊实时消息">
       <ConnectionStatus />
@@ -128,7 +111,9 @@ export function MessageStream() {
                 itemContent={row}
                 atBottomThreshold={64}
                 atBottomStateChange={setAtBottom}
-                followOutput={false}
+                // Let Virtuoso coordinate measurement and scrolling; external resize writes
+                // race its anchor compensation when the bounded message window advances.
+                followOutput={following ? 'auto' : false}
               />
             )
           )}
@@ -141,7 +126,7 @@ export function MessageStream() {
             <Button
               variant="secondary"
               onClick={() => {
-                follow.current = true;
+                setFollow(true);
                 list.current?.scrollToIndex({ index: 'LAST', align: 'end', behavior: 'auto' });
               }}
             >

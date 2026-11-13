@@ -6,7 +6,7 @@ import { openMessageActions } from './chat-message-actions';
 test.setTimeout(60000);
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
-    test(`${skin.id} ${mode}: five message menu actions and focus`, async ({ page }, info) => {
+    test(`${skin.id} ${mode}: message menu actions and focus`, async ({ page }, info) => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(error.message));
       const fixture = await setupChatMenu(page, skin.id, mode);
@@ -35,6 +35,7 @@ for (const skin of builtinSkins)
       let menu = page.getByRole('menu');
       await expect(menu).toBeVisible();
       expect(await menu.getByRole('menuitem').allTextContents()).toEqual([
+        '设置备注',
         '复制',
         '引用',
         '@TA',
@@ -63,6 +64,7 @@ for (const skin of builtinSkins)
       await expect(page.getByText('已复制消息文字或图片链接', { exact: true })).toBeVisible();
       menu = await openMessageActions(page, '2');
       expect(await menu.getByRole('menuitem').allTextContents()).toEqual([
+        '设置备注',
         '复制',
         '引用',
         '@TA',

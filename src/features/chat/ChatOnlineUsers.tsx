@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useStore } from 'zustand';
+import { useRemarks } from './remarks-context';
+import { RemarkName } from './RemarkName';
 import { MessageCircle, RefreshCw, Search } from 'lucide-react';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
@@ -18,13 +21,17 @@ export function ChatOnlineUsers({
 }) {
   const { state, refresh } = useChatMembers();
   const [query, setQuery] = useState('');
+  const { controller } = useRemarks();
+  const remarks = useStore(controller.store, (state) => state.remarks);
   const showGroup =
     !query.trim() || groupName.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
   const loading = state.status === 'idle' || state.status === 'loading';
   const users =
     state.status === 'success'
       ? buildConversationEntries(state.members).filter((entry) =>
-          entry.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+          `${entry.name} ${entry.kind === 'member' && Object.hasOwn(remarks, entry.id) ? remarks[entry.id] : ''}`
+            .toLocaleLowerCase()
+            .includes(query.trim().toLocaleLowerCase()),
         )
       : [];
   const time =
@@ -133,7 +140,11 @@ export function ChatOnlineUsers({
                         </span>
                         <div className={styles.text}>
                           <span className={styles.name} title={entry.name}>
-                            {entry.name}
+                            {entry.kind === 'member' ? (
+                              <RemarkName id={entry.id} name={entry.name} />
+                            ) : (
+                              entry.name
+                            )}
                           </span>
                           <span className={styles.preview} title={`本地工作伪装摘要：${preview}`}>
                             {preview}

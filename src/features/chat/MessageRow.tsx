@@ -1,5 +1,6 @@
 import { useMessageLocationPulse } from './use-message-location-pulse';
 import { MessageQuote } from './MessageQuote';
+import { RemarkName } from './RemarkName';
 import { RepeatButton } from './RepeatButton';
 import { RepetitionParticipants } from './RepetitionParticipants';
 import { LoaderCircle } from 'lucide-react';
@@ -101,7 +102,7 @@ export const MessageRow = memo(function MessageRow({
       )}
       <div className={styles.messageBody}>
         <div className={styles.meta}>
-          <span>{message.senderName}</span>
+          <RemarkName id={message.senderId} name={message.senderName} interactive={false} />
           <time dateTime={new Date(message.createdAt).toISOString()}>
             {new Date(message.createdAt).toLocaleTimeString('zh-CN', {
               hour: '2-digit',

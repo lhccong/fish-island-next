@@ -28,6 +28,43 @@
   color: inherit;
   cursor: zoom-in;
 }
+.imageFrame[data-collapsible='true'] {
+  min-height: 44px;
+}
+.imageFrame .collapseImage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+}
+.collapseGlyph {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.imageFrame .collapseImage:hover {
+  background: transparent;
+}
+.collapseImage:hover .collapseGlyph {
+  background: var(--color-hover);
+}
+.imageFrame .collapseImage:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: -4px;
+}
 .imageTrigger:focus-visible {
   outline: 2px solid var(--color-accent-text);
   outline-offset: -4px;

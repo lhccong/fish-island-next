@@ -1,4 +1,5 @@
 import {
+  createChatRemarks,
   createChatClient,
   createLocalChatPreferences,
   createChatRealtime,
@@ -14,6 +15,13 @@ import { authController } from '@/app/config/auth';
 import { apiBaseUrl } from '@/app/config/api';
 
 const vault = createBrowserSessionVault(apiBaseUrl);
+export const chatRemarks = createChatRemarks(
+  apiBaseUrl,
+  () => vault.read(),
+  () => {
+    void authController.restore(true);
+  },
+);
 export const chatImageUpload = createChatImageUpload(
   apiBaseUrl,
   () => vault.read(),

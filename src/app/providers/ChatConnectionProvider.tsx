@@ -1,8 +1,9 @@
 import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/features/auth';
-import { ChatRealtimeProvider } from '@/features/chat';
+import { ChatRealtimeProvider, RemarksProvider } from '@/features/chat';
 import {
   chatRealtime,
+  chatRemarks,
   chatPreferences,
   chatRedPackets,
   chatEmoticons,
@@ -25,7 +26,9 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
       emoticonPort={chatEmoticons}
       imageUploadPort={chatImageUpload}
     >
-      {children}
+      <RemarksProvider key={userId} port={chatRemarks} userId={userId}>
+        {children}
+      </RemarksProvider>
     </ChatRealtimeProvider>
   );
 }

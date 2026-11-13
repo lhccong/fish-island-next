@@ -6,3 +6,4 @@ export { createChatHistory } from './history';
 export { createChatSender } from './send';
 export { createRedPacketClient } from './red-packet';
 export { createChatEmoticons } from './emoticons';
+export { createChatRemarks } from './remarks';

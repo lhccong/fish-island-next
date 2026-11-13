@@ -5,3 +5,4 @@ export { ChatOnlineUsers } from './ChatOnlineUsers';
 export { MobileOnlineUsers } from './MobileOnlineUsers';
 export { createChatRealtimeController } from './realtime-controller';
 export { ChatRealtimeProvider } from './ChatRealtimeProvider';
+export { RemarksProvider } from './RemarksProvider';

@@ -1,6 +1,7 @@
 import { useRef, type ReactElement, type RefObject } from 'react';
 import {
   MapPin,
+  Pencil,
   AtSign,
   Copy,
   MoreHorizontal,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 import { messageClipboardText, parseMessageContent, type ReceivedMessage } from '@/domain/chat';
 import { useChatRealtime } from './realtime-context';
+import { useRemarks } from './remarks-context';
 import { ContextMenu } from '@/shared/ui/ContextMenu';
 import { DropdownMenu, type DropdownMenuItem } from '@/shared/ui/DropdownMenu';
 import { Button } from '@/shared/ui/Button';
@@ -37,6 +39,7 @@ export function MessageMenu({
   returnFocusRef,
 }: Props) {
   const { draft, composerRef, emoticons, navigation } = useChatRealtime();
+  const remarks = useRemarks();
   const focusDraft = useRef(false);
   const closeFocus = () => {
     const target = focusDraft.current ? composerRef.current : returnFocusRef.current;
@@ -58,6 +61,12 @@ export function MessageMenu({
     }
   };
   const items: DropdownMenuItem[] = [
+    {
+      label: '设置备注',
+      icon: <Pencil size={16} aria-hidden="true" />,
+      onSelect: () =>
+        remarks.open({ id: message.senderId, name: message.senderName, returnFocusRef }),
+    },
     ...(message.quote
       ? [
           {

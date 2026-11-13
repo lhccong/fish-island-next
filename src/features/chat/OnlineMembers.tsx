@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useStore } from 'zustand';
+import { useRemarks } from './remarks-context';
+import { RemarkName } from './RemarkName';
 import { ChevronDown, ChevronUp, RefreshCw, Search, X } from 'lucide-react';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
@@ -22,10 +25,14 @@ export function OnlineMembers({
   onRenameGroup: (name: string) => void;
 }) {
   const [query, setQuery] = useState('');
+  const { controller } = useRemarks();
+  const remarks = useStore(controller.store, (state) => state.remarks);
   const [expanded, setExpanded] = useState(false);
   const members = state.status === 'success' ? state.members : [];
   const filtered = members.filter((member) =>
-    member.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+    `${member.name} ${Object.hasOwn(remarks, member.id) ? remarks[member.id] : ''}`
+      .toLocaleLowerCase()
+      .includes(query.trim().toLocaleLowerCase()),
   );
   const showAll = expanded || query.trim().length > 0;
   const visible = showAll ? filtered : filtered.slice(0, 16);
@@ -34,7 +41,9 @@ export function OnlineMembers({
       {visible.map((member) => (
         <li key={member.id} title={member.name}>
           <MemberAvatar key={`${member.id}:${member.avatar}`} member={member} />
-          <span className={styles.memberName}>{member.name}</span>
+          <span className={styles.memberName}>
+            <RemarkName id={member.id} name={member.name} />
+          </span>
         </li>
       ))}
     </ul>
