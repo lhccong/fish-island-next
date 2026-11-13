@@ -91,6 +91,14 @@ for (const skin of builtinSkins)
       const panel = page.getByRole('complementary', { name: '在线成员', exact: true });
       await expect(panel.getByText('正在获取在线成员…', { exact: true })).toBeVisible();
       const edit = panel.getByRole('button', { name: '修改群聊名称', exact: true });
+      await expect(edit).toHaveText('');
+      await expect(edit).toHaveAttribute('title', '修改群聊名称');
+      await expect(panel.getByText('仅保存在当前浏览器，不影响其他成员')).toHaveCount(0);
+      await expect(panel.getByText('关于在线列表')).toHaveCount(0);
+      await expect(panel.getByText('仅显示最近获取的成员，不代表群成员总数。')).toHaveCount(0);
+      const editBounds = (await edit.boundingBox())!;
+      expect(editBounds.width).toBeGreaterThanOrEqual(44);
+      expect(editBounds.height).toBeGreaterThanOrEqual(44);
       await activate(edit);
       const input = panel.getByRole('textbox', { name: '新群聊名称', exact: true });
       await expect(input).toBeFocused();

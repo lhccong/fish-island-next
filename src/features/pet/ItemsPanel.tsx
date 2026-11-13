@@ -7,6 +7,7 @@ import { usePetOperation } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
 import { ItemIcon } from './ItemIcon';
+import { formatPetStat } from './format-stat';
 import styles from './Panels.module.css';
 
 export function ItemsPanel({
@@ -51,13 +52,22 @@ export function ItemsPanel({
       )}
       {kind === 'bag' && pet.equipment.length > 0 && (
         <section className={styles.section}>
-          <h3>已穿戴</h3>
+          <h3 data-tone="amber">
+            已穿戴 <small>{pet.equipment.length} 件装备</small>
+          </h3>
           <div className={styles.grid}>
             {pet.equipment.map(({ slot, item }) => (
-              <div className={styles.card} key={slot}>
-                <span>
-                  {equipmentSlots[slot] || slot} · {item.name}
-                </span>
+              <div className={`${styles.card} ${styles.equippedCard}`} key={slot}>
+                <div className={styles.itemHeading}>
+                  <ItemIcon url={item.icon} name={item.name} level={item.level} />
+                  <div>
+                    <small>
+                      {equipmentSlots[slot] || slot} · 品质 {item.rarity}
+                    </small>
+                    <strong>{item.name}</strong>
+                    <small>强化 +{item.level}</small>
+                  </div>
+                </div>
                 <Button
                   variant="secondary"
                   disabled={operation.pending}
@@ -89,11 +99,12 @@ export function ItemsPanel({
               {data.records.map((item) => (
                 <article className={styles.card} key={item.id}>
                   <div className={styles.itemHeading}>
-                    <ItemIcon url={item.icon} />
+                    <ItemIcon url={item.icon} name={item.name} level={item.slot ? item.level : 0} />
                     <div>
                       <strong>{item.name}</strong>
                       <small>
-                        品质 {item.rarity} {kind === 'bag' ? `· 数量 ${item.quantity}` : ''}
+                        品质 {item.rarity} · {equipmentSlots[item.slot] || '物品'}
+                        {kind === 'bag' ? ` · 数量 ${item.quantity} · 强化 +${item.level}` : ''}
                       </small>
                     </div>
                   </div>
@@ -103,7 +114,7 @@ export function ItemsPanel({
                     {item.stats.map(([label, value]) => (
                       <div key={label}>
                         <dt>{label}</dt>
-                        <dd>{value}</dd>
+                        <dd>{formatPetStat(label, value)}</dd>
                       </div>
                     ))}
                   </dl>

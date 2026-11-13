@@ -4,6 +4,8 @@ import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
 import { CompanionSummary } from './CompanionSummary';
 import { PanelDialog } from './PanelDialog';
+import { formatPetStat } from './format-stat';
+import { ItemIcon } from './ItemIcon';
 import styles from './Panels.module.css';
 
 export function OtherCompanionPanel({
@@ -34,7 +36,7 @@ export function OtherCompanionPanel({
                     {pet.stats.map(([label, value]) => (
                       <div key={label}>
                         <dt>{label}</dt>
-                        <dd>{value}</dd>
+                        <dd>{formatPetStat(label, value)}</dd>
                       </div>
                     ))}
                   </dl>
@@ -46,7 +48,12 @@ export function OtherCompanionPanel({
                     {pet.equipment.length ? (
                       pet.equipment.map(({ slot, item }) => (
                         <div className={styles.card} key={slot}>
-                          {item.name} +{item.level}
+                          <div className={styles.itemHeading}>
+                            <ItemIcon url={item.icon} name={item.name} level={item.level} />
+                            <span>
+                              {item.name} +{item.level}
+                            </span>
+                          </div>
                         </div>
                       ))
                     ) : (

@@ -88,7 +88,7 @@ export interface ForgeDetail {
   cost: number;
   chance: number;
   max: boolean;
-  entries: { number: number; name: string; value: number; locked: boolean }[];
+  entries: { number: number; name: string; value: number; locked: boolean; grade: number | null }[];
 }
 export interface PetPort {
   other(userId: string, signal: AbortSignal): Promise<Companion | null>;

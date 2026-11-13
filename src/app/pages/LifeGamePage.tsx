@@ -9,6 +9,7 @@ export function LifeGamePage() {
   return (
     <WorkspaceLayout
       sidebarLabel="发现导航"
+      mobileHeader="back-only"
       slots={{
         sidebar: <DiscoveryNavigation />,
         header: (
@@ -20,7 +21,6 @@ export function LifeGamePage() {
               </Link>
               <h1>人生重开模拟器</h1>
             </div>
-            <DiscoveryNavigation mobile />
           </>
         ),
         content: <LifeGame />,

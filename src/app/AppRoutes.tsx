@@ -26,6 +26,9 @@ const GlobalReader = lazy(() =>
 const GamesPage = lazy(() =>
   import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
 );
+const StockPage = lazy(() =>
+  import('@/app/pages/StockPage').then((module) => ({ default: module.StockPage })),
+);
 const LifeGamePage = lazy(() =>
   import('@/app/pages/LifeGamePage').then((module) => ({ default: module.LifeGamePage })),
 );
@@ -74,6 +77,14 @@ export function AppRoutes() {
             <Route path="/rank/welfare" element={<AboutPage section="welfare" />} />
             <Route path="/rank/other" element={<AboutPage section="other" />} />
             <Route path="/discover/games" element={<GamesPage />} />
+            <Route
+              path="/game/stock/:indexCode?"
+              element={
+                <RequireAuth>
+                  <StockPage />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/pet"
               element={

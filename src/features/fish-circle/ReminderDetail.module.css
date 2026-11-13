@@ -1,4 +1,6 @@
 .panel {
+  container-type: inline-size;
+  container-name: circle-detail;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -49,10 +51,16 @@
   width: calc(100% - 4px);
 }
 .content {
-  max-width: 600px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 16px 0 24px 20px;
   min-width: 0;
+}
+@container circle-detail (min-width: 960px) {
+  .content {
+    max-width: 1320px;
+    padding: 24px 0 32px 24px;
+  }
 }
 .state {
   padding: 24px 4px;

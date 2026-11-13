@@ -1,14 +1,33 @@
 import { useState } from 'react';
 import { Package } from 'lucide-react';
-import styles from './Panels.module.css';
-export function ItemIcon({ url }: { url: string }) {
-  const [failed, setFailed] = useState(false);
+import { enhanceTier } from './enhance-tier';
+import styles from './ItemIcon.module.css';
+export function ItemIcon({
+  url,
+  name = '物品',
+  level = 0,
+}: {
+  url: string;
+  name?: string;
+  level?: number;
+}) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const tier = enhanceTier(level);
   return (
-    <span className={styles.itemIcon}>
-      {url && !failed ? (
-        <img src={url} alt="" loading="lazy" onError={() => setFailed(true)} />
+    <span className={styles.itemIcon} data-enhance-tier={tier}>
+      {url && failedUrl !== url ? (
+        <img src={url} alt={name} loading="lazy" onError={() => setFailedUrl(url)} />
       ) : (
-        <Package size={24} aria-hidden="true" />
+        <span role="img" aria-label={`${name}：${url ? '图片加载失败' : '暂无图片'}`}>
+          <Package size={24} aria-hidden="true" />
+        </span>
+      )}
+      {tier > 0 && (
+        <span className={styles.badge} role="img" aria-label={`强化等级 +${level}`}>
+          <span className={styles.badgeText} aria-hidden="true">
+            +{level}
+          </span>
+        </span>
       )}
     </span>
   );

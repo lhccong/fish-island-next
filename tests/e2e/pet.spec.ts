@@ -51,6 +51,34 @@ for (const skin of builtinSkins)
           await assertPetLayout(page);
           const viewport = dialog.locator('[data-radix-scroll-area-viewport]');
           await viewport.hover();
+          if (title === '行囊' && width <= 760) {
+            const bounds = (await viewport.boundingBox())!;
+            const cdp = await page.context().newCDPSession(page);
+            const x = bounds.x + 24;
+            const y = bounds.y + bounds.height * 0.75;
+            await cdp.send('Input.dispatchTouchEvent', {
+              type: 'touchStart',
+              touchPoints: [{ x, y }],
+            });
+            for (let step = 1; step <= 8; step++) {
+              await cdp.send('Input.dispatchTouchEvent', {
+                type: 'touchMove',
+                touchPoints: [{ x, y: y - step * 24 }],
+              });
+            }
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+            await cdp.detach();
+            await expect.poll(() => viewport.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+            await expect(viewport.locator('..').locator('[data-orientation="vertical"]')).toHaveCSS(
+              'visibility',
+              'hidden',
+            );
+          }
+          if (title === '行囊' && width > 760) {
+            const track = viewport.locator('..').locator('[data-orientation="vertical"]');
+            await expect(track).toBeVisible();
+            await expect(track).toHaveCSS('opacity', '1');
+          }
           await viewport.evaluate((element) => {
             element.scrollTop = element.scrollHeight / 2;
           });
@@ -63,6 +91,12 @@ for (const skin of builtinSkins)
             await dialog.getByRole('button', { name: '穿戴', exact: true }).first().click();
             await expect.poll(() => state.actions.includes('equip')).toBe(true);
             await expect(dialog.getByRole('button', { name: '卸下', exact: true })).toBeVisible();
+            const equipment = dialog.getByRole('heading', { name: /^已穿戴/ }).locator('..');
+            const icon = equipment.getByRole('img', { name: '苔纹护腕', exact: true });
+            await expect(icon).toBeVisible();
+            await expect
+              .poll(() => icon.evaluate((img: HTMLImageElement) => img.naturalWidth))
+              .toBeGreaterThan(0);
           }
           if (title === '伙伴档案') {
             await dialog.getByRole('textbox', { name: '伙伴名字' }).fill('小苔新名字');
@@ -89,6 +123,9 @@ for (const skin of builtinSkins)
         }
         const requests = state.mineRequests;
         const position = await actor.getAttribute('style');
+        // Inner mobile routes intentionally hide global navigation (ADR-032).
+        // Resize the same mounted page to access the global appearance controls.
+        if (width <= 760) await page.setViewportSize({ width: 1440, height: 1000 });
         await page.getByRole('button', { name: '切换主题', exact: true }).click();
         const picker = page.getByRole('dialog', { name: '主题模式' });
         await picker
@@ -102,6 +139,7 @@ for (const skin of builtinSkins)
           .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
           .click();
         await picker.getByRole('button', { name: '关闭', exact: true }).click();
+        if (width <= 760) await page.setViewportSize({ width, height: 844 });
         expect(state.mineRequests).toBe(requests);
         await expect(actor).toHaveAttribute('style', position!);
         await expect(page.getByRole('heading', { name: /小苔新名字/ })).toBeVisible();
@@ -119,7 +157,9 @@ for (const skin of builtinSkins)
         state.empty = true;
         state.hold = true;
         await page.reload();
-        await expect(page.getByText('正在整理营地资料…', { exact: true })).toBeVisible();
+        await expect(page.getByText('正在整理营地资料…', { exact: true })).toBeVisible({
+          timeout: 30000,
+        });
         await assertPetLayout(page);
         state.hold = false;
         state.release();

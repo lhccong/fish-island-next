@@ -1,4 +1,21 @@
 :root {
+  --color-pet-enhance-silver: #a8b4c4;
+  --color-pet-enhance-gold: #ffc44d;
+  --color-pet-enhance-violet: #b07ce8;
+  --color-pet-enhance-fire: #f77735;
+  --color-pet-enhance-rose: #f05b85;
+  --color-pet-enhance-green: #4dce92;
+  --color-pet-enhance-blue: #57a9f4;
+  --color-pet-enhance-label-glint: #ffffff;
+  --color-pet-enhance-label-ink: #172034;
+  --color-pet-header-blue: #286bb6;
+  --color-pet-header-green: #326f41;
+  --color-pet-header-amber: #ee9a22;
+  --color-pet-header-violet: #8743c8;
+  --color-pet-header-amber-ink: #3b2d14;
+  --color-pet-header-ink: #ffffff;
+  --color-pet-heading: #302e50;
+  --color-pet-frame: #ffffff;
   --color-pet-meadow: #9dbd78;
   --color-pet-grass-detail: #799d5e;
   --color-pet-flower: #f3d99b;
@@ -16,9 +33,17 @@
   --color-pet-rock-dark: #7c897a;
   --color-pet-shadow: rgb(29 65 44 / 24%);
   --color-pet-stripe: rgb(255 255 255 / 12%);
-  --color-pet-panel: color-mix(in srgb, var(--color-life-epic-soft) 65%, var(--color-surface));
+  --color-pet-panel: #f2f0fa;
 }
 :root[data-color-mode='dark'] {
+  --color-pet-header-blue: #255c94;
+  --color-pet-header-green: #396d45;
+  --color-pet-header-amber: #8b5315;
+  --color-pet-header-amber-ink: #ffffff;
+  --color-pet-header-violet: #69409b;
+  --color-pet-heading: #e5def6;
+  --color-pet-frame: #42414e;
+  --color-pet-panel: #252430;
   --color-pet-meadow: #354c3b;
   --color-pet-grass-detail: #45634a;
   --color-pet-flower: #aaad87;

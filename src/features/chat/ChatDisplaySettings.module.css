@@ -1,0 +1,19 @@
+.settings {
+  margin-top: 12px;
+  border-top: 1px solid var(--color-divider);
+  padding-top: 8px;
+}
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 13px;
+  color: var(--color-text);
+}
+.settings p {
+  margin: 4px 0;
+  color: var(--color-muted);
+  font-size: 12px;
+}

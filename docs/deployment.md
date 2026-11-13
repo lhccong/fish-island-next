@@ -36,3 +36,23 @@ location / {
 ```
 
 若已有 `location /`，修改该块，不要重复添加。部署脚本只发布文件，不操作服务器服务配置。后端需允许站点域名的跨域请求；登录请求携带凭证时需配置明确的允许来源及凭证支持。
+
+聊天表情包搜索沿用 uTools 的百度图片接口，浏览器通过同源固定目标代理访问。在同一个站点 server 块添加以下配置并检查、重载 Nginx（开发和 preview 已配置 Vite 代理）：
+
+```nginx
+location = /emoticon-search {
+    limit_except GET { deny all; }
+    proxy_pass https://image.baidu.com/search/acjson;
+    proxy_ssl_server_name on;
+    proxy_set_header Host image.baidu.com;
+    proxy_set_header Referer https://image.baidu.com/;
+    proxy_set_header Cookie "";
+    proxy_set_header Authorization "";
+    proxy_set_header Origin "";
+    proxy_connect_timeout 5s;
+    proxy_read_timeout 15s;
+    proxy_hide_header Set-Cookie;
+}
+```
+
+请求参数由原查询字符串保留，目标固定，不提供任意 URL 转发。未部署该代理或百度返回验证页面时，搜索显示失败及重试，收藏接口仍独立可用。发布文件不会自动修改站点配置。

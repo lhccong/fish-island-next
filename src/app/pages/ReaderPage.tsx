@@ -8,6 +8,7 @@ export function ReaderPage({ onOpen }: { onOpen: () => void }) {
   return (
     <WorkspaceLayout
       sidebarLabel="发现导航"
+      mobileHeader="back-only"
       slots={{
         sidebar: <DiscoveryNavigation />,
         header: (
@@ -16,7 +17,6 @@ export function ReaderPage({ onOpen }: { onOpen: () => void }) {
               <h1>摸鱼阅读</h1>
               <span>阅读片刻，自在摸鱼</span>
             </div>
-            <DiscoveryNavigation mobile />
           </>
         ),
         content: (

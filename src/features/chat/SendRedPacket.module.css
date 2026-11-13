@@ -1,0 +1,219 @@
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(480px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  height: auto;
+  padding: 24px;
+  overflow: hidden;
+  color: var(--color-text);
+  background: var(--color-canvas);
+}
+.dialog h2 {
+  margin: 0 40px 20px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.form .scroll {
+  --scroll-area-reserved-gutter: 24px;
+  flex: 0 1 auto;
+  min-height: 0;
+  height: 400px;
+  max-height: calc(100dvh - 250px);
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 8px 4px;
+  overflow-wrap: anywhere;
+}
+.typeRow,
+.numberRow,
+.field {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.typeRow,
+.numberRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 7px 14px;
+  font-size: 14px;
+}
+.typeControl {
+  min-width: 0;
+  width: min(190px, 60%);
+}
+.typeControl > button {
+  border: 0;
+  background: transparent;
+}
+.numbers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.numberRow:focus-within,
+.field:focus-within {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 60%;
+  color: var(--color-muted);
+}
+.value input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 20px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.value > span {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+}
+.field > span:first-child {
+  color: var(--color-muted);
+}
+.field input,
+.field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.field textarea {
+  resize: none;
+  min-height: 58px;
+}
+.value input:focus,
+.value input:focus-visible,
+.field input:focus,
+.field input:focus-visible,
+.field textarea:focus,
+.field textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.value input:disabled,
+.field input:disabled,
+.field textarea:disabled {
+  color: var(--color-muted);
+}
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 18px 0 12px;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.total strong {
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.total span {
+  font-size: 14px;
+}
+.feedback {
+  flex-shrink: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.feedback p {
+  margin: 0 0 12px;
+}
+.feedback [role='alert'] {
+  color: var(--color-danger);
+}
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+@media (max-width: 760px) {
+  .dialog {
+    width: calc(100% - 24px);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding: 20px 16px max(16px, env(safe-area-inset-bottom));
+  }
+  .form .scroll {
+    --scroll-area-reserved-gutter: 20px;
+    max-height: calc(100dvh - 240px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  .typeRow,
+  .numberRow {
+    padding: 7px 12px;
+    min-height: 62px;
+  }
+  .typeControl {
+    width: 60%;
+  }
+  .value input,
+  .field input,
+  .field textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .value input {
+    font-size: 22px;
+  }
+  .field textarea {
+    min-height: 60px;
+  }
+  .total {
+    padding: 14px 0;
+  }
+  .total strong {
+    font-size: 36px;
+  }
+}

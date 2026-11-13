@@ -1,0 +1,122 @@
+.form {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 16px 24px 4px 4px;
+  border-top: 1px solid var(--color-circle-divider);
+  color: var(--color-circle-text);
+}
+.reply {
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+}
+.replyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.replyTarget {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.replyTarget strong {
+  font-weight: 500;
+  color: var(--color-accent-text);
+}
+.replyHeader > button {
+  flex-shrink: 0;
+}
+.quote {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.form textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 88px;
+  max-height: 240px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-message-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.form textarea:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.count {
+  color: var(--color-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.send {
+  margin-left: auto;
+}
+.media {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 320px;
+}
+.media > div {
+  position: relative;
+  min-width: 0;
+}
+.media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-control);
+  object-fit: cover;
+}
+.remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+.form p[role] {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.form [role='alert'] {
+  color: var(--color-danger);
+}
+@media (max-width: 760px) {
+  .form {
+    padding-right: 20px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+  .form textarea {
+    font-size: 16px;
+  }
+}

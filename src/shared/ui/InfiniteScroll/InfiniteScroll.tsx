@@ -10,6 +10,7 @@ export function InfiniteScroll({
   onLoadMore,
   label = '列表',
   summary,
+  edge = 'end',
 }: {
   enabled?: boolean;
   hasMore: boolean;
@@ -18,6 +19,7 @@ export function InfiniteScroll({
   onLoadMore: () => void;
   label?: string;
   summary?: string;
+  edge?: 'start' | 'end';
 }) {
   const sentinel = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -27,11 +29,14 @@ export function InfiniteScroll({
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) onLoadMore();
       },
-      { root: target.closest('[data-radix-scroll-area-viewport]'), rootMargin: '0px 0px 80px 0px' },
+      {
+        root: target.closest('[data-radix-scroll-area-viewport]'),
+        rootMargin: edge === 'start' ? '80px 0px 0px 0px' : '0px 0px 80px 0px',
+      },
     );
     observer.observe(target);
     return () => observer.disconnect();
-  }, [enabled, hasMore, loading, error, onLoadMore]);
+  }, [enabled, hasMore, loading, error, onLoadMore, edge]);
   return (
     <div className={styles.end} data-scroll-pagination={label}>
       <div ref={sentinel} className={styles.sentinel} aria-hidden="true" />

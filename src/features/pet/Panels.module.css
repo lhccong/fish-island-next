@@ -5,11 +5,17 @@
   max-height: calc(100dvh - 48px);
   overflow: hidden;
   padding: 24px;
-  border: 3px solid var(--color-border);
+  border: 4px solid var(--color-pet-frame);
   border-radius: 24px;
+  background: var(--color-pet-panel);
 }
 .dialog > h2 {
-  padding-right: 28px;
+  padding: 14px 40px 14px 16px;
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(135deg, var(--color-pet-stripe) 0 8px, transparent 8px 16px),
+    linear-gradient(100deg, var(--color-pet-header-blue), var(--color-pet-header-green));
+  color: var(--color-pet-header-ink);
   margin-bottom: 4px;
   font-size: 22px;
 }
@@ -49,24 +55,37 @@
   margin-top: 16px;
   overflow: hidden;
   border-radius: 16px;
-  background: var(--color-pet-panel);
+  background: color-mix(in srgb, var(--color-pet-panel) 65%, var(--color-surface));
 }
 .section > h3 {
   margin: 0;
   padding: 11px 14px;
   background:
     repeating-linear-gradient(135deg, var(--color-pet-stripe) 0 8px, transparent 8px 16px),
-    var(--color-accent-soft);
-  color: var(--color-accent-text);
+    var(--color-pet-header-blue);
+  color: var(--color-pet-header-ink);
   font-size: 15px;
 }
 .section > h3[data-tone='violet'] {
-  background-color: var(--color-life-epic-soft);
-  color: var(--color-life-epic);
+  background-color: var(--color-pet-header-violet);
 }
 .section > h3[data-tone='amber'] {
-  background-color: var(--color-profile-warm-bg);
-  color: var(--color-warning);
+  background-color: var(--color-pet-header-amber);
+  color: var(--color-pet-header-amber-ink);
+}
+.section > h3 small {
+  float: right;
+  font-size: 12px;
+  font-weight: 500;
+}
+.equippedCard {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+}
+.equippedCard > button {
+  align-self: flex-end;
 }
 .section > .stack,
 .section > .grid {
@@ -208,21 +227,6 @@
   margin-top: 4px;
   color: var(--color-muted);
   font-size: 11px;
-}
-.itemIcon {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--color-pet-panel);
-  color: var(--color-accent-text);
-}
-.itemIcon img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
 }
 .skinPreview {
   display: grid;

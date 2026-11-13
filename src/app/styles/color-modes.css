@@ -1,4 +1,11 @@
 :root {
+  --color-red-packet-surface: #f5a04c;
+  --color-red-packet-border: #de8b3c;
+  --color-red-packet-text: #542b11;
+  --color-red-packet-envelope: #ffe3a1;
+  --color-red-packet-seal: #b36726;
+  --color-red-packet-ended-surface: #efbc85;
+  --color-red-packet-ended-text: #613b1d;
   color-scheme: light;
   --color-action: var(--color-accent-text);
   --color-action-hover: color-mix(in srgb, var(--color-accent-text) 90%, var(--color-text));
@@ -6,6 +13,13 @@
 }
 
 :root[data-color-mode='dark'] {
+  --color-red-packet-surface: #995025;
+  --color-red-packet-border: #a5683c;
+  --color-red-packet-text: #fff0d5;
+  --color-red-packet-envelope: #f7c77c;
+  --color-red-packet-seal: #995025;
+  --color-red-packet-ended-surface: #704c35;
+  --color-red-packet-ended-text: #ffe4c3;
   --color-profile-accent: #ffb67d;
   --color-profile-badge-bg: #ffab6b;
   --color-profile-badge-text: #402000;

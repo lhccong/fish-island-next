@@ -3,6 +3,8 @@ import { equipmentSlots, type Companion, type PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
 import { usePetOperation } from './resource';
 import { OperationNotice } from './Feedback';
+import { ItemIcon } from './ItemIcon';
+import { formatPetStat } from './format-stat';
 import styles from './Panels.module.css';
 
 export function CarePanel({
@@ -75,7 +77,7 @@ export function CarePanel({
             pet.stats.map(([label, value]) => (
               <div key={label}>
                 <dt>{label}</dt>
-                <dd>{value}</dd>
+                <dd>{formatPetStat(label, value)}</dd>
               </div>
             ))
           ) : (
@@ -89,10 +91,15 @@ export function CarePanel({
           {pet.equipment.length ? (
             pet.equipment.map(({ slot, item }) => (
               <div className={styles.card} key={slot}>
-                <strong>{equipmentSlots[slot] || slot}</strong>
-                <p>
-                  {item.name} +{item.level}
-                </p>
+                <div className={styles.itemHeading}>
+                  <ItemIcon url={item.icon} name={item.name} level={item.level} />
+                  <div>
+                    <strong>{equipmentSlots[slot] || slot}</strong>
+                    <p>
+                      {item.name} +{item.level}
+                    </p>
+                  </div>
+                </div>
               </div>
             ))
           ) : (

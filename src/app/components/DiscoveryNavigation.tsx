@@ -5,17 +5,15 @@ import styles from './DiscoveryNavigation.module.css';
 import { AboutMenu } from './AboutMenu';
 
 export function DiscoveryNavigation({
-  mobile = false,
   circleEntry,
   hideMobileHeading = false,
 }: {
-  mobile?: boolean;
   circleEntry?: ReactNode;
   hideMobileHeading?: boolean;
 }) {
   return (
-    <nav className={mobile ? styles.mobile : styles.sidebar} aria-label="发现菜单">
-      {!mobile && <h2 className={hideMobileHeading ? styles.desktopHeading : undefined}>发现</h2>}
+    <nav className={styles.sidebar} aria-label="发现菜单">
+      <h2 className={hideMobileHeading ? styles.desktopHeading : undefined}>发现</h2>
       {circleEntry ?? (
         <NavLink to="/moments/fish-circle">
           <Aperture size={19} aria-hidden="true" />
@@ -49,7 +47,7 @@ function DiscoveryGameLink() {
       to="/discover/games"
       className={styles.game ?? ''}
       aria-current={
-        location.pathname === '/game/life' || location.pathname === '/discover/games'
+        location.pathname.startsWith('/game/') || location.pathname === '/discover/games'
           ? 'page'
           : undefined
       }

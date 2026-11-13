@@ -90,7 +90,21 @@ for (const skin of builtinSkins)
       await page.screenshot({ path: info.outputPath('group-default.png') });
       await trigger.click();
       await expect(panel.getByRole('status')).toHaveText('正在获取在线成员…');
-      await expect(panel.getByRole('button', { name: '刷新', exact: true })).toBeDisabled();
+      const refresh = panel.getByRole('button', { name: '刷新', exact: true });
+      await expect(refresh).toBeDisabled();
+      await expect(refresh).toHaveAttribute('title', '刷新在线状态');
+      await expect(refresh).toHaveText('');
+      await expect(panel.getByText('手动刷新在线状态')).toHaveCount(0);
+      const refreshBounds = (await refresh.boundingBox())!;
+      const headingBounds = (await panel.getByRole('heading', { level: 2 }).boundingBox())!;
+      const closeBounds = (await panel
+        .getByRole('button', { name: '关闭在线列表' })
+        .boundingBox())!;
+      expect(refreshBounds.width).toBeGreaterThanOrEqual(44);
+      expect(refreshBounds.height).toBeGreaterThanOrEqual(44);
+      expect(refreshBounds.x).toBeGreaterThanOrEqual(headingBounds.x + headingBounds.width);
+      expect(refreshBounds.x + refreshBounds.width).toBeLessThanOrEqual(closeBounds.x);
+      expect(refreshBounds.y).toBe(closeBounds.y);
       await noOverflow();
       phase = 'success';
       release();
@@ -162,7 +176,7 @@ for (const skin of builtinSkins)
       await scroll.evaluate((element) => {
         element.scrollTop = element.scrollHeight;
       });
-      await expect(panel.getByText('仅显示最近获取的成员，不代表群成员总数。')).toBeVisible();
+      await expect(panel.getByRole('region', { name: '本地群聊名称' })).toBeVisible();
       await scroll.evaluate((element) => {
         element.scrollTop = 0;
       });
@@ -180,7 +194,11 @@ for (const skin of builtinSkins)
       await trigger.click();
       expect(requests).toBe(1);
       phase = 'error';
-      await panel.getByRole('button', { name: '刷新', exact: true }).click();
+      if (mobile) await refresh.tap();
+      else {
+        await refresh.focus();
+        await refresh.press('Enter');
+      }
       await expect(panel.getByRole('alert')).toContainText('在线成员加载失败');
       await verifyChatList(page, info, 'error');
       await noOverflow();

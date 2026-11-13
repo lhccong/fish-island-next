@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Search, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, RefreshCw, Search, X } from 'lucide-react';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { MemberAvatar } from './MemberAvatar';
 import { GroupNameEditor } from './GroupNameEditor';
+import { ChatDisplaySettings } from './ChatDisplaySettings';
 import { useOnlineMembers } from './use-online-members';
 import styles from './ChatWorkspace.module.css';
 
@@ -42,6 +43,16 @@ export function OnlineMembers({
     <aside className={styles.members} aria-label="在线成员" id="chat-online-members">
       <div className={styles.memberHeader}>
         <h2>在线成员{state.status === 'success' ? `（${members.length}）` : ''}</h2>
+        <Button
+          variant="secondary"
+          className={styles.iconButton}
+          aria-label="刷新"
+          title="刷新在线状态"
+          disabled={state.status === 'idle' || state.status === 'loading'}
+          onClick={onRefresh}
+        >
+          <RefreshCw size={16} aria-hidden="true" />
+        </Button>
         <button
           type="button"
           className={styles.iconButton}
@@ -120,21 +131,10 @@ export function OnlineMembers({
             )}
             <div className={styles.groupInfo}>
               <GroupNameEditor name={groupName} onSave={onRenameGroup} />
-              <h3>关于在线列表</h3>
-              <p>仅显示最近获取的成员，不代表群成员总数。</p>
+              <ChatDisplaySettings />
             </div>
           </div>
         </ScrollArea>
-      </div>
-      <div className={styles.memberFooter}>
-        <span>手动刷新在线状态</span>
-        <Button
-          variant="secondary"
-          disabled={state.status === 'idle' || state.status === 'loading'}
-          onClick={onRefresh}
-        >
-          刷新
-        </Button>
       </div>
     </aside>
   );

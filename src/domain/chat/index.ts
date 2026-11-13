@@ -1,8 +1,50 @@
 // 客户端领域模型；后端 DTO 必须在 infrastructure 映射后进入此边界。
 export type MessageId = string;
+export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';
 export type ConversationId = string;
+export {
+  parseMessageContent,
+  chatImageUrl,
+  messageClipboardText,
+  messagePreview,
+} from './message-content';
+export type { MessageContentPart } from './message-content';
+export type { RedPacketDetail, RedPacketRecord, RedPacketPort } from './red-packet';
+export type { RedPacketCreateInput, RedPacketFormValues } from './red-packet';
+export { RedPacketCreateError, validateRedPacketForm } from './red-packet';
+
+export interface ReceivedMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string | null;
+  content: string;
+  createdAt: number;
+  revoked: boolean;
+  clientMessageId?: string;
+  delivery?: 'sending' | 'failed' | 'sent' | undefined;
+  sendError?: string | undefined;
+  quote?: { id: string; senderName: string; content: string };
+}
+export type ChatEvent =
+  { type: 'message'; message: ReceivedMessage } | { type: 'revoke'; id: string };
+export type ChatConnectionState =
+  'connecting' | 'connected' | 'reconnecting' | 'offline' | 'unauthorized' | 'closed';
+export interface ChatConnection {
+  close(): void;
+  retry(): void;
+  revoke(id: string): boolean;
+}
+export interface ChatRealtimePort {
+  connect(
+    onEvent: (event: ChatEvent) => void,
+    onState: (state: ChatConnectionState) => void,
+  ): ChatConnection;
+}
 
 export interface ChatPreferencesPort {
+  readShowAvatars(): boolean;
+  writeShowAvatars(value: boolean): void;
   readGroupName(): string | null;
   writeGroupName(name: string): void;
 }
@@ -29,11 +71,10 @@ export interface TextMessage {
 }
 
 export interface MessagePage {
-  messages: readonly TextMessage[];
+  messages: readonly ReceivedMessage[];
   nextCursor: string | null;
 }
 
-// 边界种子：仅描述未来纯文本阶段；更多消息类型与实时事件按实际协议扩展。
 export interface ChatHistoryPort {
   loadHistory(input: {
     conversationId: ConversationId;
@@ -41,4 +82,13 @@ export interface ChatHistoryPort {
     limit: number;
     signal?: AbortSignal;
   }): Promise<MessagePage>;
+}
+
+export interface SendMessageInput {
+  content: string;
+  quotedMessageId?: string | undefined;
+  clientMessageId: string;
+}
+export interface ChatSendPort {
+  send(input: SendMessageInput, signal: AbortSignal): Promise<ReceivedMessage>;
 }

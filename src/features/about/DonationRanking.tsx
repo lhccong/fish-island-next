@@ -19,7 +19,9 @@ export function DonationRanking({ records }: { records: Donation[] }) {
               aria-label={`第${index + 1}名 ${donor.name}`}
             >
               <span className={styles.medal}>
-                {index === 0 && <Crown size={23} aria-hidden="true" />}第 {index + 1} 名
+                {index === 0 && <Crown size={23} aria-hidden="true" />}
+                <span className={styles.rankLabel}>第 {index + 1} 名</span>
+                <span className={styles.mobileRank}>{index + 1}</span>
               </span>
               <DonationAvatar donor={donor} large />
               <strong className={styles.leaderName}>{donor.name}</strong>

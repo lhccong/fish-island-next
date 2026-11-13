@@ -69,6 +69,13 @@
   margin-left: 58px;
   min-width: 0;
 }
+.post {
+  min-width: 0;
+}
+.commentsPane {
+  min-width: 0;
+  margin-left: 58px;
+}
 .text {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -181,14 +188,19 @@
   font-size: 13px;
 }
 .card[data-variant='detail'] {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  column-gap: 12px;
   padding: 4px;
   margin: 0;
   border: 0;
   border-radius: 0;
   box-shadow: none;
+}
+.card[data-variant='detail'] .post {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 12px;
+}
+.card[data-variant='detail'] .commentsPane {
+  margin-left: 56px;
 }
 .card[data-variant='detail'] .author {
   display: contents;
@@ -230,13 +242,14 @@
   min-height: 44px;
   align-items: center;
 }
-.card[data-variant='detail'] .body > section {
-  order: 2;
-}
 .card[data-variant='detail'] .name:hover {
   text-decoration: underline;
 }
 @media (max-width: 760px) {
+  .commentsPane,
+  .card[data-variant='detail'] .commentsPane {
+    margin-left: 0;
+  }
   .card[data-variant='detail'] .name {
     min-height: 44px;
     display: flex;
@@ -245,6 +258,21 @@
   }
   .card[data-variant='detail'] .body {
     margin-top: 0;
+  }
+}
+@container circle-detail (min-width: 960px) {
+  .card[data-variant='detail'] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr);
+    gap: 32px;
+    align-items: start;
+  }
+  .card[data-variant='detail'] .commentsPane {
+    position: sticky;
+    top: 4px;
+    margin-left: 0;
+    padding-left: 24px;
+    border-left: 1px solid var(--color-circle-divider);
   }
 }
 @media (max-width: 760px) {

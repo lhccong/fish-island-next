@@ -3,6 +3,37 @@
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-circle-divider);
   font-size: 13px;
+  min-width: 0;
+}
+.heading {
+  margin: 0;
+  padding: 0 4px 8px;
+  color: var(--color-circle-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.scroller {
+  --scroll-area-reserved-gutter: 24px;
+  height: auto;
+  max-height: min(600px, 65dvh);
+}
+.scroller > [data-radix-scroll-area-viewport] {
+  height: auto;
+  max-height: inherit;
+}
+.comments[data-composing='true'] .scroller {
+  max-height: min(320px, 35dvh);
+}
+.scrollContent {
+  padding: 4px 0 8px 4px;
+}
+@container circle-detail (min-width: 960px) {
+  .comments {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
 }
 .commentList,
 .replies {
@@ -65,7 +96,12 @@
   gap: var(--space-2);
   min-height: 44px;
   color: var(--color-circle-muted);
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.5;
+  row-gap: 0;
+}
+.actions time {
+  flex-shrink: 0;
 }
 .actions button {
   min-height: 44px;
@@ -74,10 +110,17 @@
   background: transparent;
   color: var(--color-circle-muted);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
+  border-radius: var(--radius-control);
+  line-height: 1.5;
 }
 .actions button:hover {
+  background: var(--color-hover);
   color: var(--color-circle-author);
+}
+.actions button:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 0;
 }
 .actions button:disabled {
   opacity: 0.5;
@@ -102,20 +145,12 @@
 .comments [role='alert'] {
   color: var(--color-danger);
 }
-.comments > [role='alert'] {
+.scrollContent > [role='alert'] {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
   margin: 0;
-}
-.comments > [role='alert'] button {
-  min-height: 44px;
-  border: 0;
-  background: transparent;
-  color: var(--color-circle-author);
-  cursor: pointer;
-  padding: var(--space-2);
 }
 @media (min-width: 761px) {
   .actions,
@@ -124,6 +159,13 @@
   }
 }
 @media (max-width: 760px) {
+  .scroller {
+    --scroll-area-reserved-gutter: 20px;
+    max-height: min(420px, 55dvh);
+  }
+  .comments[data-composing='true'] .scroller {
+    max-height: min(260px, 32dvh);
+  }
   .actions {
     gap: var(--space-1);
   }

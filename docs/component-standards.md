@@ -74,6 +74,8 @@ ADR-031 的 shared/ui/Slider 完整统一 range 滑轨、滑块、焦点与禁�
 
 ### 基础交互要求
 
+- 图片悬停放大使用 shared/ui/HoverPreview：桌面延迟悬停和键盘聚焦显示，浮层通过 Portal 避免滚动区裁切，按视口边界避让；Esc、离开、滚动和卸载关闭并清理计时器。触屏使用菜单的显式放大预览入口及 Dialog，不能依赖 hover；悬停预览不得改变网格尺寸、拦截图片原有点击或发起业务请求。
+
 - 使用 button、a、input 等语义元素；图标按钮必须有可访问名称，装饰图标 aria-hidden。
 - 菜单、对话框、提示优先包装 Radix；验证 Tab、Escape、焦点锁定和关闭后焦点归还。
 - 从菜单切换到后续对话框时，可传 Dialog 的 returnFocusRef 指定稳定的触发按钮；关闭后不能把焦点归还已经卸载的菜单项。

@@ -1,4 +1,5 @@
 import { useId, useRef, useState } from 'react';
+import { Pencil } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import styles from './GroupNameEditor.module.css';
 
@@ -83,7 +84,9 @@ export function GroupNameEditor({
             <Button
               ref={trigger}
               variant="secondary"
+              className={styles.editButton}
               aria-label="修改群聊名称"
+              title="修改群聊名称"
               onClick={() => {
                 setDraft(name);
                 setFeedback('');
@@ -91,10 +94,9 @@ export function GroupNameEditor({
                 setEditing(true);
               }}
             >
-              修改
+              <Pencil size={16} aria-hidden="true" />
             </Button>
           </div>
-          <p className={styles.help}>仅保存在当前浏览器，不影响其他成员</p>
           {feedback && (
             <p role="status" className={styles.help}>
               {feedback}

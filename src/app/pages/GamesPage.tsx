@@ -9,6 +9,7 @@ export function GamesPage() {
   return (
     <WorkspaceLayout
       sidebarLabel="发现导航"
+      mobileHeader="back-only"
       slots={{
         sidebar: <DiscoveryNavigation />,
         header: (
@@ -17,10 +18,14 @@ export function GamesPage() {
               <h1>游戏</h1>
               <span>找点乐趣，轻松摸鱼</span>
             </div>
-            <DiscoveryNavigation mobile />
           </>
         ),
-        content: <GameCatalog onPlay={() => navigate('/game/life')} />,
+        content: (
+          <GameCatalog
+            onPlay={() => navigate('/game/life')}
+            onStock={() => navigate('/game/stock')}
+          />
+        ),
       }}
     />
   );

@@ -1,5 +1,4 @@
-import { MessageCircle } from 'lucide-react';
-import { ScrollArea } from '@/shared/ui/ScrollArea';
+import { MessageStream } from './MessageStream';
 import { ChatComposer } from './ChatComposer';
 import { OnlineMembers } from './OnlineMembers';
 import { useChatMembers } from './chat-members-context';
@@ -27,14 +26,7 @@ export function ChatWorkspace({
     >
       <div className={styles.conversation}>
         <div className={styles.messages}>
-          <ScrollArea label="群聊消息区">
-            <div className={styles.empty}>
-              <MessageCircle size={44} strokeWidth={1.2} aria-hidden="true" />
-              <h2>{groupName}</h2>
-              <p>消息服务暂未接入</p>
-              <span>点击右上角 ··· 查看当前在线的岛友</span>
-            </div>
-          </ScrollArea>
+          <MessageStream />
         </div>
         <ChatComposer />
       </div>

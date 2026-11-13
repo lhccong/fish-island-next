@@ -11,6 +11,7 @@ export function PetPage() {
   return (
     <WorkspaceLayout
       sidebarLabel="发现导航"
+      mobileHeader="back-only"
       slots={{
         sidebar: <DiscoveryNavigation />,
         header: (
@@ -19,7 +20,6 @@ export function PetPage() {
               <h1>伙伴</h1>
               <span>岛屿生活，有你相伴</span>
             </div>
-            <DiscoveryNavigation mobile />
           </>
         ),
         content: (

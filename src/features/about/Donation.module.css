@@ -111,6 +111,9 @@
 .medal svg {
   color: var(--color-accent-text);
 }
+.mobileRank {
+  display: none;
+}
 .leaderName {
   max-width: 100%;
   font-size: 14px;
@@ -307,73 +310,136 @@
 }
 @media (max-width: 760px) {
   .workspace {
-    padding: var(--space-4) 4px var(--space-5);
+    padding: var(--space-5) 4px var(--space-5) var(--space-4);
   }
   .heading {
     align-items: flex-start;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--space-3);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
   }
   .heading h2 {
-    font-size: 17px;
-    gap: 6px;
+    font-size: 18px;
+    line-height: 1.5;
+    letter-spacing: 0;
   }
   .heading h2 svg {
-    width: 18px;
+    display: none;
   }
   .heading p {
-    font-size: 12px;
+    margin-top: 6px;
+    font-size: 13px;
   }
   .rewardGrid {
     grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
   }
   .ranking,
   .activity {
-    padding: var(--space-3) 4px var(--space-2) var(--space-2);
+    height: min(520px, 65dvh);
+    padding: var(--space-4) 4px var(--space-2) var(--space-3);
   }
   .rankTitle {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
+    font-size: 14px;
+  }
+  .rankBody {
+    padding: 4px;
   }
   .podium {
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 0;
   }
   .leader {
-    padding: var(--space-3) 2px;
+    display: grid;
+    grid-template-columns: 20px 36px minmax(0, 1fr) auto;
+    column-gap: var(--space-2);
+    row-gap: 4px;
+    padding: var(--space-4) 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
   }
-  .leaderName {
-    font-size: 12px;
-  }
-  .leaderAmount {
-    font-size: 16px;
-  }
-  .leader p {
-    font-size: 11px;
+  .leader[data-rank='1'] {
+    background: transparent;
   }
   .medal {
-    font-size: 11px;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    justify-content: center;
+    font-size: 13px;
   }
+  .rankLabel,
   .medal svg {
-    width: 17px;
+    display: none;
+  }
+  .mobileRank {
+    display: inline;
+    font-variant-numeric: tabular-nums;
   }
   .largeAvatar {
-    width: 40px;
-    height: 40px;
+    grid-column: 2;
+    grid-row: 1 / 3;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    font-size: 16px;
   }
-  .ranking,
-  .activity {
-    height: min(480px, 60dvh);
+  .leaderName {
+    grid-column: 3;
+    font-size: 14px;
+    line-height: 1.5;
   }
-  .rewardGrid {
-    gap: var(--space-5);
+  .leaderAmount {
+    grid-column: 4;
+    align-self: start;
+    padding-top: 2px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .leader p {
+    grid-column: 3 / -1;
+    font-size: 12px;
   }
   .rows li {
     display: grid;
-    grid-template-columns: 24px 36px minmax(0, 1fr);
+    grid-template-columns: 20px 36px minmax(0, 1fr) auto;
     gap: var(--space-2);
+    padding: var(--space-4) 0;
+    align-items: start;
+  }
+  .rows .avatar {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .rowText {
+    display: contents;
+  }
+  .rowText strong {
+    grid-column: 3;
+    grid-row: 1;
+    min-width: 0;
+    line-height: 1.5;
+  }
+  .rowText p {
+    grid-column: 3 / -1;
+    grid-row: 2;
+    margin: 0;
+  }
+  .rowRank {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    min-width: 0;
+    align-self: center;
   }
   .rowAmount {
-    grid-column: 3;
-    justify-self: start;
+    grid-column: 4;
+    grid-row: 1;
+    padding-top: 2px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 }

@@ -62,111 +62,119 @@ export function MomentCard({
           <Pin size={12} aria-hidden="true" />
         </span>
       )}
-      <div className={styles.author}>
-        <button
-          type="button"
-          className={styles.avatar}
-          aria-label={`查看${moment.userName}的鱼小圈`}
-          onClick={() => onViewUser(moment.userId, moment.userName)}
-        >
-          <CircleAvatar name={moment.userName} src={moment.avatar} />
-        </button>
-        <div>
+      <div className={styles.post} role="group" aria-label="动态内容">
+        <div className={styles.author}>
           <button
-            className={styles.name}
             type="button"
+            className={styles.avatar}
+            aria-label={`查看${moment.userName}的鱼小圈`}
             onClick={() => onViewUser(moment.userId, moment.userName)}
           >
-            {moment.userName}
+            <CircleAvatar name={moment.userName} src={moment.avatar} />
           </button>
-          {moment.visibility === 1 && <span className={styles.private}>仅自己可见</span>}
-        </div>
-      </div>
-      <div className={styles.body}>
-        <p className={styles.text}>
-          {expanded || moment.content.length <= 500
-            ? moment.content
-            : `${moment.content.slice(0, 500)}…`}
-        </p>
-        {moment.content.length > 500 && (
-          <button type="button" onClick={() => setExpanded(!expanded)}>
-            {expanded ? '收起全文' : '展开全文'}
-          </button>
-        )}
-        <MediaGrid media={moment.media} />
-        {moment.location && (
-          <p className={styles.location}>
-            <MapPin size={14} aria-hidden="true" /> {moment.location}
-          </p>
-        )}
-        {likeNames && (
-          <p className={styles.likes}>
-            <Heart size={13} aria-hidden="true" fill="currentColor" />
-            <span>{likeNames}</span>
-          </p>
-        )}
-        <div className={styles.footer}>
-          <time className={styles.time} dateTime={moment.createdAt}>
-            {formatMomentTime(moment.createdAt)}
-          </time>
-          <div className={styles.actions}>
+          <div>
             <button
+              className={styles.name}
               type="button"
-              aria-label={`${likes.liked ? '取消点赞' : '点赞'} ${likes.count}`}
-              aria-pressed={likes.liked}
-              disabled={operation.pending}
-              onClick={() => {
-                void operation
-                  .run((signal) => service.like(moment.id, signal))
-                  .then((liked) => {
-                    if (liked !== undefined) {
-                      setLikes((old) => ({
-                        liked,
-                        count: Math.max(0, old.count + (liked === old.liked ? 0 : liked ? 1 : -1)),
-                      }));
-                      setNotice(liked ? '点赞成功' : '已取消点赞');
-                    }
-                  });
-              }}
+              onClick={() => onViewUser(moment.userId, moment.userName)}
             >
-              <Heart size={16} aria-hidden="true" fill={likes.liked ? 'currentColor' : 'none'} />
-              <span>{likes.count}</span>
+              {moment.userName}
             </button>
-            <button
-              type="button"
-              aria-label={`评论 ${commentCount}`}
-              aria-expanded={comments}
-              onClick={() => setComments(!comments)}
-            >
-              <MessageCircle size={16} aria-hidden="true" />
-              <span>{commentCount}</span>
-            </button>
-            <MomentMenu
-              triggerRef={moreRef}
-              owner={owner}
-              admin={admin}
-              top={moment.top}
-              pending={operation.pending}
-              onEdit={() => setEditing(true)}
-              onAction={setAction}
-              onToggleTop={() => {
-                void operation
-                  .run((signal) => service.action('top', moment.id, moment.top ? 0 : 1, signal))
-                  .then((ok) => {
-                    if (ok) onRefresh();
-                  });
-              }}
-            />
+            {moment.visibility === 1 && <span className={styles.private}>仅自己可见</span>}
           </div>
         </div>
-        {operation.error && <p role="alert">{operation.error}</p>}
-        {notice && (
-          <p className={styles.meta} role="status">
-            {notice}
+        <div className={styles.body}>
+          <p className={styles.text}>
+            {expanded || moment.content.length <= 500
+              ? moment.content
+              : `${moment.content.slice(0, 500)}…`}
           </p>
-        )}
-        {(comments || moment.comments > 0 || commentTarget) && (
+          {moment.content.length > 500 && (
+            <button type="button" onClick={() => setExpanded(!expanded)}>
+              {expanded ? '收起全文' : '展开全文'}
+            </button>
+          )}
+          <MediaGrid media={moment.media} />
+          {moment.location && (
+            <p className={styles.location}>
+              <MapPin size={14} aria-hidden="true" /> {moment.location}
+            </p>
+          )}
+          {likeNames && (
+            <p className={styles.likes}>
+              <Heart size={13} aria-hidden="true" fill="currentColor" />
+              <span>{likeNames}</span>
+            </p>
+          )}
+          <div className={styles.footer}>
+            <time className={styles.time} dateTime={moment.createdAt}>
+              {formatMomentTime(moment.createdAt)}
+            </time>
+            <div className={styles.actions}>
+              <button
+                type="button"
+                aria-label={`${likes.liked ? '取消点赞' : '点赞'} ${likes.count}`}
+                aria-pressed={likes.liked}
+                disabled={operation.pending}
+                onClick={() => {
+                  void operation
+                    .run((signal) => service.like(moment.id, signal))
+                    .then((liked) => {
+                      if (liked !== undefined) {
+                        setLikes((old) => ({
+                          liked,
+                          count: Math.max(
+                            0,
+                            old.count + (liked === old.liked ? 0 : liked ? 1 : -1),
+                          ),
+                        }));
+                        setNotice(liked ? '点赞成功' : '已取消点赞');
+                      }
+                    });
+                }}
+              >
+                <Heart size={16} aria-hidden="true" fill={likes.liked ? 'currentColor' : 'none'} />
+                <span>{likes.count}</span>
+              </button>
+              <button
+                type="button"
+                aria-label={`评论 ${commentCount}`}
+                aria-expanded={comments}
+                onClick={() => setComments(!comments)}
+              >
+                <MessageCircle size={16} aria-hidden="true" />
+                <span>{commentCount}</span>
+              </button>
+              <MomentMenu
+                triggerRef={moreRef}
+                owner={owner}
+                admin={admin}
+                top={moment.top}
+                pending={operation.pending}
+                onEdit={() => setEditing(true)}
+                onAction={setAction}
+                onToggleTop={() => {
+                  void operation
+                    .run((signal) => service.action('top', moment.id, moment.top ? 0 : 1, signal))
+                    .then((ok) => {
+                      if (ok) onRefresh();
+                    });
+                }}
+              />
+            </div>
+          </div>
+          {operation.error && <p role="alert">{operation.error}</p>}
+          {notice && (
+            <p className={styles.meta} role="status">
+              {notice}
+            </p>
+          )}
+        </div>
+      </div>
+      {(variant === 'detail' || comments || moment.comments > 0 || commentTarget) && (
+        <div className={styles.commentsPane}>
           <Comments
+            onStartReply={() => setComments(true)}
             target={commentTarget}
             composerOpen={comments}
             service={service}
@@ -176,8 +184,8 @@ export function MomentCard({
             admin={admin}
             onCountChange={(delta) => setCommentCount((n) => Math.max(0, n + delta))}
           />
-        )}
-      </div>
+        </div>
+      )}
       {editing && (
         <MomentEditor
           returnFocusRef={moreRef}

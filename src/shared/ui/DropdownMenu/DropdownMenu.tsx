@@ -1,21 +1,31 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode, RefObject } from 'react';
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
 import styles from './DropdownMenu.module.css';
 
+export interface DropdownMenuItem {
+  label: string;
+  icon: ReactNode;
+  onSelect: () => void;
+  disabled?: boolean;
+  tone?: 'danger' | 'highlight';
+}
 interface Props {
   className?: string;
   trigger: ReactElement;
   label: string;
-  items: readonly {
-    label: string;
-    icon: ReactNode;
-    onSelect: () => void;
-    disabled?: boolean;
-    tone?: 'danger' | 'highlight';
-  }[];
+  items: readonly DropdownMenuItem[];
+  returnFocusRef?: RefObject<HTMLElement | null>;
+  onCloseFocus?: () => void;
 }
 
-export function DropdownMenu({ trigger, label, items, className = '' }: Props) {
+export function DropdownMenu({
+  trigger,
+  label,
+  items,
+  className = '',
+  returnFocusRef,
+  onCloseFocus,
+}: Props) {
   return (
     <Dropdown.Root modal={false}>
       <Dropdown.Trigger asChild>{trigger}</Dropdown.Trigger>
@@ -28,6 +38,15 @@ export function DropdownMenu({ trigger, label, items, className = '' }: Props) {
           collisionPadding={8}
           sticky="always"
           hideWhenDetached
+          onCloseAutoFocus={(event) => {
+            if (onCloseFocus) {
+              event.preventDefault();
+              onCloseFocus();
+            } else if (returnFocusRef?.current?.isConnected) {
+              event.preventDefault();
+              returnFocusRef.current.focus({ preventScroll: true });
+            }
+          }}
         >
           {items.map((item) => (
             <Dropdown.Item

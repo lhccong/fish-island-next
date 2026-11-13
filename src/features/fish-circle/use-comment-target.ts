@@ -40,7 +40,16 @@ export function useCommentTarget({
     const frame = requestAnimationFrame(() => {
       const element = container.current?.querySelector<HTMLElement>('[data-comment-target="true"]');
       if (!element) return;
-      element.scrollIntoView({ block: 'center', behavior: 'instant' });
+      container.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+      const viewport = element.closest<HTMLElement>('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        const top =
+          viewport.scrollTop +
+          element.getBoundingClientRect().top -
+          viewport.getBoundingClientRect().top -
+          Math.max(0, (viewport.clientHeight - element.getBoundingClientRect().height) / 2);
+        viewport.scrollTo({ top: Math.max(0, top), behavior: 'instant' });
+      }
       element.focus({ preventScroll: true });
       positioned.current = true;
     });

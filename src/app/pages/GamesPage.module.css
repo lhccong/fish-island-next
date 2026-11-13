@@ -20,3 +20,19 @@
     padding: var(--space-3) var(--space-4);
   }
 }
+
+.aboutContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.mobileAboutNavigation {
+  display: none;
+}
+@media (max-width: 760px) {
+  .mobileAboutNavigation {
+    display: block;
+    flex-shrink: 0;
+  }
+}

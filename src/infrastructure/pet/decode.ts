@@ -19,6 +19,7 @@ export function text(value: unknown) {
 }
 export function number(value: unknown, fallback = 0) {
   if (value === undefined || value === null) return fallback;
+  if (typeof value === 'string' && /^-?\d+(\.\d+)?$/.test(value.trim())) value = Number(value);
   if (typeof value !== 'number' || !Number.isFinite(value))
     throw new Error('伙伴服务返回的数值异常');
   return value;
@@ -69,10 +70,16 @@ const statNames: Record<string, string> = {
   attack: '攻击',
   defense: '防御',
   hp: '生命',
+  maxHp: '生命',
+  antiCrit: '暴击抵抗',
+  antiDodge: '闪避抵抗',
+  antiBlock: '格挡抵抗',
+  antiCombo: '连击抵抗',
+  antiLifesteal: '汲取抵抗',
 };
 function stats(value: Record<string, unknown>): [string, number][] {
   return Object.entries(value)
-    .filter(([key, v]) => key in statNames && typeof v === 'number')
+    .filter(([key, v]) => key in statNames && v !== undefined && v !== null)
     .map(([key, v]) => [statNames[key]!, number(v)]);
 }
 export function item(value: unknown, instance = false): PetItem {
@@ -167,12 +174,14 @@ export function forge(value: unknown): ForgeDetail {
     entries: [1, 2, 3, 4].flatMap((n) => {
       if (!data[`entry${n}`]) return [];
       const e = record(data[`entry${n}`]);
+      const grade = e.grade == null ? null : number(e.grade);
       return [
         {
           number: n,
           name: statNames[text(e.attr)] || text(e.attr),
           value: number(e.value),
           locked: e.locked === true,
+          grade: grade !== null && [1, 2, 3, 4, 5].includes(grade) ? grade : null,
         },
       ];
     }),

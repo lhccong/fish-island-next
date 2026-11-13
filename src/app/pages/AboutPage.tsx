@@ -21,6 +21,7 @@ export function AboutPage({
   return (
     <WorkspaceLayout
       sidebarLabel="发现导航"
+      mobileHeader="back-only"
       slots={{
         contentScroll: false,
         sidebar: <DiscoveryNavigation />,
@@ -33,16 +34,22 @@ export function AboutPage({
             <AboutNavigation />
           </>
         ),
-        content:
-          section === 'reward' ? (
-            <RewardWorkspace service={aboutService} />
-          ) : section === 'welfare' ? (
-            <WelfareWorkspace />
-          ) : section === 'other' ? (
-            <ProductsWorkspace />
-          ) : (
-            <AboutWorkspace />
-          ),
+        content: (
+          <div className={styles.aboutContent}>
+            <div className={styles.mobileAboutNavigation}>
+              <AboutNavigation />
+            </div>
+            {section === 'reward' ? (
+              <RewardWorkspace service={aboutService} />
+            ) : section === 'welfare' ? (
+              <WelfareWorkspace />
+            ) : section === 'other' ? (
+              <ProductsWorkspace />
+            ) : (
+              <AboutWorkspace />
+            )}
+          </div>
+        ),
       }}
     />
   );

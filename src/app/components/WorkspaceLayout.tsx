@@ -14,6 +14,7 @@ export function WorkspaceLayout({
   mobileNavigation,
   sidebarVariant,
   hideMobileHeader = false,
+  mobileHeader = 'full',
 }: {
   slots: Omit<WorkspaceShellSlots, 'navigation'>;
   sidebarLabel?: string;
@@ -21,6 +22,7 @@ export function WorkspaceLayout({
   mobileNavigation?: 'tabs' | 'hidden';
   sidebarVariant?: 'default' | 'chat';
   hideMobileHeader?: boolean;
+  mobileHeader?: 'full' | 'back-only';
 }) {
   const skinId = useAppearanceStore((state) => state.skinId);
   const { pathname } = useLocation();
@@ -38,12 +40,28 @@ export function WorkspaceLayout({
       slots={{
         ...slots,
         header: (
-          <div className={styles.header}>
+          <div className={styles.header} data-mobile-header={mobileHeader}>
             {!mobileRoot && (
               <Link
                 className={styles.back}
-                to={pathname === '/chat' ? '/' : '/discover'}
-                aria-label={pathname === '/chat' ? '返回热榜' : '返回发现'}
+                to={
+                  pathname.startsWith('/game/stock/')
+                    ? '/game/stock'
+                    : pathname.startsWith('/game/')
+                      ? '/discover/games'
+                      : pathname === '/chat'
+                        ? '/'
+                        : '/discover'
+                }
+                aria-label={
+                  pathname.startsWith('/game/stock/')
+                    ? '返回股市概览'
+                    : pathname.startsWith('/game/')
+                      ? '返回游戏'
+                      : pathname === '/chat'
+                        ? '返回热榜'
+                        : '返回发现'
+                }
               >
                 <ChevronLeft size={24} aria-hidden="true" />
               </Link>

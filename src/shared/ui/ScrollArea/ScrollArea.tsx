@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import * as Primitive from '@radix-ui/react-scroll-area';
 import styles from './ScrollArea.module.css';
 
@@ -7,6 +7,7 @@ interface ScrollAreaProps {
   label: string;
   className?: string;
   gutter?: 'overlay' | 'reserved';
+  viewportRef?: Ref<HTMLDivElement>;
 }
 
 export function ScrollArea({
@@ -14,6 +15,7 @@ export function ScrollArea({
   label,
   className = '',
   gutter = 'overlay',
+  viewportRef,
 }: ScrollAreaProps) {
   return (
     <Primitive.Root
@@ -22,7 +24,13 @@ export function ScrollArea({
       data-gutter={gutter}
       className={`${styles.root} ${className}`}
     >
-      <Primitive.Viewport className={styles.viewport} tabIndex={0} role="region" aria-label={label}>
+      <Primitive.Viewport
+        ref={viewportRef}
+        className={styles.viewport}
+        tabIndex={0}
+        role="region"
+        aria-label={label}
+      >
         {children}
       </Primitive.Viewport>
       <Primitive.Scrollbar orientation="vertical" className={styles.scrollbar}>

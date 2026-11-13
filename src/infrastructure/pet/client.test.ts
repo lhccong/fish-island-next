@@ -1,11 +1,55 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createPetClient } from './client';
-import { companion, image, round } from './decode';
+import { companion, forge, image, item, number, round } from './decode';
 
 const token = () => ({ name: 'synthetic-session', value: 'synthetic-value' });
 const pet = { petId: '17', name: '测试伙伴', petUrl: '', level: 2, hunger: 60, mood: 70 };
 afterEach(() => vi.unstubAllGlobals());
 describe('pet protocol migration', () => {
+  it('preserves server entry grades and leaves missing or unknown grades unclassified', () => {
+    for (const grade of [1, 2, 3, 4, 5])
+      expect(
+        forge({ entry1: { attr: 'attack', value: 10, grade: String(grade) } }).entries[0]?.grade,
+      ).toBe(grade);
+    for (const grade of [undefined, null, 0, 6])
+      expect(forge({ entry1: { attr: 'attack', value: 10, grade } }).entries[0]?.grade).toBeNull();
+  });
+  it('normalizes legacy forge attribute aliases to the same Chinese names as companion stats', () => {
+    const aliases = {
+      maxHp: '生命',
+      antiCrit: '暴击抵抗',
+      antiDodge: '闪避抵抗',
+      antiBlock: '格挡抵抗',
+      antiCombo: '连击抵抗',
+      antiLifesteal: '汲取抵抗',
+    };
+    for (const [attr, name] of Object.entries(aliases)) {
+      expect(forge({ entry1: { attr, value: 0.0192 } }).entries[0]).toMatchObject({
+        name,
+        value: 0.0192,
+      });
+      expect(companion({ ...pet, equipStats: { [attr]: 0.0192 } }).stats).toEqual([[name, 0.0192]]);
+    }
+  });
+  it('decodes decimal strings from item templates without losing images or accepting invalid numbers', () => {
+    const template = {
+      id: '40',
+      icon: 'https://example.test/hat.png',
+      rarity: '2',
+      purchasePoint: '20.5',
+      baseDefense: '4',
+    };
+    expect(item({ id: '501', template, enhanceLevel: '3', quantity: '1' }, true)).toMatchObject({
+      icon: template.icon,
+      rarity: 2,
+      price: 20.5,
+      level: 3,
+      quantity: 1,
+      stats: [['防御', 4]],
+    });
+    for (const value of ['', 'NaN', 'Infinity', '2px', {}, true])
+      expect(() => number(value)).toThrow('数值异常');
+  });
   it('preserves the required identifiers in rename and other-profile requests', async () => {
     const fetcher = vi
       .fn()

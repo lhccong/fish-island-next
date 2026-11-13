@@ -31,9 +31,6 @@
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
-.mobile {
-  display: none;
-}
 .about {
   width: 100%;
   border: 0;
@@ -45,31 +42,5 @@
 @media (max-width: 760px) {
   .sidebar .desktopHeading {
     display: none;
-  }
-  .mobile {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
-    border-top: 1px solid var(--color-border);
-  }
-  .mobile a,
-  .mobile .about {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    flex: 1;
-    min-height: 44px;
-    padding: var(--space-2);
-    border-radius: var(--radius-control);
-    text-decoration: none;
-    color: var(--color-text);
-    font-size: 14px;
-  }
-  .mobile a[aria-current='page'],
-  .mobile .about[data-active='true'] {
-    background: var(--color-accent-soft);
-    color: var(--color-accent-text);
   }
 }
