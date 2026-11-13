@@ -7,7 +7,8 @@ const winId = 'b01b23456789cdef0123456789abcdef';
 const message = (id: number, content = `合成历史 ${id}`) => ({
   id: id === 101 ? bagId : id === 51 ? winId : String(id),
   content,
-  timestamp: 1794441600000 + id,
+  // Legacy robot/payment messages persist epoch milliseconds as strings.
+  timestamp: id % 2 === 0 ? String(1794441600000 + id) : 1794441600000 + id,
   sender: { id: '456', name: '合成岛友', avatar: null },
 });
 const records = (last: number) =>

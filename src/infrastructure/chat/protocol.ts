@@ -45,7 +45,9 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
     typeof timestamp === 'number'
       ? timestamp
       : typeof timestamp === 'string'
-        ? Date.parse(timestamp)
+        ? /^-?\d+$/.test(timestamp)
+          ? Number(timestamp)
+          : Date.parse(timestamp)
         : NaN;
   if (
     !messageId ||

@@ -12,6 +12,18 @@ const record = (id: string) => ({
   },
 });
 afterEach(() => vi.unstubAllGlobals());
+it('loads mixed timestamp formats without rejecting the whole history page', () => {
+  const robot = record('robot');
+  const legacyRobot = {
+    messageWrapper: {
+      message: { ...robot.messageWrapper.message, timestamp: '1794441600000' },
+    },
+  };
+  expect(decodeHistory({ records: [record('new'), legacyRobot] }, 2)).toMatchObject({
+    nextCursor: 'robot',
+    messages: [{ id: 'new' }, { id: 'robot', createdAt: 1794441600000 }],
+  });
+});
 it('decodes legacy wrappers, preserves long IDs and rejects malformed history', () => {
   expect(decodeHistory({ records: [record('9007199254740993')] }, 1)).toMatchObject({
     nextCursor: '9007199254740993',

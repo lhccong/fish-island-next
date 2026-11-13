@@ -1,5 +1,20 @@
 import { expect, it } from 'vitest';
-import { decodeChatEvent } from './protocol';
+import { decodeChatEvent, decodeReceivedMessage } from './protocol';
+
+it('normalizes legacy millisecond strings alongside ISO and numeric timestamps', () => {
+  const message = { id: 'robot', sender: { id: '-1' }, content: '合成机器人消息' };
+  for (const timestamp of [1794441600000, '1794441600000', '2026-11-12T00:00:00Z']) {
+    expect(decodeReceivedMessage({ ...message, timestamp })?.createdAt).toBe(1794441600000);
+    expect(
+      decodeChatEvent(
+        JSON.stringify({ type: 'chat', data: { message: { ...message, timestamp } } }),
+      ),
+    ).toMatchObject({ message: { createdAt: 1794441600000 } });
+  }
+  for (const timestamp of ['', 'invalid', '99999999999999999999', null]) {
+    expect(decodeReceivedMessage({ ...message, timestamp })).toBeNull();
+  }
+});
 
 it('decodes a safe sender avatar and drops unsafe avatar URLs', () => {
   const frame = (avatar: string) =>
