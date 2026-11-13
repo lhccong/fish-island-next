@@ -6,6 +6,7 @@ import {
   createChatSender,
   createRedPacketClient,
   createChatEmoticons,
+  createChatImageUpload,
 } from '@/infrastructure/chat';
 import { createChatRealtimeController } from '@/features/chat';
 import { createBrowserSessionVault } from '@/infrastructure/auth';
@@ -13,6 +14,13 @@ import { authController } from '@/app/config/auth';
 import { apiBaseUrl } from '@/app/config/api';
 
 const vault = createBrowserSessionVault(apiBaseUrl);
+export const chatImageUpload = createChatImageUpload(
+  apiBaseUrl,
+  () => vault.read(),
+  () => {
+    void authController.restore(true);
+  },
+);
 export const chatEmoticons = createChatEmoticons(
   apiBaseUrl,
   () => vault.read(),

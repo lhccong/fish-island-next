@@ -1,5 +1,7 @@
 // 客户端领域模型；后端 DTO 必须在 infrastructure 映射后进入此边界。
 export type MessageId = string;
+export type { ChatImageUploadPort } from './image-upload';
+export { senderTitle } from './sender-title';
 export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';
 export type ConversationId = string;
 export {
@@ -17,6 +19,8 @@ export interface ReceivedMessage {
   id: string;
   senderId: string;
   senderName: string;
+  senderTitleId?: string;
+  senderLevel?: number;
   senderAvatar?: string | null;
   content: string;
   createdAt: number;
@@ -43,6 +47,8 @@ export interface ChatRealtimePort {
 }
 
 export interface ChatPreferencesPort {
+  readDeferImages(): boolean;
+  writeDeferImages(value: boolean): void;
   readShowAvatars(): boolean;
   writeShowAvatars(value: boolean): void;
   readGroupName(): string | null;

@@ -7,27 +7,31 @@ import { RedPacketLauncher } from './RedPacketLauncher';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
 import { DraftQuote } from './DraftQuote';
+import { ComposerImage } from './ComposerImage';
 import styles from './ChatWorkspace.module.css';
 
 export function ChatComposer() {
-  const { draft, composerRef, controller, user } = useChatRealtime();
+  const { draft, composerRef, controller, user, imageUpload } = useChatRealtime();
+  const image = useStore(imageUpload.store, (state) => state);
   const text = useStore(draft.store, (state) => state.text);
   const quote = useStore(draft.store, (state) => state.quote);
   const feedback = useStore(draft.store, (state) => state.feedback);
   const composing = useRef(false);
+  const content = (image.status === 'ready' ? `[img]${image.url}[/img]` : '') + text;
+  const imageBusy = image.status === 'uploading' || image.status === 'error';
   const send = () => {
-    if (!user || !text.trim()) return;
-    if (text.length > 5000) return draft.notify('消息不能超过 5000 字', 'error');
+    if (!user || !content.trim() || imageBusy) return;
+    if (content.length > 5000) return draft.notify('消息不能超过 5000 字', 'error');
     const quoted = quote
       ? Object.values(controller.store.getState().messages).find((m) => m.id === quote.id)
       : null;
     if (quote && (!quoted || quoted.revoked))
       return draft.notify('引用消息已撤回或不在当前窗口，请取消引用后发送', 'error');
-    if (!controller.sender.send(text, quote?.id, user))
+    if (!controller.sender.send(content, quote?.id, user))
       return draft.notify('待处理消息过多，请重试或处理失败消息后发送', 'error');
     draft.setText('');
     draft.clearQuote();
-    draft.notify('消息已提交');
+    imageUpload.clear();
     composerRef.current?.focus({ preventScroll: true });
   };
   return (
@@ -45,12 +49,25 @@ export function ChatComposer() {
       {quote && (
         <DraftQuote id={quote.id} senderName={quote.senderName} onDismiss={draft.clearQuote} />
       )}
+      <ComposerImage />
       <textarea
         ref={composerRef}
         aria-label="消息草稿"
         placeholder="写点什么…"
         value={text}
         onChange={(event) => draft.setText(event.target.value)}
+        onPaste={(event) => {
+          const files = Array.from(event.clipboardData.items)
+            .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
+            .map((item) => item.getAsFile())
+            .filter((file): file is File => file !== null);
+          if (!files.length) return;
+          event.preventDefault();
+          if (!user) return draft.notify('请登录后上传图片', 'error');
+          if (files.length > 1) return draft.notify('一次只能粘贴一张图片', 'error');
+          if (!imageUpload.paste(files[0]!))
+            draft.notify('请先发送或移除当前图片，再粘贴新图片', 'error');
+        }}
         onCompositionStart={() => {
           composing.current = true;
         }}
@@ -80,10 +97,13 @@ export function ChatComposer() {
             </span>
           )}
           <span>
-            {text.length > 5000 ? '消息不能超过 5000 字' : '手机回车换行，电脑 Shift+Enter 换行'}
+            {content.length > 5000 ? '消息不能超过 5000 字' : '手机回车换行，电脑 Shift+Enter 换行'}
           </span>
         </div>
-        <Button disabled={!user || !text.trim() || text.length > 5000} onClick={send}>
+        <Button
+          disabled={!user || !content.trim() || content.length > 5000 || imageBusy}
+          onClick={send}
+        >
           发送
         </Button>
       </div>

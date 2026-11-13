@@ -78,9 +78,14 @@ export function HoverPreview({
       <span
         ref={anchor}
         className={styles.anchor}
-        onMouseEnter={show}
+        onMouseEnter={(event) => {
+          if (event.target instanceof Node && event.currentTarget.contains(event.target)) show();
+        }}
         onMouseLeave={leave}
-        onFocusCapture={show}
+        onFocusCapture={(event) => {
+          // React Portal 的菜单聚焦也会沿 React 树冒泡，不能据此重开悬停预览。
+          if (event.currentTarget.contains(event.target)) show();
+        }}
         onBlurCapture={close}
         onPointerDownCapture={close}
         onContextMenuCapture={close}

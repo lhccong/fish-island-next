@@ -1,7 +1,13 @@
 import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/features/auth';
 import { ChatRealtimeProvider } from '@/features/chat';
-import { chatRealtime, chatPreferences, chatRedPackets, chatEmoticons } from '@/app/config/chat';
+import {
+  chatRealtime,
+  chatPreferences,
+  chatRedPackets,
+  chatEmoticons,
+  chatImageUpload,
+} from '@/app/config/chat';
 
 export function ChatConnectionProvider({ children }: { children: ReactNode }) {
   const { session } = useAuth();
@@ -17,6 +23,7 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
       preferences={chatPreferences}
       redPackets={chatRedPackets}
       emoticonPort={chatEmoticons}
+      imageUploadPort={chatImageUpload}
     >
       {children}
     </ChatRealtimeProvider>

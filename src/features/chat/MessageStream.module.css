@@ -79,9 +79,13 @@
 .row[data-self='true'] .bubble {
   background: var(--color-message-outgoing);
 }
-.row .bubble[data-red-packet-content='true'] {
+.row .bubble[data-red-packet-content='true'],
+.row .bubble[data-image-only='true'] {
   padding: 0;
   background: transparent;
+}
+.row[data-self='true'] .bubble[data-image-only='true'] {
+  --chat-image-position: right center;
 }
 .bubble[data-revoked='true'] {
   background: transparent;
@@ -152,4 +156,10 @@
   .sending svg {
     animation: none;
   }
+}
+
+.bubbleLine[data-repeat='true'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 4px 8px;
 }

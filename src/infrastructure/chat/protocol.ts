@@ -73,6 +73,10 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
     senderId,
     senderName: typeof sender?.name === 'string' ? sender.name.slice(0, 200) : '岛友',
     senderAvatar: chatImageUrl(sender?.avatar),
+    ...(typeof sender?.level === 'number' && Number.isSafeInteger(sender.level) && sender.level >= 0
+      ? { senderLevel: sender.level }
+      : {}),
+    ...(id(sender?.titleId) ? { senderTitleId: id(sender?.titleId)! } : {}),
     content: message.content,
     createdAt,
     revoked: false,

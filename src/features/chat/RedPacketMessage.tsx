@@ -3,6 +3,7 @@ import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
 import { RedPacketRecords } from './RedPacketRecords';
+import { RedPacketTitle } from './RedPacketTitle';
 import styles from './RedPacketMessage.module.css';
 
 export function RedPacketMessage({ id }: { id: string }) {
@@ -20,6 +21,10 @@ export function RedPacketMessage({ id }: { id: string }) {
       : ended
         ? '已抢完'
         : `剩余 ${state.detail.remainingCount} 个`;
+  const description =
+    state.amount !== null
+      ? `恭喜你抢到 ${state.amount} 积分！`
+      : state.grabError || (state.loading ? '红包加载中…' : status);
   return (
     <span
       className={styles.card}
@@ -45,18 +50,27 @@ export function RedPacketMessage({ id }: { id: string }) {
           <path d="M17 27h8M21 23v8" stroke="var(--color-red-packet-envelope)" strokeWidth="1.5" />
         </svg>
         <span className={styles.info}>
-          <span className={styles.title}>{state.detail?.name || '恭喜发财，大吉大利'}</span>
-          <span className={styles.description}>{status}</span>
-          {state.amount !== null && <span role="status">恭喜你抢到 {state.amount} 积分！</span>}
+          <RedPacketTitle
+            name={state.detail?.name || '恭喜发财，大吉大利'}
+            error={state.grabError}
+          />
+          <span
+            className={styles.description}
+            role={
+              state.grabError
+                ? 'alert'
+                : state.loading || state.amount !== null
+                  ? 'status'
+                  : undefined
+            }
+            title={description}
+          >
+            {description}
+          </span>
         </span>
       </span>
       <span className={styles.footer}>
         <span className={styles.caption}>{quiz ? '答题红包' : '积分红包'}</span>
-        {state.loading && (
-          <span className={styles.feedback} role="status">
-            红包加载中…
-          </span>
-        )}
         {state.error && (
           <span className={styles.feedback} role="alert">
             {state.error}
@@ -65,22 +79,17 @@ export function RedPacketMessage({ id }: { id: string }) {
             </Button>
           </span>
         )}
-        {quiz && !ended && state.amount === null && (
+        {quiz && (
           <label className={styles.answer}>
             答案
             <input
               aria-label="红包答案"
               value={answer}
               maxLength={100}
-              disabled={state.grabbing}
+              disabled={state.grabbing || !!ended || state.amount !== null}
               onChange={(event) => setAnswer(event.target.value)}
             />
           </label>
-        )}
-        {state.grabError && (
-          <span className={styles.feedback} role="alert">
-            {state.grabError}
-          </span>
         )}
         <span className={styles.actions}>
           <Button

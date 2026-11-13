@@ -104,7 +104,8 @@ for (const skin of builtinSkins)
       release();
       await expect(frame).toHaveAttribute('data-image-state', 'ready');
       const after = (await frame.boundingBox())!;
-      expect(Math.abs(before.height - after.height)).toBeLessThan(1);
+      expect(after.height).toBeLessThanOrEqual(before.height);
+      expect(Math.abs(after.width / after.height - 640 / 360)).toBeLessThan(0.02);
       await expect(row.getByRole('img', { name: '聊天图片' })).toHaveCSS('object-fit', 'contain');
       await expect(row).toContainText('图片前文');
       await expect(row).toContainText('图片后文');

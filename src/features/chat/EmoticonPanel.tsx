@@ -9,7 +9,7 @@ import { EmoticonFeedback } from './EmoticonFeedback';
 import styles from './EmoticonPanel.module.css';
 
 export default function EmoticonPanel({ onSelect }: { onSelect: () => void }) {
-  const { emoticons, draft, composerRef } = useChatRealtime();
+  const { emoticons, draft, controller, user } = useChatRealtime();
   const revision = useStore(emoticons.store, (s) => s.revision);
   const pending = useStore(emoticons.store, (s) => s.pending);
   const [input, setInput] = useState('');
@@ -58,17 +58,20 @@ export default function EmoticonPanel({ onSelect }: { onSelect: () => void }) {
         saved={!keyword}
         pending={pending}
         onSelect={(url) => {
-          const text = draft.store.getState().text;
-          const start = composerRef.current?.selectionStart ?? text.length;
-          const end = composerRef.current?.selectionEnd ?? start;
           const marker = `[img]${url}[/img]`;
-          if (text.length - (end - start) + marker.length > 5000) {
-            setNotice('消息不能超过 5000 字，请关闭面板并缩短草稿后重试');
-            draft.notify('消息不能超过 5000 字，请先缩短草稿', 'error');
+          if (!user) {
+            setNotice('请登录后发送表情包');
             return;
           }
-          draft.setText(text.slice(0, start) + marker + text.slice(end));
-          draft.notify('表情包已加入草稿');
+          if (marker.length > 5000) {
+            setNotice('表情包地址过长，无法发送');
+            return;
+          }
+          if (!controller.sender.send(marker, undefined, user)) {
+            setNotice('待处理消息过多，请重试或处理失败消息后发送');
+            return;
+          }
+          draft.notify('表情包已提交发送');
           onSelect();
         }}
         onToggle={(id, url) => {

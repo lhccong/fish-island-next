@@ -80,7 +80,7 @@ export function EmoticonTile({
                 <span>
                   图片不可用
                   <br />
-                  点击仍可加入草稿
+                  点击仍可发送
                 </span>
               ) : (
                 <img

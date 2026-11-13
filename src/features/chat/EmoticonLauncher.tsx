@@ -11,7 +11,7 @@ export function EmoticonLauncher() {
   return (
     <Dialog
       title="表情包"
-      description="选图加入草稿再发送。电脑悬停放大，右键管理；手机使用图片角上的“…”菜单。"
+      description="点击表情包直接发送。电脑悬停放大，右键管理；手机使用图片角上的“…”菜单。"
       open={open}
       onOpenChange={setOpen}
       className={styles.dialog ?? ''}

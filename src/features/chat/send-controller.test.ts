@@ -109,3 +109,16 @@ it('pins pending and failed messages while evicting confirmed history', () => {
   expect(f.model.store.getState().ids).toHaveLength(1000);
   expect(f.model.store.getState().messages[f.key]?.delivery).toBe('sending');
 });
+
+it('direct repeats reject double submission while in flight and preserve exact content', () => {
+  const f = setup();
+  expect(f.sender.repeat('合成正文', user)).toBe(false);
+  expect(f.sender.repeat(' 复读正文 ', user)).toBe(true);
+  expect(f.sender.repeat(' 复读正文 ', user)).toBe(false);
+  expect(f.send).toHaveBeenCalledTimes(2);
+  expect(f.send.mock.calls[1]?.[0]).toMatchObject({
+    content: ' 复读正文 ',
+    quotedMessageId: undefined,
+  });
+  f.sender.reset();
+});

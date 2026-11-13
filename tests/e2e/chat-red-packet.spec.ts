@@ -99,11 +99,15 @@ for (const skin of builtinSkins)
       const card = row.locator('[data-red-packet]');
       await expect(card.getByText('红包加载中…')).toBeVisible();
       await expect(card.getByRole('button', { name: '抢红包', exact: true })).toBeDisabled();
+      const loadingBox = (await card.boundingBox())!;
       releaseDetail();
       await expect(card).toContainText('合成详情失败');
       failDetail = false;
       await act(card.getByRole('button', { name: '重试详情' }));
       await expect(card).toContainText('剩余 2 个');
+      const readyBox = (await card.boundingBox())!;
+      expect(readyBox.width).toBe(loadingBox.width);
+      expect(readyBox.height).toBe(loadingBox.height);
       await expect(row).toContainText('祝福');
       await expect(row).toContainText('后文');
       await expect(row).not.toContainText('[redpacket]');
@@ -179,6 +183,9 @@ for (const skin of builtinSkins)
       releaseGrab();
       await expect(card).toContainText('恭喜你抢到 6 积分！');
       await expect(card.getByRole('button', { name: '已领取', exact: true })).toBeDisabled();
+      const claimedBox = (await card.boundingBox())!;
+      expect(claimedBox.width).toBe(readyBox.width);
+      expect(claimedBox.height).toBe(readyBox.height);
       await page.screenshot({ path: info.outputPath('packet-claimed.png') });
       const menu = await openMessageActions(page, '1');
       await act(menu.getByRole('menuitem', { name: '引用', exact: true }));
@@ -205,6 +212,15 @@ for (const skin of builtinSkins)
       await act(submit);
       await expect(quiz).toContainText('答案错误');
       await quiz.getByRole('textbox', { name: '红包答案' }).fill('鱼');
+      const title = quiz.getByRole('button', { name: /^查看红包完整内容/ });
+      await act(title);
+      const content = page.getByRole('dialog', { name: '红包祝福与题目', exact: true });
+      await expect(content.getByRole('region', { name: '红包完整内容' })).toContainText(
+        '合成题目：摸鱼岛的吉祥物是什么？'.repeat(3),
+      );
+      await page.keyboard.press('Escape');
+      await expect(title).toBeFocused();
+      const quizBox = (await quiz.locator('[data-red-packet]').boundingBox())!;
       if (!mobile) {
         const calls = detailCalls;
         await page.getByRole('button', { name: '切换主题', exact: true }).click();
@@ -223,6 +239,10 @@ for (const skin of builtinSkins)
       }
       await act(submit);
       await expect(quiz).toContainText('恭喜你抢到 8 积分！');
+      await expect(quiz.getByRole('textbox', { name: '红包答案' })).toBeDisabled();
+      const quizClaimedBox = (await quiz.locator('[data-red-packet]').boundingBox())!;
+      expect(quizClaimedBox.width).toBe(quizBox.width);
+      expect(quizClaimedBox.height).toBe(quizBox.height);
       for (const [id, packet, status] of [
         ['4', 'rpc_empty', '已抢完'],
         ['5', 'rpc_expired', '已过期'],
@@ -231,6 +251,9 @@ for (const skin of builtinSkins)
         const ended = page.locator(`[data-message-id="${id}"]`);
         await expect(ended.getByText(status!, { exact: true })).toBeVisible();
         await expect(ended.getByRole('button', { name: '抢红包', exact: true })).toBeDisabled();
+        const endedBox = (await ended.locator('[data-red-packet]').boundingBox())!;
+        expect(endedBox.width).toBe(readyBox.width);
+        expect(endedBox.height).toBe(readyBox.height);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,

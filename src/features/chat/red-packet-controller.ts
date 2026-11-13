@@ -60,12 +60,8 @@ function createEntry(id: string, port: RedPacketPort) {
       if (!store.getState().detail && !store.getState().error) void load();
       return () => {
         references--;
-        // A pending write belongs to the account, not a virtualized message row.
-        if (!references && detailRequest && !grabRequest) {
-          detailRequest.abort();
-          detailRequest = null;
-          store.setState({ loading: false });
-        }
+        // Virtualization is not account disposal: keep the read and loading geometry
+        // stable until it settles. Cache eviction/dispose still cancel requests.
       };
     },
     async grab(answer: string) {

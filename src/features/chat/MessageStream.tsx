@@ -16,8 +16,8 @@ const row = (_index: number, id: string, showAvatars: boolean) => (
 );
 export function MessageStream() {
   const { controller, avatarPreference: avatars } = useChatRealtime();
-  const ids = useStore(controller.store, (state) => state.ids);
-  const firstItemIndex = useStore(controller.store, (state) => state.firstItemIndex);
+  const ids = useStore(controller.store, (state) => state.visibleIds);
+  const firstItemIndex = useStore(controller.store, (state) => state.viewFirstItemIndex);
   const initialized = useStore(controller.history.store, (state) => state.initialized);
   useEffect(() => {
     const deactivate = controller.history.activate();

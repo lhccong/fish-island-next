@@ -24,9 +24,13 @@ for (const skin of builtinSkins)
       expect(commands).toHaveLength(0);
       await draft.dispatchEvent('compositionend');
       await draft.fill('合成发送正文');
+      const composer = page.getByRole('region', { name: '群聊输入区', exact: true });
+      const beforeSend = await composer.boundingBox();
       await send.click();
       await expect(page.getByLabel('消息发送中')).toBeVisible();
       await expect(draft).toHaveValue('');
+      await expect(composer.getByText('消息已提交', { exact: true })).toHaveCount(0);
+      expect(await composer.boundingBox()).toEqual(beforeSend);
       await expect.poll(() => commands.length).toBe(1);
       expect(Object.keys(commands[0]!).sort()).toEqual(['clientMessageId', 'content']);
       await draft.fill('发送时保留下一条草稿');
@@ -51,6 +55,8 @@ for (const skin of builtinSkins)
       await held!.fulfill({ json: { code: 0, data: { message: canonical } } });
       fixture.broadcast(canonical);
       await expect(page.getByLabel('消息发送中')).toHaveCount(0);
+      await expect(composer.getByText('消息已提交', { exact: true })).toHaveCount(0);
+      expect(await composer.boundingBox()).toEqual(beforeSend);
       await expect(page.getByText('服务端昵称', { exact: true })).toBeVisible();
       await expect(page.locator('[data-delivery="sent"]')).toHaveCount(1);
       await openMessageActions(page, '1794530000001');

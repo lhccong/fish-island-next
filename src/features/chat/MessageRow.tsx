@@ -1,3 +1,5 @@
+import { RepeatButton } from './RepeatButton';
+import { RepetitionParticipants } from './RepetitionParticipants';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { messagePreview, parseMessageContent } from '@/domain/chat';
@@ -18,6 +20,7 @@ export const MessageRow = memo(function MessageRow({
 }) {
   const { controller, userId } = useChatRealtime();
   const message = useStore(controller.store, (state) => state.messages[id]);
+  const group = useStore(controller.store, (state) => state.repetitions[id]);
   const revoke = useStore(controller.store, (state) => state.revokeState[message?.id ?? id]);
   const connected = useStore(controller.store, (state) => state.connection === 'connected');
   const bubbleRef = useRef<HTMLDivElement>(null);
@@ -39,6 +42,12 @@ export const MessageRow = memo(function MessageRow({
       className={styles.bubble}
       data-revoked={message.revoked}
       data-red-packet-content={!message.revoked && parts.some((part) => part.kind === 'red-packet')}
+      data-image-only={
+        !message.revoked &&
+        !message.quote &&
+        parts.some((part) => part.kind === 'image') &&
+        parts.every((part) => part.kind === 'image' || (part.kind === 'text' && !part.text.trim()))
+      }
       tabIndex={0}
       role="group"
       aria-label={`${message.senderName || '岛友'}的消息`}
@@ -89,7 +98,7 @@ export const MessageRow = memo(function MessageRow({
           </time>
           {!message.revoked && !local && <MessageMenu {...menuProps} presentation="button" />}
         </div>
-        <div className={styles.bubbleLine}>
+        <div className={styles.bubbleLine} data-repeat={!!group}>
           {self && message.delivery === 'sending' && (
             <span role="status" aria-label="消息发送中" className={styles.sending}>
               <LoaderCircle size={16} aria-hidden="true" />
@@ -102,6 +111,8 @@ export const MessageRow = memo(function MessageRow({
               {bubble}
             </MessageMenu>
           )}
+          {group && <RepeatButton content={message.content} />}
+          {group && group.length >= 3 && <RepetitionParticipants ids={group} />}
         </div>
         {self && message.delivery === 'failed' && (
           <div className={styles.revoke}>

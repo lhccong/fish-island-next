@@ -1,0 +1,60 @@
+.attachment {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 4px 48px 4px 4px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.attachment[data-ready='true'] {
+  width: 88px;
+  height: 88px;
+  padding: 12px 12px 4px 4px;
+}
+.attachment img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: var(--radius-control);
+}
+.attachment > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.attachment [data-tone='error'] {
+  color: var(--color-danger);
+}
+.controls {
+  display: flex;
+  gap: 8px;
+}
+.remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 44px;
+  height: 44px;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.remove svg {
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+.remove:hover svg {
+  background: var(--color-hover);
+}

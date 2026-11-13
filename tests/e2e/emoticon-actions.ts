@@ -32,6 +32,8 @@ export async function verifyEmoticonPreview(page: Page, info: TestInfo) {
     await tile.focus();
     await tile.press('Shift+F10');
     await expect(page.getByRole('menu', { name: '表情包 1 操作' })).toBeVisible();
+    await page.getByRole('menuitem', { name: '放大预览', exact: true }).focus();
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
     await page.keyboard.press('Escape');
     await expect(tile).toBeFocused();
   } else {

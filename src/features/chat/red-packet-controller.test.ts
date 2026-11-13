@@ -55,7 +55,7 @@ it('allows manual recovery and refreshes status after a rejected claim', async (
   await ended.grab('right');
   expect(port.grab).toHaveBeenCalledTimes(2);
 });
-it('cancels reads when the last row unmounts and ignores responses after account disposal', async () => {
+it('keeps a pending read across virtual row unmounts and ignores responses after account disposal', async () => {
   const { port, controller } = fixture();
   let release!: (value: RedPacketDetail) => void;
   vi.mocked(port.detail).mockReturnValueOnce(
@@ -67,11 +67,14 @@ it('cancels reads when the last row unmounts and ignores responses after account
   const unmount = entry.retain();
   const signal = vi.mocked(port.detail).mock.calls[0]![1];
   unmount();
-  expect(signal.aborted).toBe(true);
+  expect(signal.aborted).toBe(false);
+  expect(entry.store.getState().loading).toBe(true);
+  const remount = entry.retain();
+  expect(port.detail).toHaveBeenCalledTimes(1);
   release(detail);
   await Promise.resolve();
-  expect(entry.store.getState().detail).toBeNull();
-  await entry.load();
+  expect(entry.store.getState().detail).toEqual(detail);
+  remount();
   let resolveGrab!: (value: number) => void;
   vi.mocked(port.grab).mockReturnValueOnce(
     new Promise((resolve) => {
@@ -83,4 +86,22 @@ it('cancels reads when the last row unmounts and ignores responses after account
   resolveGrab(10);
   await pending;
   expect(entry.store.getState().amount).toBeNull();
+});
+
+it('aborts pending detail reads on account disposal', async () => {
+  const { port, controller } = fixture();
+  let release!: (value: RedPacketDetail) => void;
+  vi.mocked(port.detail).mockReturnValueOnce(
+    new Promise((resolve) => {
+      release = resolve;
+    }),
+  );
+  const entry = controller.entry('rpc1');
+  const unmount = entry.retain();
+  unmount();
+  controller.dispose();
+  expect(vi.mocked(port.detail).mock.calls[0]![1].aborted).toBe(true);
+  release(detail);
+  await Promise.resolve();
+  expect(entry.store.getState().detail).toBeNull();
 });

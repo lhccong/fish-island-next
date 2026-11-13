@@ -1,10 +1,11 @@
+import { projectRepetitions, type RepetitionView } from './repetition';
 import { createStore } from 'zustand/vanilla';
 import type { ChatConnectionState, ChatEvent, ReceivedMessage } from '@/domain/chat';
 
 export function compareMessages(a: ReceivedMessage, b: ReceivedMessage) {
   return a.createdAt - b.createdAt || a.id.localeCompare(b.id, 'en');
 }
-interface MessageState {
+interface MessageState extends RepetitionView {
   firstItemIndex: number;
   ids: readonly string[];
   messages: Readonly<Record<string, ReceivedMessage>>;
@@ -13,6 +14,7 @@ interface MessageState {
 }
 export function createMessageStore() {
   const store = createStore<MessageState>(() => ({
+    ...projectRepetitions([], {}),
     firstItemIndex: 1000000,
     ids: [],
     messages: Object.create(null),
@@ -23,10 +25,20 @@ export function createMessageStore() {
   let floor: ReceivedMessage | null = null;
   return {
     store,
+    updateDelivery(key: string, delivery: ReceivedMessage['delivery'], sendError?: string) {
+      const state = store.getState();
+      if (!state.messages[key]) return;
+      const messages = {
+        ...state.messages,
+        [key]: { ...state.messages[key], delivery, sendError },
+      };
+      store.setState({ messages, ...projectRepetitions(state.ids, messages, state) });
+    },
     reset() {
       tombstones.clear();
       floor = null;
       store.setState({
+        ...projectRepetitions([], {}),
         firstItemIndex: 1000000,
         ids: [],
         messages: Object.create(null),
@@ -114,7 +126,13 @@ export function createMessageStore() {
       const removedCount = newFirst ? before.ids.indexOf(newFirst) : 0;
       const firstItemIndex =
         before.firstItemIndex + (prependCount >= 0 ? -prependCount : Math.max(0, removedCount));
-      store.setState({ ids, messages, revokeState, firstItemIndex });
+      store.setState({
+        ids,
+        messages,
+        revokeState,
+        firstItemIndex,
+        ...projectRepetitions(ids, messages, before),
+      });
     },
   };
 }

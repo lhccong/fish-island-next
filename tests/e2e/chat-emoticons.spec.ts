@@ -3,6 +3,7 @@ import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { openMessageActions } from './chat-message-actions';
 import { verifyEmoticonPreview, openEmoticonActions } from './emoticon-actions';
+import { verifyChatImagePreview } from './chat-image-preview-actions';
 
 test.setTimeout(60000);
 for (const skin of builtinSkins)
@@ -56,7 +57,7 @@ for (const skin of builtinSkins)
       await expect(open).toBeFocused();
       fixture.broadcast({
         id: '1794530000001',
-        content: '[img]https://menu.test/image.png[/img]',
+        content: '参考图片[img]https://menu.test/image.png[/img]',
         sender: { id: '456', name: '合成岛友' },
         timestamp: Date.now() - 1000,
       });
@@ -67,6 +68,8 @@ for (const skin of builtinSkins)
       await page.getByRole('menuitem', { name: '添加表情包', exact: true }).click();
       await expect(page.getByText('已添加到表情包')).toBeVisible();
       expect(saved).toBe(true);
+      await openMessageActions(page, '1794530000001');
+      await page.getByRole('menuitem', { name: '引用', exact: true }).click();
       listFail = true;
       await open.click();
       await expect(dialog.getByText('合成列表失败')).toBeVisible();
@@ -125,13 +128,14 @@ for (const skin of builtinSkins)
         el.scrollTop = 0;
       });
       await dialog.getByRole('button', { name: '使用表情包 1', exact: true }).focus();
-      await dialog.getByRole('button', { name: '使用表情包 1', exact: true }).click();
-      await expect(page.getByRole('textbox', { name: '消息草稿' })).toHaveValue(
-        '保留草稿[img]https://menu.test/image.png[/img]',
-      );
+      const sentIds: string[] = [];
       await page.route('**/api/chat/message/send', async (route) => {
         const data = route.request().postDataJSON() as { content: string; clientMessageId: string };
-        expect(data.content).toBe('保留草稿[img]https://menu.test/image.png[/img]');
+        expect(data.content).toBe('[img]https://menu.test/image.png[/img]');
+        expect(data).not.toHaveProperty('quotedMessageId');
+        sentIds.push(data.clientMessageId);
+        if (sentIds.length === 1)
+          return route.fulfill({ json: { code: 50001, message: '合成表情发送失败' } });
         return route.fulfill({
           json: {
             code: 0,
@@ -147,7 +151,11 @@ for (const skin of builtinSkins)
           },
         });
       });
-      await page.getByRole('button', { name: '发送', exact: true }).click();
+      await dialog.getByRole('button', { name: '使用表情包 1', exact: true }).click();
+      await expect(dialog).not.toBeVisible();
+      await expect(page.getByRole('textbox', { name: '消息草稿' })).toHaveValue('保留草稿');
+      await expect(page.getByRole('region', { name: '引用消息', exact: true })).toBeVisible();
+      await page.getByRole('button', { name: '重试发送', exact: true }).click();
       await page.getByRole('region', { name: '群聊消息区', exact: true }).evaluate((el) => {
         el.scrollTop = el.scrollHeight;
       });
@@ -159,6 +167,9 @@ for (const skin of builtinSkins)
           return page.locator('[data-delivery="sent"]').count();
         })
         .toBe(1);
+      expect(sentIds).toHaveLength(2);
+      expect(sentIds[0]).toBe(sentIds[1]);
+      await verifyChatImagePreview(page, info);
       await open.click();
       await expect.poll(() => !!held).toBe(true);
       await held!.fulfill({ json: { code: 0, data: { records: [records[0]], total: '1' } } });

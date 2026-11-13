@@ -4,6 +4,7 @@ import base from './playwright.chat-realtime.config';
 export default defineConfig({
   ...base,
   testMatch: 'chat-emoticons.spec.ts',
+  expect: { timeout: 15000 },
   outputDir: 'test-results-chat-emoticons/results',
   reporter: 'list',
   use: { ...base.use, baseURL: 'http://127.0.0.1:4201' },

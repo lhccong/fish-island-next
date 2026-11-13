@@ -1,18 +1,22 @@
 import type { AuthUser } from '@/domain/auth';
 import { createContext, useContext, type RefObject } from 'react';
 import type { ChatDraft } from './chat-draft';
+import type { ImageUploadController } from './image-upload-controller';
 import type { EmoticonController } from './emoticon-controller';
 import type { RedPacketController } from './red-packet-controller';
 import type { RedPacketCreation } from './red-packet-creation';
 import type { ChatRealtimeController } from './realtime-controller';
 import type { useAvatarPreference } from './use-avatar-preference';
+import type { useImagePreference } from './use-image-preference';
 
 export const ChatRealtimeContext = createContext<{
   controller: ChatRealtimeController;
   userId: string;
   user?: AuthUser | undefined;
   avatarPreference: ReturnType<typeof useAvatarPreference>;
+  imagePreference: ReturnType<typeof useImagePreference>;
   draft: ChatDraft;
+  imageUpload: ImageUploadController;
   emoticons: EmoticonController;
   packets: RedPacketController;
   packetCreation: RedPacketCreation;

@@ -10,11 +10,7 @@ export function createSendController(
   const inputs = new Map<string, SendMessageInput>();
   let generation = 0;
   const update = (key: string, delivery: 'sending' | 'sent' | 'failed', sendError?: string) => {
-    const current = model.store.getState();
-    if (!current.messages[key]) return;
-    model.store.setState({
-      messages: { ...current.messages, [key]: { ...current.messages[key], delivery, sendError } },
-    });
+    model.updateDelivery(key, delivery, sendError);
   };
   const run = async (key: string, input: SendMessageInput) => {
     if (!port || requests.has(key)) return;
@@ -97,6 +93,17 @@ export function createSendController(
   };
   return {
     enqueue,
+    repeat(content: string, user: AuthUser) {
+      if (
+        [...inputs.keys()].some(
+          (key) =>
+            inputs.get(key)?.content === content &&
+            model.store.getState().messages[key]?.delivery === 'sending',
+        )
+      )
+        return false;
+      return enqueue(content, undefined, user) !== null;
+    },
     send(content: string, quotedMessageId: string | undefined, user: AuthUser) {
       return enqueue(content, quotedMessageId, user) !== null;
     },

@@ -1,0 +1,91 @@
+.repeat.repeat {
+  position: relative;
+  flex: 0 0 44px;
+  width: 44px;
+  min-height: 44px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+}
+.disc {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-accent-text);
+  font-size: 12px;
+  font-weight: 500;
+}
+.repeat:hover:not(:disabled) .disc {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-text);
+}
+.burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: var(--color-accent-text);
+  animation: repeat-pop 500ms ease-out forwards;
+}
+.participants {
+  max-width: 100%;
+  grid-column: 1;
+  justify-self: end;
+}
+.people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.participant {
+  display: flex;
+  min-width: 0;
+  animation: participant-in 200ms ease-out;
+}
+.avatar {
+  display: flex;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.avatar > span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+}
+@keyframes repeat-pop {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+@keyframes participant-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .burst,
+  .participant {
+    animation: none;
+  }
+  .burst {
+    display: none;
+  }
+}
