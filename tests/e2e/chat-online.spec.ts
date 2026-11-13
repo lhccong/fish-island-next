@@ -190,7 +190,7 @@ for (const skin of builtinSkins)
       await page.keyboard.press('Escape');
       await expect(trigger).toBeFocused();
       await expect(panel).toHaveCount(0);
-      await expect(draft).toHaveValue('合成草稿：保留输入');
+      await expect(draft).toHaveText('合成草稿：保留输入');
       await trigger.click();
       expect(requests).toBe(1);
       phase = 'error';
@@ -227,7 +227,7 @@ for (const skin of builtinSkins)
         .click();
       await picker.getByRole('button', { name: '关闭', exact: true }).click();
       if (mobile) await page.setViewportSize(viewport);
-      await expect(draft).toHaveValue('合成草稿：保留输入');
+      await expect(draft).toHaveText('合成草稿：保留输入');
       await trigger.click();
       await expect(panel.getByRole('listitem')).toHaveCount(16);
       expect(requests).toBe(4);

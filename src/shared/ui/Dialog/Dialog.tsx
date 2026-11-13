@@ -13,6 +13,7 @@ import styles from './Dialog.module.css';
 interface DialogProps {
   modal?: boolean;
   hideDescription?: boolean;
+  hideTitle?: boolean;
   style?: CSSProperties;
   trigger?: ReactElement;
   returnFocusRef?: RefObject<HTMLElement | null>;
@@ -30,6 +31,7 @@ interface DialogProps {
 export function Dialog({
   modal = true,
   hideDescription = false,
+  hideTitle = false,
   style,
   trigger,
   returnFocusRef,
@@ -76,7 +78,9 @@ export function Dialog({
             </Primitive.Close>
           )}
           {illustration}
-          <Primitive.Title className={styles.title}>{title}</Primitive.Title>
+          <Primitive.Title className={hideTitle ? styles.hiddenDescription : styles.title}>
+            {title}
+          </Primitive.Title>
           <Primitive.Description
             className={hideDescription ? styles.hiddenDescription : styles.description}
           >

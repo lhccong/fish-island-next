@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useStore } from 'zustand';
 import { Folder, Scissors } from 'lucide-react';
 import { EmoticonLauncher } from './EmoticonLauncher';
@@ -8,6 +7,7 @@ import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
 import { DraftQuote } from './DraftQuote';
 import { ComposerImage } from './ComposerImage';
+import { ChatEditor } from './ChatEditor';
 import styles from './ChatWorkspace.module.css';
 
 export function ChatComposer() {
@@ -16,7 +16,6 @@ export function ChatComposer() {
   const text = useStore(draft.store, (state) => state.text);
   const quote = useStore(draft.store, (state) => state.quote);
   const feedback = useStore(draft.store, (state) => state.feedback);
-  const composing = useRef(false);
   const content = (image.status === 'ready' ? `[img]${image.url}[/img]` : '') + text;
   const imageBusy = image.status === 'uploading' || image.status === 'error';
   const send = () => {
@@ -50,12 +49,8 @@ export function ChatComposer() {
         <DraftQuote id={quote.id} senderName={quote.senderName} onDismiss={draft.clearQuote} />
       )}
       <ComposerImage />
-      <textarea
-        ref={composerRef}
-        aria-label="消息草稿"
-        placeholder="写点什么…"
-        value={text}
-        onChange={(event) => draft.setText(event.target.value)}
+      <ChatEditor
+        onSend={send}
         onPaste={(event) => {
           const files = Array.from(event.clipboardData.items)
             .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
@@ -67,25 +62,6 @@ export function ChatComposer() {
           if (files.length > 1) return draft.notify('一次只能粘贴一张图片', 'error');
           if (!imageUpload.paste(files[0]!))
             draft.notify('请先发送或移除当前图片，再粘贴新图片', 'error');
-        }}
-        onCompositionStart={() => {
-          composing.current = true;
-        }}
-        onCompositionEnd={() => {
-          composing.current = false;
-        }}
-        onKeyDown={(event) => {
-          if (
-            event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing &&
-            !composing.current &&
-            event.nativeEvent.keyCode !== 229 &&
-            window.matchMedia('(min-width: 761px)').matches
-          ) {
-            event.preventDefault();
-            send();
-          }
         }}
       />
       <div className={styles.actions}>

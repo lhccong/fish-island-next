@@ -40,7 +40,7 @@ for (const skin of builtinSkins)
       await draft.press('Tab');
       await page.keyboard.press('Shift+Tab');
       await checkFocus();
-      await expect(draft).toHaveValue('聚焦后继续输入');
+      await expect(draft).toHaveText('聚焦后继续输入');
       await draft.evaluate((el) => el.blur());
       await expect(composer).toHaveCSS('box-shadow', 'none');
       await expect(composer).toHaveCSS('border-top-color', baseline.color);

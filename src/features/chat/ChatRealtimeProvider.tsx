@@ -1,5 +1,6 @@
 import type { AuthUser } from '@/domain/auth';
 import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { createMessageNavigation } from './message-navigation';
 import { createChatDraft } from './chat-draft';
 import type { ChatEmoticonPort, ChatImageUploadPort } from '@/domain/chat';
 import { createImageUploadController } from './image-upload-controller';
@@ -55,7 +56,9 @@ export function ChatRealtimeProvider({
     packetCreation.start();
     return () => packetCreation.dispose();
   }, [packetCreation]);
-  const composerRef = useRef<HTMLTextAreaElement>(null);
+  const navigation = useMemo(() => createMessageNavigation(controller), [controller]);
+  useEffect(() => navigation.start(userId, user?.name ?? ''), [navigation, userId, user?.name]);
+  const composerRef = useRef<HTMLDivElement>(null);
   const emoticons = useMemo(
     () => createEmoticonController(emoticonPort, userId),
     [emoticonPort, userId],
@@ -68,6 +71,7 @@ export function ChatRealtimeProvider({
     <ChatRealtimeContext.Provider
       value={{
         controller,
+        navigation,
         user,
         userId,
         avatarPreference,

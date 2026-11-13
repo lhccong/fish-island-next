@@ -4,6 +4,7 @@
   min-width: 0;
 }
 .preview {
+  pointer-events: none;
   position: fixed;
   z-index: 83;
   display: flex;

@@ -8,7 +8,13 @@ import { EmoticonTile } from './EmoticonTile';
 import { EmoticonFeedback } from './EmoticonFeedback';
 import styles from './EmoticonPanel.module.css';
 
-export default function EmoticonPanel({ onSelect }: { onSelect: () => void }) {
+export default function EmoticonPanel({
+  onSelect,
+  search,
+}: {
+  onSelect: () => void;
+  search: boolean;
+}) {
   const { emoticons, draft, controller, user } = useChatRealtime();
   const revision = useStore(emoticons.store, (s) => s.revision);
   const pending = useStore(emoticons.store, (s) => s.pending);
@@ -27,57 +33,55 @@ export default function EmoticonPanel({ onSelect }: { onSelect: () => void }) {
   );
   return (
     <>
-      <form
-        className={styles.search}
-        onSubmit={(event) => {
-          event.preventDefault();
-          setKeyword(input.trim());
-        }}
-      >
-        <input
-          aria-label="搜索表情包"
-          placeholder="输入关键词搜索表情包"
-          maxLength={80}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <Button type="submit">搜索</Button>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            setInput('');
-            setKeyword('');
+      {search && (
+        <form
+          className={styles.search}
+          onSubmit={(event) => {
+            event.preventDefault();
+            const value = input.trim();
+            if (value) setKeyword(value);
           }}
         >
-          我的收藏
-        </Button>
-      </form>
-      <EmoticonList
-        key={keyword ? `search:${keyword}` : `saved:${revision}`}
-        load={load}
-        saved={!keyword}
-        pending={pending}
-        onSelect={(url) => {
-          const marker = `[img]${url}[/img]`;
-          if (!user) {
-            setNotice('请登录后发送表情包');
-            return;
-          }
-          if (marker.length > 5000) {
-            setNotice('表情包地址过长，无法发送');
-            return;
-          }
-          if (!controller.sender.send(marker, undefined, user)) {
-            setNotice('待处理消息过多，请重试或处理失败消息后发送');
-            return;
-          }
-          draft.notify('表情包已提交发送');
-          onSelect();
-        }}
-        onToggle={(id, url) => {
-          void (keyword ? emoticons.add(url) : emoticons.remove(id));
-        }}
-      />
+          <input
+            aria-label="搜索表情包"
+            placeholder="输入关键词搜索表情包"
+            maxLength={80}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <Button type="submit">搜索</Button>
+        </form>
+      )}
+      {search && !keyword ? (
+        <p className={styles.caption}>输入关键词查找表情包</p>
+      ) : (
+        <EmoticonList
+          key={keyword ? `search:${keyword}` : `saved:${revision}`}
+          load={load}
+          saved={!keyword}
+          pending={pending}
+          onSelect={(url) => {
+            const marker = `[img]${url}[/img]`;
+            if (!user) {
+              setNotice('请登录后发送表情包');
+              return;
+            }
+            if (marker.length > 5000) {
+              setNotice('表情包地址过长，无法发送');
+              return;
+            }
+            if (!controller.sender.send(marker, undefined, user)) {
+              setNotice('待处理消息过多，请重试或处理失败消息后发送');
+              return;
+            }
+            draft.notify('表情包已提交发送');
+            onSelect();
+          }}
+          onToggle={(id, url) => {
+            void (keyword ? emoticons.add(url) : emoticons.remove(id));
+          }}
+        />
+      )}
       <div className={styles.feedback}>
         {notice && (
           <span role="alert" data-tone="error">

@@ -29,9 +29,19 @@ export function decodeRedPacketRecords(value: unknown): readonly RedPacketRecord
   for (const raw of value) {
     const item = object(raw);
     if (typeof item.id !== 'string' || !item.id) throw new Error('红包记录格式异常，请重试');
+    let userAvatar: string | null = null;
+    if (typeof item.userAvatar === 'string') {
+      try {
+        const url = new URL(item.userAvatar);
+        if (url.protocol === 'https:' || url.protocol === 'http:') userAvatar = url.href;
+      } catch {
+        // Invalid optional avatars use the nickname placeholder.
+      }
+    }
     records.set(item.id, {
       id: item.id,
-      userName: typeof item.userName === 'string' ? item.userName : '岛友',
+      userName: typeof item.userName === 'string' && item.userName.trim() ? item.userName : '岛友',
+      userAvatar,
       amount: integer(item.amount),
       grabTime:
         typeof item.grabTime === 'string' && Number.isFinite(Date.parse(item.grabTime))

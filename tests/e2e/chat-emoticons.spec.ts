@@ -47,6 +47,7 @@ for (const skin of builtinSkins)
       const open = page.getByRole('button', { name: '表情包', exact: true });
       await page.getByRole('textbox', { name: '消息草稿' }).fill('保留草稿');
       await open.click();
+      await page.getByRole('button', { name: '我的收藏', exact: true }).click();
       const dialog = page.getByRole('dialog', { name: '表情包', exact: true });
       await expect(dialog.getByText('正在加载表情包…')).toBeVisible();
       await expect.poll(() => !!held).toBe(true);
@@ -72,6 +73,7 @@ for (const skin of builtinSkins)
       await page.getByRole('menuitem', { name: '引用', exact: true }).click();
       listFail = true;
       await open.click();
+      await page.getByRole('button', { name: '我的收藏', exact: true }).click();
       await expect(dialog.getByText('合成列表失败')).toBeVisible();
       listFail = false;
       await dialog.getByRole('button', { name: '重试表情包' }).click();
@@ -153,7 +155,7 @@ for (const skin of builtinSkins)
       });
       await dialog.getByRole('button', { name: '使用表情包 1', exact: true }).click();
       await expect(dialog).not.toBeVisible();
-      await expect(page.getByRole('textbox', { name: '消息草稿' })).toHaveValue('保留草稿');
+      await expect(page.getByRole('textbox', { name: '消息草稿' })).toHaveText('保留草稿');
       await expect(page.getByRole('region', { name: '引用消息', exact: true })).toBeVisible();
       await page.getByRole('button', { name: '重试发送', exact: true }).click();
       await page.getByRole('region', { name: '群聊消息区', exact: true }).evaluate((el) => {
@@ -171,6 +173,7 @@ for (const skin of builtinSkins)
       expect(sentIds[0]).toBe(sentIds[1]);
       await verifyChatImagePreview(page, info);
       await open.click();
+      await page.getByRole('button', { name: '我的收藏', exact: true }).click();
       await expect.poll(() => !!held).toBe(true);
       await held!.fulfill({ json: { code: 0, data: { records: [records[0]], total: '1' } } });
       held = undefined;
@@ -204,6 +207,7 @@ for (const skin of builtinSkins)
               },
         });
       });
+      await dialog.getByRole('button', { name: '搜索表情', exact: true }).click();
       await dialog.getByRole('textbox', { name: '搜索表情包' }).fill('开心');
       await dialog.getByRole('button', { name: '搜索', exact: true }).click();
       await expect(dialog.getByRole('button', { name: '重试表情包' })).toBeVisible();
@@ -225,28 +229,7 @@ for (const skin of builtinSkins)
   }
 
 async function scrollToEnd(page: Page, scroll: Locator) {
-  const box = (await scroll.boundingBox())!;
-  if (page.viewportSize()!.width > 760) {
-    await scroll.hover();
-    await page.mouse.wheel(0, 5000);
-  } else {
-    const session = await page.context().newCDPSession(page);
-    for (let swipe = 0; swipe < 6; swipe++) {
-      const x = box.x + box.width / 2;
-      const start = box.y + box.height - 16;
-      const distance = box.height - 32;
-      await session.send('Input.dispatchTouchEvent', {
-        type: 'touchStart',
-        touchPoints: [{ x, y: start }],
-      });
-      for (let step = 1; step <= 5; step++)
-        await session.send('Input.dispatchTouchEvent', {
-          type: 'touchMove',
-          touchPoints: [{ x, y: start - (distance * step) / 5 }],
-        });
-      await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    }
-    await session.detach();
-  }
+  await scroll.hover();
+  await page.mouse.wheel(0, 5000);
   await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
 }

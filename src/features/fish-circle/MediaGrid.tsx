@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Media } from '@/domain/fish-circle';
-import { Dialog } from '@/shared/ui/Dialog';
+import { ImageViewer } from '@/shared/ui/ImageViewer';
 import styles from './Circle.module.css';
+
 export function MediaGrid({ media }: { media: Media[] }) {
-  const [preview, setPreview] = useState<Media | null>(null);
+  const [preview, setPreview] = useState<number | null>(null);
+  const returnFocus = useRef<HTMLButtonElement | null>(null);
+  const images = media.filter((item) => item.type === 'image');
   return (
     <>
       <div className={styles.media} data-count={media.length}>
@@ -13,7 +16,10 @@ export function MediaGrid({ media }: { media: Media[] }) {
               key={`${m.url}-${i}`}
               type="button"
               aria-label={`查看图片 ${i + 1}`}
-              onClick={() => setPreview(m)}
+              onClick={(event) => {
+                returnFocus.current = event.currentTarget;
+                setPreview(images.indexOf(m));
+              }}
             >
               <img
                 src={m.url}
@@ -27,24 +33,14 @@ export function MediaGrid({ media }: { media: Media[] }) {
           ),
         )}
       </div>
-      <Dialog
-        open={preview !== null}
-        onOpenChange={(open) => {
-          if (!open) setPreview(null);
-        }}
-        title="图片预览"
-        description="查看动态原图"
-        dismissLabel="关闭图片预览"
-      >
-        {preview && (
-          <img
-            className={styles.preview}
-            src={preview.url}
-            alt="动态原图"
-            referrerPolicy="no-referrer"
-          />
-        )}
-      </Dialog>
+      {preview !== null && (
+        <ImageViewer
+          images={images.map((image) => ({ url: image.url, alt: '动态原图' }))}
+          initialIndex={preview}
+          onClose={() => setPreview(null)}
+          returnFocusRef={returnFocus}
+        />
+      )}
     </>
   );
 }

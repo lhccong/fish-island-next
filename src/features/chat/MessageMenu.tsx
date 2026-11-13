@@ -1,5 +1,14 @@
 import { useRef, type ReactElement, type RefObject } from 'react';
-import { AtSign, Copy, MoreHorizontal, Quote, Repeat2, Undo2, ImagePlus } from 'lucide-react';
+import {
+  MapPin,
+  AtSign,
+  Copy,
+  MoreHorizontal,
+  Quote,
+  Repeat2,
+  Undo2,
+  ImagePlus,
+} from 'lucide-react';
 import { messageClipboardText, parseMessageContent, type ReceivedMessage } from '@/domain/chat';
 import { useChatRealtime } from './realtime-context';
 import { ContextMenu } from '@/shared/ui/ContextMenu';
@@ -27,7 +36,7 @@ export function MessageMenu({
   onRevoke,
   returnFocusRef,
 }: Props) {
-  const { draft, composerRef, emoticons } = useChatRealtime();
+  const { draft, composerRef, emoticons, navigation } = useChatRealtime();
   const focusDraft = useRef(false);
   const closeFocus = () => {
     const target = focusDraft.current ? composerRef.current : returnFocusRef.current;
@@ -49,6 +58,17 @@ export function MessageMenu({
     }
   };
   const items: DropdownMenuItem[] = [
+    ...(message.quote
+      ? [
+          {
+            label: '定位原文',
+            icon: <MapPin size={16} aria-hidden="true" />,
+            onSelect: () => {
+              void navigation.locate(message.quote!.id);
+            },
+          },
+        ]
+      : []),
     ...parseMessageContent(message.content)
       .filter((part) => part.kind === 'image')
       .map((part, index, images) => ({

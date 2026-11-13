@@ -1,8 +1,10 @@
+import { useMessageLocationPulse } from './use-message-location-pulse';
+import { MessageQuote } from './MessageQuote';
 import { RepeatButton } from './RepeatButton';
 import { RepetitionParticipants } from './RepetitionParticipants';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
-import { messagePreview, parseMessageContent } from '@/domain/chat';
+import { parseMessageContent } from '@/domain/chat';
 import { memo, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
 import { useChatRealtime } from './realtime-context';
@@ -18,12 +20,16 @@ export const MessageRow = memo(function MessageRow({
   id: string;
   showAvatars: boolean;
 }) {
-  const { controller, userId } = useChatRealtime();
+  const { controller, userId, draft, composerRef, navigation } = useChatRealtime();
+  const locationRevision = useStore(navigation.store, (state) =>
+    state.target === id ? state.revision : 0,
+  );
   const message = useStore(controller.store, (state) => state.messages[id]);
   const group = useStore(controller.store, (state) => state.repetitions[id]);
   const revoke = useStore(controller.store, (state) => state.revokeState[message?.id ?? id]);
   const connected = useStore(controller.store, (state) => state.connection === 'connected');
   const bubbleRef = useRef<HTMLDivElement>(null);
+  useMessageLocationPulse(bubbleRef, navigation, id, locationRevision);
   const parts = useMemo(() => parseMessageContent(message?.content ?? ''), [message?.content]);
   if (!message) return null;
   const self = message.senderId === userId;
@@ -57,11 +63,7 @@ export const MessageRow = memo(function MessageRow({
         '消息已撤回'
       ) : (
         <>
-          {message.quote && (
-            <blockquote className={styles.quote}>
-              引用 {message.quote.senderName}：{messagePreview(message.quote.content)}
-            </blockquote>
-          )}
+          {message.quote && <MessageQuote quote={message.quote} />}
           <MessageContent parts={parts} accountId={userId} />
         </>
       )}
@@ -71,12 +73,22 @@ export const MessageRow = memo(function MessageRow({
     <article
       className={styles.row}
       data-self={self}
+      data-located={locationRevision > 0}
       data-message-id={message.id}
       data-show-avatars={showAvatars}
       data-delivery={message.delivery}
     >
       {showAvatars && (
-        <span className={styles.senderAvatar} data-message-avatar="true">
+        <button
+          type="button"
+          className={styles.senderAvatar}
+          data-message-avatar="true"
+          aria-label={`@${message.senderName}`}
+          onClick={() => {
+            draft.mention(message.senderName);
+            composerRef.current?.focus({ preventScroll: true });
+          }}
+        >
           <MemberAvatar
             key={`${message.senderId}:${message.senderAvatar ?? ''}`}
             member={{
@@ -85,7 +97,7 @@ export const MessageRow = memo(function MessageRow({
               avatar: message.senderAvatar ?? null,
             }}
           />
-        </span>
+        </button>
       )}
       <div className={styles.messageBody}>
         <div className={styles.meta}>

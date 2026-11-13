@@ -151,6 +151,28 @@
   color: var(--color-muted);
   font-size: 12px;
 }
+.recordResult {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: var(--space-1);
+}
+.lucky,
+.unlucky {
+  padding: 2px var(--space-1);
+  border-radius: var(--radius-control);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.lucky {
+  background: var(--color-red-packet-surface);
+  color: var(--color-red-packet-text);
+}
+.unlucky {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
 .amount {
   flex-shrink: 0;
   color: var(--color-red-packet-text);

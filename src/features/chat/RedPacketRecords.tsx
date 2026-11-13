@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './RedPacketMessage.module.css';
+import { MemberAvatar } from './MemberAvatar';
 
 type RecordsState =
   | { status: 'loading' }
@@ -31,6 +32,9 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
     );
     return () => request.abort();
   }, [id, open, port, attempt]);
+  const amounts = state.status === 'ready' ? state.records.map((record) => record.amount) : [];
+  const highest = Math.max(...amounts);
+  const lowest = Math.min(...amounts);
   return (
     <Dialog
       open={open}
@@ -45,7 +49,7 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
       }
       returnFocusRef={trigger}
       title="红包记录"
-      description="按领取积分从高到低排列"
+      description="按领取积分从高到低排列，手气王和倒霉王按当前记录评定，同分并列；全部同分时不标注"
       hideDescription
       dismissLabel="关闭红包记录"
       showCloseAction={false}
@@ -74,6 +78,10 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
             <ul className={styles.recordList}>
               {state.records.map((record) => (
                 <li key={record.id} className={styles.record}>
+                  <MemberAvatar
+                    key={`${record.id}:${record.userAvatar ?? ''}`}
+                    member={{ id: record.id, name: record.userName, avatar: record.userAvatar }}
+                  />
                   <span className={styles.person}>
                     <span>{record.userName}</span>
                     <span className={styles.time}>
@@ -82,7 +90,15 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
                         : '时间未知'}
                     </span>
                   </span>
-                  <span className={styles.amount}>{record.amount} 积分</span>
+                  <span className={styles.recordResult}>
+                    <span className={styles.amount}>{record.amount} 积分</span>
+                    {highest > lowest && record.amount === highest && (
+                      <span className={styles.lucky}>手气王</span>
+                    )}
+                    {highest > lowest && record.amount === lowest && (
+                      <span className={styles.unlucky}>倒霉王</span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

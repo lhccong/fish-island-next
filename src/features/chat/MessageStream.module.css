@@ -54,6 +54,63 @@
 }
 .senderAvatar {
   flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  cursor: pointer;
+}
+.senderAvatar:hover {
+  background: var(--color-hover);
+}
+.streamFooter {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 4px 24px 6px;
+}
+.streamFooter:empty {
+  display: none;
+}
+.navigationNotice {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.navigationNotice .noticeAction {
+  padding: 4px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-accent-text);
+}
+.navigationNotice .noticeAction:hover:not(:disabled) {
+  border-color: transparent;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.navigationFeedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.navigationFeedback svg,
+.noticeAction svg {
+  flex-shrink: 0;
 }
 .meta {
   display: flex;
@@ -103,9 +160,7 @@
   color: var(--color-muted);
 }
 .latest {
-  position: absolute;
-  right: 24px;
-  bottom: 12px;
+  margin-left: auto;
 }
 @media (max-width: 760px) {
   .row {
@@ -120,8 +175,12 @@
   .row[data-show-avatars='true'] .messageBody {
     max-width: calc(100% - 54px);
   }
-  .latest {
-    right: 20px;
+  .streamFooter {
+    padding: 4px 20px 6px 16px;
+    gap: 4px 8px;
+  }
+  .navigationFeedback {
+    min-height: 44px;
   }
 }
 
@@ -141,6 +200,17 @@
   animation: send-spin 1s linear infinite;
 }
 .quote {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  font-family: inherit;
+  background: transparent;
+  cursor: pointer;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 0;
+  border-radius: var(--radius-control);
   margin: 0 0 8px;
   border-left: 2px solid var(--color-border);
   padding-left: 8px;
@@ -162,4 +232,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 44px;
   gap: 4px 8px;
+}
+
+.quote:hover {
+  background: var(--color-hover);
 }

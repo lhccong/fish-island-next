@@ -157,7 +157,7 @@ for (const skin of builtinSkins)
         )
         .toBeLessThan(5);
       await expect(page.getByRole('button', { name: '查看最新消息' })).toBeVisible();
-      await expect(draft).toHaveValue('历史加载期间保留草稿');
+      await expect(draft).toHaveText('历史加载期间保留草稿');
       await scroll.evaluate((element) => {
         element.scrollTop = 0;
       });
@@ -182,7 +182,7 @@ for (const skin of builtinSkins)
       }
       expect(requests).toHaveLength(requestCount);
       expect(connections).toBe(1);
-      await expect(draft).toHaveValue('历史加载期间保留草稿');
+      await expect(draft).toHaveText('历史加载期间保留草稿');
       const latest = page.getByRole('button', { name: '查看最新消息' });
       if (mobile) await latest.tap();
       else await latest.click();

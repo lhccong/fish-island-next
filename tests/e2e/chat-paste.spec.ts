@@ -5,15 +5,28 @@ import { setupChatMenu } from './chat-menu-fixture';
 test.setTimeout(60000);
 
 async function pasteImage(page: Page, count = 1) {
-  await page.getByRole('textbox', { name: '消息草稿' }).evaluate((element, count) => {
+  return page.getByRole('textbox', { name: '消息草稿' }).evaluate(async (element, count) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 200;
+    const context = canvas.getContext('2d')!;
+    const pixels = context.createImageData(320, 200);
+    let seed = 19;
+    for (let i = 0; i < pixels.data.length; i++) {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      pixels.data[i] = i % 4 === 3 ? 255 : seed >>> 24;
+    }
+    context.putImageData(pixels, 0, 0);
+    const original = await new Promise<Blob>((resolve) =>
+      canvas.toBlob((blob) => resolve(blob!), 'image/png'),
+    );
     const data = new DataTransfer();
     for (let i = 0; i < count; i++)
-      data.items.add(
-        new File([new Uint8Array([137, 80, 78, 71])], `synthetic-${i}.png`, { type: 'image/png' }),
-      );
+      data.items.add(new File([original], `synthetic-${i}.png`, { type: 'image/png' }));
     element.dispatchEvent(
       new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }),
     );
+    return original.size;
   }, count);
 }
 
@@ -26,14 +39,15 @@ for (const skin of builtinSkins)
       const composer = page.getByRole('region', { name: '群聊输入区', exact: true });
       const attachment = page.getByRole('region', { name: '待发送图片', exact: true });
       await expect(attachment).toHaveCount(0);
-      const textPasteAllowed = await draft.evaluate((element) => {
+      await draft.focus();
+      await draft.evaluate((element) => {
         const clipboardData = new DataTransfer();
         clipboardData.setData('text/plain', '普通粘贴');
-        return element.dispatchEvent(
+        element.dispatchEvent(
           new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
         );
       });
-      expect(textPasteAllowed).toBe(true);
+      await expect(draft).toHaveText('普通粘贴');
       let held!: Route;
       let uploads = 0;
       await page.route('**/api/file/minio/upload?biz=user_file', (route) => {
@@ -44,17 +58,20 @@ for (const skin of builtinSkins)
       await pasteImage(page, 2);
       await expect(composer).toContainText('一次只能粘贴一张图片');
       expect(uploads).toBe(0);
-      await pasteImage(page);
+      const originalSize = await pasteImage(page);
       await expect(attachment).toContainText('图片上传中');
       await expect(send).toBeDisabled();
       await expect.poll(() => uploads).toBe(1);
       expect(held.request().headers()['content-type']).toContain('multipart/form-data');
+      expect(originalSize).toBeLessThan(1024 * 1024);
+      expect(held.request().postDataBuffer()!.byteLength).toBeLessThan(originalSize);
+      expect(held.request().postData()).toContain('filename="pasted-image.webp"');
       await draft.fill('上传时可继续编辑');
       await page.screenshot({ path: info.outputPath('uploading.png') });
       await held.fulfill({ json: { code: 50000 } });
       await expect(attachment).toContainText('图片上传失败');
       await page.screenshot({ path: info.outputPath('error.png') });
-      await expect(draft).toHaveValue('上传时可继续编辑');
+      await expect(draft).toHaveText('上传时可继续编辑');
       await attachment.getByRole('button', { name: '重试上传' }).click();
       await expect.poll(() => uploads).toBe(2);
       await held.fulfill({ json: { code: 0, data: 'https://menu.test/image.png' } });
@@ -82,7 +99,7 @@ for (const skin of builtinSkins)
       await remove.click();
       await expect(draft).toBeFocused();
       await expect(attachment).toHaveCount(0);
-      await expect(draft).toHaveValue('上传时可继续编辑');
+      await expect(draft).toHaveText('上传时可继续编辑');
       await draft.fill('');
       await pasteImage(page);
       await expect.poll(() => uploads).toBe(3);
@@ -113,7 +130,7 @@ for (const skin of builtinSkins)
       await send.click();
       await expect.poll(() => sent).toBe('[img]https://menu.test/image.png[/img]');
       await expect(attachment).toHaveCount(0);
-      await expect(draft).toHaveValue('');
+      await expect(draft).toHaveText('');
       expect(fixture.stats().connections).toBe(1);
       await pasteImage(page);
       await expect.poll(() => uploads).toBe(4);
@@ -140,9 +157,10 @@ test('large static image compression preserves transparency and bounds', async (
         seed = (seed * 1664525 + 1013904223) >>> 0;
         pixels.data[i + channel] = seed >>> 24;
       }
-      pixels.data[i + 3] = i < 400 ? 0 : 255;
+      pixels.data[i + 3] = 255;
     }
     context.putImageData(pixels, 0, 0);
+    context.clearRect(0, 0, 32, 32);
     const original = await new Promise<Blob>((resolve) =>
       canvas.toBlob((blob) => resolve(blob!), 'image/png'),
     );
@@ -166,7 +184,7 @@ test('large static image compression preserves transparency and bounds', async (
     return result;
   });
   expect(result.original).toBeGreaterThan(1024 * 1024);
-  expect(result.size).toBeLessThanOrEqual(1024 * 1024);
+  expect(result.size).toBeLessThanOrEqual(256 * 1024);
   expect(result.type).toBe('image/webp');
   expect(Math.max(result.width, result.height)).toBeLessThanOrEqual(2000);
   expect(result.alpha).toBe(0);
@@ -202,7 +220,7 @@ test('theme and mode changes preserve upload, text and combined send', async ({ 
       await expect(page.getByRole('region', { name: '待发送图片', exact: true })).toContainText(
         '图片上传中',
       );
-      await expect(draft).toHaveValue('图片附带文字');
+      await expect(draft).toHaveText('图片附带文字');
       expect(uploads).toBe(1);
       expect(fixture.stats().connections).toBe(1);
       expect(fixture.stats().historyRequests).toBe(1);

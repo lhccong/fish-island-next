@@ -160,7 +160,7 @@ for (const skin of builtinSkins)
         await activate(panel.getByRole('button', { name: '取消', exact: true }));
       }
       await activate(panel.getByRole('button', { name: '关闭在线列表' }));
-      await expect(draft).toHaveValue('保留合成草稿');
+      await expect(draft).toHaveText('保留合成草稿');
       if (!touch)
         await expect(
           page.getByRole('complementary', { name: '聊天会话' }).getByText(name, { exact: true }),

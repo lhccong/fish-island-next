@@ -9,8 +9,11 @@ import type { ChatRealtimeController } from './realtime-controller';
 import type { useAvatarPreference } from './use-avatar-preference';
 import type { useImagePreference } from './use-image-preference';
 
+import type { MessageNavigation } from './message-navigation';
+
 export const ChatRealtimeContext = createContext<{
   controller: ChatRealtimeController;
+  navigation: MessageNavigation;
   userId: string;
   user?: AuthUser | undefined;
   avatarPreference: ReturnType<typeof useAvatarPreference>;
@@ -20,7 +23,7 @@ export const ChatRealtimeContext = createContext<{
   emoticons: EmoticonController;
   packets: RedPacketController;
   packetCreation: RedPacketCreation;
-  composerRef: RefObject<HTMLTextAreaElement | null>;
+  composerRef: RefObject<HTMLDivElement | null>;
 } | null>(null);
 export function useChatRealtime() {
   const value = useContext(ChatRealtimeContext);

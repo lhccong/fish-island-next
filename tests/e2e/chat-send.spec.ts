@@ -28,7 +28,7 @@ for (const skin of builtinSkins)
       const beforeSend = await composer.boundingBox();
       await send.click();
       await expect(page.getByLabel('消息发送中')).toBeVisible();
-      await expect(draft).toHaveValue('');
+      await expect(draft).toHaveText('');
       await expect(composer.getByText('消息已提交', { exact: true })).toHaveCount(0);
       expect(await composer.boundingBox()).toEqual(beforeSend);
       await expect.poll(() => commands.length).toBe(1);
@@ -37,7 +37,7 @@ for (const skin of builtinSkins)
       await page.screenshot({ path: info.outputPath('sending.png') });
       await held!.fulfill({ json: { code: 50001, message: '合成失败，请重试' } });
       await expect(page.getByRole('button', { name: '重试发送' })).toBeVisible();
-      await expect(draft).toHaveValue('发送时保留下一条草稿');
+      await expect(draft).toHaveText('发送时保留下一条草稿');
       await page.getByRole('button', { name: '重试发送' }).click();
       await expect.poll(() => commands.length).toBe(2);
       expect(commands[0]).toEqual(commands[1]);
@@ -95,7 +95,9 @@ for (const skin of builtinSkins)
           },
         },
       });
-      await expect(page.locator('blockquote')).toContainText('被引用的合成正文');
+      await expect(
+        page.getByRole('button', { name: '定位原文：合成岛友', exact: true }),
+      ).toContainText('被引用的合成正文');
       await expect(page.getByLabel('消息发送中')).toHaveCount(0);
       await draft.fill('   ');
       await expect(send).toBeDisabled();

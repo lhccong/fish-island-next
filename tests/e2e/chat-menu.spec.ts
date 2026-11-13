@@ -78,14 +78,14 @@ for (const skin of builtinSkins)
       await select('2', '引用');
       const quote = page.getByRole('region', { name: '引用消息', exact: true });
       await expect(quote).toContainText('岛友原文');
-      await expect(draft).toHaveValue('原有草稿');
+      await expect(draft).toHaveText('原有草稿');
       await expect(draft).toBeFocused();
       await select('2', '@TA');
-      await expect(draft).toHaveValue('原有草稿 @合成岛友 ');
+      await expect(draft).toHaveText('原有草稿 @合成岛友 ');
       await expect(draft).toBeFocused();
       await select('2', '复读机');
       const prepared = '原有草稿 @合成岛友 \n岛友原文';
-      await expect(draft).toHaveValue(prepared);
+      await expect(draft).toHaveText(prepared);
       await expect(page.getByText('已将消息追加到草稿', { exact: true })).toBeVisible();
       await expect(page.getByRole('button', { name: '发送', exact: true })).toBeEnabled();
       expect(fixture.stats().commands.filter((command) => command.type === 2)).toHaveLength(0);
@@ -104,7 +104,7 @@ for (const skin of builtinSkins)
           .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
           .click();
         await picker.getByRole('button', { name: '关闭', exact: true }).click();
-        await expect(draft).toHaveValue(prepared);
+        await expect(draft).toHaveText(prepared);
         await expect(quote).toContainText('岛友原文');
       }
       fixture.revoke('2');
@@ -112,7 +112,7 @@ for (const skin of builtinSkins)
       await expect(quote).not.toContainText('岛友原文');
       await page.getByRole('button', { name: '取消引用', exact: true }).click();
       await expect(quote).toHaveCount(0);
-      await expect(draft).toHaveValue(prepared);
+      await expect(draft).toHaveText(prepared);
       expect(fixture.stats()).toMatchObject({ connections: 1, historyRequests: 1 });
       await page.evaluate(() => window.dispatchEvent(new Event('offline')));
       await expect(page.getByRole('status', { name: '聊天室连接状态', exact: true })).toHaveText(
@@ -155,7 +155,7 @@ for (const skin of builtinSkins)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
-      await expect(draft).toHaveValue(prepared);
+      await expect(draft).toHaveText(prepared);
       expect(errors).toEqual([]);
     });
   }

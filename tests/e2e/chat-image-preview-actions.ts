@@ -50,6 +50,6 @@ export async function verifyChatImagePreview(page: Page, info: TestInfo) {
   await expect(preview).not.toBeVisible();
   await expect(image).toBeFocused();
   expect(Math.abs((await scroll.evaluate((el) => el.scrollTop)) - top)).toBeLessThanOrEqual(1);
-  await expect(page.getByRole('textbox', { name: '消息草稿' })).toHaveValue('保留草稿');
+  await expect(page.getByRole('textbox', { name: '消息草稿' })).toHaveText('保留草稿');
   await expect(page.getByRole('region', { name: '引用消息', exact: true })).toBeVisible();
 }

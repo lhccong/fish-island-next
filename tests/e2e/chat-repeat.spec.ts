@@ -43,7 +43,7 @@ for (const skin of builtinSkins)
       await expect.poll(() => commands.length).toBe(1);
       expect(commands[0]!.content).toBe(body);
       expect(commands[0]!.quotedMessageId).toBeUndefined();
-      await expect(draft).toHaveValue('保留独立草稿');
+      await expect(draft).toHaveText('保留独立草稿');
       await expect(page.getByRole('button', { name: '复读发送中' })).toBeDisabled();
       await held!.fulfill({ json: { code: 50001, message: '合成复读失败' } });
       await expect(page.getByRole('button', { name: '重试发送' })).toBeVisible();
@@ -103,7 +103,7 @@ for (const skin of builtinSkins)
       await picker.getByRole('button', { name: '关闭主题弹窗' }).click();
       if (originalViewport.width <= 760) await page.setViewportSize(originalViewport);
       await expect(page.getByRole('group', { name: '连续复读：3条', exact: true })).toBeVisible();
-      await expect(draft).toHaveValue('保留独立草稿');
+      await expect(draft).toHaveText('保留独立草稿');
 
       const overflow = await page
         .locator('[data-message-id], [aria-label="复读参与者"], [aria-label="群聊消息区"]')
@@ -112,7 +112,7 @@ for (const skin of builtinSkins)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
-      await expect(draft).toHaveValue('保留独立草稿');
+      await expect(draft).toHaveText('保留独立草稿');
       fixture.revoke('2');
       await expect(page.getByRole('group', { name: '连续复读：3条', exact: true })).toHaveCount(0);
       await expect(page.locator('[data-message-id]')).toHaveCount(3);

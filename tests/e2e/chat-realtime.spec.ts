@@ -148,7 +148,7 @@ for (const skin of builtinSkins)
       });
       socket!.send(message('1'));
       await expect(page.locator('[data-message-id="1"]')).toHaveCount(1);
-      await expect(draft).toHaveValue('合成草稿保留');
+      await expect(draft).toHaveText('合成草稿保留');
       await expect(page.getByRole('button', { name: '发送', exact: true })).toBeEnabled();
       if (page.viewportSize()!.width > 760) {
         await page.getByRole('button', { name: '切换主题', exact: true }).click();
@@ -166,7 +166,7 @@ for (const skin of builtinSkins)
           .click();
         await picker.getByRole('button', { name: '关闭', exact: true }).click();
         expect(connections).toBe(4);
-        await expect(draft).toHaveValue('合成草稿保留');
+        await expect(draft).toHaveText('合成草稿保留');
         await page.getByRole('region', { name: '群聊消息区', exact: true }).evaluate((element) => {
           element.scrollTop = 0;
         });

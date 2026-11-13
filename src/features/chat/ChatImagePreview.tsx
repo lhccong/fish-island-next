@@ -1,7 +1,7 @@
 import { useState, type RefObject } from 'react';
-import { Dialog } from '@/shared/ui/Dialog';
-import { Button } from '@/shared/ui/Button';
-import styles from './ChatImagePreview.module.css';
+import { parseMessageContent } from '@/domain/chat';
+import { ImageViewer } from '@/shared/ui/ImageViewer';
+import { useChatRealtime } from './realtime-context';
 
 export default function ChatImagePreview({
   url,
@@ -12,53 +12,26 @@ export default function ChatImagePreview({
   onClose: () => void;
   returnFocusRef: RefObject<HTMLButtonElement | null>;
 }) {
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [attempt, setAttempt] = useState(0);
+  const { controller } = useChatRealtime();
+  const [images] = useState(() => {
+    const state = controller.store.getState();
+    const urls = state.ids.flatMap((id) => {
+      const message = state.messages[id];
+      return message && !message.revoked
+        ? parseMessageContent(message.content).flatMap((part) =>
+            part.kind === 'image' ? [part.url] : [],
+          )
+        : [];
+    });
+    if (!urls.includes(url)) urls.push(url);
+    return [...new Set(urls)].map((url) => ({ url, alt: '聊天图片大图' }));
+  });
   return (
-    <Dialog
-      open
-      onOpenChange={(value) => {
-        if (!value) onClose();
-      }}
-      title="图片预览"
-      description="查看完整图片，按 Esc 或点击关闭返回聊天。"
-      className={styles.dialog ?? ''}
+    <ImageViewer
+      images={images}
+      initialIndex={images.findIndex((image) => image.url === url)}
+      onClose={onClose}
       returnFocusRef={returnFocusRef}
-      dismissLabel="关闭图片预览"
-      showCloseAction={false}
-    >
-      <div className={styles.picture} data-preview-state={status}>
-        {status !== 'error' && (
-          <img
-            key={attempt}
-            src={url}
-            alt="聊天图片大图"
-            decoding="async"
-            referrerPolicy="no-referrer"
-            onLoad={() => setStatus('ready')}
-            onError={() => setStatus('error')}
-          />
-        )}
-        {status === 'loading' && (
-          <span role="status" className={styles.status}>
-            大图加载中…
-          </span>
-        )}
-        {status === 'error' && (
-          <div className={styles.status} role="alert">
-            <span>图片加载失败</span>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setStatus('loading');
-                setAttempt((n) => n + 1);
-              }}
-            >
-              重试加载大图
-            </Button>
-          </div>
-        )}
-      </div>
-    </Dialog>
+    />
   );
 }

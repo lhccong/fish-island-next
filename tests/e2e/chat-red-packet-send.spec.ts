@@ -249,7 +249,7 @@ for (const skin of builtinSkins)
         true,
       );
       await page.keyboard.press('Escape');
-      await expect(draft).toHaveValue('保留原有聊天草稿');
+      await expect(draft).toHaveText('保留原有聊天草稿');
       expect(errors).toEqual([]);
     });
   }

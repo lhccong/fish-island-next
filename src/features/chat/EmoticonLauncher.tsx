@@ -1,25 +1,20 @@
-import { lazy, Suspense, useRef, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Smile } from 'lucide-react';
-import { Dialog } from '@/shared/ui/Dialog';
+import { Popover } from '@/shared/ui/Popover';
 import { Button } from '@/shared/ui/Button';
 import styles from './EmoticonPanel.module.css';
 
-const Panel = lazy(() => import('./EmoticonPanel'));
+const Panel = lazy(() => import('./EmoticonPicker'));
 export function EmoticonLauncher() {
   const [open, setOpen] = useState(false);
-  const trigger = useRef<HTMLButtonElement>(null);
   return (
-    <Dialog
-      title="表情包"
-      description="点击表情包直接发送。电脑悬停放大，右键管理；手机使用图片角上的“…”菜单。"
+    <Popover
+      label="表情包"
       open={open}
       onOpenChange={setOpen}
-      className={styles.dialog ?? ''}
-      returnFocusRef={trigger}
-      dismissLabel="关闭表情包"
-      showCloseAction={false}
+      className={styles.panel ?? ''}
       trigger={
-        <Button ref={trigger} variant="secondary" aria-label="表情包">
+        <Button variant="secondary" aria-label="表情包">
           <Smile size={20} aria-hidden="true" />
         </Button>
       }
@@ -29,6 +24,6 @@ export function EmoticonLauncher() {
           <Panel onSelect={() => setOpen(false)} />
         </Suspense>
       )}
-    </Dialog>
+    </Popover>
   );
 }

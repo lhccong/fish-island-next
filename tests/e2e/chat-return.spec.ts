@@ -107,7 +107,7 @@ for (const skin of builtinSkins)
       if (mobile) await retry.tap();
       else await retry.click();
       await expect(page.getByText('返回后最新消息', { exact: true })).toBeVisible();
-      await expect(draft).toHaveValue('返回时保留草稿');
+      await expect(draft).toHaveText('返回时保留草稿');
       expect(connections).toBe(1);
       await navigate('热榜');
       await socket.close({ code: 1006 });
@@ -117,7 +117,7 @@ for (const skin of builtinSkins)
       await expect(page.locator('[data-message-id="1"]')).toHaveCount(1);
       await expect(page.locator('[data-message-id="1"]')).toBeInViewport();
       await expect(page.getByText('返回后最新消息', { exact: true })).toBeVisible();
-      await expect(draft).toHaveValue('返回时保留草稿');
+      await expect(draft).toHaveText('返回时保留草稿');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );

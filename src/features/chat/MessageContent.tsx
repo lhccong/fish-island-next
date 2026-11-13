@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { MessageContentPart } from '@/domain/chat';
 import { MessageImage } from './MessageImage';
+import { MessageText } from './MessageText';
 import { RedPacketMessage } from './RedPacketMessage';
 
 export const MessageContent = memo(function MessageContent({
@@ -21,7 +22,7 @@ export const MessageContent = memo(function MessageContent({
           ? part.url.length + 11
           : part.id.length + 23;
     return part.kind === 'text' ? (
-      <span key={key}>{part.text}</span>
+      <MessageText key={key} text={part.text} />
     ) : part.kind === 'image' ? (
       <MessageImage key={key} url={part.url} />
     ) : (

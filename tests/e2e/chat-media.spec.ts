@@ -125,7 +125,7 @@ for (const skin of builtinSkins)
       await expect(toggle).not.toBeChecked();
       await page.getByRole('button', { name: '关闭在线列表' }).click();
       await expect(row.locator('[data-message-avatar]')).toHaveCount(0);
-      await expect(draft).toHaveValue('媒体测试草稿');
+      await expect(draft).toHaveText('媒体测试草稿');
       expect(connections).toBe(1);
       push('2', '[img]https://chat-media.test/broken.png[/img]', null);
       const failed = page.locator('[data-message-id="2"]');

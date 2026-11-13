@@ -8,6 +8,7 @@ export interface RedPacketDetail {
 export interface RedPacketRecord {
   id: string;
   userName: string;
+  userAvatar: string | null;
   amount: number;
   grabTime: string | null;
 }

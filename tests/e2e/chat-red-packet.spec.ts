@@ -2,6 +2,7 @@ import { expect, test, type Locator } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { openMessageActions } from './chat-message-actions';
+import { setupRecordAvatars, expectRecordAvatarsAndTitles } from './red-packet-record-assertions';
 
 test.setTimeout(90000);
 for (const skin of builtinSkins)
@@ -16,6 +17,7 @@ for (const skin of builtinSkins)
         if (mobile) await target.tap();
         else await target.click();
       };
+      await setupRecordAvatars(page);
       let detailCalls = 0;
       let failDetail = true;
       let grabs = 0;
@@ -71,6 +73,12 @@ for (const skin of builtinSkins)
                     : Array.from({ length: 25 }, (_, index) => ({
                         id: `synthetic-${index}`,
                         userName: `合成岛友${index}`,
+                        userAvatar:
+                          index === 0
+                            ? 'https://records.test/avatar.png'
+                            : index === 1
+                              ? 'https://records.test/broken.png'
+                              : null,
                         amount: 25 - index,
                         grabTime: '2026-11-13T01:00:00Z',
                       })),
@@ -126,6 +134,7 @@ for (const skin of builtinSkins)
       await act(recordsButton);
       const scroll = dialog.getByRole('region', { name: '红包领取记录' });
       await expect(scroll.getByRole('listitem')).toHaveCount(25);
+      await expectRecordAvatarsAndTitles(scroll);
       const bounds = await scroll.evaluate((element) => {
         const item = element.querySelector('li')!.getBoundingClientRect();
         const rect = element.getBoundingClientRect();
@@ -192,7 +201,7 @@ for (const skin of builtinSkins)
       await expect(page.getByRole('region', { name: '引用消息', exact: true })).toContainText(
         '祝福[红包]后文',
       );
-      await expect(draft).toHaveValue('保留合成草稿');
+      await expect(draft).toHaveText('保留合成草稿');
       fixture.push('2', '[redpacket]rpc_main[/redpacket]', true);
       await expect(
         page.locator('[data-message-id="2"]').getByRole('button', { name: '已领取', exact: true }),
@@ -233,7 +242,7 @@ for (const skin of builtinSkins)
           .click();
         await page.keyboard.press('Escape');
         await expect(quiz.getByRole('textbox', { name: '红包答案' })).toHaveValue('鱼');
-        await expect(draft).toHaveValue('保留合成草稿');
+        await expect(draft).toHaveText('保留合成草稿');
         expect(detailCalls).toBe(calls);
         expect(fixture.stats().connections).toBe(1);
       }

@@ -1,5 +1,6 @@
 // 客户端领域模型；后端 DTO 必须在 infrastructure 映射后进入此边界。
 export type MessageId = string;
+export { parseEmojiText } from './emoji';
 export type { ChatImageUploadPort } from './image-upload';
 export { senderTitle } from './sender-title';
 export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';

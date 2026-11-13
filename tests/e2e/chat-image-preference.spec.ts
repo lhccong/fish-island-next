@@ -76,7 +76,7 @@ for (const skin of builtinSkins)
       const second = page.locator('[data-message-id="102"]');
       await expect(second.getByRole('button', { name: '点击显示图片' })).toBeVisible();
       expect(requests).toBe(2);
-      await expect(draft).toHaveValue('图片偏好合成草稿');
+      await expect(draft).toHaveText('图片偏好合成草稿');
       expect(fixture.stats().connections).toBe(1);
       expect(fixture.stats().historyRequests).toBe(1);
       await open();
@@ -171,7 +171,7 @@ for (const skin of builtinSkins)
       await picker.getByRole('button', { name: '关闭主题弹窗' }).click();
       await page.setViewportSize(viewport);
       await expect(second.getByRole('button', { name: '点击显示图片' })).toBeVisible();
-      await expect(draft).toHaveValue('图片偏好合成草稿');
+      await expect(draft).toHaveText('图片偏好合成草稿');
       expect(fixture.stats().connections).toBe(1);
       expect(fixture.stats().historyRequests).toBe(1);
       expect(requests).toBe(beforeSwitch);

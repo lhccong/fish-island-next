@@ -4,6 +4,7 @@ import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
+import { MessageNavigationNotice } from './MessageNavigationNotice';
 import { MessageRow } from './MessageRow';
 import { ConnectionStatus } from './ConnectionStatus';
 import { HistoryBoundary } from './HistoryBoundary';
@@ -15,8 +16,10 @@ const row = (_index: number, id: string, showAvatars: boolean) => (
   <MessageRow id={id} showAvatars={showAvatars} />
 );
 export function MessageStream() {
-  const { controller, avatarPreference: avatars } = useChatRealtime();
+  const { controller, navigation, avatarPreference: avatars } = useChatRealtime();
   const ids = useStore(controller.store, (state) => state.visibleIds);
+  const target = useStore(navigation.store, (state) => state.target);
+  const revision = useStore(navigation.store, (state) => state.revision);
   const firstItemIndex = useStore(controller.store, (state) => state.viewFirstItemIndex);
   const initialized = useStore(controller.history.store, (state) => state.initialized);
   useEffect(() => {
@@ -24,13 +27,29 @@ export function MessageStream() {
     const retry = setTimeout(() => controller.retry(), 0);
     return () => {
       clearTimeout(retry);
+      navigation.cancel();
       deactivate();
     };
-  }, [controller]);
+  }, [controller, navigation]);
   const [viewport, setViewport] = useState<HTMLDivElement | null>(null);
   const [atBottom, setAtBottom] = useState(true);
   const list = useRef<VirtuosoHandle>(null);
   const follow = useRef(true);
+  useEffect(() => {
+    if (!target || !viewport) return;
+    const state = controller.store.getState();
+    const index = state.visibleIds.indexOf(target);
+    if (index < 0) return;
+    follow.current = false;
+    const frame = requestAnimationFrame(() => {
+      list.current?.scrollToIndex({
+        index,
+        align: 'center',
+        behavior: 'auto',
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [target, revision, controller, viewport]);
   useEffect(() => {
     let frame: number | undefined;
     const unsubscribe = controller.store.subscribe((state, previous) => {
@@ -114,6 +133,9 @@ export function MessageStream() {
             )
           )}
         </ScrollArea>
+      </div>
+      <div className={styles.streamFooter}>
+        <MessageNavigationNotice />
         {!atBottom && ids.length > 0 && (
           <div className={styles.latest}>
             <Button

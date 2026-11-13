@@ -72,8 +72,8 @@ it('validates detail and records, deduplicates IDs and sorts by points', () => {
       { id: 'a', amount: 2 },
     ]),
   ).toEqual([
-    { id: 'b', amount: 10, userName: '合成用户', grabTime: null },
-    { id: 'a', amount: 2, userName: '岛友', grabTime: null },
+    { id: 'b', amount: 10, userName: '合成用户', userAvatar: null, grabTime: null },
+    { id: 'a', amount: 2, userName: '岛友', userAvatar: null, grabTime: null },
   ]);
   expect(() => decodeRedPacketRecords([{ id: 'a', amount: '4' }])).toThrow();
 });
@@ -117,4 +117,15 @@ it('handles auth expiry, business errors and uncertain network results without r
   await expect(client.grab('rpc1', 'wrong', signal)).rejects.toThrow('答案错误');
   await expect(client.grab('rpc1', '', signal)).rejects.toThrow('领取结果未确认');
   expect(fetch).toHaveBeenCalledTimes(3);
+});
+
+it('keeps valid record avatars and falls back for unsafe URLs or blank names', () => {
+  const records = decodeRedPacketRecords([
+    { id: 'a', amount: 4, userAvatar: 'https://image.test/avatar.png' },
+    { id: 'b', amount: 3, userAvatar: 'javascript:alert(1)', userName: '  ' },
+    { id: 'c', amount: 2, userAvatar: 'invalid' },
+  ]);
+  expect(records[0]?.userAvatar).toBe('https://image.test/avatar.png');
+  expect(records[1]).toMatchObject({ userAvatar: null, userName: '岛友' });
+  expect(records[2]?.userAvatar).toBeNull();
 });

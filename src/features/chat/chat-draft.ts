@@ -7,13 +7,19 @@ interface ChatDraftState {
 }
 export function createChatDraft(ownerId: string) {
   const store = createStore<ChatDraftState>(() => ({ text: '', quote: null, feedback: null }));
+  let selection = { start: 0, end: 0 };
   const notify = (text: string, kind: 'info' | 'error' = 'info') =>
     store.setState({ feedback: { text, kind } });
   return {
     ownerId,
     store,
     notify,
-    setText(text: string) {
+    selection: () => selection,
+    select(start: number, end = start) {
+      selection = { start, end };
+    },
+    setText(text: string, caret = text.length) {
+      selection = { start: caret, end: caret };
       store.setState({ text, feedback: null });
     },
     quote(id: string, senderName: string) {
@@ -28,12 +34,14 @@ export function createChatDraft(ownerId: string) {
       store.setState((state) => ({
         text: state.text + (state.text && !/\s$/.test(state.text) ? ' ' : '') + text,
       }));
+      selection = { start: store.getState().text.length, end: store.getState().text.length };
       notify('已将提及放入草稿');
     },
     repeat(content: string) {
       store.setState((state) => ({
         text: state.text + (state.text && !state.text.endsWith('\n') ? '\n' : '') + content,
       }));
+      selection = { start: store.getState().text.length, end: store.getState().text.length };
       notify('已将消息追加到草稿');
     },
   };
