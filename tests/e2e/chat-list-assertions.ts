@@ -13,6 +13,8 @@ export async function verifyChatList(
     : page.getByRole('complementary', { name: '聊天会话', exact: true });
   const list = host.getByRole('region', { name: '聊天列表', exact: true });
   await expect(list).toBeVisible();
+  await expect(list.locator('[data-camouflage-dot]')).toHaveCount(0);
+  await expect(list.getByRole('img', { name: '本地伪装提醒' })).toHaveCount(0);
   if (!mobile) expect((await host.boundingBox())!.width).toBe(300);
   await expect(list).not.toContainText('在线');
   if (state === 'loading') {
@@ -27,9 +29,6 @@ export async function verifyChatList(
     await expect(list.locator('[data-kind="cover"]')).toHaveCount(5);
     await expect(list.locator('[data-kind="cover"]').filter({ hasText: '服务号' })).toHaveCount(1);
     await expect(list.locator('[data-kind="cover"]').filter({ hasText: '公众号' })).toHaveCount(1);
-    const dotCount = await list.locator('[data-camouflage-dot]').count();
-    expect(dotCount).toBeGreaterThan(0);
-    expect(dotCount).toBeLessThan(105);
     const longPreview = list
       .locator('[data-kind="cover"]')
       .filter({ hasText: '服务号' })
@@ -71,7 +70,7 @@ export async function verifyChatList(
     await expect(list.getByRole('listitem').getByText('公众号', { exact: true })).toBeVisible();
     await search.fill('');
     await expect(list.getByRole('listitem')).toHaveCount(105);
-    await expect(list.locator('[data-camouflage-dot]')).toHaveCount(dotCount);
+    await expect(list.locator('[data-camouflage-dot]')).toHaveCount(0);
     expect(
       await list
         .getByRole('listitem')

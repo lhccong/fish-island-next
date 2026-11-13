@@ -22,7 +22,3 @@ function getHash(id: string): number {
 export function getWorkPreview(id: string): string {
   return previews[getHash(id) % previews.length]!;
 }
-
-export function hasCamouflageDot(id: string): boolean {
-  return getHash(id) % 6 === 0;
-}

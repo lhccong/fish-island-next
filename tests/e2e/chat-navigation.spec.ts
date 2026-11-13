@@ -50,6 +50,7 @@ for (const skin of builtinSkins)
       );
       await page.screenshot({ path: info.outputPath('mention-footer.png') });
       await act(notice);
+      await expect(page.getByText('已定位消息', { exact: true })).toBeVisible();
       const mentioned = page.locator('[data-message-id="41"]');
       await expect(mentioned).toHaveAttribute('data-located', 'true');
       await expect(mentioned).toBeVisible();
@@ -69,6 +70,7 @@ for (const skin of builtinSkins)
         'none',
       );
       await expect(notice).toHaveCount(0);
+      await expect(page.getByText('已定位消息', { exact: true })).toHaveCount(0);
       fixture.push('41', '@本人合成 请查看');
       await expect(notice).toHaveCount(0);
       fixture.broadcast({
@@ -88,6 +90,7 @@ for (const skin of builtinSkins)
       await expect(quote).toBeVisible();
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await act(quote);
+      await expect(page.getByText('已定位消息', { exact: true })).toBeVisible();
       await expect(original).toBeVisible();
       await expect(original).toHaveAttribute('data-located', 'true');
       const originalBubble = original.getByRole('group');
@@ -109,6 +112,7 @@ for (const skin of builtinSkins)
         'none',
       );
       await page.getByRole('button', { name: '查看最新消息', exact: true }).click();
+      await expect(page.getByText('已定位消息', { exact: true })).toHaveCount(0);
       await expect(quote).toBeVisible();
       if (page.viewportSize()!.width > 760) await quote.click({ button: 'right' });
       else {

@@ -4,7 +4,7 @@ import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { useChatMembers } from './chat-members-context';
 import { MemberAvatar } from './MemberAvatar';
-import { getWorkPreview, hasCamouflageDot } from './work-preview';
+import { getWorkPreview } from './work-preview';
 import { buildConversationEntries } from './camouflage-conversations';
 import { CoverAvatar } from './CoverAvatar';
 import styles from './ChatOnlineUsers.module.css';
@@ -113,10 +113,6 @@ export function ChatOnlineUsers({
                   {users.map((entry) => {
                     const preview =
                       entry.kind === 'member' ? getWorkPreview(entry.id) : entry.preview;
-                    const dot =
-                      entry.kind === 'cover'
-                        ? entry.avatar !== 'group'
-                        : hasCamouflageDot(entry.id);
                     return (
                       <li
                         className={styles.row}
@@ -133,15 +129,6 @@ export function ChatOnlineUsers({
                             />
                           ) : (
                             <CoverAvatar conversation={entry} />
-                          )}
-                          {dot && (
-                            <span
-                              className={styles.unreadDot}
-                              role="img"
-                              aria-label="本地伪装提醒"
-                              title="本地伪装标记"
-                              data-camouflage-dot
-                            />
                           )}
                         </span>
                         <div className={styles.text}>

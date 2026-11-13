@@ -32,11 +32,14 @@ export function createMessageNavigation(chat: ChatRealtimeController) {
   let generation = 0;
   let pulsedRevision = 0;
   let release: (() => void) | undefined;
+  let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
   const cancel = () => {
     generation++;
+    clearTimeout(feedbackTimer);
+    feedbackTimer = undefined;
     release?.();
     release = undefined;
-    if (store.getState().pending) store.setState({ pending: null, feedback: '' });
+    store.setState({ pending: null, feedback: '' });
   };
   const locate = async (id: string) => {
     cancel();
@@ -57,6 +60,10 @@ export function createMessageNavigation(chat: ChatRealtimeController) {
           feedback: '已定位消息',
           mentions: current.mentions.filter((item) => item !== id),
         }));
+        feedbackTimer = setTimeout(() => {
+          feedbackTimer = undefined;
+          if (version === generation) store.setState({ feedback: '' });
+        }, 2500);
         return;
       }
       const history = chat.history.store.getState();
