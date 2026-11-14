@@ -118,6 +118,7 @@ for (const viewport of [
           });
           await page.goto('/');
           await page.getByRole('button', { name: '用户菜单', exact: true }).click();
+          await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
           await page.getByRole('button', { name: '每日签到', exact: true }).click();
           const dialog = page.getByRole('dialog', { name: '每日签到', exact: true });
           const scroll = dialog.getByRole('region', { name: '签到详情' });

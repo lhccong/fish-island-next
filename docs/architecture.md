@@ -46,6 +46,8 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-067 迁移经典斗地主，domain/landlords、infrastructure/landlords、features/landlords 分层，app 注入账号唯一 WebSocket，房间、手牌选择、聊天和排行状态独立；见 ADR-067。
+
 ADR-064 迁移账号签到、月度日历和补签，domain/sign-in、infrastructure/sign-in、features/sign-in 分层，app 通过账号资料插槽注入，独立请求状态不影响聊天。见 ADR-064。
 
 ADR-063 迁移谁是卧底同屏游戏与联机房间，domain/undercover 定义规则和端口，infrastructure/undercover 适配旧协议，features/undercover 分离对局、房间、消息与草稿，app 注入并复用账号唯一 WebSocket，见 ADR-063。
@@ -291,3 +293,5 @@ ADR-057 在 appearance 内新增独立标签页名称与图标本地偏好，app
 ADR-062 迁移联机五子棋 /game/piece：独立 domain/gomoku、infrastructure/gomoku、features/gomoku 分层；app 将游戏扩展注入现有账号 WebSocket，不新增连接。棋局规则、单机 AI 与联机状态隔离，断线停棋，邀请复用公共聊天，详见 ADR-062。
 
 ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；聊天精确订阅屏蔽偏好。详见 ADR-065。
+
+ADR-066 迁移你画我猜：domain/draw、infrastructure/draw、features/draw 分层；app 复用账号连接，整幅画布串行保存，独立游戏路由与窗口共享实现，见 ADR-066。

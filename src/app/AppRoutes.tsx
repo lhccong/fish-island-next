@@ -27,6 +27,10 @@ const GlobalReader = lazy(() =>
 const GamesPage = lazy(() =>
   import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
 );
+const DrawPage = lazy(() => import('@/app/pages/DrawPage').then((m) => ({ default: m.DrawPage })));
+const LandlordsPage = lazy(() =>
+  import('@/app/pages/LandlordsPage').then((m) => ({ default: m.LandlordsPage })),
+);
 const UndercoverPage = lazy(() =>
   import('@/app/pages/UndercoverPage').then((module) => ({ default: module.UndercoverPage })),
 );
@@ -95,7 +99,14 @@ export function AppRoutes() {
                 </GameErrorBoundary>
               }
             />
-            <Route path="/game/draw" element={<Navigate to="/game/undercover" replace />} />
+            <Route
+              path="/game/draw/:roomId?"
+              element={
+                <GameErrorBoundary>
+                  <DrawPage />
+                </GameErrorBoundary>
+              }
+            />
             <Route
               path="/game/piece"
               element={
@@ -160,6 +171,16 @@ export function AppRoutes() {
               element={
                 <RequireAuth>
                   <FishCirclePage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/game/landlords/:roomId?"
+              element={
+                <RequireAuth>
+                  <GameErrorBoundary>
+                    <LandlordsPage />
+                  </GameErrorBoundary>
                 </RequireAuth>
               }
             />

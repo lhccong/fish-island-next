@@ -16,6 +16,8 @@ import { createBrowserSessionVault } from '@/infrastructure/auth';
 import { authController } from '@/app/config/auth';
 import { apiBaseUrl } from '@/app/config/api';
 import { gameRealtime } from '@/app/config/game-realtime';
+import { drawChannel } from '@/app/config/draw';
+import { landlordsChannel } from '@/app/config/landlords';
 import { undercoverChannel } from '@/app/config/undercover';
 
 const vault = createBrowserSessionVault(apiBaseUrl);
@@ -65,10 +67,14 @@ export const chatRealtime = createChatRealtimeController(
       receive(raw) {
         gameRealtime.receive(raw);
         undercoverChannel.receive(raw);
+        drawChannel.receive(raw);
+        landlordsChannel.receive(raw);
       },
       connection(state, send) {
         gameRealtime.connection(state, send);
         undercoverChannel.connection(state, send);
+        landlordsChannel.connection(state, send);
+        drawChannel.connection(state);
       },
     },
   ),

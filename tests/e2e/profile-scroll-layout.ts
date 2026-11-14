@@ -3,13 +3,17 @@ import { expect, type Page } from '@playwright/test';
 export async function checkProfileScrollGutter(page: Page) {
   const viewport = page.getByRole('region', { name: '个人资料编辑区', exact: true });
   const rail = viewport.locator('..').locator('[data-orientation="vertical"]');
+  const mobile = page.viewportSize()!.width <= 760;
   await viewport.hover();
-  await expect(rail).toBeVisible();
+  if (mobile) await expect(rail).toBeHidden();
+  else await expect(rail).toBeVisible();
   const content = page.getByRole('region', { name: '头像设置', exact: true });
   const contentBox = (await content.boundingBox())!;
-  const railBox = (await rail.boundingBox())!;
+  const railBox = await rail.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return { x: box.x, y: box.y, width: box.width, height: box.height };
+  });
   const viewportBox = (await viewport.boundingBox())!;
-  const mobile = page.viewportSize()!.width <= 760;
   expect(railBox.x - contentBox.x - contentBox.width).toBeGreaterThanOrEqual(
     (mobile ? 12 : 16) - 0.5,
   );

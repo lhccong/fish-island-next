@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/features/auth';
+import { blacklist } from '@/app/config/account-tools';
 import { ChatRealtimeProvider, RemarksProvider } from '@/features/chat';
 import {
   chatRealtime,
@@ -19,6 +20,7 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
   }, [userId]);
   return (
     <ChatRealtimeProvider
+      blacklist={blacklist}
       controller={chatRealtime}
       userId={userId}
       user={session.status === 'authenticated' ? session.user : undefined}

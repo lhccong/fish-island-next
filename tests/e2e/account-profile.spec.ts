@@ -23,12 +23,15 @@ for (const skin of builtinSkins)
       await page.getByRole('dialog').getByRole('button', { name: '登录', exact: true }).click();
       const account = page.getByRole('button', { name: '用户菜单', exact: true });
       await expect(account).toBeVisible();
-      if (skin.id !== 'wps') {
+      if (skin.id !== 'wps' && page.viewportSize()!.width > 760) {
         await page.getByRole('button', { name: '查看资料测试热榜消息', exact: true }).click();
         await page.getByRole('textbox', { name: '消息输入框' }).fill('编辑资料保留草稿');
       }
       const before = state.hotRequests;
+      if (!(await account.isVisible()))
+        await page.getByRole('button', { name: '返回全部热榜' }).click();
       await account.click();
+      await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
       const dialog = page.getByRole('dialog');
       await expect(dialog).toContainText('还没有填写个人简介');
       await dialog.getByRole('button', { name: '修改信息', exact: true }).click();
@@ -168,7 +171,7 @@ for (const skin of builtinSkins)
       await dialog.getByRole('button', { name: '关闭个人资料' }).click();
       await expect(account).toBeFocused();
       await expect(account.locator('img')).toHaveAttribute('src', state.user.userAvatar);
-      if (skin.id !== 'wps') {
+      if (skin.id !== 'wps' && page.viewportSize()!.width > 760) {
         await expect(page.getByRole('textbox', { name: '消息输入框' })).toHaveValue(
           '编辑资料保留草稿',
         );
@@ -177,7 +180,10 @@ for (const skin of builtinSkins)
           state.user.userAvatar,
         );
       }
+      if (!(await account.isVisible()))
+        await page.getByRole('button', { name: '返回全部热榜' }).click();
       await account.click();
+      await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
       state.emptyExtras = true;
       await page.getByRole('button', { name: '修改信息', exact: true }).click();
       await expect(page.getByRole('textbox', { name: '朋友圈背景', exact: true })).toHaveValue(

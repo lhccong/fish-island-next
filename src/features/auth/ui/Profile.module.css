@@ -1,12 +1,12 @@
 .dialog {
-  width: min(620px, calc(100% - 32px));
-  padding: 28px;
+  width: min(520px, calc(100% - 32px));
+  padding: 24px;
 }
 .editorDialog {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   width: min(800px, calc(100% - 40px));
-  height: min(920px, calc(100dvh - 48px));
+  height: min(780px, calc(100dvh - 48px));
   max-height: calc(100dvh - 48px);
   padding: 28px 28px 0;
   border: 1px solid var(--color-border);
@@ -488,15 +488,13 @@
 }
 .avatar {
   flex-shrink: 0;
-  transform: scale(1.5);
-  margin: 12px;
 }
 .identityText {
   min-width: 0;
 }
 .identityText h3 {
   margin: 0 0 8px;
-  font-size: 20px;
+  font-size: 23px;
   overflow-wrap: anywhere;
 }
 .identityText span {

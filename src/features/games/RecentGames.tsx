@@ -1,8 +1,25 @@
-import { ChartCandlestick, Grid3X3, RotateCcw, Sprout, ScanFace } from 'lucide-react';
+import {
+  ChartCandlestick,
+  Grid3X3,
+  RotateCcw,
+  Sprout,
+  ScanFace,
+  Pencil,
+  Spade,
+} from 'lucide-react';
 import styles from './GameCatalog.module.css';
 
-export type CatalogGame = 'farm' | 'life' | 'stock' | 'gomoku' | 'undercover';
-const catalogGames = ['farm', 'life', 'stock', 'gomoku', 'undercover'] as const;
+export type CatalogGame =
+  'farm' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords';
+const catalogGames = [
+  'farm',
+  'life',
+  'stock',
+  'gomoku',
+  'undercover',
+  'draw',
+  'landlords',
+] as const;
 export function RecentGames({
   recent,
   onPlay,
@@ -28,6 +45,8 @@ export function RecentGames({
                 stock: ChartCandlestick,
                 gomoku: Grid3X3,
                 undercover: ScanFace,
+                draw: Pencil,
+                landlords: Spade,
               }[game];
               return (
                 <button
@@ -47,6 +66,8 @@ export function RecentGames({
                         stock: '摸鱼股市',
                         gomoku: '五子棋',
                         undercover: '谁是卧底',
+                        draw: '你画我猜',
+                        landlords: '斗地主',
                       }[game]
                     }
                   </span>

@@ -7,7 +7,7 @@ import { RepetitionParticipants } from './RepetitionParticipants';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { parseMessageContent } from '@/domain/chat';
-import { memo, useMemo, useRef } from 'react';
+import { memo, useMemo, useRef, useSyncExternalStore } from 'react';
 import { useStore } from 'zustand';
 import { useChatRealtime } from './realtime-context';
 import { MemberAvatar } from './MemberAvatar';
@@ -27,11 +27,14 @@ export const MessageRow = memo(function MessageRow({
   presentation?: ChatPresentation;
   rowNumber: number | undefined;
 }) {
-  const { controller, userId, draft, composerRef, navigation } = useChatRealtime();
+  const { controller, userId, draft, composerRef, navigation, blacklist } = useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
     state.target === id ? state.revision : 0,
   );
   const message = useStore(controller.store, (state) => state.messages[id]);
+  const blocked = useSyncExternalStore(blacklist.subscribe, () =>
+    blacklist.read(userId).some((user) => user.id === message?.senderId),
+  );
   const group = useStore(controller.store, (state) => state.repetitions[id]);
   const revoke = useStore(controller.store, (state) => state.revokeState[message?.id ?? id]);
   const connected = useStore(controller.store, (state) => state.connection === 'connected');
@@ -39,6 +42,7 @@ export const MessageRow = memo(function MessageRow({
   useMessageLocationPulse(bubbleRef, navigation, id, locationRevision);
   const parts = useMemo(() => parseMessageContent(message?.content ?? ''), [message?.content]);
   if (!message) return null;
+  if (blocked) return <div className={styles.empty}>已屏蔽该岛友的消息</div>;
   const self = message.senderId === userId;
   const menuProps = {
     message,

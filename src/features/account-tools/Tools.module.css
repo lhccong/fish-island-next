@@ -1,0 +1,297 @@
+.dialog {
+  --tool-height: 520px;
+  display: flex;
+  flex-direction: column;
+  width: min(480px, calc(100% - 32px));
+  height: min(
+    var(--tool-height),
+    calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+  );
+  overflow: hidden;
+  padding: 28px 24px 20px;
+  border: 1px solid var(--color-border);
+}
+.dialog > h2 {
+  flex: none;
+  margin: 0 40px 8px 4px;
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.5;
+  letter-spacing: -0.3px;
+}
+.dialog > p {
+  flex: none;
+  margin: 0 20px 24px 4px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.password {
+  --tool-height: 600px;
+}
+.redeem {
+  --tool-height: 336px;
+}
+.tour {
+  --tool-height: 360px;
+}
+.cardDialog {
+  --tool-height: 568px;
+  width: min(500px, calc(100% - 32px));
+}
+.cardDialog:has([data-compact='true']) {
+  --tool-height: 416px;
+}
+.cardDialog:has([data-has-cover='false'][data-compact='false']) {
+  --tool-height: 464px;
+}
+.apps {
+  --tool-height: 660px;
+  width: min(720px, calc(100% - 32px));
+}
+.apps:has([data-view='list'][data-many='false']) {
+  --tool-height: 480px;
+}
+.apps:has([data-view='list'] [data-expanded='true']) {
+  --tool-height: 592px;
+}
+.dialog:has([data-view='empty']) {
+  --tool-height: 400px;
+}
+.work {
+  --tool-height: 640px;
+  width: min(520px, calc(100% - 32px));
+}
+.body,
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  flex: 1;
+}
+.scroll {
+  flex: 1;
+  min-height: 0;
+}
+.fields {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  padding: 4px 0 16px 4px;
+  overflow-wrap: anywhere;
+}
+.field {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 400;
+  transition: border-color 120ms;
+}
+.field input:hover:not(:disabled),
+.field textarea:hover:not(:disabled) {
+  border-color: var(--color-muted);
+}
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+  border-color: var(--color-accent-text);
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--color-muted);
+}
+.field textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+.field input:disabled,
+.field textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.codeRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+.codeRow > button {
+  margin-bottom: 4px;
+}
+.formGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.span {
+  grid-column: 1 / -1;
+}
+.timeFields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+.section {
+  display: grid;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+.actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.form > .actions,
+.body > .actions {
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.toolbar {
+  display: flex;
+  flex: none;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 0 4px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.toolbar > span {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.feedback {
+  flex: none;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.feedback:empty {
+  display: none;
+}
+.feedback p {
+  margin: 0;
+}
+.feedback [role='alert'] {
+  color: var(--color-danger);
+}
+.feedback [role='status'] {
+  color: var(--color-accent-text);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.text {
+  flex: 1;
+  min-width: 100px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 500;
+}
+.text p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+.avatar {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+}
+.empty {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-height: 200px;
+  padding: 24px 12px;
+  text-align: center;
+}
+.empty p {
+  max-width: 30em;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.timer {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  min-width: 0;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+@media (max-width: 760px) {
+  .apps:has([data-view='list'][data-many='false']) {
+    --tool-height: 556px;
+  }
+  .apps:has([data-view='list'] [data-expanded='true']) {
+    --tool-height: 688px;
+  }
+  .password {
+    --tool-height: 660px;
+  }
+  .dialog {
+    padding: 24px 16px 16px;
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  .dialog > h2 {
+    font-size: 19px;
+  }
+  .dialog > p {
+    margin-bottom: 20px;
+  }
+  .field {
+    font-size: 14px;
+  }
+  .field input,
+  .field textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .formGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .codeRow > button {
+    margin-bottom: 0;
+  }
+  .row {
+    gap: 10px;
+  }
+  .row > .actions {
+    flex-basis: 100%;
+  }
+}

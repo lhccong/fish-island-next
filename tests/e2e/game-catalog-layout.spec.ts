@@ -20,8 +20,10 @@ for (const skin of builtinSkins)
           },
           { skinId: skin.id, colorMode: mode },
         );
+        await page.route('https://**/*', (route) => route.abort());
         await page.route('**/api/**', (route) => route.abort());
-        await page.goto('/discover/games');
+        await page.goto('/discover/games', { waitUntil: 'domcontentloaded' });
+        await page.bringToFront();
         await expect(page.getByText('玩过的游戏会留在这里，方便下次找到。')).toBeVisible({
           timeout: 15_000,
         });
@@ -80,4 +82,10 @@ for (const skin of builtinSkins)
         await dialog.getByRole('button', { name: '关闭', exact: true }).click();
         if (width <= 760) await page.setViewportSize({ width, height: 900 });
         await expect(page.getByRole('button', { name: '人生重开模拟器 再玩一次' })).toBeVisible();
+        const gomoku = page.getByRole('button', { name: '打开五子棋', exact: true });
+        await gomoku.scrollIntoViewIfNeeded();
+        if (width <= 760) await gomoku.tap();
+        else await gomoku.click();
+        await expect(page).toHaveURL(/\/user\/login\?redirect=%2Fgame%2Fpiece/);
+        await expect(page.getByRole('textbox', { name: '账号或邮箱', exact: true })).toBeVisible();
       });

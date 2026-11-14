@@ -4,14 +4,17 @@ import styles from './SourceAvatar.module.css';
 interface SourceAvatarProps {
   name: string;
   src: string | null;
-  size?: 'default' | 'small';
+  size?: 'default' | 'small' | 'profile';
 }
 
 export function SourceAvatar({ name, src, size = 'default' }: SourceAvatarProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   return (
-    <span className={`${styles.avatar} ${size === 'small' ? styles.small : ''}`} aria-hidden="true">
+    <span
+      className={`${styles.avatar} ${size === 'small' ? styles.small : size === 'profile' ? styles.profile : ''}`}
+      aria-hidden="true"
+    >
       {name.slice(0, 1)}
       {src && failedSrc !== src ? (
         <img

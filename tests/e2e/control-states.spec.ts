@@ -25,6 +25,7 @@ for (const skin of builtinSkins) {
       await page.getByLabel('密码', { exact: true }).fill('synthetic-password');
       await page.getByRole('dialog').getByRole('button', { name: '登录', exact: true }).click();
       await page.getByRole('button', { name: '用户菜单', exact: true }).click();
+      await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
       await page.getByRole('button', { name: '修改信息', exact: true }).click();
       const title = page.getByRole('combobox', { name: '称号设置' });
       const section = page.getByRole('region', { name: '称号设置', exact: true });

@@ -1,4 +1,5 @@
 import type { AuthUser } from '@/domain/auth';
+import type { BlacklistPort } from '@/domain/account-tools';
 import type { LuckyBagController } from './lucky-bag-controller';
 import type { LuckyBagCreation } from './lucky-bag-creation';
 import { createContext, useContext, type RefObject } from 'react';
@@ -15,6 +16,7 @@ import type { MessageNavigation } from './message-navigation';
 
 export const ChatRealtimeContext = createContext<{
   controller: ChatRealtimeController;
+  blacklist: BlacklistPort;
   luckyBags: LuckyBagController;
   luckyBagCreation: LuckyBagCreation;
   navigation: MessageNavigation;

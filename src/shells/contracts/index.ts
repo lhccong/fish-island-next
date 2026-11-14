@@ -17,6 +17,7 @@ export interface ChatShellProps {
 }
 
 export interface WorkspaceShellSlots {
+  status?: ReactNode;
   contentScroll?: boolean;
   footer?: ReactNode;
   contentKey?: string;

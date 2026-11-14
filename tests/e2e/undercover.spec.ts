@@ -25,7 +25,7 @@ for (const skin of builtinSkins)
           { skin: skin.id, mode },
         );
         const fixture = await undercoverFixture(page);
-        await page.goto('/game/draw');
+        await page.goto('/game/undercover');
         await expect(page).toHaveURL('/game/undercover');
         await selectValue(page, '玩家人数', '3 人');
         await selectValue(page, '词语来源', '自定义词对');

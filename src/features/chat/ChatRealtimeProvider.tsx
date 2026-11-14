@@ -15,6 +15,7 @@ import type { ChatRealtimeController } from './realtime-controller';
 import { ChatRealtimeContext } from './realtime-context';
 import { useAvatarPreference } from './use-avatar-preference';
 import { useImagePreference } from './use-image-preference';
+import type { BlacklistPort } from '@/domain/account-tools';
 
 export function ChatRealtimeProvider({
   controller,
@@ -26,6 +27,7 @@ export function ChatRealtimeProvider({
   emoticonPort,
   imageUploadPort,
   children,
+  blacklist,
 }: {
   controller: ChatRealtimeController;
   userId: string;
@@ -36,6 +38,7 @@ export function ChatRealtimeProvider({
   emoticonPort: ChatEmoticonPort;
   imageUploadPort: ChatImageUploadPort;
   children: ReactNode;
+  blacklist: BlacklistPort;
 }) {
   const avatarPreference = useAvatarPreference(preferences);
   const luckyBags = useMemo(
@@ -98,6 +101,7 @@ export function ChatRealtimeProvider({
     <ChatRealtimeContext.Provider
       value={{
         controller,
+        blacklist,
         luckyBags,
         luckyBagCreation,
         navigation,

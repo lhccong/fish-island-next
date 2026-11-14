@@ -141,3 +141,13 @@ ADR-050 好友面板复用 pet-path/path-edge/wood 作为木质外框，surface/
 ADR-051 游戏独立窗口沿用 surface/canvas/text/muted/border/action 语义变量；全部注册主题与明暗共用窗口和游戏内核。手机全屏、安全区、44px 控件与 reserved gutter；桌面可拖动和调整大小。外观切换不重挂载游戏或新增业务请求。
 
 ADR-062 五子棋使用局部 color-gomoku-board/grid/black/white/stone-edge 语义变量提供明暗棋盘与固定黑白身份；界面、操作、选点与胜线复用主题 surface/text/muted/border/action/accent。房间信息横排于顶部，桌面右上公共聊天室限高内部滚动、右下棋谱，手机及窄浮窗单列重排；点按棋盘直接落子，保留键盘落子和安全区。全部注册主题共用业务状态与外壳，切换不新增请求或连接。
+
+ADR-065 账号菜单、卡片、关注/粉丝列表、邮箱找回密码、兑换与应用管理统一复用 surface/canvas/text/muted/border/action 语义变量及 shared/ui 控件。菜单不显示老板键和位置重置；手机入口至少 44px、reserved 正文滚动，明暗及皮肤切换保留输入和请求状态。工作时间本机偏好沿用外观模块的本机设置方式，不引入第二套主题体系。
+
+账号工具的资料头像、应用状态、统计分区及表单分隔使用现有 surface/canvas/border/muted/accent-soft/accent-text；主操作继续使用 action。兑换、引导、名单、卡片、密码与应用管理分别设置内容尺寸，窄屏单列呈现；不新增局部品牌色、插画或字体。
+
+ADR-066 你画我猜以主题 surface/canvas/text/muted/border/action 呈现工具和房间，固定白色画纸及颜料属于作品素材，明暗保持原貌。桌面双栏、手机纵向重排，主题切换保留画布、猜词草稿与房间，不新增请求或连接。
+
+ADR-067 斗地主全部主题共用 surface/canvas/text/muted/border/action/accent 语义变量，牌面红色使用 danger 并保留花色文字；明暗模式不反色图片。手机手牌分行、44px 选牌控件、自然换行操作；外观切换保留手牌选择、对局与聊天草稿，不额外请求或重连。
+
+你画我猜样式调整（2026-11-15）：题目/计时/房间操作收拢到同一信息带；画布工具置顶、作品独立留边，玩家以昵称首字作占位。窄容器单列画布，手机将猜词区前置于玩家列表之前。全部配色沿用现有语义 token，画纸/颜料保持原貌，不改变请求和状态边界。

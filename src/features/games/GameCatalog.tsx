@@ -3,6 +3,8 @@ import { WindowLauncher } from '@/shared/ui/WindowLauncher';
 import { Sparkles, Sprout, Sun, ChartCandlestick, Grid3X3 } from 'lucide-react';
 import styles from './GameCatalog.module.css';
 import { RecentGames, type CatalogGame } from './RecentGames';
+import { DrawEntry } from './DrawEntry';
+import { LandlordsEntry } from './LandlordsEntry';
 import { UndercoverEntry } from './UndercoverEntry';
 export function GameCatalog({
   onPlay,
@@ -10,6 +12,8 @@ export function GameCatalog({
   onFarm,
   onGomoku,
   onUndercover,
+  onDraw,
+  onLandlords,
   onWindow,
 }: {
   onPlay: () => void;
@@ -17,6 +21,8 @@ export function GameCatalog({
   onFarm: () => void;
   onGomoku: () => void;
   onUndercover: () => void;
+  onDraw: () => void;
+  onLandlords: () => void;
   onWindow: (game: CatalogGame) => void;
 }) {
   const [recent, setRecent] = useState<Record<CatalogGame, boolean>>(() => {
@@ -33,6 +39,8 @@ export function GameCatalog({
       stock: read('stock'),
       gomoku: read('gomoku'),
       undercover: read('undercover'),
+      draw: read('draw'),
+      landlords: read('landlords'),
     };
   });
   const remember = (game: CatalogGame) => {
@@ -45,9 +53,15 @@ export function GameCatalog({
   };
   const playGame = (game: CatalogGame) => {
     remember(game);
-    ({ farm: onFarm, life: onPlay, stock: onStock, gomoku: onGomoku, undercover: onUndercover })[
-      game
-    ]();
+    ({
+      farm: onFarm,
+      life: onPlay,
+      stock: onStock,
+      gomoku: onGomoku,
+      undercover: onUndercover,
+      draw: onDraw,
+      landlords: onLandlords,
+    })[game]();
   };
   const playFarm = () => playGame('farm');
   const play = () => playGame('life');
@@ -65,6 +79,11 @@ export function GameCatalog({
           <span>发现另一种可能</span>
         </div>
         <div className={styles.cards}>
+          <LandlordsEntry
+            onPlay={() => playGame('landlords')}
+            onWindow={() => openWindow('landlords')}
+          />
+          <DrawEntry onPlay={() => playGame('draw')} onWindow={() => openWindow('draw')} />
           <UndercoverEntry
             onPlay={() => playGame('undercover')}
             onWindow={() => openWindow('undercover')}

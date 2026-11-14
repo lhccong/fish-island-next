@@ -141,6 +141,7 @@ test('account login handles failure, protected redirect, refresh and logout', as
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('authenticated.png'), fullPage: true });
   await page.getByRole('button', { name: '用户菜单', exact: true }).click();
+  await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('测试岛友');
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '摸鱼岛', exact: true })).toBeVisible();
@@ -170,6 +171,7 @@ test('email login persists and synchronizes logout across tabs', async ({
   await second.goto('/chat');
   await expect(second.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
   await page.getByRole('button', { name: '用户菜单' }).click();
+  await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await expect(second.getByRole('dialog', { name: '摸鱼岛', exact: true })).toBeVisible();
   await second.close();
@@ -206,6 +208,7 @@ test('logout failure warns after navigating away from protected content', async 
   await fillLogin(page);
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await page.getByRole('button', { name: '用户菜单' }).click();
+  await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
   server.logoutFailure = true;
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '摸鱼岛', exact: true })).toBeVisible();

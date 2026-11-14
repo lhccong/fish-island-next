@@ -38,3 +38,14 @@
   padding: 0;
   background: var(--color-hot-surface);
 }
+.profile {
+  flex-basis: 64px;
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+  border-radius: 14px;
+}
+.profile img {
+  padding: 0;
+  object-fit: cover;
+}

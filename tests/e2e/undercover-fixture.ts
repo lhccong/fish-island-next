@@ -57,6 +57,11 @@ export async function undercoverFixture(page: Page) {
   });
   await page.routeWebSocket('**/ws/**', (ws) => {
     sockets.add(ws);
+    // Retire the mock and acknowledge the page close handshake before context disposal.
+    ws.onClose(() => {
+      sockets.delete(ws);
+      void ws.close().catch(() => {});
+    });
     state.connected++;
     broadcast = (frame) => ws.send(frame);
     ws.onMessage((raw) => {

@@ -74,6 +74,7 @@ for (const skin of builtinSkins)
       );
       await page.screenshot({ path: info.outputPath('signed-in-avatar.png'), fullPage: true });
       await account.click();
+      await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
       await page.getByRole('button', { name: '退出登录', exact: true }).click();
       await expect(page.getByRole('button', { name: '登录', exact: true })).toBeVisible();
       if (skin.id !== 'wps') {

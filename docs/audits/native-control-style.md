@@ -48,3 +48,13 @@
 ## 宠物挑战（ADR-061）
 
 入口：伙伴 → 宠物 Boss / 宠物爬塔 / 挑战。`src/features/pet/ChallengePanel.tsx` 的分类使用 shared/ui/Select 的 pixel 呈现；战斗、排行与楼层预览使用共享 Dialog、reserved ScrollArea 和 Button。`TowerCard.tsx` 楼层输入保留 number 语义与手机数字键盘，通过局部 CSS 统一输入外观并移除系统步进装饰；无原生 select、系统确认或手写可点击 div 选择器。24px 装备格为只读图像，不冒充触控按钮。
+
+- ADR-065 头像菜单迁移：旧 AvatarDropdown 的 Ant Design 选择器不复制到 Next；新增工作制、本周类型和应用状态均使用 shared/ui/Select，操作使用 DropdownMenu，删除/重置采用面板内确认。工作时间采用有格式校验的文本时间输入，保留软键盘能力，无系统选项列表。
+
+## 你画我猜（ADR-066）
+
+入口：游戏 → 你画我猜 → 创建房间、画布工具。源码：src/features/draw/CreateRoom.tsx、DrawCanvas.tsx、RoomActions.tsx。人数/轮数/词库/绘画方式/颜色统一使用 shared/ui/Select，笔触复用 Slider，操作与确认复用 Button/Dialog，正文采用 reserved ScrollArea；不引入原生 select、系统 color 面板或 alert/confirm/prompt。整改状态：新迁移界面已统一；验收与限制见 [你画我猜验收](draw-migration.md)。
+
+## 斗地主迁移（ADR-067）
+
+入口：游戏 → 斗地主。src/features/landlords/Ranking.tsx 排序使用共享 Select；Lobby.tsx 加入房间及离房确认使用共享 Dialog，表单和榜单使用 reserved ScrollArea，操作使用共享 Button。未引入原生 select、alert/confirm/prompt；详细验证与限制见 [斗地主验收](landlords-migration.md)。

@@ -2,13 +2,16 @@ import type { ReactNode } from 'react';
 import { AccountDialog } from './AccountDialog';
 import { useAuth } from './use-auth';
 import styles from './ui/AccountControl.module.css';
+import type { DropdownMenuItem } from '@/shared/ui/DropdownMenu';
 
 export function AccountControl({
   onLogin,
   accountActions,
+  menuItems,
 }: {
   onLogin: () => void;
   accountActions?: ReactNode;
+  menuItems?: readonly DropdownMenuItem[];
 }) {
   const { session, pending, logout, notify } = useAuth();
   async function leave() {
@@ -23,6 +26,7 @@ export function AccountControl({
       {session.status === 'authenticated' ? (
         <AccountDialog
           accountActions={accountActions}
+          menuItems={menuItems}
           user={session.user}
           onLogout={() => {
             void leave();

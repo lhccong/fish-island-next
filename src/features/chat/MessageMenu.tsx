@@ -9,6 +9,7 @@ import {
   Repeat2,
   Undo2,
   ImagePlus,
+  Ban,
 } from 'lucide-react';
 import {
   hasRewardMessageContent,
@@ -43,7 +44,8 @@ export function MessageMenu({
   onRevoke,
   returnFocusRef,
 }: Props) {
-  const { controller, user, draft, composerRef, emoticons, navigation } = useChatRealtime();
+  const { controller, user, userId, draft, composerRef, emoticons, navigation, blacklist } =
+    useChatRealtime();
   const remarks = useRemarks();
   const focusDraft = useRef(false);
   const closeFocus = () => {
@@ -66,6 +68,30 @@ export function MessageMenu({
     }
   };
   const items: DropdownMenuItem[] = [
+    ...(!self
+      ? [
+          {
+            label: '加入黑名单',
+            icon: <Ban size={16} aria-hidden="true" />,
+            onSelect: () => {
+              focusDraft.current = true;
+              composerRef.current?.focus({ preventScroll: true });
+              try {
+                blacklist.write(
+                  userId,
+                  [
+                    ...blacklist.read(userId),
+                    { id: message.senderId, name: message.senderName },
+                  ].filter((item, index, all) => all.findIndex((v) => v.id === item.id) === index),
+                );
+                draft.notify('已屏蔽，可在我的黑名单中移除');
+              } catch {
+                draft.notify('无法保存黑名单，请检查浏览器存储权限', 'error');
+              }
+            },
+          },
+        ]
+      : []),
     {
       label: '设置备注',
       icon: <Pencil size={16} aria-hidden="true" />,

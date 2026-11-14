@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import styles from './WorkspaceLayout.module.css';
 import { WorkspaceAccount } from './WorkspaceAccount';
 import type { ReactNode } from 'react';
+import { AccountToolsHost } from './AccountToolsHost';
 
 export function WorkspaceLayout({
   slots,
@@ -60,6 +61,7 @@ export function WorkspaceLayout({
       mobileNavigation={mobileNavigationMode}
       slots={{
         ...slots,
+        status: <AccountToolsHost />,
         header: (
           <div className={styles.header} data-mobile-header={mobileHeader}>
             {!mobileRoot && (

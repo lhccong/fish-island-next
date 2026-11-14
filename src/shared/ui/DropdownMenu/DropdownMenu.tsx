@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode, RefObject } from 'react';
+import { Fragment, type ReactElement, type ReactNode, type RefObject } from 'react';
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
 import styles from './DropdownMenu.module.css';
 
@@ -8,6 +8,7 @@ export interface DropdownMenuItem {
   onSelect: () => void;
   disabled?: boolean;
   tone?: 'danger' | 'highlight';
+  separatorBefore?: boolean;
 }
 interface Props {
   className?: string;
@@ -16,6 +17,7 @@ interface Props {
   items: readonly DropdownMenuItem[];
   returnFocusRef?: RefObject<HTMLElement | null>;
   onCloseFocus?: () => void;
+  presentation?: 'default' | 'account';
 }
 
 export function DropdownMenu({
@@ -25,6 +27,7 @@ export function DropdownMenu({
   className = '',
   returnFocusRef,
   onCloseFocus,
+  presentation = 'default',
 }: Props) {
   return (
     <Dropdown.Root modal={false}>
@@ -33,6 +36,7 @@ export function DropdownMenu({
         <Dropdown.Content
           className={`${styles.menu} ${className}`}
           aria-label={label}
+          data-presentation={presentation}
           align="end"
           sideOffset={4}
           collisionPadding={8}
@@ -49,16 +53,18 @@ export function DropdownMenu({
           }}
         >
           {items.map((item) => (
-            <Dropdown.Item
-              key={item.label}
-              className={styles.item}
-              disabled={item.disabled}
-              data-tone={item.tone}
-              onSelect={item.onSelect}
-            >
-              {item.icon}
-              {item.label}
-            </Dropdown.Item>
+            <Fragment key={item.label}>
+              {item.separatorBefore && <Dropdown.Separator className={styles.separator} />}
+              <Dropdown.Item
+                className={styles.item}
+                disabled={item.disabled}
+                data-tone={item.tone}
+                onSelect={item.onSelect}
+              >
+                {item.icon}
+                {item.label}
+              </Dropdown.Item>
+            </Fragment>
           ))}
         </Dropdown.Content>
       </Dropdown.Portal>

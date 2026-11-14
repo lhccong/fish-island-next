@@ -39,6 +39,7 @@ export function WechatShell({
       </aside>
       <div className={styles.workspace}>
         <header className={styles.header}>{slots.header}</header>
+        {slots.status}
         <main className={styles.content} id="main-content">
           {slots.contentScroll === false ? (
             slots.content
