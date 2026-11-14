@@ -10,7 +10,12 @@ import {
   Undo2,
   ImagePlus,
 } from 'lucide-react';
-import { messageClipboardText, parseMessageContent, type ReceivedMessage } from '@/domain/chat';
+import {
+  hasRewardMessageContent,
+  messageClipboardText,
+  parseMessageContent,
+  type ReceivedMessage,
+} from '@/domain/chat';
 import { useChatRealtime } from './realtime-context';
 import { useRemarks } from './remarks-context';
 import { ContextMenu } from '@/shared/ui/ContextMenu';
@@ -104,16 +109,20 @@ export function MessageMenu({
       icon: <AtSign size={16} aria-hidden="true" />,
       onSelect: () => prepare(() => draft.mention(message.senderName)),
     },
-    {
-      label: '复读机',
-      icon: <Repeat2 size={16} aria-hidden="true" />,
-      disabled: !user || message.content.length > 5000 || !message.content.trim(),
-      onSelect: () => {
-        if (!user) return;
-        if (!controller.sender.repeat(message.content, user))
-          draft.notify('复读未提交，请处理待发送消息后重试', 'error');
-      },
-    },
+    ...(hasRewardMessageContent(message.content)
+      ? []
+      : [
+          {
+            label: '复读机',
+            icon: <Repeat2 size={16} aria-hidden="true" />,
+            disabled: !user || message.content.length > 5000 || !message.content.trim(),
+            onSelect: () => {
+              if (!user) return;
+              if (!controller.sender.repeat(message.content, user))
+                draft.notify('复读未提交，请处理待发送消息后重试', 'error');
+            },
+          },
+        ]),
     ...(self
       ? [
           {

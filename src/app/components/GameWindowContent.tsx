@@ -13,6 +13,10 @@ const LifeGame = lazy(() => import('@/features/life').then((m) => ({ default: m.
 const StockWorkspace = lazy(() =>
   import('@/features/stock').then((m) => ({ default: m.StockWorkspace })),
 );
+const GomokuGame = lazy(() => import('./GomokuGame').then((m) => ({ default: m.GomokuGame })));
+const UndercoverGame = lazy(() =>
+  import('./UndercoverGame').then((m) => ({ default: m.UndercoverGame })),
+);
 
 export function GameWindowContent({ game }: { game: GameId }) {
   const { session, restore } = useAuth();
@@ -20,6 +24,7 @@ export function GameWindowContent({ game }: { game: GameId }) {
   const location = useLocation();
   const [detailCode, setDetailCode] = useState<string | null>(null);
   if (game === 'life') return <LifeGame />;
+  if (game === 'undercover') return <UndercoverGame />;
   if (session.status === 'checking') return <p role="status">正在恢复登录状态…</p>;
   if (session.status === 'error')
     return (
@@ -39,6 +44,7 @@ export function GameWindowContent({ game }: { game: GameId }) {
         </Button>
       </div>
     );
+  if (game === 'gomoku') return <GomokuGame />;
   if (game === 'farm')
     return (
       <FarmWorkspace key={session.user.id} service={farmService} onPet={() => navigate('/pet')} />

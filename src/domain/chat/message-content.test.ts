@@ -4,7 +4,21 @@ import {
   parseMessageContent,
   messageClipboardText,
   messagePreview,
+  hasRewardMessageContent,
 } from './message-content';
+
+it('identifies rendered reward cards in mixed messages without blocking ordinary text or images', () => {
+  for (const tag of ['redpacket', 'luckybag', 'REDPACKET', 'LuckyBag']) {
+    expect(hasRewardMessageContent(`前文[${tag}]synthetic-id[/${tag}]后文`)).toBe(true);
+  }
+  for (const content of [
+    '普通消息',
+    '[img]https://synthetic.test/image.png[/img]',
+    '红包和福袋',
+    '[luckybag]missing-close',
+  ])
+    expect(hasRewardMessageContent(content)).toBe(false);
+});
 
 it('copies image URLs as text and renders bounded quote previews without retaining markup', () => {
   const content = '合成[img]https://example.test/a.png[/img]消息';

@@ -1,5 +1,9 @@
 # 浏览器默认控件样式排查与整改
 
+## 谁是卧底迁移（ADR-063）
+
+入口：游戏 → 谁是卧底。源码：`src/features/undercover/LocalSetup.tsx`、`LocalTurn.tsx`、`CreateRoomDialog.tsx`、`RoomPlayers.tsx`。人数、卧底数、词语来源、模式、时长与投票目标均使用共享 Radix Select；结束、退出和投票确认使用共享 Dialog，操作使用 Button，房间设置和发言记录使用 reserved ScrollArea。没有复制旧版 Ant Design 或原生系统选项列表，没有引入 alert/confirm/prompt。验收范围和限制见 [谁是卧底验收](undercover-migration.md)。
+
 日期：2026-11-12。范围：fish-island-next 当前工作区的 src 应用源码与 CSS，包括尚未提交的文件；不涉及旁边的旧项目仓库。先通过源码确认问题，再使用合成账号、动态和接口响应进行浏览器验证，不包含真实账号资料或聊天记录。
 
 ## 四处问题的整改
@@ -40,3 +44,7 @@
 入口：游戏 → 摸鱼农场 → 选择种子。源码：src/features/farm/SeedDialog.tsx。旧项目原生/Ant Design 控件不复制，作物分类采用 shared/ui/Select，操作与确认使用共享 Button、Dialog、reserved ScrollArea；无新增原生 select、alert、confirm 或 prompt。验证范围与限制见 [农场验收](farm-migration.md)。
 
 农场好友排序（src/features/farm/FarmFriendList.tsx）采用共享 Select 的 pixel 呈现，触发器和 Portal 面板同步羊皮纸语义配色、直角、字号与选中/聚焦状态；保持 Radix 键盘、Esc 与焦点返回，不使用原生下拉列表。
+
+## 宠物挑战（ADR-061）
+
+入口：伙伴 → 宠物 Boss / 宠物爬塔 / 挑战。`src/features/pet/ChallengePanel.tsx` 的分类使用 shared/ui/Select 的 pixel 呈现；战斗、排行与楼层预览使用共享 Dialog、reserved ScrollArea 和 Button。`TowerCard.tsx` 楼层输入保留 number 语义与手机数字键盘，通过局部 CSS 统一输入外观并移除系统步进装饰；无原生 select、系统确认或手写可点击 div 选择器。24px 装备格为只读图像，不冒充触控按钮。

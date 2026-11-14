@@ -73,6 +73,12 @@ ADR-012 的鱼小圈右侧使用默认 `--color-circle-*`、`--shadow-circle-*` 
 
 ## 4. 设计与兼容验收
 
+宠物的伙伴榜、首领贡献榜、爬塔榜与每日排位统一为紧凑分隔行，接入 userAvatar 并保留宠物小像；头像缺失/失败显示可识别回退。名次、头像、身份、成绩和操作分列，前三名只用现有 legendary/accent-soft 语义色弱强调；手机操作独立一行，长昵称与组合字符限制在文本行内，不遮挡成绩、头像和相邻行。明暗及全部注册主题共用，不增加逐条用户资料请求，见 ADR-061。
+
+ADR-063 的谁是卧底沿用 surface/canvas/text/muted/border/action 语义变量，发牌以当前玩家和隐藏词卡为视觉重点，联机桌面分区、手机纵向重排。所有注册主题与明暗共用业务实例，外观切换保留对局、草稿与房间状态；操作、弹窗、下拉与滚动遵守共享控件规范。
+
+ADR-061 的宠物挑战采用像素 Dialog 呈现变体及前后站位战场。局部 `--color-pet-battle-sky/haze/ink/hp` 提供明暗场景、框线和生命条；界面背景与文字复用 surface/text/muted/border，普通操作沿用 action/on-accent。我方左侧、对手右侧，血条与对应角色上下邻接，六个 compact 装备格紧贴各自血条下方；手机小格改为三列，明确保留双方归属。暴击、闪避、格挡、吸血使用既有 amber/blue/violet/hp 语义色，保留静态文字与减少动态效果支持。保持原图、reserved gutter、安全区及 44px 触控；主题与模式切换保留战斗帧、选择与请求状态。不扩大第三方皮肤白名单。
+
 ADR-052 的 WPS 聊天由 app 显式注入 worksheet 变体；消息和输入保持同一组件与业务状态，隐藏左侧会话栏与消息称号。桌面隐藏群聊标题行，以表格上方 32px 编辑区的 ƒx 公式栏发送消息，发送与详情使用独立列。行列、网格、选区和工作表标签仅使用 surface/canvas/sidebar/border/text/muted/accent 语义变量；窄内容区合并发送者与时间的视觉区域，保留正文、行号与菜单。输入焦点采用主题选区边框，手机保留返回页头、44px 控件、独立草稿、工具展开与安全区。其他主题保持 conversation 呈现，外观切换不触发历史请求或重连。
 
 ADR-049 的称号 SVG 属于可信自有插画，保留旧版局部配色，不随主题或明暗反色；HTTPS 图片称号保持原貌。元信息、占位与失败文字复用 muted 语义颜色，窄屏允许换行，徽章预留尺寸且不挤压正文。不扩大第三方 SVG 导入权限。
@@ -133,3 +139,5 @@ ADR-050 好友面板复用 pet-path/path-edge/wood 作为木质外框，surface/
 好友面板像素菜单使用 color-pixel-* 明暗纸面/木框 token，局部映射 surface/text/muted/border；主操作维持主题 action。Select 的 pixel 呈现同时覆盖触发器与 Portal 面板，保留统一焦点、选中和禁用状态。
 
 ADR-051 游戏独立窗口沿用 surface/canvas/text/muted/border/action 语义变量；全部注册主题与明暗共用窗口和游戏内核。手机全屏、安全区、44px 控件与 reserved gutter；桌面可拖动和调整大小。外观切换不重挂载游戏或新增业务请求。
+
+ADR-062 五子棋使用局部 color-gomoku-board/grid/black/white/stone-edge 语义变量提供明暗棋盘与固定黑白身份；界面、操作、选点与胜线复用主题 surface/text/muted/border/action/accent。房间信息横排于顶部，桌面右上公共聊天室限高内部滚动、右下棋谱，手机及窄浮窗单列重排；点按棋盘直接落子，保留键盘落子和安全区。全部注册主题共用业务状态与外壳，切换不新增请求或连接。

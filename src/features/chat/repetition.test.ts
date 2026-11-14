@@ -34,6 +34,7 @@ it.each([
   { delivery: 'sending' as const },
   { delivery: 'failed' as const },
   { content: '[redpacket]123[/redpacket]' },
+  { content: '[luckybag]lb_synthetic[/luckybag]' },
   { content: ' ' },
 ])('breaks the run for ineligible or different messages: %j', (extra) => {
   const model = createMessageStore();
@@ -41,8 +42,8 @@ it.each([
   expect(model.store.getState().visibleIds).toEqual(['1', '2', '3']);
   expect(model.store.getState().repetitions).toEqual({});
 });
-it('groups identical images but never groups identical red packets or whitespace', () => {
-  for (const content of ['[redpacket]123[/redpacket]', ' ']) {
+it('groups identical images but never groups identical prize messages or whitespace', () => {
+  for (const content of ['[redpacket]123[/redpacket]', '[luckybag]lb_synthetic[/luckybag]', ' ']) {
     const model = createMessageStore();
     apply(model, ...['1', '2', '3'].map((id) => message(id, { content })));
     expect(model.store.getState().visibleIds).toHaveLength(3);

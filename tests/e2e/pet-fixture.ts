@@ -1,5 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 import { createActivityFixture } from './pet-activities-fixture';
+import {
+  createPetChallengeState,
+  isPetChallengePath,
+  petChallengeResponse,
+} from './pet-challenges-fixture';
 
 const portrait = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130"><ellipse cx="60" cy="116" rx="32" ry="8" fill="#274d3a" opacity=".15"/><path d="M29 66 23 22q22 2 29 22 14-13 31-8L105 8q10 29-7 52 18 44-15 55H42Q14 104 29 66" fill="#e4be79" stroke="#775c3a" stroke-width="3"/><path d="M49 90q15-16 28 0v20H49" fill="#fff1cd"/><circle cx="45" cy="68" r="4" fill="#293d36"/><circle cx="79" cy="68" r="4" fill="#293d36"/><path d="m56 80 5 4 6-4M29 24l8 27M102 14 90 43" fill="none" stroke="#775c3a" stroke-width="3"/><path d="M53 41q-10-23 7-32 16 14 7 29" fill="#689f68" stroke="#446b48" stroke-width="3"/></svg>`;
 export async function setupPet(page: Page, skin: string, mode: string) {
@@ -39,16 +44,9 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     },
     equippedItems: {} as Record<string, typeof item>,
   };
-  const boss = {
-    id: '91',
-    name: '林地守卫',
-    avatar: 'https://camp.test/companion.svg',
-    health: 90,
-    attack: 10,
-    rewardPoints: 15,
-  };
   const state = {
     activity: activity.state,
+    ...createPetChallengeState(),
     pet,
     empty: false,
     fail: false,
@@ -61,7 +59,6 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     mineRequests: 0,
     actions: [] as string[],
     requests: [] as string[],
-    battleCount: 0,
     owned: false,
     skinUsed: false,
     auto: null as null | {
@@ -72,7 +69,6 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     },
     locked: [] as number[],
     forgeLevel: 1,
-    failBattle: false,
   };
   await page.addInitScript(
     ({ skin, mode }) => {
@@ -135,6 +131,10 @@ export async function setupPet(page: Page, skin: string, mode: string) {
         pet.name = (route.request().postDataJSON() as { name: string }).name;
         state.actions.push('rename');
       } else {
+        if (state.holdChallenges && ['boss/list/cache', 'tower/progress'].includes(path))
+          await new Promise<void>((resolve) => {
+            state.releaseChallenges = resolve;
+          });
         if (state.panelFail)
           return route.fulfill({ json: { code: 40000, message: '合成面板读取失败，请重试' } });
         const records = <T>(values: T[]) => ({
@@ -145,9 +145,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
           state.bagEmpty = true;
           state.actions.push('batch');
           data = 20;
-        } else if (path === 'boss/ranking')
-          data = [{ userId: '124', petName: '栗栗', userName: '合成岛友乙', rank: 1, damage: 125 }];
-        else if (path === 'itemInstances/my/list/page/vo')
+        } else if (path === 'itemInstances/my/list/page/vo')
           data = records(
             Array.from({ length: state.bagEmpty ? 0 : 12 }, (_, n) => ({
               ...item,
@@ -205,42 +203,8 @@ export async function setupPet(page: Page, skin: string, mode: string) {
                   level: 9,
                 },
               ];
-        else if (path === 'boss/list/cache') data = state.panelEmpty ? [] : [boss];
-        else if (path === 'boss/battle/info')
-          data = {
-            petInfo: { petId: pet.petId, name: pet.name, avatar: pet.petUrl, health: 120 },
-            bossInfo: { ...boss, maxHealth: 90 },
-          };
-        else if (path === 'pet/battle/info')
-          data = {
-            myPet: { petId: pet.petId, name: pet.name, avatar: pet.petUrl, health: 120 },
-            opponentPet: { petId: '18', name: '栗栗', avatar: pet.petUrl, health: 90 },
-          };
-        else if (['pet/battle/start', 'boss/battle', 'tower/challenge'].includes(path)) {
-          state.battleCount++;
-          if (state.failBattle)
-            return route.fulfill({ json: { code: 40000, message: '挑战次数不足，请明日再试' } });
-          const rounds = [
-            { attackerType: 'PET', damage: 45, petRemainingHealth: 120, bossRemainingHealth: 45 },
-            { attackerType: 'BOSS', damage: 10, petRemainingHealth: 110, bossRemainingHealth: 45 },
-            {
-              attackerType: 'PET',
-              damage: 45,
-              petRemainingHealth: 110,
-              bossRemainingHealth: 0,
-              isCritical: true,
-            },
-          ];
-          data =
-            path === 'tower/challenge'
-              ? { battleRounds: rounds, win: true, rewardPoints: 10 }
-              : rounds;
-        } else if (path === 'tower/progress')
-          data = {
-            maxFloor: 2,
-            completed: false,
-            nextMonster: { ...boss, floor: 3, avatarUrl: boss.avatar },
-          };
+        else if (isPetChallengePath(path))
+          return route.fulfill({ json: petChallengeResponse(path, url, state, pet) });
         else if (path === 'pet/autoFeed/config') {
           if (route.request().method() === 'POST') {
             state.auto = route.request().postDataJSON() as typeof state.auto;

@@ -93,8 +93,8 @@ for (const skin of builtinSkins)
         expect(state.activity.competitions).toBe(1);
         await dialog.getByRole('combobox', { name: '挑战分类' }).click();
         await page.getByRole('option', { name: '逐层试炼', exact: true }).click();
-        await dialog.getByRole('button', { name: '查看试炼', exact: true }).click();
-        await dialog.getByRole('button', { name: '开始挑战', exact: true }).click();
+        await dialog.getByRole('button', { name: '开始试炼', exact: true }).click();
+        await dialog.getByRole('button', { name: '开始试炼', exact: true }).click();
         await dialog.getByRole('button', { name: '跳过演出', exact: true }).click();
         await expect(
           dialog.getByText('本次累计伤害 90 · 获得 10 积分', { exact: true }),

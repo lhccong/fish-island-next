@@ -1,4 +1,8 @@
 :root {
+  --color-pet-battle-sky: #c0e7e4;
+  --color-pet-battle-haze: #e5efc8;
+  --color-pet-battle-ink: #334943;
+  --color-pet-battle-hp: #31804a;
   --color-pet-enhance-silver: #a8b4c4;
   --color-pet-enhance-gold: #ffc44d;
   --color-pet-enhance-violet: #b07ce8;
@@ -36,6 +40,10 @@
   --color-pet-panel: #f2f0fa;
 }
 :root[data-color-mode='dark'] {
+  --color-pet-battle-sky: #222d43;
+  --color-pet-battle-haze: #364650;
+  --color-pet-battle-ink: #a0b9ad;
+  --color-pet-battle-hp: #7bc891;
   --color-pet-header-blue: #255c94;
   --color-pet-header-green: #396d45;
   --color-pet-header-amber: #8b5315;

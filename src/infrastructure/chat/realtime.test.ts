@@ -77,6 +77,44 @@ it('StrictMode setup/cleanup does not create an abandoned connection', () => {
   expect(Socket.instances).toHaveLength(0);
 });
 
+it('dispatches game frames through the same connection and disables the extension on disconnect', () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('navigator', { onLine: true });
+  vi.stubGlobal('WebSocket', Socket);
+  const receive = vi.fn();
+  let send: ((frame: unknown) => boolean) | null = null;
+  const connection = createChatRealtime(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic-value' }),
+    vi.fn(),
+    {
+      receive,
+      connection: (_status, sender) => {
+        send = sender;
+      },
+    },
+  ).connect(vi.fn(), vi.fn());
+  vi.advanceTimersByTime(1);
+  const socket = Socket.instances[0]!;
+  socket.open();
+  const gameSend = send as unknown as (frame: unknown) => boolean;
+  expect(
+    gameSend({
+      type: 2,
+      userId: -1,
+      data: { type: 'createChessRoom', content: { gameType: 'normal' } },
+    }),
+  ).toBe(true);
+  socket.onmessage?.({ data: '{"type":"createChessRoom","data":"12345"}' });
+  expect(receive).toHaveBeenCalledOnce();
+  expect(Socket.instances).toHaveLength(1);
+  socket.onclose?.({ code: 1006 });
+  expect(send).toBeNull();
+  connection.close();
+  expect(vi.getTimerCount()).toBe(0);
+});
+
 it('pauses offline, resumes online and reconnects a timed out handshake', () => {
   vi.useFakeTimers();
   const target = new EventTarget();

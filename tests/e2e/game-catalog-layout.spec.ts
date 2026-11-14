@@ -15,7 +15,7 @@ for (const skin of builtinSkins)
           ({ skinId, colorMode }) => {
             localStorage.setItem('fish-island:skin', skinId);
             localStorage.setItem('fish-island:color-mode', colorMode);
-            for (const game of ['farm', 'life', 'stock'])
+            for (const game of ['farm', 'life', 'stock', 'gomoku', 'undercover'])
               localStorage.removeItem(`fish-island:recent-${game}`);
           },
           { skinId: skin.id, colorMode: mode },
@@ -26,7 +26,7 @@ for (const skin of builtinSkins)
           timeout: 15_000,
         });
         const cards = page.getByRole('button', { name: /^打开/ });
-        await expect(cards).toHaveCount(3);
+        await expect(page.getByRole('button', { name: '打开五子棋', exact: true })).toBeVisible();
         const boxes = await cards.evaluateAll((elements) =>
           elements.map((element) => {
             const { x, y, width, height } = element.getBoundingClientRect();
@@ -38,15 +38,18 @@ for (const skin of builtinSkins)
           expect(box.x).toBeGreaterThanOrEqual(4);
           expect(box.x + box.width).toBeLessThanOrEqual(width - 4);
         }
+        expect(boxes.length).toBeGreaterThanOrEqual(4);
         if (width > 760) {
-          expect(boxes[0].y).toBe(boxes[1].y);
-          expect(boxes[1].y).toBe(boxes[2].y);
-          expect(Math.abs(boxes[0].width - boxes[1].width)).toBeLessThan(1);
-          expect(Math.abs(boxes[0].height - boxes[1].height)).toBeLessThan(1);
-          expect(boxes[2].x + boxes[2].width).toBeGreaterThan(width - 60);
+          const firstRow = boxes.filter((box) => Math.abs(box.y - boxes[0].y) < 1);
+          expect(firstRow.length).toBeGreaterThan(1);
+          for (const box of firstRow) {
+            expect(Math.abs(box.width - firstRow[0].width)).toBeLessThan(1);
+            expect(Math.abs(box.height - firstRow[0].height)).toBeLessThan(1);
+          }
+          expect(firstRow.at(-1)!.x + firstRow.at(-1)!.width).toBeGreaterThan(width - 60);
         } else {
-          expect(boxes[1].y).toBeGreaterThan(boxes[0].y + boxes[0].height);
-          expect(boxes[2].y).toBeGreaterThan(boxes[1].y + boxes[1].height);
+          for (let i = 1; i < boxes.length; i++)
+            expect(boxes[i].y).toBeGreaterThan(boxes[i - 1].y + boxes[i - 1].height);
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
           true,

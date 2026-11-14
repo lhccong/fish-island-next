@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
+import { hasRewardMessageContent } from '@/domain/chat';
 import { useChatRealtime } from './realtime-context';
 import styles from './Repetition.module.css';
 export function RepeatButton({ content }: { content: string }) {
@@ -14,6 +15,7 @@ export function RepeatButton({ content }: { content: string }) {
     ),
   );
   const [animate, setAnimate] = useState(false);
+  if (hasRewardMessageContent(content)) return null;
   return (
     <Button
       variant="secondary"

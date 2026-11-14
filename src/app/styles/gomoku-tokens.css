@@ -1,0 +1,14 @@
+:root {
+  --color-gomoku-board: #ead6ae;
+  --color-gomoku-grid: #8b7049;
+  --color-gomoku-black: #252629;
+  --color-gomoku-white: #fffdf5;
+  --color-gomoku-stone-edge: #797363;
+}
+:root[data-color-mode='dark'] {
+  --color-gomoku-board: #443e32;
+  --color-gomoku-grid: #a2967c;
+  --color-gomoku-black: #191a1c;
+  --color-gomoku-white: #e9e7df;
+  --color-gomoku-stone-edge: #999582;
+}

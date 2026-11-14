@@ -6,6 +6,10 @@ export function createChatRealtime(
   baseUrl: string,
   credential: () => SessionToken | null,
   onExpired: () => void,
+  extension?: {
+    receive(raw: unknown): void;
+    connection(state: ChatConnectionState, send: ((frame: unknown) => boolean) | null): void;
+  },
 ): ChatRealtimePort {
   return {
     connect(onEvent, onState) {
@@ -16,7 +20,19 @@ export function createChatRealtime(
       let timer: ReturnType<typeof setTimeout> | undefined;
       let deadline: ReturnType<typeof setTimeout> | undefined;
       let heartbeat: ReturnType<typeof setInterval> | undefined;
-      const state = (value: ChatConnectionState) => onState(value);
+      const send = (frame: unknown) => {
+        if (socket?.readyState !== WebSocket.OPEN) return false;
+        try {
+          socket.send(JSON.stringify(frame));
+          return true;
+        } catch {
+          return false;
+        }
+      };
+      const state = (value: ChatConnectionState) => {
+        onState(value);
+        extension?.connection(value, value === 'connected' ? send : null);
+      };
       const disposeSocket = () => {
         clearTimeout(deadline);
         clearInterval(heartbeat);
@@ -75,6 +91,7 @@ export function createChatRealtime(
             }, 25000);
           };
           current.onmessage = (event) => {
+            extension?.receive(event.data);
             const decoded = decodeChatEvent(event.data);
             if (decoded) onEvent(decoded);
           };

@@ -3,6 +3,7 @@ import type { MessageContentPart } from '@/domain/chat';
 import { MessageImage } from './MessageImage';
 import { MessageText } from './MessageText';
 import { RedPacketMessage } from './RedPacketMessage';
+import { LuckyBagMessage } from './LuckyBagMessage';
 
 export const MessageContent = memo(function MessageContent({
   parts,
@@ -20,11 +21,13 @@ export const MessageContent = memo(function MessageContent({
         ? part.text.length
         : part.kind === 'image'
           ? part.url.length + 11
-          : part.id.length + 23;
+          : part.id.length + (part.kind === 'lucky-bag' ? 21 : 23);
     return part.kind === 'text' ? (
       <MessageText key={key} text={part.text} />
     ) : part.kind === 'image' ? (
       <MessageImage key={key} url={part.url} />
+    ) : part.kind === 'lucky-bag' ? (
+      <LuckyBagMessage key={`${accountId}:${key}`} id={part.id} />
     ) : (
       <RedPacketMessage key={`${accountId}:${key}`} id={part.id} />
     );

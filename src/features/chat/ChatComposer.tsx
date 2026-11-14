@@ -4,6 +4,7 @@ import { Folder, Plus, Scissors } from 'lucide-react';
 import { EmoticonLauncher } from './EmoticonLauncher';
 import { EmoticonFeedback } from './EmoticonFeedback';
 import { RedPacketLauncher } from './RedPacketLauncher';
+import { LuckyBagLauncher } from './LuckyBagLauncher';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
 import { DraftQuote } from './DraftQuote';
@@ -85,6 +86,7 @@ export function ChatComposer({
           </Button>
           <div id={toolsId} className={styles.extraTools}>
             <RedPacketLauncher key={user?.id ?? ''} />
+            <LuckyBagLauncher key={`lucky:${user?.id ?? ''}`} />
             <button type="button" disabled aria-label="文件（暂未接入）">
               <Folder size={20} />
             </button>

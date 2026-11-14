@@ -39,6 +39,7 @@ export interface PetRank {
   id: string;
   userId: string;
   owner: string;
+  ownerAvatar: string;
   name: string;
   url: string;
   level: number;
@@ -49,6 +50,10 @@ export interface Challenger {
   name: string;
   url: string;
   health: number;
+  maxHealth?: number;
+  level?: number;
+  stats?: [string, number][];
+  equipment?: Companion['equipment'];
   attack: number;
   reward: number;
 }
@@ -60,6 +65,8 @@ export interface BattleRound {
   critical: boolean;
   dodge: boolean;
   block: boolean;
+  combo?: boolean;
+  lifesteal?: number;
 }
 export interface BattlePreview {
   self: Challenger;
@@ -73,8 +80,26 @@ export interface BattleResult {
 export type BattleTarget = { kind: 'boss' | 'pet'; id: string } | { kind: 'tower' };
 export interface TowerProgress {
   floor: number;
+  maxOpenFloor: number;
+  nextFloor: number | null;
   completed: boolean;
   next: Challenger | null;
+}
+export interface TowerRank {
+  userId: string;
+  name: string;
+  avatar: string;
+  rank: number;
+  floor: number;
+}
+export interface BossRank {
+  userId: string;
+  name: string;
+  owner: string;
+  avatar: string;
+  petUrl: string;
+  rank: number;
+  damage: number;
 }
 export interface AutoFeed {
   enabled: boolean;
@@ -92,10 +117,7 @@ export interface ForgeDetail {
 }
 export interface PetPort {
   other(userId: string, signal: AbortSignal): Promise<Companion | null>;
-  bossRanks(
-    bossId: string,
-    signal: AbortSignal,
-  ): Promise<{ userId: string; name: string; owner: string; rank: number; damage: number }[]>;
+  bossRanks(bossId: string, signal: AbortSignal): Promise<BossRank[]>;
   batchDecompose(signal: AbortSignal): Promise<number>;
   tournament(signal: AbortSignal): Promise<{ ranks: PetRank[]; mine: number | null }>;
   compete(
@@ -131,6 +153,8 @@ export interface PetPort {
   preview(target: BattleTarget, signal: AbortSignal): Promise<BattlePreview>;
   battle(target: BattleTarget, signal: AbortSignal): Promise<BattleResult>;
   tower(signal: AbortSignal): Promise<TowerProgress>;
+  towerFloor(floor: number, signal: AbortSignal): Promise<Challenger>;
+  towerRanks(signal: AbortSignal): Promise<TowerRank[]>;
   autoFeed(petId: string, signal: AbortSignal): Promise<AutoFeed | null>;
   saveAutoFeed(petId: string, value: AutoFeed, signal: AbortSignal): Promise<AutoFeed>;
   forge(petId: string, slot: number, signal: AbortSignal): Promise<ForgeDetail>;
@@ -177,6 +201,10 @@ export const forgeSlots = [
 ] as const;
 export function boundedPercent(value: number) {
   return Math.max(0, Math.min(100, value));
+}
+// Legacy BattleStatsVO.fromPet: level health plus total equipment health.
+export function companionBattleHealth(pet: Pick<Companion, 'level' | 'stats'>) {
+  return pet.level * 100 + (pet.stats.find(([name]) => name === '生命')?.[1] ?? 0);
 }
 export function campPosition(x: number, y: number) {
   return { x: Math.max(16, Math.min(84, x)), y: Math.max(32, Math.min(80, y)) };

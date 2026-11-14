@@ -1,7 +1,14 @@
 export type MessageContentPart =
   | { kind: 'text'; text: string }
   | { kind: 'image'; url: string }
+  | { kind: 'lucky-bag'; id: string }
   | { kind: 'red-packet'; id: string };
+
+export function hasRewardMessageContent(content: string): boolean {
+  return parseMessageContent(content).some(
+    (part) => part.kind === 'red-packet' || part.kind === 'lucky-bag',
+  );
+}
 
 export function messageClipboardText(content: string): string {
   return parseMessageContent(content)
@@ -10,14 +17,22 @@ export function messageClipboardText(content: string): string {
         ? `${index > 0 ? '\n' : ''}${part.url}${index < parts.length - 1 ? '\n' : ''}`
         : part.kind === 'red-packet'
           ? '[红包]'
-          : part.text,
+          : part.kind === 'lucky-bag'
+            ? '[福袋]'
+            : part.text,
     )
     .join('');
 }
 export function messagePreview(content: string): string {
   const text = parseMessageContent(content)
     .map((part) =>
-      part.kind === 'image' ? '[图片]' : part.kind === 'red-packet' ? '[红包]' : part.text,
+      part.kind === 'image'
+        ? '[图片]'
+        : part.kind === 'red-packet'
+          ? '[红包]'
+          : part.kind === 'lucky-bag'
+            ? '[福袋]'
+            : part.text,
     )
     .join('');
   const characters = Array.from(text);
@@ -41,7 +56,7 @@ export function parseMessageContent(content: string): readonly MessageContentPar
   let position = 0;
   let images = 0;
   let packets = 0;
-  for (const match of content.matchAll(/\[(img|redpacket)\]([\s\S]*?)\[\/\1\]/gi)) {
+  for (const match of content.matchAll(/\[(img|redpacket|luckybag)\]([\s\S]*?)\[\/\1\]/gi)) {
     const image = match[1]!.toLowerCase() === 'img';
     const value = match[2]!.trim();
     const url = image ? chatImageUrl(value) : null;
@@ -53,7 +68,10 @@ export function parseMessageContent(content: string): readonly MessageContentPar
       parts.push({ kind: 'image', url });
       images++;
     } else {
-      parts.push({ kind: 'red-packet', id: value });
+      parts.push({
+        kind: match[1]!.toLowerCase() === 'luckybag' ? 'lucky-bag' : 'red-packet',
+        id: value,
+      });
       packets++;
     }
     position = match.index + match[0].length;

@@ -54,7 +54,10 @@ export const MessageRow = memo(function MessageRow({
       ref={bubbleRef}
       className={styles.bubble}
       data-revoked={message.revoked}
-      data-red-packet-content={!message.revoked && parts.some((part) => part.kind === 'red-packet')}
+      data-red-packet-content={
+        !message.revoked &&
+        parts.some((part) => part.kind === 'red-packet' || part.kind === 'lucky-bag')
+      }
       data-image-only={
         !message.revoked &&
         !message.quote &&

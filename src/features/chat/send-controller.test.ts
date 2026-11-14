@@ -135,3 +135,21 @@ it('direct repeats reject double submission while in flight and preserve exact c
   });
   f.sender.reset();
 });
+
+it('rejects red packet and lucky bag repeats before creating a pending message or request', () => {
+  const f = setup();
+  const ids = f.model.store.getState().ids;
+  for (const content of [
+    '[redpacket]synthetic[/redpacket]',
+    '前文[luckybag]synthetic[/luckybag]后文',
+    '[REDPACKET]synthetic[/REDPACKET]',
+    '[LuckyBag]synthetic[/LuckyBag]',
+  ])
+    expect(f.sender.repeat(content, user)).toBe(false);
+  expect(f.model.store.getState().ids).toBe(ids);
+  expect(f.send).toHaveBeenCalledTimes(1);
+  // Creation publishing and ordinary sends retain their existing protocol.
+  expect(f.sender.send('[redpacket]created[/redpacket]', undefined, user)).toBe(true);
+  expect(f.send).toHaveBeenCalledTimes(2);
+  f.sender.reset();
+});

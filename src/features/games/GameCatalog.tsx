@@ -1,136 +1,105 @@
 import { useState } from 'react';
 import { WindowLauncher } from '@/shared/ui/WindowLauncher';
-import { RotateCcw, Sparkles, Sprout, Sun, ChartCandlestick } from 'lucide-react';
+import { Sparkles, Sprout, Sun, ChartCandlestick, Grid3X3 } from 'lucide-react';
 import styles from './GameCatalog.module.css';
+import { RecentGames, type CatalogGame } from './RecentGames';
+import { UndercoverEntry } from './UndercoverEntry';
 export function GameCatalog({
   onPlay,
   onStock,
   onFarm,
+  onGomoku,
+  onUndercover,
   onWindow,
 }: {
   onPlay: () => void;
   onStock: () => void;
   onFarm: () => void;
-  onWindow: (game: 'farm' | 'life' | 'stock') => void;
+  onGomoku: () => void;
+  onUndercover: () => void;
+  onWindow: (game: CatalogGame) => void;
 }) {
-  const [recentFarm, setRecentFarm] = useState(() => {
-    try {
-      return localStorage.getItem('fish-island:recent-farm') === 'true';
-    } catch {
-      return false;
-    }
+  const [recent, setRecent] = useState<Record<CatalogGame, boolean>>(() => {
+    const read = (game: CatalogGame) => {
+      try {
+        return localStorage.getItem(`fish-island:recent-${game}`) === 'true';
+      } catch {
+        return false;
+      }
+    };
+    return {
+      farm: read('farm'),
+      life: read('life'),
+      stock: read('stock'),
+      gomoku: read('gomoku'),
+      undercover: read('undercover'),
+    };
   });
-  const playFarm = () => {
-    setRecentFarm(true);
-    try {
-      localStorage.setItem('fish-island:recent-farm', 'true');
-    } catch {
-      /* 存储受限不阻断进入 */
-    }
-    onFarm();
-  };
-  const [recent, setRecent] = useState(() => {
-    try {
-      return localStorage.getItem('fish-island:recent-life') === 'true';
-    } catch {
-      return false;
-    }
-  });
-  const [recentStock, setRecentStock] = useState(() => {
-    try {
-      return localStorage.getItem('fish-island:recent-stock') === 'true';
-    } catch {
-      return false;
-    }
-  });
-  const playStock = () => {
-    setRecentStock(true);
-    try {
-      localStorage.setItem('fish-island:recent-stock', 'true');
-    } catch {
-      /* 最近游戏记录不可用时仍可进入 */
-    }
-    onStock();
-  };
-  const play = () => {
-    setRecent(true);
-    try {
-      localStorage.setItem('fish-island:recent-life', 'true');
-    } catch {
-      /* 存储受限时仍可开始。 */
-    }
-    onPlay();
-  };
-  const openWindow = (game: 'farm' | 'life' | 'stock') => {
-    if (game === 'farm') setRecentFarm(true);
-    else if (game === 'stock') setRecentStock(true);
-    else setRecent(true);
+  const remember = (game: CatalogGame) => {
+    setRecent((items) => ({ ...items, [game]: true }));
     try {
       localStorage.setItem(`fish-island:recent-${game}`, 'true');
     } catch {
-      /* 最近游戏记录不可用时仍可打开窗口。 */
+      /* 存储受限不影响游戏入口。 */
     }
+  };
+  const playGame = (game: CatalogGame) => {
+    remember(game);
+    ({ farm: onFarm, life: onPlay, stock: onStock, gomoku: onGomoku, undercover: onUndercover })[
+      game
+    ]();
+  };
+  const playFarm = () => playGame('farm');
+  const play = () => playGame('life');
+  const playStock = () => playGame('stock');
+  const openWindow = (game: CatalogGame) => {
+    remember(game);
     onWindow(game);
   };
   return (
     <div className={styles.catalog}>
-      <section className={styles.recent} aria-labelledby="recent-games-title">
-        <div className={styles.heading}>
-          <h2 id="recent-games-title">最近玩过</h2>
-          <span>
-            {recent || recentStock || recentFarm
-              ? `共${Number(recent) + Number(recentStock) + Number(recentFarm)}款`
-              : '等你来玩'}
-          </span>
-        </div>
-        {recent || recentStock || recentFarm ? (
-          <div className={styles.recentGames}>
-            {recentFarm && (
-              <button type="button" className={styles.recentGame} onClick={playFarm}>
-                <span className={styles.icon}>
-                  <Sprout size={28} aria-hidden="true" />
-                </span>
-                <span>摸鱼农场</span>
-                <small>再玩一次</small>
-              </button>
-            )}
-            {recent && (
-              <button type="button" className={styles.recentGame} onClick={play}>
-                <span className={styles.icon}>
-                  <RotateCcw size={28} aria-hidden="true" />
-                </span>
-                <span>人生重开模拟器</span>
-                <small>再玩一次</small>
-              </button>
-            )}
-            {recentStock && (
-              <button type="button" className={styles.recentGame} onClick={playStock}>
-                <span className={styles.icon}>
-                  <ChartCandlestick size={28} aria-hidden="true" />
-                </span>
-                <span>摸鱼股市</span>
-                <small>再玩一次</small>
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className={styles.empty}>
-            <span className={styles.icon}>
-              <RotateCcw size={26} aria-hidden="true" />
-            </span>
-            <div>
-              <p>你的下一段人生，从这里开始</p>
-              <span>玩过的游戏会留在这里，方便下次找到。</span>
-            </div>
-          </div>
-        )}
-      </section>
+      <RecentGames recent={recent} onPlay={playGame} />
       <section className={styles.recommendations} aria-labelledby="recommended-games-title">
         <div className={styles.heading}>
           <h2 id="recommended-games-title">每日一荐</h2>
           <span>发现另一种可能</span>
         </div>
         <div className={styles.cards}>
+          <UndercoverEntry
+            onPlay={() => playGame('undercover')}
+            onWindow={() => openWindow('undercover')}
+          />
+          <div className={styles.entry}>
+            <button
+              type="button"
+              className={styles.stockCard}
+              onClick={() => playGame('gomoku')}
+              aria-label="打开五子棋"
+            >
+              <div className={styles.stockArt} aria-hidden="true">
+                <span>FISH ISLAND GOMOKU</span>
+                <h3>
+                  一人一手，
+                  <br />
+                  闲暇有对手。
+                </h3>
+                <Grid3X3 size={100} strokeWidth={1} />
+                <p>联机对局 · 单机练习</p>
+              </div>
+              <div className={styles.stockCaption}>
+                <div>
+                  <span>好友房间 · 公共聊天邀请</span>
+                  <h3>五子棋</h3>
+                  <p>执黑先行，和岛友来一场五连对决</p>
+                </div>
+              </div>
+            </button>
+            <WindowLauncher
+              className={styles.windowLauncher ?? ''}
+              label="独立窗口打开五子棋"
+              onClick={() => openWindow('gomoku')}
+            />
+          </div>
           <div className={styles.entry}>
             <button
               type="button"
@@ -239,7 +208,7 @@ export function GameCatalog({
             />
           </div>
         </div>
-        <p className={styles.note}>无需下载，即点即玩 · 农场与股市需登录，进度保存在账号中</p>
+        <p className={styles.note}>无需下载，即点即玩 · 联机游戏、农场与股市需登录</p>
       </section>
     </div>
   );

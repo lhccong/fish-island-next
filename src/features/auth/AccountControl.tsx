@@ -1,8 +1,15 @@
+import type { ReactNode } from 'react';
 import { AccountDialog } from './AccountDialog';
 import { useAuth } from './use-auth';
 import styles from './ui/AccountControl.module.css';
 
-export function AccountControl({ onLogin }: { onLogin: () => void }) {
+export function AccountControl({
+  onLogin,
+  accountActions,
+}: {
+  onLogin: () => void;
+  accountActions?: ReactNode;
+}) {
   const { session, pending, logout, notify } = useAuth();
   async function leave() {
     try {
@@ -15,6 +22,7 @@ export function AccountControl({ onLogin }: { onLogin: () => void }) {
     <div className={styles.account}>
       {session.status === 'authenticated' ? (
         <AccountDialog
+          accountActions={accountActions}
           user={session.user}
           onLogout={() => {
             void leave();

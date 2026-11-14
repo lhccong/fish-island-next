@@ -27,6 +27,8 @@ export function GamesPage() {
             onPlay={() => navigate('/game/life')}
             onStock={() => navigate('/game/stock')}
             onFarm={() => navigate('/game/farm')}
+            onGomoku={() => navigate('/game/piece')}
+            onUndercover={() => navigate('/game/undercover')}
             onWindow={openGame}
           />
         ),

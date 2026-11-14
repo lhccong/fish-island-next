@@ -10,6 +10,7 @@ export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';
 export type ConversationId = string;
 export {
   parseMessageContent,
+  hasRewardMessageContent,
   chatImageUrl,
   messageClipboardText,
   messagePreview,
@@ -102,3 +103,11 @@ export interface SendMessageInput {
 export interface ChatSendPort {
   send(input: SendMessageInput, signal: AbortSignal): Promise<ReceivedMessage>;
 }
+export type {
+  LuckyBagDetail,
+  LuckyBagRecord,
+  LuckyBagPort,
+  LuckyBagCreateInput,
+  LuckyBagFormValues,
+} from './lucky-bag';
+export { LuckyBagCreateError, validateLuckyBagForm } from './lucky-bag';

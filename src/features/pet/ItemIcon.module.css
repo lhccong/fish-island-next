@@ -23,6 +23,32 @@
   height: 48px;
   object-fit: contain;
 }
+.itemIcon[data-size='compact'] {
+  width: 24px;
+  height: 24px;
+  border-width: 1px;
+  border-radius: 2px;
+}
+.itemIcon[data-size='compact'] img {
+  width: 20px;
+  height: 20px;
+}
+.itemIcon[data-size='compact'] > span > svg {
+  width: 16px;
+  height: 16px;
+}
+.itemIcon[data-size='compact'] .badge {
+  top: -5px;
+  right: -3px;
+  padding: 0;
+  border-radius: 3px;
+}
+.itemIcon[data-size='compact'] .badgeText {
+  font-size: 8px;
+  line-height: 10px;
+  padding: 0 2px;
+  border-radius: 2px;
+}
 .itemIcon:not([data-enhance-tier='0']) {
   border-color: transparent;
   background:

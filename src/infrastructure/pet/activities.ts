@@ -52,6 +52,7 @@ export function createPetActivities(
             userId: id(data.userId),
             name: text(data.petName),
             owner: text(data.userName),
+            ownerAvatar: image(data.userAvatar),
             url: image(data.petUrl),
             rank: number(data.rank),
             level: number(data.petLevel),

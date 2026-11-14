@@ -26,6 +26,7 @@ import { ChallengePanel } from './ChallengePanel';
 import { AutoFeedPanel } from './AutoFeedPanel';
 import { ForgePanel } from './ForgePanel';
 import { SupplyPanel } from './SupplyPanel';
+import { ChallengeEntrances } from './ChallengeEntrances';
 import styles from './PetWorkspace.module.css';
 
 const panels = [
@@ -61,6 +62,7 @@ export function PetWorkspace({ service, userId }: { service: PetPort; userId: st
   const resource = usePetResource(load);
   const pet = resource.data ?? null;
   const [panel, setPanel] = useState<PanelId | null>(null);
+  const [challengeMode, setChallengeMode] = useState('rank');
   const [name, setName] = useState('');
   const operation = usePetOperation();
   const selected = panels.find((item) => item.id === panel);
@@ -153,6 +155,13 @@ export function PetWorkspace({ service, userId }: { service: PetPort; userId: st
             </Button>
           </div>
         </div>
+        <ChallengeEntrances
+          disabled={!pet}
+          onSelect={(mode) => {
+            setChallengeMode(mode);
+            setPanel('challenge');
+          }}
+        />
         <nav className={styles.tools} aria-label="伙伴功能">
           {panels.map(({ id, title, icon: Icon }, index) => (
             <button
@@ -160,7 +169,10 @@ export function PetWorkspace({ service, userId }: { service: PetPort; userId: st
               type="button"
               className={styles.tool}
               disabled={!pet}
-              onClick={() => setPanel(id)}
+              onClick={() => {
+                if (id === 'challenge') setChallengeMode('rank');
+                setPanel(id);
+              }}
             >
               <span className={styles.toolIcon} data-tone={index % 3}>
                 <Icon size={22} aria-hidden="true" />
@@ -191,6 +203,7 @@ export function PetWorkspace({ service, userId }: { service: PetPort; userId: st
           title={selected.title}
           description={selected.description}
           onClose={() => setPanel(null)}
+          appearance={panel === 'challenge' ? 'pixel' : 'default'}
         >
           {panel === 'care' && <CarePanel service={service} pet={pet} onChange={onChange} />}
           {(panel === 'bag' || panel === 'catalog' || panel === 'shop') && (
@@ -200,7 +213,13 @@ export function PetWorkspace({ service, userId }: { service: PetPort; userId: st
             <SkinsPanel service={service} currentUrl={pet.url} onChange={onChange} />
           )}
           {panel === 'challenge' && (
-            <ChallengePanel service={service} pet={pet} userId={userId} onChange={onChange} />
+            <ChallengePanel
+              service={service}
+              pet={pet}
+              userId={userId}
+              onChange={onChange}
+              initialMode={challengeMode}
+            />
           )}
           {panel === 'auto' && <AutoFeedPanel service={service} petId={pet.id} />}
           {panel === 'forge' && <ForgePanel service={service} petId={pet.id} onChange={onChange} />}

@@ -27,11 +27,17 @@ const GlobalReader = lazy(() =>
 const GamesPage = lazy(() =>
   import('@/app/pages/GamesPage').then((module) => ({ default: module.GamesPage })),
 );
+const UndercoverPage = lazy(() =>
+  import('@/app/pages/UndercoverPage').then((module) => ({ default: module.UndercoverPage })),
+);
 const StockPage = lazy(() =>
   import('@/app/pages/StockPage').then((module) => ({ default: module.StockPage })),
 );
 const FarmPage = lazy(() =>
   import('@/app/pages/FarmPage').then((module) => ({ default: module.FarmPage })),
+);
+const GomokuPage = lazy(() =>
+  import('@/app/pages/GomokuPage').then((module) => ({ default: module.GomokuPage })),
 );
 const LifeGamePage = lazy(() =>
   import('@/app/pages/LifeGamePage').then((module) => ({ default: module.LifeGamePage })),
@@ -81,6 +87,25 @@ export function AppRoutes() {
             <Route path="/rank/welfare" element={<AboutPage section="welfare" />} />
             <Route path="/rank/other" element={<AboutPage section="other" />} />
             <Route path="/discover/games" element={<GamesPage />} />
+            <Route
+              path="/game/undercover"
+              element={
+                <GameErrorBoundary>
+                  <UndercoverPage />
+                </GameErrorBoundary>
+              }
+            />
+            <Route path="/game/draw" element={<Navigate to="/game/undercover" replace />} />
+            <Route
+              path="/game/piece"
+              element={
+                <RequireAuth>
+                  <GameErrorBoundary>
+                    <GomokuPage />
+                  </GameErrorBoundary>
+                </RequireAuth>
+              }
+            />
             <Route
               path="/game/farm"
               element={

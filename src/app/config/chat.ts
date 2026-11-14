@@ -7,6 +7,7 @@ import {
   createChatHistory,
   createChatSender,
   createRedPacketClient,
+  createLuckyBagClient,
   createChatEmoticons,
   createChatImageUpload,
 } from '@/infrastructure/chat';
@@ -14,8 +15,17 @@ import { createChatRealtimeController } from '@/features/chat';
 import { createBrowserSessionVault } from '@/infrastructure/auth';
 import { authController } from '@/app/config/auth';
 import { apiBaseUrl } from '@/app/config/api';
+import { gameRealtime } from '@/app/config/game-realtime';
+import { undercoverChannel } from '@/app/config/undercover';
 
 const vault = createBrowserSessionVault(apiBaseUrl);
+export const chatLuckyBags = createLuckyBagClient(
+  apiBaseUrl,
+  () => vault.read(),
+  () => {
+    void authController.restore(true);
+  },
+);
 export const chatRemarks = createChatRemarks(
   apiBaseUrl,
   () => vault.read(),
@@ -50,6 +60,16 @@ export const chatRealtime = createChatRealtimeController(
     () => vault.read(),
     () => {
       void authController.restore(true);
+    },
+    {
+      receive(raw) {
+        gameRealtime.receive(raw);
+        undercoverChannel.receive(raw);
+      },
+      connection(state, send) {
+        gameRealtime.connection(state, send);
+        undercoverChannel.connection(state, send);
+      },
     },
   ),
   createChatHistory(

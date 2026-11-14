@@ -1,4 +1,4 @@
-import { parseMessageContent, type ReceivedMessage } from '@/domain/chat';
+import { hasRewardMessageContent, type ReceivedMessage } from '@/domain/chat';
 
 const eligibility = new WeakMap<ReceivedMessage, boolean>();
 function eligible(message: ReceivedMessage) {
@@ -9,7 +9,7 @@ function eligible(message: ReceivedMessage) {
     !message.quote &&
     !!message.content.trim() &&
     !['sending', 'failed'].includes(message.delivery ?? '') &&
-    !parseMessageContent(message.content).some((part) => part.kind === 'red-packet');
+    !hasRewardMessageContent(message.content);
   eligibility.set(message, result);
   return result;
 }

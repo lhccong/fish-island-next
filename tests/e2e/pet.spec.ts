@@ -106,7 +106,7 @@ for (const skin of builtinSkins)
           if (title === '挑战') {
             await dialog.getByRole('combobox', { name: '挑战分类' }).click();
             await page.getByRole('option', { name: '首领挑战', exact: true }).click();
-            await dialog.getByRole('button', { name: '查看挑战', exact: true }).click();
+            await dialog.getByRole('button', { name: '开始挑战', exact: true }).click();
             await dialog.getByRole('button', { name: '开始挑战', exact: true }).click();
             const skip = dialog.getByRole('button', { name: '跳过演出', exact: true });
             await expect(skip).toBeVisible();

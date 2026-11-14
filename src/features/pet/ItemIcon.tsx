@@ -6,15 +6,17 @@ export function ItemIcon({
   url,
   name = '物品',
   level = 0,
+  size = 'default',
 }: {
   url: string;
   name?: string;
   level?: number;
+  size?: 'default' | 'compact';
 }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const tier = enhanceTier(level);
   return (
-    <span className={styles.itemIcon} data-enhance-tier={tier}>
+    <span className={styles.itemIcon} data-enhance-tier={tier} data-size={size}>
       {url && failedUrl !== url ? (
         <img src={url} alt={name} loading="lazy" onError={() => setFailedUrl(url)} />
       ) : (

@@ -1,0 +1,783 @@
+.stage {
+  position: relative;
+  height: 370px;
+  isolation: isolate;
+  overflow: hidden;
+  border: 3px solid var(--color-pet-battle-ink);
+  background: var(--color-pet-battle-sky);
+}
+.landscape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.healthPanel {
+  position: absolute;
+  width: 32%;
+  min-width: 190px;
+  padding: 12px 16px 8px;
+  border: 2px solid var(--color-pet-battle-ink);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 4px 4px 0 var(--color-pet-shadow);
+  z-index: 2;
+}
+.healthPanel[data-side='opponent'] {
+  left: auto;
+  right: 5%;
+  top: 194px;
+}
+.healthPanel[data-side='self'] {
+  right: auto;
+  left: 5%;
+  bottom: 14px;
+}
+.identity {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.identity strong {
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.identity > span {
+  font-size: 11px;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+.healthLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.healthLine b {
+  font:
+    700 12px ui-monospace,
+    monospace;
+  color: var(--color-pet-battle-hp);
+}
+.healthTrack {
+  flex: 1;
+  height: 12px;
+  padding: 2px;
+  border: 1px solid var(--color-pet-battle-ink);
+  background: var(--color-canvas);
+}
+.healthTrack > span {
+  display: block;
+  height: 100%;
+  background: var(--color-pet-battle-hp);
+  transition: width 400ms steps(12, end);
+}
+.healthTrack[data-low='true'] > span {
+  background: var(--color-danger);
+}
+.healthPanel > small {
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  font:
+    12px ui-monospace,
+    monospace;
+}
+.fighter {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 210px;
+  height: 170px;
+}
+.fighter[data-side='self'] {
+  left: 9%;
+  bottom: 154px;
+}
+.fighter[data-side='opponent'] {
+  right: 12%;
+  top: 12px;
+}
+.platform {
+  position: absolute;
+  bottom: 6px;
+  width: 100%;
+  height: 32px;
+  border: 4px solid var(--color-pet-grass-detail);
+  background: var(--color-pet-path);
+  clip-path: polygon(
+    12% 0,
+    88% 0,
+    88% 12%,
+    100% 12%,
+    100% 88%,
+    88% 88%,
+    88% 100%,
+    12% 100%,
+    12% 88%,
+    0 88%,
+    0 12%,
+    12% 12%
+  );
+}
+.sprite {
+  position: relative;
+  align-self: end;
+  margin-bottom: 18px;
+  transition: opacity 200ms;
+}
+.fighter[data-fallen='true'] .sprite {
+  opacity: 0.5;
+}
+.hit {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  z-index: 4;
+  padding: 4px 8px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-pet-battle-ink);
+  color: var(--color-danger);
+  font-size: 20px;
+  font-weight: 800;
+  white-space: nowrap;
+  animation: damage 800ms steps(8, end) both;
+}
+.hit[data-effect='critical'] {
+  font-size: 24px;
+  background: var(--color-pet-header-amber);
+  color: var(--color-pet-header-amber-ink);
+  box-shadow: 4px 4px 0 var(--color-pet-shadow);
+}
+.hit[data-effect='heal'] {
+  color: var(--color-pet-battle-hp);
+  border-color: var(--color-pet-battle-hp);
+}
+.hit[data-effect='dodge'] {
+  color: var(--color-pet-header-ink);
+  background: var(--color-pet-header-blue);
+}
+.hit[data-effect='block'] {
+  color: var(--color-pet-header-ink);
+  background: var(--color-pet-header-violet);
+}
+.hit[data-effect='combo'] {
+  color: var(--color-pet-heading);
+  background: var(--color-pet-panel);
+}
+.impact {
+  position: absolute;
+  top: 30%;
+  left: 40%;
+  color: var(--color-pet-flower);
+  font-size: 90px;
+  line-height: 1;
+  filter: drop-shadow(2px 2px var(--color-pet-wood));
+  pointer-events: none;
+  animation: impact 450ms steps(4, end) both;
+}
+.impact[data-critical='true'] {
+  font-size: 120px;
+}
+.shield,
+.dodgeTrail,
+.healRing,
+.comboSlash {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+.shield {
+  color: var(--color-pet-header-violet);
+  filter: drop-shadow(2px 2px var(--color-surface));
+  animation: shield 650ms steps(5, end) both;
+}
+.dodgeTrail {
+  width: 58px;
+  height: 90px;
+  border-inline: 4px solid var(--color-pet-water-glint);
+  box-shadow:
+    -12px 0 0 var(--color-pet-water-edge),
+    12px 0 0 var(--color-pet-water-edge);
+  animation: evade 650ms steps(6, end) both;
+}
+.healRing {
+  width: 90px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+  border: 4px dashed var(--color-pet-battle-hp);
+  color: var(--color-pet-battle-hp);
+  font:
+    700 60px ui-monospace,
+    monospace;
+  animation: recover 800ms steps(8, end) both;
+}
+.comboSlash {
+  width: 90px;
+  height: 6px;
+  background: var(--color-pet-water-glint);
+  box-shadow: 0 14px 0 var(--color-pet-flower);
+  transform: rotate(-40deg);
+  animation: slash 550ms steps(5, end) both;
+}
+@keyframes shield {
+  from {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+}
+@keyframes evade {
+  from {
+    transform: translateX(-20px);
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+}
+@keyframes recover {
+  from {
+    transform: translateY(15px);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+@keyframes slash {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 1;
+  }
+  50% {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.battle {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+  min-width: 0;
+}
+.battleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.battleHeader h3 {
+  margin: 0;
+  font-size: 20px;
+}
+.battleHeader span {
+  color: var(--color-muted);
+  font:
+    12px ui-monospace,
+    monospace;
+}
+.console {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 3px solid var(--color-pet-battle-ink);
+  background: var(--color-surface);
+  box-shadow: 3px 3px 0 var(--color-pet-shadow);
+}
+.console p {
+  margin: 0;
+  line-height: 1.8;
+  font-size: 14px;
+}
+.console small {
+  color: var(--color-muted);
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+.result {
+  padding: 16px;
+  background: var(--color-accent-soft);
+  border-left: 4px solid var(--color-accent-text);
+  color: var(--color-text);
+}
+.result h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+.result p {
+  margin: 0;
+  font-size: 13px;
+}
+.disclosure {
+  border-block: 1px solid var(--color-border);
+  padding: 12px 4px;
+}
+.disclosure summary {
+  cursor: pointer;
+  font-size: 13px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.disclosure summary::before {
+  content: '+';
+  color: var(--color-accent-text);
+  font:
+    20px ui-monospace,
+    monospace;
+}
+.disclosure[open] summary::before {
+  content: '−';
+}
+.log {
+  padding-left: 28px;
+  font-size: 12px;
+  line-height: 2;
+}
+.note {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.hub {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.entrance {
+  display: grid;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 132px;
+  align-content: center;
+  justify-items: start;
+  padding: 20px;
+  text-align: left;
+  color: var(--color-text);
+  border: 2px solid var(--color-pet-battle-ink);
+  background: var(--color-pet-battle-sky);
+  cursor: pointer;
+}
+.entrance .landscape {
+  opacity: 0.4;
+}
+.entrance strong {
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+.entrance span {
+  font-size: 12px;
+  margin-top: 8px;
+}
+.entrance:hover:not(:disabled) {
+  border-color: var(--color-accent-text);
+}
+.entrance:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.entrance > svg:not(.landscape) {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+.bosses {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+.bossCard {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  border: 2px solid var(--color-pet-battle-ink);
+  background: var(--color-surface);
+}
+.bossPortrait {
+  position: relative;
+  isolation: isolate;
+  min-height: 194px;
+  display: grid;
+  place-items: center;
+  background: var(--color-pet-battle-sky);
+}
+.bossPortrait > span {
+  z-index: 1;
+}
+.bossInfo {
+  padding: 20px;
+  min-width: 0;
+}
+.bossInfo h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 0 0 16px;
+}
+.stats > div {
+  display: grid;
+  gap: 5px;
+}
+.stats dt {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.stats dd {
+  margin: 0;
+  font:
+    700 18px ui-monospace,
+    monospace;
+}
+.tower {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+}
+.towerBanner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  align-items: center;
+  position: relative;
+  isolation: isolate;
+  min-height: 220px;
+  padding: 24px;
+  border: 2px solid var(--color-pet-battle-ink);
+  background: var(--color-pet-battle-sky);
+}
+.towerBanner .landscape {
+  opacity: 0.45;
+}
+.towerBanner h3 {
+  margin: 8px 0;
+  font-size: 28px;
+}
+.towerBanner p {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.towerBanner .floor {
+  font:
+    700 48px ui-monospace,
+    monospace;
+}
+.towerBanner > div {
+  position: relative;
+}
+.floorTrack {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.floorTrack button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  font:
+    14px ui-monospace,
+    monospace;
+}
+.floorTrack button:hover,
+.floorTrack button[aria-current='step'] {
+  border-color: var(--color-accent-text);
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.floorForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+}
+.floorForm label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+.floorForm input {
+  appearance: textfield;
+  width: 100px;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.floorForm input::-webkit-inner-spin-button,
+.floorForm input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+.empty {
+  padding: 32px 16px;
+  text-align: center;
+  border: 2px dashed var(--color-border);
+  background: var(--color-surface);
+}
+.empty h3 {
+  margin: 0 0 10px;
+}
+.empty p {
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+@keyframes damage {
+  from {
+    transform: translate(-50%, 8px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -24px);
+    opacity: 1;
+  }
+}
+@keyframes impact {
+  from {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+@media (max-width: 760px) {
+  .stage {
+    height: 440px;
+  }
+  .healthPanel {
+    min-width: 0;
+    width: 46%;
+    padding: 8px 8px 6px;
+  }
+  .healthPanel[data-side='opponent'] {
+    left: auto;
+    right: 8px;
+    top: 156px;
+  }
+  .healthPanel[data-side='self'] {
+    right: auto;
+    left: 8px;
+    bottom: 8px;
+  }
+  .identity {
+    flex-wrap: wrap;
+    display: grid;
+    gap: 4px;
+  }
+  .identity strong {
+    font-size: 13px;
+  }
+  .identity > span {
+    font-size: 10px;
+  }
+  .healthLine {
+    margin-top: 6px;
+  }
+  .fighter {
+    width: 136px;
+    height: 136px;
+  }
+  .fighter[data-side='opponent'] {
+    right: 4px;
+    top: 12px;
+  }
+  .fighter[data-side='self'] {
+    left: 4px;
+    bottom: 178px;
+  }
+  .fighter[data-side='self'] .sprite {
+    zoom: 0.85;
+  }
+  .fighter[data-side='opponent'] .sprite {
+    zoom: 0.8;
+  }
+  .console {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  .console p {
+    font-size: 13px;
+    min-height: 46px;
+  }
+  .battleHeader h3 {
+    font-size: 17px;
+  }
+  .battleHeader {
+    align-items: start;
+  }
+  .battleHeader span {
+    font-size: 11px;
+  }
+  .hub {
+    gap: 8px;
+  }
+  .entrance {
+    padding: 14px 12px;
+    min-height: 120px;
+  }
+  .entrance strong {
+    font-size: 17px;
+  }
+  .entrance span {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .entrance > svg:not(.landscape) {
+    display: none;
+  }
+  .bossCard {
+    grid-template-columns: 1fr;
+  }
+  .bossPortrait {
+    min-height: 150px;
+  }
+  .bossInfo {
+    padding: 14px;
+  }
+  .bossInfo h3 {
+    font-size: 19px;
+  }
+  .towerBanner {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .towerBanner > div:last-child {
+    justify-self: end;
+  }
+  .towerBanner h3 {
+    font-size: 23px;
+  }
+  .floorForm input,
+  .disclosure summary {
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .healthTrack > span {
+    transition: none;
+  }
+  .hit,
+  .impact {
+    animation: none;
+  }
+  .hit {
+    transform: translateX(-50%);
+  }
+  .impact {
+    display: none;
+  }
+  .shield,
+  .dodgeTrail,
+  .healRing,
+  .comboSlash {
+    animation: none;
+  }
+  .dodgeTrail,
+  .healRing,
+  .comboSlash {
+    display: none;
+  }
+}
+
+.equipment {
+  margin-top: 10px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 10px;
+  min-width: 0;
+}
+.equipment > small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+.gearGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 24px);
+  gap: 4px;
+  justify-content: end;
+}
+.gear {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  min-width: 0;
+}
+.emptyGear {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px dashed var(--color-border);
+  color: var(--color-muted);
+  background: var(--color-canvas);
+}
+/* Keep each health/equipment panel immediately below its own fighter. */
+.healthPanel::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid var(--color-pet-battle-ink);
+  border-left: 2px solid var(--color-pet-battle-ink);
+  background: var(--color-surface);
+  transform: rotate(45deg);
+}
+@media (max-width: 760px) {
+  .gearGrid {
+    grid-template-columns: repeat(3, 24px);
+    justify-content: start;
+    gap: 6px;
+  }
+  .equipment {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+}

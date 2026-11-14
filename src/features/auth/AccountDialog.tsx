@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { LogOut, Pencil, UserRound } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -9,7 +9,15 @@ import { useAuth } from './use-auth';
 import styles from './ui/Profile.module.css';
 import accountStyles from './ui/AccountControl.module.css';
 
-export function AccountDialog({ user, onLogout }: { user: AuthUser; onLogout: () => void }) {
+export function AccountDialog({
+  user,
+  onLogout,
+  accountActions,
+}: {
+  user: AuthUser;
+  onLogout: () => void;
+  accountActions?: ReactNode;
+}) {
   const { pending } = useAuth();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -76,6 +84,7 @@ export function AccountDialog({ user, onLogout }: { user: AuthUser; onLogout: ()
             </p>
           )}
           <div className={styles.actions}>
+            {accountActions}
             <Button
               variant="secondary"
               className={styles.logout}

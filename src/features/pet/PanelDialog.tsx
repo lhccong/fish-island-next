@@ -8,11 +8,13 @@ export function PanelDialog({
   description,
   onClose,
   children,
+  appearance = 'default',
 }: {
   title: string;
   description: string;
   onClose: () => void;
   children: ReactNode;
+  appearance?: 'default' | 'pixel';
 }) {
   return (
     <Dialog
@@ -24,7 +26,7 @@ export function PanelDialog({
       description={description}
       showCloseAction={false}
       dismissLabel="关闭面板"
-      className={styles.dialog ?? ''}
+      className={`${styles.dialog} ${appearance === 'pixel' ? styles.pixelDialog : ''}`}
     >
       <ScrollArea label={`${title}内容`} gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.body}>{children}</div>

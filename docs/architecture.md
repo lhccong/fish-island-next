@@ -46,6 +46,14 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-064 迁移账号签到、月度日历和补签，domain/sign-in、infrastructure/sign-in、features/sign-in 分层，app 通过账号资料插槽注入，独立请求状态不影响聊天。见 ADR-064。
+
+ADR-063 迁移谁是卧底同屏游戏与联机房间，domain/undercover 定义规则和端口，infrastructure/undercover 适配旧协议，features/undercover 分离对局、房间、消息与草稿，app 注入并复用账号唯一 WebSocket，见 ADR-063。
+
+ADR-061 补齐宠物 Boss 与爬塔直达入口、楼层预览和爬塔排行，以像素场景回放服务端回合；挑战弹窗使用既有控件的呈现变体，协议与状态边界保持独立，见 ADR-061。
+
+ADR-060 迁移聊天福袋发送、参与、消息卡片、进行中列表与中奖记录，创建由服务端广播；账号级 active store 统一列表快照与可参与数量角标，按实时事件和到期时间更新，账号独立状态与既有分层保持一致，见 ADR-060。
+
 ADR-059 优化 HTTP 聊天发送等待链：后端合并 Redis 消息 ID 预留并异步预热可选地区；前端收到已落库的同账号广播即可确认发送，保持同一发送协议和状态边界，见 ADR-059。
 
 ADR-058 增加本地聊天列表外观偏好端口、存储适配及独立 Provider，支持自定义名称和摘要呈现 Todo 清单，桌面/手机/WPS 共用编辑入口，不改变真实成员或消息状态，见 ADR-058。
@@ -279,3 +287,7 @@ ADR-050 补充 shared/ui/Toast 顶部无占位反馈及农场好友木质列表�
 ADR-051 为三款游戏接入 app 跨路由浮窗宿主，共享 FloatingWindow 包装既有 Radix 非模态窗口；复用原有 feature 和服务，收起/切换保留挂载，账号切换释放受保护内容。详见 ADR-051。
 
 ADR-057 在 appearance 内新增独立标签页名称与图标本地偏好，app 的 TabIdentityProvider 应用浏览器标题及图标；复用主题弹窗入口，与主题、模式和业务状态独立，详见 ADR-057。
+
+ADR-062 迁移联机五子棋 /game/piece：独立 domain/gomoku、infrastructure/gomoku、features/gomoku 分层；app 将游戏扩展注入现有账号 WebSocket，不新增连接。棋局规则、单机 AI 与联机状态隔离，断线停棋，邀请复用公共聊天，详见 ADR-062。
+
+ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；聊天精确订阅屏蔽偏好。详见 ADR-065。

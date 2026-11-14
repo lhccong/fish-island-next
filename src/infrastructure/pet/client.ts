@@ -86,6 +86,8 @@ export function createPetClient(
             userId: id(data.userId),
             name: text(data.petName),
             owner: text(data.userName),
+            avatar: image(data.userAvatar),
+            petUrl: image(data.petAvatar),
             rank: number(data.rank),
             damage: number(data.damage),
           };
@@ -156,6 +158,7 @@ export function createPetClient(
           id: id(data.petId),
           userId: id(data.userId),
           owner: text(data.userName),
+          ownerAvatar: image(data.userAvatar),
           name: text(data.name),
           url: image(data.petUrl),
           level: number(data.level),
@@ -195,9 +198,27 @@ export function createPetClient(
       const data = record(await request('tower/progress', signal));
       return {
         floor: number(data.maxFloor),
+        maxOpenFloor: number(data.maxOpenFloor),
+        nextFloor:
+          data.completed === true ? null : number(data.nextFloor, number(data.maxFloor) + 1),
         completed: data.completed === true,
         next: data.nextMonster ? challenger(data.nextMonster) : null,
       };
+    },
+    async towerFloor(floor, signal) {
+      return challenger(await request(`tower/floor?${query({ floor })}`, signal));
+    },
+    async towerRanks(signal) {
+      return list(await request('tower/ranking?limit=20', signal), (value) => {
+        const data = record(value);
+        return {
+          userId: id(data.userId),
+          name: text(data.userName) || '岛友',
+          avatar: image(data.userAvatar),
+          rank: number(data.rank),
+          floor: number(data.maxFloor),
+        };
+      });
     },
     async autoFeed(petId, signal) {
       const data = await request(`pet/autoFeed/config?${query({ petId })}`, signal);

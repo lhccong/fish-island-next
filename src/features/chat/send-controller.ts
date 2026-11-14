@@ -1,5 +1,6 @@
 import type { AuthUser } from '@/domain/auth';
 import type { ChatSendPort, SendMessageInput } from '@/domain/chat';
+import { hasRewardMessageContent } from '@/domain/chat';
 import type { createMessageStore } from './message-store';
 
 export function createSendController(
@@ -94,6 +95,7 @@ export function createSendController(
   return {
     enqueue,
     repeat(content: string, user: AuthUser) {
+      if (hasRewardMessageContent(content)) return false;
       if (
         [...inputs.keys()].some(
           (key) =>

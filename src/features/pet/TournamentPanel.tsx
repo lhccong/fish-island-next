@@ -3,7 +3,8 @@ import type { PetPort } from '@/domain/pet';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
-import { PetSprite } from './PetSprite';
+import { PetRankRow } from './PetRankRow';
+import rankingStyles from './Rankings.module.css';
 import styles from './Panels.module.css';
 
 export function TournamentPanel({
@@ -31,17 +32,18 @@ export function TournamentPanel({
           <>
             <p>我的名次：{data.mine ?? '尚未上榜'}</p>
             {!data.ranks.length && <div className={styles.feedback}>今日暂无排位记录。</div>}
-            <div className={styles.stack}>
+            <ol className={rankingStyles.list} hidden={!data.ranks.length}>
               {data.ranks.map((entry) => (
-                <div className={styles.rankRow} key={entry.id}>
-                  <span className={styles.rank}>{entry.rank}</span>
-                  <PetSprite name={entry.name} url={entry.url} size={44} />
-                  <div>
-                    <strong>{entry.name}</strong>
-                    <small>
-                      {entry.owner} · Lv.{entry.level}
-                    </small>
-                  </div>
+                <PetRankRow
+                  key={entry.id}
+                  rank={entry.rank}
+                  name={entry.name}
+                  owner={entry.owner}
+                  avatar={entry.ownerAvatar}
+                  petUrl={entry.url}
+                  metric={`Lv.${entry.level}`}
+                  mine={entry.userId === userId}
+                >
                   <ConfirmAction
                     label="挑战排位"
                     disabled={entry.userId === userId}
@@ -57,9 +59,9 @@ export function TournamentPanel({
                       onChange();
                     }}
                   />
-                </div>
+                </PetRankRow>
               ))}
-            </div>
+            </ol>
           </>
         )}
       </ResourceView>

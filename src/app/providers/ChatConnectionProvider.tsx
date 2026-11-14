@@ -6,6 +6,7 @@ import {
   chatRemarks,
   chatPreferences,
   chatRedPackets,
+  chatLuckyBags,
   chatEmoticons,
   chatImageUpload,
 } from '@/app/config/chat';
@@ -23,6 +24,7 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
       user={session.status === 'authenticated' ? session.user : undefined}
       preferences={chatPreferences}
       redPackets={chatRedPackets}
+      luckyBagPort={chatLuckyBags}
       emoticonPort={chatEmoticons}
       imageUploadPort={chatImageUpload}
     >

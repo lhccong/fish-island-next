@@ -1,4 +1,6 @@
 import type { AuthUser } from '@/domain/auth';
+import type { LuckyBagController } from './lucky-bag-controller';
+import type { LuckyBagCreation } from './lucky-bag-creation';
 import { createContext, useContext, type RefObject } from 'react';
 import type { ChatDraft } from './chat-draft';
 import type { ImageUploadController } from './image-upload-controller';
@@ -13,6 +15,8 @@ import type { MessageNavigation } from './message-navigation';
 
 export const ChatRealtimeContext = createContext<{
   controller: ChatRealtimeController;
+  luckyBags: LuckyBagController;
+  luckyBagCreation: LuckyBagCreation;
   navigation: MessageNavigation;
   userId: string;
   user?: AuthUser | undefined;

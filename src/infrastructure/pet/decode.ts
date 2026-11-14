@@ -136,6 +136,16 @@ export function challenger(value: unknown): Challenger {
     name: text(data.name) || '挑战对手',
     url: image(data.avatar ?? data.avatarUrl),
     health: number(data.currentHealth ?? data.health ?? data.maxHealth),
+    maxHealth: number(data.maxHealth ?? data.health ?? data.currentHealth),
+    ...(data.level == null ? {} : { level: number(data.level) }),
+    stats: stats(data),
+    ...(data.equippedItems == null
+      ? {}
+      : {
+          equipment: Object.entries(record(data.equippedItems))
+            .filter(([, value]) => value !== null)
+            .map(([slot, value]) => ({ slot, item: item(value, true) })),
+        }),
     attack: number(data.attack),
     reward: number(data.rewardPoints),
   };
@@ -152,6 +162,8 @@ export function round(value: unknown): BattleRound {
     critical: data.isCritical === true,
     dodge: data.isDodge === true,
     block: data.isBlock === true,
+    combo: data.isCombo === true,
+    lifesteal: number(data.lifestealHeal),
   };
 }
 export function autoFeed(value: unknown): AutoFeed {
