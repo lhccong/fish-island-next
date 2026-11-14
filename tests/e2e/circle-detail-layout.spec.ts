@@ -8,6 +8,8 @@ for (const skin of builtinSkins)
     test(`${skin.id} ${mode}: detail columns, inner comments and reply form`, async ({
       page,
     }, info) => {
+      if ((page.viewportSize()?.width ?? 1280) > 760)
+        await page.setViewportSize({ width: 1920, height: 1080 });
       await page.addInitScript(
         ({ skin, mode }) => {
           localStorage.setItem('fish-island:skin', skin);
@@ -159,8 +161,15 @@ for (const skin of builtinSkins)
       feed.mutationFailure = false;
       await form.getByRole('button', { name: '发送评论' }).click();
       await expect(comments.getByRole('status').filter({ hasText: '评论成功' })).toBeVisible();
-      expect(feed.replyParent).toBe('3017');
+      expect(feed.replyParent).toBe('5000');
       expect(feed.replyUser).toBe('999');
+      const sent = target.locator('[data-comment-id="6000"]');
+      await expect(sent.getByText('切换宽度后仍保留的回复草稿', { exact: true })).toBeVisible();
+      await expect(sent.getByRole('button', { name: '置顶评论', exact: true })).toHaveCount(0);
+      await target.getByRole('button', { name: '收起回复', exact: true }).click();
+      await expect(sent).toHaveCount(0);
+      await target.getByRole('button', { name: '查看 1 条回复', exact: true }).click();
+      await expect(sent).toBeVisible();
       await expect(editor).toHaveValue('');
       await detail.getByRole('button', { name: '返回鱼小圈' }).click();
       state.detailFailure = true;

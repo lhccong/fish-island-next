@@ -122,7 +122,7 @@ test('a full page of comments and child replies loads, paginates and retries cor
   await card.getByRole('textbox', { name: '评论内容' }).fill('合成的子回复测试');
   await card.getByRole('button', { name: '发送评论', exact: true }).click();
   await expect(card.getByText('合成的子回复测试', { exact: true })).toBeVisible();
-  expect(state.replyParent).toBe('3009');
+  expect(state.replyParent).toBe('4009');
   expect(state.replyUser).toBe('999');
   await noOverflow(page);
 });

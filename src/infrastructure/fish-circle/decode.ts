@@ -57,11 +57,21 @@ export function moment(v: unknown): Moment {
   };
 }
 export function comment(v: unknown): Comment {
-  return decodeComment(v, 0);
+  const root = decodeComment(v);
+  const pending = [{ raw: record(v), decoded: root }];
+  while (pending.length) {
+    const { raw, decoded } = pending.pop()!;
+    if (!Array.isArray(raw.children)) continue;
+    for (const child of raw.children) {
+      const next = decodeComment(child);
+      decoded.children.push(next);
+      pending.push({ raw: record(child), decoded: next });
+    }
+  }
+  return root;
 }
-function decodeComment(v: unknown, depth: number): Comment {
+function decodeComment(v: unknown): Comment {
   const c = record(v);
-  if (depth > 8) throw new CircleError('评论层级异常');
   const images: Media[] = [];
   const content = text(c.content).replace(
     /\[img:(https?:\/\/[^\]\s]+)\]/g,
@@ -82,9 +92,7 @@ function decodeComment(v: unknown, depth: number): Comment {
     replyName: text(c.replyUserName),
     createdAt: text(c.createTime),
     top: c.isTop === 1,
-    children: Array.isArray(c.children)
-      ? c.children.map((x: unknown) => decodeComment(x, depth + 1))
-      : [],
+    children: [],
   };
 }
 export function page<T>(value: unknown, decode: (v: unknown) => T): Page<T> {

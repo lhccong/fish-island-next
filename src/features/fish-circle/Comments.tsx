@@ -73,7 +73,7 @@ export function Comments({
   function commentCount(c: Comment): number {
     return 1 + c.children.reduce((n, child) => n + commentCount(child), 0);
   }
-  function renderComment(c: Comment, root: Comment = c) {
+  function renderComment(c: Comment, ancestors: string[] = []) {
     const highlighted = anchor.match?.status === 'found' && anchor.match.id === c.id;
     const repliesOpen =
       replyOverrides.get(c.id) ??
@@ -104,12 +104,11 @@ export function Comments({
               onClick={(event) => {
                 replyElement.current = event.currentTarget.closest('li');
                 onStartReply();
-                setReply({
-                  ...root,
-                  userId: c.userId,
-                  userName: c.userName,
-                  content: c.content,
-                  media: c.media,
+                setReply(c);
+                setReplyOverrides((old) => {
+                  const next = new Map(old);
+                  for (const id of [...ancestors, c.id]) next.set(id, true);
+                  return next;
                 });
               }}
             >
@@ -134,7 +133,7 @@ export function Comments({
                 删除评论
               </button>
             )}
-            {canManage && (
+            {canManage && ancestors.length === 0 && (
               <button
                 type="button"
                 disabled={operation.pending}
@@ -150,30 +149,30 @@ export function Comments({
               </button>
             )}
           </div>
-          {c.children.length > 0 && (
-            <>
-              <button
-                className={styles.more}
-                type="button"
-                aria-expanded={repliesOpen}
-                onClick={() =>
-                  setReplyOverrides((old) => {
-                    const next = new Map(old);
-                    next.set(c.id, !repliesOpen);
-                    return next;
-                  })
-                }
-              >
-                {repliesOpen ? '收起回复' : `查看 ${c.children.length} 条回复`}
-              </button>
-              {repliesOpen && (
-                <ul className={styles.replies}>
-                  {c.children.map((child) => renderComment(child, root))}
-                </ul>
-              )}
-            </>
-          )}
         </div>
+        {c.children.length > 0 && (
+          <div className={styles.thread}>
+            <button
+              className={styles.more}
+              type="button"
+              aria-expanded={repliesOpen}
+              onClick={() =>
+                setReplyOverrides((old) => {
+                  const next = new Map(old);
+                  next.set(c.id, !repliesOpen);
+                  return next;
+                })
+              }
+            >
+              {repliesOpen ? '收起回复' : `查看 ${c.children.length} 条回复`}
+            </button>
+            {repliesOpen && (
+              <ul className={styles.replies}>
+                {c.children.map((child) => renderComment(child, [...ancestors, c.id]))}
+              </ul>
+            )}
+          </div>
+        )}
       </li>
     );
   }

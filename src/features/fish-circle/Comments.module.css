@@ -42,10 +42,23 @@
   margin: 0;
 }
 .comment {
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
   align-items: flex-start;
   gap: var(--space-2);
   margin-bottom: var(--space-3);
+  row-gap: 0;
+}
+.thread {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-inline-start: 36px;
+}
+.replies .thread {
+  padding-inline-start: 12px;
+}
+.replies .replies .thread {
+  padding-inline-start: 0;
 }
 .content {
   min-width: 0;
@@ -75,6 +88,7 @@
   line-height: 1.6;
 }
 .author {
+  overflow-wrap: anywhere;
   color: var(--color-circle-author);
   font-size: 13px;
   line-height: 1.7;
@@ -171,5 +185,12 @@
   }
   .replies .comment {
     gap: var(--space-1);
+    row-gap: 0;
+  }
+  .thread {
+    padding-inline-start: 32px;
+  }
+  .replies .thread {
+    padding-inline-start: 8px;
   }
 }

@@ -105,7 +105,18 @@ export async function setupDetailLayout(page: Page) {
                                 userName: '通知岛友',
                                 content: state.target,
                                 createTime: '2026-11-12 10:00:00',
-                                children: [],
+                                children: feed.comment
+                                  ? [
+                                      {
+                                        id: '6000',
+                                        userId: '123',
+                                        userName: '合成岛友',
+                                        replyUserName: '通知岛友',
+                                        content: feed.comment,
+                                        children: [],
+                                      },
+                                    ]
+                                  : [],
                               },
                             ],
                           },

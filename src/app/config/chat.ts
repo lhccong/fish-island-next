@@ -2,6 +2,7 @@ import {
   createChatRemarks,
   createChatClient,
   createLocalChatPreferences,
+  createChatListPreferences,
   createChatRealtime,
   createChatHistory,
   createChatSender,
@@ -67,6 +68,7 @@ export const chatRealtime = createChatRealtimeController(
   ),
 );
 export const chatPreferences = createLocalChatPreferences();
+export const chatListPreferences = createChatListPreferences();
 export const chatService = createChatClient(
   apiBaseUrl,
   () => vault.read(),

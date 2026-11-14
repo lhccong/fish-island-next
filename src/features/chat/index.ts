@@ -1,4 +1,5 @@
 export { ChatWorkspace } from './ChatWorkspace';
+export { ChatListProvider } from './ChatListProvider';
 export { useLocalGroupName } from './use-local-group-name';
 export { ChatMembersProvider } from './ChatMembersProvider';
 export { ChatOnlineUsers } from './ChatOnlineUsers';

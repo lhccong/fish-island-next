@@ -44,10 +44,12 @@ describe('fish circle compatibility', () => {
     expect(result.items[9]?.children[0]?.content).toBe('reply');
     expect(result.total).toBe(15);
   });
-  it('keeps the guard for actual excessive reply nesting', () => {
+  it('preserves deep reply trees instead of rejecting the entire page after eight levels', () => {
     let nested: unknown = { id: '100', userId: '123' };
     for (let i = 0; i < 10; i++) nested = { id: String(i), userId: '123', children: [nested] };
-    expect(() => comment(nested)).toThrow('评论层级异常');
+    let decoded = comment(nested);
+    for (let i = 0; i < 10; i++) decoded = decoded.children[0]!;
+    expect(decoded.id).toBe('100');
   });
   it('decodes legacy image comments without executing HTML', () => {
     const decoded = comment({

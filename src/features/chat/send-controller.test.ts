@@ -37,13 +37,13 @@ function setup() {
   };
 }
 it.each(['push-first', 'http-first'])(
-  'merges %s with a stable key and keeps HTTP spinner until settled',
+  'merges %s with a stable key and confirms on either canonical receipt',
   async (order) => {
     const f = setup();
     const message = f.canonical();
     if (order === 'push-first') {
       f.model.apply([{ type: 'message', message }]);
-      expect(f.model.store.getState().messages[f.key]?.delivery).toBe('sending');
+      expect(f.model.store.getState().messages[f.key]?.delivery).toBe('sent');
     }
     f.resolve(message);
     await Promise.resolve();
@@ -90,6 +90,19 @@ it('uses a pushed confirmation when HTTP times out, and cancels account work', a
   await Promise.resolve();
   expect(call[1].aborted).toBe(true);
   expect(f.model.store.getState().ids).toEqual([]);
+});
+it('ignores another sender receipt and never retries a confirmed message', async () => {
+  const f = setup();
+  f.model.apply([{ type: 'message', message: { ...f.canonical(), senderId: 'other' } }]);
+  expect(f.model.store.getState().messages[f.key]?.delivery).toBe('sending');
+  f.model.apply([{ type: 'message', message: f.canonical() }]);
+  expect(f.model.store.getState().messages[f.key]?.delivery).toBe('sent');
+  f.reject();
+  await Promise.resolve();
+  f.sender.retry(f.key);
+  expect(f.send).toHaveBeenCalledTimes(1);
+  expect(f.model.store.getState().messages[f.key]?.sendError).toBeUndefined();
+  f.sender.reset();
 });
 it('pins pending and failed messages while evicting confirmed history', () => {
   const f = setup();

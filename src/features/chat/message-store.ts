@@ -81,11 +81,11 @@ export function createMessageStore() {
             : undefined;
           if (localKey) {
             const existing = messages[localKey]!;
-            // Confirmed entities replace previews, retaining the rendering key and HTTP lifecycle.
+            // A canonical entity is broadcast only after persistence; either transport confirms it.
             messages[localKey] = {
               ...message,
-              delivery: existing.delivery === 'failed' ? 'sent' : existing.delivery,
-              sendError: existing.delivery === 'failed' ? undefined : existing.sendError,
+              delivery: existing.delivery ? 'sent' : undefined,
+              sendError: undefined,
               revoked: existing.revoked || tombstones.has(message.id),
               ...(existing.revoked || tombstones.has(message.id) ? { content: '' } : {}),
             };

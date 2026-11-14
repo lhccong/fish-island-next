@@ -1,4 +1,5 @@
 import { BrowserRouter } from 'react-router';
+import { TabIdentityProvider } from '@/app/providers/TabIdentityProvider';
 import { SkinProvider } from '@/app/providers/SkinProvider';
 import { AuthProvider } from '@/features/auth';
 import { authController } from '@/app/config/auth';
@@ -9,6 +10,7 @@ import { NotificationSessionProvider } from '@/app/providers/NotificationSession
 export function App() {
   return (
     <BrowserRouter>
+      <TabIdentityProvider />
       <AuthProvider controller={authController}>
         <ChatConnectionProvider>
           <SkinProvider>

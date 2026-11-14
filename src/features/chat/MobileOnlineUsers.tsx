@@ -3,7 +3,13 @@ import { Dialog } from '@/shared/ui/Dialog';
 import { ChatOnlineUsers } from './ChatOnlineUsers';
 import styles from './MobileOnlineUsers.module.css';
 
-export function MobileOnlineUsers({ groupName }: { groupName: string }) {
+export function MobileOnlineUsers({
+  groupName,
+  alwaysVisible = false,
+}: {
+  groupName: string;
+  alwaysVisible?: boolean;
+}) {
   return (
     <Dialog
       title="聊天列表"
@@ -13,7 +19,11 @@ export function MobileOnlineUsers({ groupName }: { groupName: string }) {
       showCloseAction={false}
       dismissLabel="关闭聊天列表"
       trigger={
-        <button type="button" className={styles.trigger} aria-label="查看聊天列表">
+        <button
+          type="button"
+          className={`${styles.trigger} ${alwaysVisible ? styles.alwaysVisible : ''}`}
+          aria-label="查看聊天列表"
+        >
           <UsersRound size={21} aria-hidden="true" />
         </button>
       }

@@ -35,6 +35,7 @@ for (const skin of builtinSkins)
       expect(Object.keys(commands[0]!).sort()).toEqual(['clientMessageId', 'content']);
       await draft.fill('发送时保留下一条草稿');
       await page.screenshot({ path: info.outputPath('sending.png') });
+      const withNextDraft = await composer.boundingBox();
       await held!.fulfill({ json: { code: 50001, message: '合成失败，请重试' } });
       await expect(page.getByRole('button', { name: '重试发送' })).toBeVisible();
       await expect(draft).toHaveText('发送时保留下一条草稿');
@@ -51,12 +52,15 @@ for (const skin of builtinSkins)
       };
       fixture.broadcast(canonical);
       await expect(page.getByText('服务端昵称', { exact: true })).toBeVisible();
-      await expect(page.getByLabel('消息发送中')).toBeVisible();
-      await held!.fulfill({ json: { code: 0, data: { message: canonical } } });
+      await expect(page.getByLabel('消息发送中')).toHaveCount(0);
+      await expect(page.locator('[data-delivery="sent"]')).toHaveCount(1);
+      // Persistence was confirmed over WS; a delayed HTTP failure cannot undo delivery.
+      await held!.fulfill({ json: { code: 50001, message: '合成迟到的 HTTP 失败' } });
       fixture.broadcast(canonical);
       await expect(page.getByLabel('消息发送中')).toHaveCount(0);
+      await expect(page.getByRole('button', { name: '重试发送' })).toHaveCount(0);
       await expect(composer.getByText('消息已提交', { exact: true })).toHaveCount(0);
-      expect(await composer.boundingBox()).toEqual(beforeSend);
+      expect(await composer.boundingBox()).toEqual(withNextDraft);
       await expect(page.getByText('服务端昵称', { exact: true })).toBeVisible();
       await expect(page.locator('[data-delivery="sent"]')).toHaveCount(1);
       await openMessageActions(page, '1794530000001');

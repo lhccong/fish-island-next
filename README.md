@@ -68,7 +68,7 @@ npm run test:e2e
 
 从后端协议梳理与纯文本聊天闭环开始，随后验证第二种外壳，最后实现声明式皮肤包导入。详细顺序以架构文档为准。
 
-可复制 `.env.example` 为 `.env.local` 并通过 `VITE_API_BASE_URL` 指定后端根地址（不包含 /api）；未设置或空值使用旧后端。替换服务须支持浏览器跨域、凭证与动态认证请求头。`VITE_WS_URL` 暂未使用。前端环境变量不能存放秘密。部署 `dist/` 时需将未知前端路由回退到 index.html。
+可复制 `.env.example` 为 `.env.local` 并通过 `VITE_API_BASE_URL` 指定后端根地址（不包含 /api）；未设置或空值使用旧后端。直接访问其他服务须支持浏览器跨域、凭证与动态认证请求头。本地联调请使用仅在开发模式加载的 `.env.development.local`：将 `VITE_API_BASE_URL` 设为 Vite origin（例如 `http://localhost:5173`），再设置 `VITE_DEV_API_TARGET=http://127.0.0.1:8123`、`VITE_DEV_WS_TARGET=ws://127.0.0.1:8090`，启用 HTTP 与 WebSocket 同源代理；后者把 `/ws/` 转为 Netty 根路径。端口或访问主机改变时同步调整 origin；部署构建须使用部署环境的 API 地址。前端环境变量不能存放秘密。部署 `dist/` 时需将未知前端路由回退到 index.html。
 
 # Linux 部署
 

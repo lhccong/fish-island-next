@@ -11,6 +11,9 @@ import { getWorkPreview } from './work-preview';
 import { buildConversationEntries } from './camouflage-conversations';
 import { CoverAvatar } from './CoverAvatar';
 import styles from './ChatOnlineUsers.module.css';
+import { useChatListAppearance } from './chat-list-context';
+import { ChatListEditor } from './ChatListEditor';
+import { CustomChatEntries } from './CustomChatEntries';
 
 export function ChatOnlineUsers({
   groupName,
@@ -20,6 +23,7 @@ export function ChatOnlineUsers({
   presentation?: 'sidebar' | 'dialog';
 }) {
   const { state, refresh } = useChatMembers();
+  const { appearance, readError } = useChatListAppearance();
   const [query, setQuery] = useState('');
   const { controller } = useRemarks();
   const remarks = useStore(controller.store, (state) => state.remarks);
@@ -55,16 +59,19 @@ export function ChatOnlineUsers({
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
-        <button
-          type="button"
-          className={styles.refresh}
-          disabled={loading}
-          onClick={refresh}
-          aria-label="刷新聊天列表"
-          title="刷新"
-        >
-          <RefreshCw size={18} aria-hidden="true" />
-        </button>
+        <ChatListEditor />
+        {!appearance.custom && (
+          <button
+            type="button"
+            className={styles.refresh}
+            disabled={loading}
+            onClick={refresh}
+            aria-label="刷新聊天列表"
+            title="刷新"
+          >
+            <RefreshCw size={18} aria-hidden="true" />
+          </button>
+        )}
       </div>
       <div className={styles.scroll}>
         <ScrollArea
@@ -83,9 +90,9 @@ export function ChatOnlineUsers({
                   </span>
                   <span
                     className={styles.preview}
-                    title="本地工作伪装摘要：项目进度已同步，请查看最新排期"
+                    title={`本地工作伪装摘要：${appearance.groupPreview}`}
                   >
-                    项目进度已同步，请查看最新排期
+                    {appearance.groupPreview}
                   </span>
                 </div>
                 {time && (
@@ -95,12 +102,18 @@ export function ChatOnlineUsers({
                 )}
               </div>
             )}
-            {loading && (
+            {readError && (
+              <p className={styles.notice} role="alert">
+                {readError}
+              </p>
+            )}
+            {appearance.custom && <CustomChatEntries query={query} />}
+            {!appearance.custom && loading && (
               <p className={styles.notice} role="status">
                 正在加载列表…
               </p>
             )}
-            {state.status === 'error' && (
+            {!appearance.custom && state.status === 'error' && (
               <div className={styles.notice} role="alert">
                 <p>暂时无法加载列表，请检查网络后重试</p>
                 <Button variant="secondary" onClick={refresh}>
@@ -108,7 +121,8 @@ export function ChatOnlineUsers({
                 </Button>
               </div>
             )}
-            {state.status === 'success' &&
+            {!appearance.custom &&
+              state.status === 'success' &&
               (users.length === 0 ? (
                 query.trim() && showGroup ? null : (
                   <p className={styles.notice} role="status">

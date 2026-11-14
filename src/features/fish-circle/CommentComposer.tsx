@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { ImagePlus, X } from 'lucide-react';
 import type { Comment, FishCirclePort, Media } from '@/domain/fish-circle';
 import { Button } from '@/shared/ui/Button';
+import { CommentEmoticons } from './CommentEmoticons';
 import { useOperation } from './use-operation';
 import styles from './CommentComposer.module.css';
 interface Props {
@@ -20,6 +21,22 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
   const replyContext = useId();
   const send = useOperation();
   const upload = useOperation();
+  const [mediaError, setMediaError] = useState('');
+  async function uploadImages(files: File[]) {
+    if (busy) return;
+    setMediaError('');
+    if (files.length > 3 - images.length) {
+      setMediaError('每条评论最多添加 3 张图片，请移除附件后重试');
+      return;
+    }
+    await upload.run(async (signal) => {
+      for (const file of files) {
+        const media = await service.upload(file, signal);
+        if (signal.aborted) return;
+        setImages((old) => [...old, media]);
+      }
+    });
+  }
   const busy = send.pending || upload.pending;
   useEffect(() => {
     form.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
@@ -31,7 +48,7 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
       className={styles.form}
       onSubmit={(e) => {
         e.preventDefault();
-        if (busy) return;
+        if (busy || (!content.trim() && !images.length)) return;
         void send
           .run((signal) => service.comment(momentId, content.trim(), reply, images, signal))
           .then((ok) => {
@@ -66,11 +83,22 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
         disabled={busy}
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        onPaste={(event) => {
+          const files = Array.from(event.clipboardData.items)
+            .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
+            .flatMap((item) => {
+              const file = item.getAsFile();
+              return file ? [file] : [];
+            });
+          if (!files.length) return;
+          event.preventDefault();
+          void uploadImages(files);
+        }}
       />
       {images.length > 0 && (
         <div className={styles.media}>
           {images.map((m, i) => (
-            <div key={m.url}>
+            <div key={`${m.url}-${i}`}>
               <img src={m.url} alt={`评论附件 ${i + 1}`} referrerPolicy="no-referrer" />
               <Button
                 variant="secondary"
@@ -90,18 +118,14 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
           ref={picker}
           aria-label="评论图片"
           type="file"
+          multiple
           hidden
           accept="image/jpeg,image/png,image/gif,image/webp"
           disabled={busy || images.length >= 3}
           onChange={(e) => {
-            const file = e.target.files?.[0];
+            const files = Array.from(e.target.files || []);
             e.target.value = '';
-            if (file)
-              void upload
-                .run((signal) => service.upload(file, signal))
-                .then((media) => {
-                  if (media) setImages((old) => [...old, media].slice(0, 3));
-                });
+            if (files.length) void uploadImages(files);
           }}
         />
         <Button
@@ -112,6 +136,14 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
           <ImagePlus size={16} aria-hidden="true" />
           添加评论图片
         </Button>
+        <CommentEmoticons
+          disabled={busy || images.length >= 3}
+          onSelect={(url) => {
+            if (busy || images.length >= 3) return;
+            setMediaError('');
+            setImages((old) => [...old, { type: 'image', url }]);
+          }}
+        />
         <span className={styles.count}>{images.length}/3 张</span>
         <Button
           type="submit"
@@ -122,7 +154,9 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
         </Button>
       </div>
       {upload.pending && <p role="status">正在上传评论图片…</p>}
-      {(send.error || upload.error) && <p role="alert">{send.error || upload.error}</p>}
+      {(mediaError || send.error || upload.error) && (
+        <p role="alert">{mediaError || send.error || upload.error}</p>
+      )}
     </form>
   );
 }

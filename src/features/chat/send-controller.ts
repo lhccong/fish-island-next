@@ -109,7 +109,8 @@ export function createSendController(
     },
     retry(key: string) {
       const input = inputs.get(key);
-      if (input) void run(key, input);
+      if (input && model.store.getState().messages[key]?.delivery === 'failed')
+        void run(key, input);
     },
     reset() {
       generation++;

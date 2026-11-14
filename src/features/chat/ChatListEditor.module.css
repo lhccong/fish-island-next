@@ -1,0 +1,95 @@
+.trigger {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.trigger:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+.dialog {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: min(680px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+  padding-bottom: max(var(--space-6), env(safe-area-inset-bottom));
+}
+.scroll {
+  min-height: 0;
+  flex: 1;
+}
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 4px 0 8px 4px;
+}
+.body > button {
+  align-self: flex-start;
+}
+.entry {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+.entry legend {
+  padding: 0 4px;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--color-text);
+  font-size: 13px;
+}
+.field input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+}
+.error {
+  color: var(--color-danger);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.notice {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .dialog {
+    padding: 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  .field input {
+    height: 44px;
+    font-size: 16px;
+  }
+}

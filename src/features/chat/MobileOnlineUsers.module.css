@@ -1,6 +1,21 @@
 .trigger {
   display: none;
 }
+.alwaysVisible {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  background: transparent;
+  cursor: pointer;
+}
+.alwaysVisible:hover {
+  background: var(--color-hover);
+}
 .dialog {
   display: flex;
   flex-direction: column;
@@ -15,6 +30,9 @@
   min-height: 0;
 }
 @media (max-width: 760px) {
+  .alwaysVisible {
+    display: none;
+  }
   .trigger {
     display: grid;
     place-items: center;
