@@ -1,6 +1,7 @@
 import { useMessageLocationPulse } from './use-message-location-pulse';
 import { MessageQuote } from './MessageQuote';
 import { RemarkName } from './RemarkName';
+import { SenderTitle } from './SenderTitle';
 import { RepeatButton } from './RepeatButton';
 import { RepetitionParticipants } from './RepetitionParticipants';
 import { LoaderCircle } from 'lucide-react';
@@ -13,13 +14,18 @@ import { MemberAvatar } from './MemberAvatar';
 import { MessageContent } from './MessageContent';
 import { MessageMenu } from './MessageMenu';
 import styles from './MessageStream.module.css';
+import type { ChatPresentation } from './chat-presentation';
 
 export const MessageRow = memo(function MessageRow({
   id,
   showAvatars,
+  presentation = 'conversation',
+  rowNumber,
 }: {
   id: string;
   showAvatars: boolean;
+  presentation?: ChatPresentation;
+  rowNumber: number | undefined;
 }) {
   const { controller, userId, draft, composerRef, navigation } = useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
@@ -78,7 +84,13 @@ export const MessageRow = memo(function MessageRow({
       data-message-id={message.id}
       data-show-avatars={showAvatars}
       data-delivery={message.delivery}
+      data-presentation={presentation}
     >
+      {presentation === 'worksheet' && (
+        <span className={styles.rowNumber} aria-hidden="true">
+          {rowNumber}
+        </span>
+      )}
       {showAvatars && (
         <button
           type="button"
@@ -102,14 +114,23 @@ export const MessageRow = memo(function MessageRow({
       )}
       <div className={styles.messageBody}>
         <div className={styles.meta}>
-          <RemarkName id={message.senderId} name={message.senderName} interactive={false} />
+          <div className={styles.identity}>
+            <RemarkName id={message.senderId} name={message.senderName} interactive={false} />
+            {presentation !== 'worksheet' && (
+              <SenderTitle titleId={message.senderTitleId} level={message.senderLevel} />
+            )}
+          </div>
           <time dateTime={new Date(message.createdAt).toISOString()}>
             {new Date(message.createdAt).toLocaleTimeString('zh-CN', {
               hour: '2-digit',
               minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
             })}
           </time>
-          {!message.revoked && !local && <MessageMenu {...menuProps} presentation="button" />}
+          <span className={styles.messageActions}>
+            {!message.revoked && !local && <MessageMenu {...menuProps} presentation="button" />}
+          </span>
         </div>
         <div className={styles.bubbleLine} data-repeat={!!group}>
           {self && message.delivery === 'sending' && (
@@ -125,23 +146,27 @@ export const MessageRow = memo(function MessageRow({
             </MessageMenu>
           )}
           {group && <RepeatButton content={message.content} />}
-          {group && group.length >= 3 && <RepetitionParticipants ids={group} />}
+          {group && group.length >= 3 && (
+            <RepetitionParticipants ids={group} showTitles={presentation !== 'worksheet'} />
+          )}
         </div>
-        {self && message.delivery === 'failed' && (
-          <div className={styles.revoke}>
-            <span role="status">{message.sendError || '发送失败'}</span>
-            <Button variant="secondary" onClick={() => controller.sender.retry(id)}>
-              重试发送
-            </Button>
-          </div>
-        )}
-        {self && !message.revoked && revoke && (
-          <div className={styles.revoke}>
-            <span role="status">
-              {revoke === 'pending' ? '等待撤回确认…' : '撤回未确认，请从消息菜单重试'}
-            </span>
-          </div>
-        )}
+        <div className={styles.rowFeedback}>
+          {self && message.delivery === 'failed' && (
+            <div className={styles.revoke}>
+              <span role="status">{message.sendError || '发送失败'}</span>
+              <Button variant="secondary" onClick={() => controller.sender.retry(id)}>
+                重试发送
+              </Button>
+            </div>
+          )}
+          {self && !message.revoked && revoke && (
+            <div className={styles.revoke}>
+              <span role="status">
+                {revoke === 'pending' ? '等待撤回确认…' : '撤回未确认，请从消息菜单重试'}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </article>
   );

@@ -38,7 +38,7 @@ export function MessageMenu({
   onRevoke,
   returnFocusRef,
 }: Props) {
-  const { draft, composerRef, emoticons, navigation } = useChatRealtime();
+  const { controller, user, draft, composerRef, emoticons, navigation } = useChatRealtime();
   const remarks = useRemarks();
   const focusDraft = useRef(false);
   const closeFocus = () => {
@@ -107,7 +107,12 @@ export function MessageMenu({
     {
       label: '复读机',
       icon: <Repeat2 size={16} aria-hidden="true" />,
-      onSelect: () => prepare(() => draft.repeat(message.content)),
+      disabled: !user || message.content.length > 5000 || !message.content.trim(),
+      onSelect: () => {
+        if (!user) return;
+        if (!controller.sender.repeat(message.content, user))
+          draft.notify('复读未提交，请处理待发送消息后重试', 'error');
+      },
     },
     ...(self
       ? [

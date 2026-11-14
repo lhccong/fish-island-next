@@ -66,6 +66,11 @@
 .shell[data-navigation-layout='ribbon'][data-sidebar-hidden='true'] .workspace {
   grid-column: 1;
 }
+@media (min-width: 761px) {
+  .shell[data-desktop-header-hidden='true'] .header {
+    display: none;
+  }
+}
 @media (max-width: 760px) {
   .shell[data-mobile-header-hidden='true'] .header {
     display: none;

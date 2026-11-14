@@ -6,6 +6,7 @@ import { PageLoading } from '@/app/components/PageLoading';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
+import { GameWindowsProvider } from '@/app/components/GameWindowsProvider';
 const AboutPage = lazy(() =>
   import('@/app/pages/AboutPage').then((module) => ({ default: module.AboutPage })),
 );
@@ -28,6 +29,9 @@ const GamesPage = lazy(() =>
 );
 const StockPage = lazy(() =>
   import('@/app/pages/StockPage').then((module) => ({ default: module.StockPage })),
+);
+const FarmPage = lazy(() =>
+  import('@/app/pages/FarmPage').then((module) => ({ default: module.FarmPage })),
 );
 const LifeGamePage = lazy(() =>
   import('@/app/pages/LifeGamePage').then((module) => ({ default: module.LifeGamePage })),
@@ -64,7 +68,7 @@ export function AppRoutes() {
       : { ...location, pathname: '/', search: '', hash: '', state: null }
     : location;
   return (
-    <>
+    <GameWindowsProvider>
       <div aria-hidden={isLogin ? true : undefined}>
         <Suspense fallback={<PageLoading />}>
           <Routes location={displayLocation}>
@@ -77,6 +81,14 @@ export function AppRoutes() {
             <Route path="/rank/welfare" element={<AboutPage section="welfare" />} />
             <Route path="/rank/other" element={<AboutPage section="other" />} />
             <Route path="/discover/games" element={<GamesPage />} />
+            <Route
+              path="/game/farm"
+              element={
+                <RequireAuth>
+                  <FarmPage />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/game/stock/:indexCode?"
               element={
@@ -156,6 +168,6 @@ export function AppRoutes() {
           <GlobalReader />
         </Suspense>
       )}
-    </>
+    </GameWindowsProvider>
   );
 }

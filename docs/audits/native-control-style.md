@@ -27,8 +27,16 @@
 
 ## 相邻控件检查
 
+- ADR-053 通知 → 管理：`src/features/fish-circle/NotificationRow.tsx` 与 `CircleNotifications.module.css` 已将复选框改为语义 token 自定义外观，保留原生 checkbox 语义与键盘，标签提供 44px 触控区；通知操作使用共享 DropdownMenu，面板内删除确认操作使用共享 Button，不调用浏览器确认框。
+
 - 未发现应用实现中的 datalist、optgroup 或原生 date/time/month/week/color 选择器，也未发现用于业务交互的 alert/confirm/prompt 调用；安全解码测试里的 javascript:alert 字符串不是实际调用。
 - 保持登录、热榜来源设置、通知未读筛选使用 checkbox 和主题 accent-color；人生重开部分 radio 已使用自定义外观。它们不属于截图中的原生展开面板，本次没有修改这些控件或补做其全部平台的视觉验收。
 - 人生重开/修仙的属性分配、动态打赏和抽奖人数使用 number 输入框，平台数字步进按钮保留为后续视觉复查项。
 - 头像/背景图及发布图片已有自定义上传入口，系统文件选择窗口属于需保留的系统能力。
 - 动态更多操作使用 shared/ui/DropdownMenu，编辑/删除确认使用统一 Dialog。
+
+## 农场迁移（ADR-050）
+
+入口：游戏 → 摸鱼农场 → 选择种子。源码：src/features/farm/SeedDialog.tsx。旧项目原生/Ant Design 控件不复制，作物分类采用 shared/ui/Select，操作与确认使用共享 Button、Dialog、reserved ScrollArea；无新增原生 select、alert、confirm 或 prompt。验证范围与限制见 [农场验收](farm-migration.md)。
+
+农场好友排序（src/features/farm/FarmFriendList.tsx）采用共享 Select 的 pixel 呈现，触发器和 Portal 面板同步羊皮纸语义配色、直角、字号与选中/聚焦状态；保持 Radix 键盘、Esc 与焦点返回，不使用原生下拉列表。

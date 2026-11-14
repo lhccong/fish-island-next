@@ -1,10 +1,12 @@
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { GameCatalog } from '@/features/games';
+import { useGameWindows } from '@/app/components/game-windows-context';
 import { useNavigate } from 'react-router';
 import styles from './GamesPage.module.css';
 
 export function GamesPage() {
+  const openGame = useGameWindows();
   const navigate = useNavigate();
   return (
     <WorkspaceLayout
@@ -24,6 +26,8 @@ export function GamesPage() {
           <GameCatalog
             onPlay={() => navigate('/game/life')}
             onStock={() => navigate('/game/stock')}
+            onFarm={() => navigate('/game/farm')}
+            onWindow={openGame}
           />
         ),
       }}

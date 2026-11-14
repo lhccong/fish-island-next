@@ -95,8 +95,24 @@
   min-height: 24px;
   color: var(--color-muted);
 }
+.pixel {
+  --color-surface: var(--color-pixel-paper);
+  --color-text: var(--color-pixel-ink);
+  --color-muted: var(--color-pixel-muted);
+  --color-border: var(--color-pixel-border);
+  --radius-control: 2px;
+  border-width: 2px;
+  font-size: 13px;
+}
+.pixel .option {
+  border-radius: 0;
+  font-size: 13px;
+}
 @media (max-width: 760px) {
   .trigger {
+    font-size: 16px;
+  }
+  .pixel .option {
     font-size: 16px;
   }
 }

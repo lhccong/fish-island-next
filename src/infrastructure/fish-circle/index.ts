@@ -46,6 +46,22 @@ export function createFishCircleClient(
     return true;
   }
   return {
+    async unreadReminderCount(signal) {
+      const raw = await request('event_remind/my/unread/count', null, signal);
+      const value = typeof raw === 'string' && /^\d+$/.test(raw) ? Number(raw) : raw;
+      if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0)
+        throw new CircleError('未读消息数量异常');
+      return value;
+    },
+    async allReminderAction(action, signal) {
+      return confirmed(
+        await request(
+          `event_remind/${action === 'read' ? 'batch/set/read' : 'all/delete'}`,
+          {},
+          signal,
+        ),
+      );
+    },
     async reminders(current, signal) {
       return page(
         await request(
@@ -64,7 +80,7 @@ export function createFishCircleClient(
     async reminderAction(action, ids, signal) {
       return confirmed(
         await request(
-          `event_remind/batch/${action === 'read' ? 'set/read' : 'delete'}`,
+          `event_remind/batch/${action === 'read' ? 'read' : 'delete'}`,
           { ids },
           signal,
         ),

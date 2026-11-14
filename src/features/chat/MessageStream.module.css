@@ -115,11 +115,23 @@
 .meta {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   max-width: 100%;
   color: var(--color-muted);
   font-size: 12px;
   margin-bottom: 6px;
+}
+.identity {
+  display: contents;
+}
+.messageActions,
+.rowFeedback {
+  display: contents;
+}
+.meta time {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .bubble {
   min-width: 0;
@@ -236,4 +248,197 @@
 
 .quote:hover {
   background: var(--color-hover);
+}
+
+.stream[data-presentation='worksheet'] .list {
+  margin-inline-end: var(--chat-sheet-gutter);
+  border-right: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  background-image:
+    linear-gradient(
+      to right,
+      transparent 35px,
+      var(--color-border) 35px,
+      var(--color-border) 36px,
+      transparent 36px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 31px,
+      var(--color-divider) 31px,
+      var(--color-divider) 32px
+    );
+}
+.row[data-presentation='worksheet'] {
+  display: grid;
+  grid-template-columns: var(--chat-sheet-columns);
+  grid-template-rows: minmax(64px, auto) auto;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.row[data-presentation='worksheet']:hover,
+.row[data-presentation='worksheet']:focus-within {
+  background: var(--color-accent-soft);
+}
+.row[data-presentation='worksheet'] .rowNumber {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  padding: 14px 2px;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-sidebar);
+  color: var(--color-muted);
+  font-size: 11px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.row[data-presentation='worksheet'] .messageBody,
+.row[data-presentation='worksheet'] .meta {
+  display: contents;
+}
+.row[data-presentation='worksheet'] .identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  min-width: 0;
+  padding: 14px 12px;
+  border-right: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 12px;
+}
+.row[data-presentation='worksheet'][data-show-avatars='true'] .identity {
+  padding-left: 56px;
+}
+.row[data-presentation='worksheet'] .senderAvatar {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: start;
+  margin: 6px 4px;
+}
+.row[data-presentation='worksheet'] .meta time {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  padding: 16px 10px;
+  border-right: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.row[data-presentation='worksheet'] .messageActions {
+  display: block;
+  grid-column: 4;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
+  margin: 4px 4px 0 0;
+  z-index: 1;
+}
+.row[data-presentation='worksheet'] .bubbleLine {
+  grid-column: 4;
+  grid-row: 1;
+  align-items: flex-start;
+  padding: 4px 48px 4px 4px;
+  max-width: none;
+}
+.row[data-presentation='worksheet'] .bubble {
+  flex: 1;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 0;
+  background: transparent;
+  font-size: 13px;
+}
+.row[data-presentation='worksheet'] .bubble:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 0;
+}
+.row[data-presentation='worksheet'] .bubble[data-image-only='true'],
+.row[data-presentation='worksheet'] .bubble[data-red-packet-content='true'] {
+  padding: 8px;
+  --chat-image-position: left center;
+}
+.row[data-presentation='worksheet'] .rowFeedback {
+  display: block;
+  grid-column: 4;
+  grid-row: 2;
+  min-width: 0;
+}
+.row[data-presentation='worksheet'] .rowFeedback:empty {
+  display: none;
+}
+.row[data-presentation='worksheet'] .revoke {
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0 12px 8px;
+}
+.row[data-presentation='worksheet'][data-self='true'] .rowNumber {
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  box-shadow: inset 3px 0 var(--color-accent);
+}
+@container chat-conversation (max-width: 640px) {
+  .stream[data-presentation='worksheet'] .list {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent 31px,
+        var(--color-border) 31px,
+        var(--color-border) 32px,
+        transparent 32px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 31px,
+        var(--color-divider) 31px,
+        var(--color-divider) 32px
+      );
+  }
+  .row[data-presentation='worksheet'] {
+    grid-template-columns: 32px minmax(0, 1fr) 52px;
+    grid-template-rows: auto auto auto auto;
+  }
+  .row[data-presentation='worksheet'] .rowNumber {
+    grid-row: 1 / 5;
+  }
+  .row[data-presentation='worksheet'] .identity {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 10px 8px 2px;
+    border: 0;
+  }
+  .row[data-presentation='worksheet'] .meta time {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 0 8px 6px;
+    border: 0;
+    font-size: 11px;
+  }
+  .row[data-presentation='worksheet'][data-show-avatars='true'] .meta time {
+    padding-left: 56px;
+  }
+  .row[data-presentation='worksheet'] .senderAvatar {
+    grid-row: 1 / 3;
+  }
+  .row[data-presentation='worksheet'] .messageActions {
+    grid-column: 3;
+    grid-row: 1 / 3;
+  }
+  .row[data-presentation='worksheet'] .bubbleLine {
+    grid-column: 2 / 4;
+    grid-row: 3;
+    padding: 4px 8px 8px 4px;
+  }
+  .row[data-presentation='worksheet'] .bubble {
+    font-size: 14px;
+  }
+  .row[data-presentation='worksheet'] .rowFeedback {
+    grid-column: 2 / 4;
+    grid-row: 4;
+  }
 }

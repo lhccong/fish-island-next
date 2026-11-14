@@ -26,6 +26,8 @@ for (const skin of builtinSkins)
       await page.route('**/api/event_remind/**', async (route) => {
         requests++;
         const path = new URL(route.request().url()).pathname;
+        if (path.endsWith('/count'))
+          return route.fulfill({ json: { code: 0, data: read || deleted ? 0 : 11 } });
         const body = route.request().postDataJSON();
         expect(route.request().headers()['test-session']).toBe('synthetic-value');
         if (path.endsWith('/page')) {
@@ -61,7 +63,8 @@ for (const skin of builtinSkins)
           });
         }
         if (mutationFail) return route.fulfill({ json: { code: 40000, message: '通知操作失败' } });
-        expect(body.ids.length).toBeGreaterThan(0);
+        if (path.endsWith('/batch/delete') || path.endsWith('/batch/read'))
+          expect(body.ids.length).toBeGreaterThan(0);
         if (path.endsWith('/read')) read = true;
         if (path.endsWith('/delete')) deleted = true;
         return route.fulfill({ json: { code: 0, data: true } });
@@ -93,12 +96,12 @@ for (const skin of builtinSkins)
       expect(current).toBeGreaterThanOrEqual(2);
       mutationFail = true;
       await dialog.getByRole('button', { name: '更多通知操作' }).click();
-      await page.getByRole('menuitem', { name: '已加载消息已读', exact: true }).click();
+      await page.getByRole('menuitem', { name: '全部已读', exact: true }).click();
       await expect(dialog.getByRole('alert')).toHaveText('通知操作失败');
       mutationFail = false;
       await dialog.getByRole('button', { name: '更多通知操作' }).click();
-      await page.getByRole('menuitem', { name: '已加载消息已读', exact: true }).click();
-      await expect(dialog.getByRole('status')).toHaveText('已加载消息已标为已读');
+      await page.getByRole('menuitem', { name: '全部已读', exact: true }).click();
+      await expect(dialog.getByText('全部消息已标为已读', { exact: true })).toBeVisible();
       expect(read).toBe(true);
       await dialog.getByRole('button').filter({ hasText: '通知测试岛友' }).first().click();
       const detail = page.getByRole('region', { name: '动态详情', exact: true });

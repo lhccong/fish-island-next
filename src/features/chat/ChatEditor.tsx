@@ -5,13 +5,16 @@ import { useChatRealtime } from './realtime-context';
 import { editorSelection, readEditor, renderEditor, selectEditor } from './composer-editor';
 import styles from './ChatEditor.module.css';
 import { ComposerMentions } from './ComposerMentions';
+import type { ChatPresentation } from './chat-presentation';
 
 export function ChatEditor({
   onSend,
   onPaste,
+  presentation = 'conversation',
 }: {
   onSend: () => void;
   onPaste: ClipboardEventHandler<HTMLDivElement>;
+  presentation?: ChatPresentation;
 }) {
   const { draft, composerRef } = useChatRealtime();
   const text = useStore(draft.store, (state) => state.text);
@@ -50,6 +53,7 @@ export function ChatEditor({
           {...attributes}
           ref={composerRef}
           className={styles.editor}
+          data-presentation={presentation}
           contentEditable
           suppressContentEditableWarning
           role="textbox"

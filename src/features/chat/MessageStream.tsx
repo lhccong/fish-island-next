@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -9,19 +9,41 @@ import { MessageRow } from './MessageRow';
 import { ConnectionStatus } from './ConnectionStatus';
 import { HistoryBoundary } from './HistoryBoundary';
 import styles from './MessageStream.module.css';
+import { WorksheetHeader } from './WorksheetHeader';
+import type { ChatPresentation } from './chat-presentation';
 
 const key = (_index: number, id: string) => id;
 const listComponents = { Header: HistoryBoundary };
-const row = (_index: number, id: string, showAvatars: boolean) => (
-  <MessageRow id={id} showAvatars={showAvatars} />
+interface RowContext {
+  showAvatars: boolean;
+  presentation: ChatPresentation;
+  firstItemIndex: number;
+}
+const row = (index: number, id: string, context: RowContext) => (
+  <MessageRow
+    id={id}
+    showAvatars={context.showAvatars}
+    presentation={context.presentation}
+    rowNumber={
+      context.presentation === 'worksheet' ? index - context.firstItemIndex + 1 : undefined
+    }
+  />
 );
-export function MessageStream() {
+export function MessageStream({
+  presentation = 'conversation',
+}: {
+  presentation?: ChatPresentation;
+}) {
   const { controller, navigation, avatarPreference: avatars } = useChatRealtime();
   const ids = useStore(controller.store, (state) => state.visibleIds);
   const target = useStore(navigation.store, (state) => state.target);
   const revision = useStore(navigation.store, (state) => state.revision);
   const firstItemIndex = useStore(controller.store, (state) => state.viewFirstItemIndex);
   const initialized = useStore(controller.history.store, (state) => state.initialized);
+  const rowContext = useMemo(
+    () => ({ showAvatars: avatars.showAvatars, presentation, firstItemIndex }),
+    [avatars.showAvatars, presentation, firstItemIndex],
+  );
   useEffect(() => {
     const deactivate = controller.history.activate();
     const retry = setTimeout(() => controller.retry(), 0);
@@ -88,8 +110,9 @@ export function MessageStream() {
     return () => viewport.removeEventListener('scroll', trackPosition);
   }, [viewport, setFollow]);
   return (
-    <section className={styles.stream} aria-label="群聊实时消息">
+    <section className={styles.stream} aria-label="群聊实时消息" data-presentation={presentation}>
       <ConnectionStatus />
+      {presentation === 'worksheet' && <WorksheetHeader />}
       <div className={styles.list}>
         <ScrollArea label="群聊消息区" viewportRef={setViewport}>
           {ids.length === 0 ? (
@@ -106,7 +129,7 @@ export function MessageStream() {
                 firstItemIndex={firstItemIndex}
                 initialTopMostItemIndex={{ index: 'LAST', align: 'end' }}
                 components={listComponents}
-                context={avatars.showAvatars}
+                context={rowContext}
                 computeItemKey={key}
                 itemContent={row}
                 atBottomThreshold={64}

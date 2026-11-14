@@ -46,6 +46,14 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-053 增加账号作用域的通知未读计数 Provider，app 注入，导航与铃铛共享角标；后端区分单条已读、全部已读及全部删除，全部操作覆盖未加载记录。详见 ADR-053。
+
+ADR-053 允许 app 经 fish-circle/notifications/index.ts 访问轻量通知子模块，避免导航加载完整鱼小圈；仅这一命名公开入口纳入 ESLint 例外，内部文件及跨 feature 依赖仍禁止。
+
+ADR-052 为 WPS 聊天注入 worksheet 呈现变体：复用现有消息虚拟列表、精确行订阅与独立输入草稿，以工作表行列、公式栏式输入和群聊标签呈现；窄屏重排单元格，不新增通信或状态分支，见 ADR-052。
+
+ADR-049 将聊天元信息时间显示到秒，并以本地 SVG 重绘旧版 CSS 称号与声明式动效，HTTPS 位图保留原貌与失败回退；沿用消息行订阅与现有主题外壳，见 ADR-049。
+
 ADR-048 补充输入框 @ 在线成员匹配：shared/ui 封装内联候选，chat feature 复用在线快照和独立草稿，不增加请求、连接或消息列表订阅，见 ADR-048。
 
 ADR-047 接入账号私有聊天备注，domain/chat 端口、infrastructure/chat 旧版整份 JSON 协议适配、feature 独立控制器及共享编辑弹窗，由 app 按账号注入。消息与成员名称订阅备注显示，不修改消息实体或 @ 协议，详见 ADR-047。
@@ -68,7 +76,7 @@ ADR-039 迁移摸鱼股市，domain/stock、infrastructure/stock、features/stoc
 
 ADR-038 新增 HTTP 群聊发送，由服务端补齐身份和引用、落库后全员广播；独立发送用例管理临时消息、取消与失败重试，按 clientMessageId 合并 HTTP/WS 确认。详见 ADR-038。
 
-ADR-037 提供消息右键/键盘上下文菜单和手机长按/更多菜单：复制、引用、@TA、复读机及本人撤回。shared/ui 封装既有 Radix 栈 ContextMenu，feature 复用单一撤回用例和独立账号草稿 store；草稿动作不发送消息，详见 ADR-037。
+ADR-037 提供消息右键/键盘上下文菜单和手机长按/更多菜单：复制、引用、@TA、复读机及本人撤回。shared/ui 封装既有 Radix 栈 ContextMenu，feature 复用单一撤回用例和独立账号草稿 store；引用和 @TA 准备草稿，复读机复用 ADR-043 的发送用例直接发送原文并保留草稿，详见 ADR-037。
 
 ADR-036 补齐聊天室首次 HTTP 历史与向上滚动续读；历史和实时共用归一化实体、去重与撤回墓碑，独立历史控制器管理取消、重试和游标。当前窗口上限为 1000 条，边界明确提示，不宣称无限历史或断线续传，详见 ADR-036。
 
@@ -255,3 +263,9 @@ ADR-033 手机视口统一隐藏原生与 Radix 可视滑轨，保留滚动逻�
 ADR-034 统一全系统滚动分页：shared/ui/InfiniteScroll 提供边界观察器和通用分页 Hook，feature 负责领域适配与请求生命周期；后端页码协议保留，界面移除页码及翻页/加载更多按钮。详见 ADR-034。
 
 ADR-032 补充发现内层手机页头仅返回呈现：游戏、阅读、伙伴、关于及人生重开通过 app 组合 `mobileHeader="back-only"` 隐藏标题与菜单，关于分区导航移入正文；桌面与朋友圈封面返回保持原有布局。
+
+ADR-050 迁移摸鱼农场：domain/farm、infrastructure/farm、features/farm 分层，app 注入并懒加载鉴权路由 /game/farm；保留种植、收获、浇水、解锁、好友拜访与偷菜，原创像素场景复用 pet 语义 token，详见 ADR-050。
+
+ADR-050 补充 shared/ui/Toast 顶部无占位反馈及农场好友木质列表；好友/本人/访客头像在 infrastructure/farm 校验后呈现，搜索排序和弹窗切换由 feature 管理。
+
+ADR-051 为三款游戏接入 app 跨路由浮窗宿主，共享 FloatingWindow 包装既有 Radix 非模态窗口；复用原有 feature 和服务，收起/切换保留挂载，账号切换释放受保护内容。详见 ADR-051。

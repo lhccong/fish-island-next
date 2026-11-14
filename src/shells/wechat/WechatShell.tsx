@@ -9,6 +9,7 @@ export function WechatShell({
   hideSidebar = false,
   mobileNavigation = 'tabs',
   hideMobileHeader = false,
+  hideDesktopHeader = false,
   sidebarVariant = 'default',
 }: {
   slots: WorkspaceShellSlots;
@@ -17,6 +18,7 @@ export function WechatShell({
   hideSidebar?: boolean;
   mobileNavigation?: 'tabs' | 'hidden';
   hideMobileHeader?: boolean;
+  hideDesktopHeader?: boolean;
   sidebarVariant?: 'default' | 'chat';
 }) {
   return (
@@ -26,6 +28,7 @@ export function WechatShell({
       data-sidebar-hidden={hideSidebar}
       data-mobile-navigation={mobileNavigation}
       data-mobile-header-hidden={hideMobileHeader}
+      data-desktop-header-hidden={hideDesktopHeader}
       data-sidebar-variant={sidebarVariant}
     >
       <aside className={styles.rail} aria-label="应用导航">

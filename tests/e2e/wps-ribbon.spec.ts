@@ -117,7 +117,8 @@ test('WPS document tabs navigate between authenticated pages and follow browser 
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL('/chat');
   await expect(chat).toHaveAttribute('aria-current', 'page');
-  await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeVisible();
+  await expect(page.getByLabel('消息工作表列', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '鱼岛群聊', level: 1 })).toBeHidden();
   await noOverflow(page);
   await hot.click();
   await expect(page).toHaveURL('/');

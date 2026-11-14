@@ -26,7 +26,10 @@ export function createChatImageUpload(
         onExpired();
         throw new Error('登录已过期，请重新登录');
       }
-      const payload: unknown = await response.json();
+      const payload: unknown = await response.json().catch(() => {
+        signal.throwIfAborted();
+        throw new Error(response.ok ? '图片上传结果异常，请重试' : '图片上传失败，请重试');
+      });
       if (!payload || typeof payload !== 'object' || !('code' in payload))
         throw new Error('图片上传结果异常，请重试');
       if (payload.code === 40100) {

@@ -1,16 +1,9 @@
 .bell {
   position: relative;
 }
-.dot {
-  position: absolute;
-  top: 9px;
-  right: 9px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-danger);
-}
 .panel {
+  display: flex;
+  flex-direction: column;
   width: min(360px, calc(100% - 24px));
   padding: 0;
   left: auto;
@@ -25,6 +18,7 @@
   max-height: calc(100dvh - 24px);
 }
 .panel h2 {
+  flex-shrink: 0;
   height: 48px;
   display: flex;
   align-items: center;
@@ -36,7 +30,8 @@
   justify-content: flex-start;
   white-space: nowrap;
 }
-.panel button {
+.iconButton,
+.item {
   min-height: 44px;
   min-width: 44px;
   border: 0;
@@ -46,16 +41,19 @@
   color: var(--color-muted);
   cursor: pointer;
 }
-.panel button:hover {
+.iconButton:hover,
+.item:hover {
   background: var(--color-hover);
   color: var(--color-text);
 }
-.panel button:disabled {
+.iconButton:disabled,
+.item:disabled {
   opacity: 0.45;
   cursor: default;
 }
 .panel > [role='alert'],
 .panel > [role='status'] {
+  flex-shrink: 0;
   padding: 8px 16px;
   margin: 0;
   font-size: 12px;
@@ -71,6 +69,8 @@
   top: 2px;
 }
 .list {
+  min-height: 0;
+  flex: 0 1 auto;
   --scroll-area-reserved-gutter: 24px;
   height: min(360px, calc(100dvh - 152px));
   width: calc(100% - 12px);
@@ -90,10 +90,25 @@
   border-bottom: 0;
 }
 .row input {
+  appearance: none;
+  flex-shrink: 0;
+  border: 1px solid var(--color-muted);
+  border-radius: 4px;
+  background: var(--color-surface);
   width: 20px;
   height: 20px;
-  margin-right: 12px;
-  accent-color: var(--color-accent);
+  margin: 0;
+}
+.row input:checked {
+  background: var(--color-action);
+  box-shadow: inset 0 0 0 3px var(--color-surface);
+}
+.selection {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  min-height: 44px;
+  cursor: pointer;
 }
 .panel .item {
   display: flex;
@@ -193,18 +208,23 @@
   font-size: 13px;
 }
 .confirm {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 11px;
+  flex-wrap: wrap;
+  font-size: 13px;
   color: var(--color-muted);
-  padding: 0 8px;
-  border-top: 1px solid var(--color-border);
-}
-.confirm {
   padding: 8px 16px;
+  border-top: 1px solid var(--color-border);
   background: var(--color-canvas);
+}
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
 }
 
 @media (max-width: 760px) {

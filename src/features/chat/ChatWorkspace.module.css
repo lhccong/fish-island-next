@@ -7,6 +7,7 @@
   background: var(--color-canvas);
 }
 .conversation {
+  container: chat-conversation / inline-size;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -57,6 +58,23 @@
   display: flex;
   gap: 4px;
 }
+.inputRow {
+  display: flex;
+  flex-direction: column;
+}
+.editorSlot {
+  min-width: 0;
+}
+.editorInput {
+  min-width: 0;
+}
+.extraTools {
+  display: flex;
+  gap: 4px;
+}
+.tools .moreTools {
+  display: none;
+}
 .tools button,
 .iconButton {
   display: grid;
@@ -102,6 +120,9 @@
 }
 .composerFeedback [data-tone='error'] {
   color: var(--color-danger);
+}
+.composerFeedback:empty {
+  display: none;
 }
 .members {
   --member-gutter: var(--space-6);
@@ -262,7 +283,119 @@
   font-size: 12px;
   margin: 0;
 }
+.workspace[data-presentation='worksheet'] {
+  --chat-sheet-gutter: 24px;
+  --chat-sheet-columns: 36px minmax(140px, 180px) 100px minmax(0, 1fr);
+}
+.sheetBar {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 0;
+  padding-left: 36px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-sidebar);
+}
+.sheetTab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 4px 16px;
+  border-inline: 1px solid var(--color-border);
+  box-shadow: inset 0 -2px var(--color-accent);
+  background: var(--color-surface);
+  color: var(--color-accent-text);
+  font-size: 12px;
+  font-weight: 500;
+}
+.sheetTab svg {
+  flex-shrink: 0;
+}
+.sheetTab > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.composer[data-presentation='worksheet'] {
+  padding: 2px 16px 2px 8px;
+  border-top: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.composer[data-presentation='worksheet'] .editorSlot {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-canvas);
+}
+.composer[data-presentation='worksheet'] .editorSlot:focus-within {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: -1px;
+}
+.formulaIcon {
+  box-sizing: content-box;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  color: var(--color-muted);
+  font-size: 17px;
+  font-style: italic;
+  line-height: 18px;
+}
+.composer[data-presentation='worksheet'] .editorInput {
+  flex: 1;
+  border-left: 1px solid var(--color-border);
+}
+@media (min-width: 761px) {
+  .composer[data-presentation='worksheet'] .inputRow {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 4px 12px;
+  }
+  .composer[data-presentation='worksheet'] .editorSlot {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .composer[data-presentation='worksheet'] .actions {
+    display: contents;
+  }
+  .composer[data-presentation='worksheet'] .actions > button {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .composer[data-presentation='worksheet'] .composerFeedback {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .composer[data-presentation='worksheet'] .shortcutHint {
+    display: none;
+  }
+  .toolbarAction {
+    grid-column: 4;
+    grid-row: 1;
+  }
+}
 @media (max-width: 760px) {
+  .workspace[data-presentation='worksheet'] {
+    --chat-sheet-gutter: 20px;
+  }
+  .composer[data-presentation='worksheet'] {
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+  }
+  .composer[data-presentation='worksheet'] .formulaIcon {
+    padding: 6px 5px;
+  }
+  .composer[data-presentation='worksheet'] .editorSlot {
+    border-radius: 0;
+  }
+  .toolbarAction {
+    display: none;
+  }
+  .sheetBar {
+    display: none;
+  }
   .workspace[data-members-open='true'] .conversation {
     visibility: hidden;
   }
@@ -294,13 +427,64 @@
     height: 44px;
   }
   .composer {
-    padding: 4px 16px max(12px, env(safe-area-inset-bottom));
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+    background: var(--color-canvas);
+  }
+  .inputRow {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .editorSlot {
+    flex: 1;
+    align-self: center;
+  }
+  .editorSlot:focus-within {
+    border-radius: var(--radius-control);
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: -2px;
+  }
+  .tools {
+    display: contents;
+  }
+  .tools > button {
+    order: 1;
+    color: var(--color-text);
+    padding: 0;
+  }
+  .tools .moreTools {
+    display: grid;
+  }
+  .extraTools {
+    display: none;
+    order: 4;
+    width: 100%;
+    padding: 12px 4px 8px;
+    gap: 20px;
+    border-top: 1px solid var(--color-border);
+  }
+  .composer[data-tools-open='true'] .extraTools {
+    display: flex;
+  }
+  .extraTools button {
+    background: var(--color-surface);
+    color: var(--color-text);
   }
   .actions {
-    gap: 8px;
+    display: contents;
   }
-  .actions > span {
+  .actions > button {
+    order: 2;
+    flex-shrink: 0;
+  }
+  .composerFeedback {
+    order: 3;
+    width: 100%;
     font-size: 11px;
+  }
+  .shortcutHint {
+    display: none;
   }
   .empty {
     padding: 36px 20px;

@@ -3,6 +3,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { chatService, chatPreferences } from '@/app/config/chat';
 import { useAuth } from '@/features/auth';
+import { useAppearanceStore } from '@/features/appearance';
 import {
   ChatWorkspace,
   useLocalGroupName,
@@ -14,12 +15,18 @@ import styles from './ChatPlaceholderPage.module.css';
 
 export function ChatPlaceholderPage() {
   const { session } = useAuth();
+  const skinId = useAppearanceStore((state) => state.skinId);
+  const presentation = skinId === 'wps' ? 'worksheet' : 'conversation';
   const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
   const [membersOpen, setMembersOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  const formulaTrigger = useRef<HTMLButtonElement>(null);
   const closeMembers = () => {
     setMembersOpen(false);
-    trigger.current?.focus();
+    const visibleTrigger = trigger.current?.getClientRects().length
+      ? trigger.current
+      : formulaTrigger.current;
+    visibleTrigger?.focus();
   };
   if (session.status !== 'authenticated') return null;
   return (
@@ -27,6 +34,8 @@ export function ChatPlaceholderPage() {
       <WorkspaceLayout
         sidebarLabel="聊天会话"
         sidebarVariant="chat"
+        hideSidebar={presentation === 'worksheet'}
+        hideDesktopHeader={presentation === 'worksheet'}
         slots={{
           contentScroll: false,
           sidebar: <ChatOnlineUsers groupName={groupName} />,
@@ -59,6 +68,22 @@ export function ChatPlaceholderPage() {
               onCloseMembers={closeMembers}
               groupName={groupName}
               onRenameGroup={saveGroupName}
+              presentation={presentation}
+              toolbarAction={
+                presentation === 'worksheet' && (
+                  <button
+                    type="button"
+                    ref={formulaTrigger}
+                    className={`${styles.more} ${styles.formulaDetails}`}
+                    aria-label="群聊详情"
+                    aria-expanded={membersOpen}
+                    aria-controls={membersOpen ? 'chat-online-members' : undefined}
+                    onClick={() => setMembersOpen((open) => !open)}
+                  >
+                    <MoreHorizontal size={23} aria-hidden="true" />
+                  </button>
+                )
+              }
             />
           ),
         }}

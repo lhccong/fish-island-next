@@ -73,6 +73,10 @@ ADR-012 的鱼小圈右侧使用默认 `--color-circle-*`、`--shadow-circle-*` 
 
 ## 4. 设计与兼容验收
 
+ADR-052 的 WPS 聊天由 app 显式注入 worksheet 变体；消息和输入保持同一组件与业务状态，隐藏左侧会话栏与消息称号。桌面隐藏群聊标题行，以表格上方 32px 编辑区的 ƒx 公式栏发送消息，发送与详情使用独立列。行列、网格、选区和工作表标签仅使用 surface/canvas/sidebar/border/text/muted/accent 语义变量；窄内容区合并发送者与时间的视觉区域，保留正文、行号与菜单。输入焦点采用主题选区边框，手机保留返回页头、44px 控件、独立草稿、工具展开与安全区。其他主题保持 conversation 呈现，外观切换不触发历史请求或重连。
+
+ADR-049 的称号 SVG 属于可信自有插画，保留旧版局部配色，不随主题或明暗反色；HTTPS 图片称号保持原貌。元信息、占位与失败文字复用 muted 语义颜色，窄屏允许换行，徽章预留尺寸且不挤压正文。不扩大第三方 SVG 导入权限。
+
 ADR-047 的用户备注使用全部主题共用的 Dialog、reserved ScrollArea 与紧凑 Button；名称入口、输入、反馈复用 text/muted/surface/canvas/border/hover/danger 语义变量，手机保持 44px 触控与安全区。切换主题或模式保留备注、编辑输入和请求状态，不修改消息原名或草稿。
 
 ADR-046 的图片查看器使用 canvas 画布、sidebar 工具栏及 text/muted/border/hover/accent 语义变量，全部主题和明暗模式共享布局；图片不染色。桌面保留窗口边距，手机全屏并将工具栏重排两行，安全区保留。主题切换不改变当前图片、缩放、旋转或业务状态。
@@ -119,3 +123,13 @@ ADR-039 的摸鱼股市复用 surface/canvas/text/muted/border/action 语义变�
 股市概览采用全工作区宽度，四项资产卡片、三页签和桌面三列/手机单列指数卡片；所有主题复用同一组合，详情按需加载 K 线。卡片、页签、提示与交易按钮使用既有语义变量，保持明暗可读性，普通买入按钮沿用共享紧凑尺寸而不固定橙色或拉伸。
 
 ADR-042 的发送红包表单采用 canvas 底色、surface 分组行、语义文字/边框和主题动作按钮，移除橙色预览横幅；总积分与个数右对齐，底部汇总使用当前模式文字色。所有主题明暗复用同一表单，默认100积分/10个，模式切换不清空账号草稿或创建/发布状态。
+
+ADR-050 的农场场景复用 color-pet-* 草地、木屋、土壤和像素植物配色，界面与操作使用工作台语义 token；全部注册主题和明暗模式共用，手机三列田地与独立滚动弹窗。切换主题或模式不改变地块选择、种子选择或业务请求。
+
+农场连续田垄使用 color-farm-soil/furrow/edge/soil-ink/grass-ink 明暗语义 token；取消白底卡片与草地网格，仅保留统一田埂和当前悬停/聚焦提示。原始作物图片与表情保留原貌。
+
+ADR-050 好友面板复用 pet-path/path-edge/wood 作为木质外框，surface/text/muted/border 承载列表与输入，action/accent 表达操作和选中；明暗模式分别继承已有 token。顶部 Toast 使用 surface/text/border/accent/shadow-panel，Portal 固定显示且不推动农场布局。
+
+好友面板像素菜单使用 color-pixel-* 明暗纸面/木框 token，局部映射 surface/text/muted/border；主操作维持主题 action。Select 的 pixel 呈现同时覆盖触发器与 Portal 面板，保留统一焦点、选中和禁用状态。
+
+ADR-051 游戏独立窗口沿用 surface/canvas/text/muted/border/action 语义变量；全部注册主题与明暗共用窗口和游戏内核。手机全屏、安全区、44px 控件与 reserved gutter；桌面可拖动和调整大小。外观切换不重挂载游戏或新增业务请求。

@@ -10,6 +10,8 @@ test('theme and mode changes preserve notification page without requests', async
   let requests = 0;
   await page.route('**/api/event_remind/**', (route) => {
     requests++;
+    if (route.request().url().endsWith('/count'))
+      return route.fulfill({ json: { code: 0, data: 2 } });
     const current = route.request().postDataJSON().current;
     return route.fulfill({
       json: {

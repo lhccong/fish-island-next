@@ -69,6 +69,7 @@ for (const skin of builtinSkins)
       });
       const draft = page.getByRole('textbox', { name: '消息草稿' });
       await draft.fill('保留原有聊天草稿');
+      if (mobile) await page.getByRole('button', { name: '更多聊天工具' }).tap();
       const launcher = page.getByRole('button', { name: '发红包', exact: true });
       await expect(launcher).toHaveCSS('width', '44px');
       await act(launcher);

@@ -3,9 +3,10 @@ import type { ShellId, WorkspaceShellSlots } from '@/shells/contracts';
 import { WechatShell } from '@/shells/wechat';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
 import { Link, useLocation } from 'react-router';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import styles from './WorkspaceLayout.module.css';
 import { WorkspaceAccount } from './WorkspaceAccount';
+import type { ReactNode } from 'react';
 
 export function WorkspaceLayout({
   slots,
@@ -14,7 +15,9 @@ export function WorkspaceLayout({
   mobileNavigation,
   sidebarVariant,
   hideMobileHeader = false,
+  hideDesktopHeader = false,
   mobileHeader = 'full',
+  headerAction,
 }: {
   slots: Omit<WorkspaceShellSlots, 'navigation'>;
   sidebarLabel?: string;
@@ -22,10 +25,27 @@ export function WorkspaceLayout({
   mobileNavigation?: 'tabs' | 'hidden';
   sidebarVariant?: 'default' | 'chat';
   hideMobileHeader?: boolean;
+  hideDesktopHeader?: boolean;
   mobileHeader?: 'full' | 'back-only';
+  headerAction?: ReactNode;
 }) {
   const skinId = useAppearanceStore((state) => state.skinId);
   const { pathname } = useLocation();
+  const gamePage = pathname.startsWith('/game/');
+  const backTo = pathname.startsWith('/game/stock/')
+    ? '/game/stock'
+    : gamePage
+      ? '/discover/games'
+      : pathname === '/chat'
+        ? '/'
+        : '/discover';
+  const backLabel = pathname.startsWith('/game/stock/')
+    ? '返回股市概览'
+    : gamePage
+      ? '返回游戏'
+      : pathname === '/chat'
+        ? '返回热榜'
+        : '返回发现';
   const mobileRoot = pathname === '/' || pathname === '/discover' || pathname === '/user/login';
   const shellId: ShellId = skinId === 'wps' ? 'wps' : 'wechat';
   const mobileNavigationMode = mobileNavigation ?? (mobileRoot ? 'tabs' : 'hidden');
@@ -36,6 +56,7 @@ export function WorkspaceLayout({
       hideSidebar={hideSidebar}
       {...(sidebarVariant ? { sidebarVariant } : {})}
       hideMobileHeader={hideMobileHeader}
+      hideDesktopHeader={hideDesktopHeader}
       mobileNavigation={mobileNavigationMode}
       slots={{
         ...slots,
@@ -44,28 +65,19 @@ export function WorkspaceLayout({
             {!mobileRoot && (
               <Link
                 className={styles.back}
-                to={
-                  pathname.startsWith('/game/stock/')
-                    ? '/game/stock'
-                    : pathname.startsWith('/game/')
-                      ? '/discover/games'
-                      : pathname === '/chat'
-                        ? '/'
-                        : '/discover'
-                }
-                aria-label={
-                  pathname.startsWith('/game/stock/')
-                    ? '返回股市概览'
-                    : pathname.startsWith('/game/')
-                      ? '返回游戏'
-                      : pathname === '/chat'
-                        ? '返回热榜'
-                        : '返回发现'
-                }
+                data-game={gamePage}
+                to={backTo}
+                aria-label={backLabel}
+                title={backLabel}
               >
-                <ChevronLeft size={24} aria-hidden="true" />
+                {gamePage ? (
+                  <ArrowLeft size={18} aria-hidden="true" />
+                ) : (
+                  <ChevronLeft size={24} aria-hidden="true" />
+                )}
               </Link>
             )}
+            {headerAction && <div className={styles.headerAction}>{headerAction}</div>}
             <div className={styles.title}>
               {slots.header ?? (mobileRoot && <h1 className={styles.mobileHeading}>今日热榜</h1>)}
             </div>

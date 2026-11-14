@@ -6,6 +6,7 @@ import { stockService } from '@/app/config/stock';
 import { useAuth } from '@/features/auth';
 import { StockWorkspace } from '@/features/stock';
 import styles from './GamesPage.module.css';
+import { GameWindowLauncher } from '@/app/components/GameWindowLauncher';
 export function StockPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export function StockPage() {
   if (session.status !== 'authenticated') return null;
   return (
     <WorkspaceLayout
+      headerAction={<GameWindowLauncher game="stock" />}
       sidebarLabel="发现导航"
       mobileHeader="back-only"
       slots={{

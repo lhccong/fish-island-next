@@ -1,0 +1,37 @@
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  max-width: 100%;
+  color: var(--color-muted);
+  vertical-align: middle;
+}
+
+.badge img {
+  display: block;
+  object-fit: contain;
+}
+
+.artwork {
+  display: block;
+  overflow: visible;
+}
+
+.fallback,
+.unknown {
+  max-width: 100%;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.fallback {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unknown {
+  overflow-wrap: anywhere;
+}

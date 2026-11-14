@@ -94,6 +94,9 @@
   background: var(--color-hover);
 }
 @media (max-width: 760px) {
+  .formulaDetails {
+    display: none;
+  }
   .header {
     min-height: 56px;
     padding: 4px 12px;

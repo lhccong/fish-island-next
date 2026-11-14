@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Route } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { openMessageActions } from './chat-message-actions';
@@ -10,6 +10,12 @@ for (const skin of builtinSkins)
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(error.message));
       const fixture = await setupChatMenu(page, skin.id, mode);
+      const sends: Record<string, string>[] = [];
+      let held: Route | undefined;
+      await page.route('**/api/chat/message/send', (route) => {
+        sends.push(route.request().postDataJSON() as Record<string, string>);
+        held = route;
+      });
       const mobile = page.viewportSize()!.width <= 760;
       const draft = page.getByRole('textbox', { name: '消息草稿' });
       await draft.fill('原有草稿');
@@ -86,9 +92,38 @@ for (const skin of builtinSkins)
       await expect(draft).toHaveText('原有草稿 @合成岛友 ');
       await expect(draft).toBeFocused();
       await select('2', '复读机');
-      const prepared = '原有草稿 @合成岛友 \n岛友原文';
+      const prepared = '原有草稿 @合成岛友 ';
       await expect(draft).toHaveText(prepared);
-      await expect(page.getByText('已将消息追加到草稿', { exact: true })).toBeVisible();
+      await expect(quote).toContainText('岛友原文');
+      await expect(page.locator('[data-message-id="2"]').getByRole('group')).toBeFocused();
+      await expect.poll(() => sends.length).toBe(1);
+      expect(sends[0]!.content).toBe('岛友原文');
+      expect(sends[0]!.quotedMessageId).toBeUndefined();
+      await select('2', '复读机');
+      await expect(page.getByText('复读未提交，请处理待发送消息后重试')).toBeVisible();
+      expect(sends).toHaveLength(1);
+      await held!.fulfill({ json: { code: 50001, message: '合成复读失败' } });
+      await expect(page.getByRole('button', { name: '重试发送' })).toBeVisible();
+      await expect(draft).toHaveText(prepared);
+      await page.getByRole('button', { name: '重试发送' }).click();
+      await expect.poll(() => sends.length).toBe(2);
+      expect(sends[1]).toEqual(sends[0]);
+      await held!.fulfill({
+        json: {
+          code: 0,
+          data: {
+            message: {
+              id: '20',
+              content: sends[1]!.content,
+              clientMessageId: sends[1]!.clientMessageId,
+              sender: { id: '123', name: '本人合成' },
+              timestamp: Date.now(),
+            },
+          },
+        },
+      });
+      await expect(page.getByRole('button', { name: '重试发送' })).toHaveCount(0);
+      await expect(draft).toHaveText(prepared);
       await expect(page.getByRole('button', { name: '发送', exact: true })).toBeEnabled();
       expect(fixture.stats().commands.filter((command) => command.type === 2)).toHaveLength(0);
       await page.screenshot({ path: info.outputPath('draft.png') });
@@ -105,7 +140,7 @@ for (const skin of builtinSkins)
         await picker
           .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
           .click();
-        await picker.getByRole('button', { name: '关闭', exact: true }).click();
+        await picker.getByRole('button', { name: '关闭主题弹窗', exact: true }).click();
         await expect(draft).toHaveText(prepared);
         await expect(quote).toContainText('岛友原文');
       }

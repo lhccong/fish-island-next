@@ -2,6 +2,22 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { createChatImageUpload } from './image-upload';
 
 afterEach(() => vi.unstubAllGlobals());
+it('reports readable errors for unavailable or malformed upload responses', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi
+      .fn()
+      .mockResolvedValueOnce(new Response('', { status: 503 }))
+      .mockResolvedValueOnce(new Response('<html>invalid response</html>')),
+  );
+  const port = createChatImageUpload('', () => ({ name: 'synthetic', value: 'test' }), vi.fn());
+  await expect(
+    port.upload(new File(['x'], 'image.png'), new AbortController().signal),
+  ).rejects.toThrow('图片上传失败，请重试');
+  await expect(
+    port.upload(new File(['x'], 'image.png'), new AbortController().signal),
+  ).rejects.toThrow('图片上传结果异常，请重试');
+});
 it('uploads multipart using the legacy business and authenticated header', async () => {
   const fetcher = vi
     .fn()

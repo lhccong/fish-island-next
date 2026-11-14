@@ -194,11 +194,32 @@ describe('legacy interaction reminders', () => {
     const fetcher = respond(true);
     const client = createFishCircleClient('', token, vi.fn());
     await client.reminderAction('read', ['12'], signal());
-    expect(fetcher.mock.calls[0]![0]).toBe('/api/event_remind/batch/set/read');
+    expect(fetcher.mock.calls[0]![0]).toBe('/api/event_remind/batch/read');
     expect(JSON.parse(fetcher.mock.calls[0]![1].body)).toEqual({ ids: ['12'] });
     await client.reminderAction('delete', ['12'], signal());
     expect(fetcher.mock.calls[1]![0]).toBe('/api/event_remind/batch/delete');
     respond(false);
     await expect(client.reminderAction('read', ['12'], signal())).rejects.toThrow('服务器未确认');
+  });
+  it('reads full unread counts and separates global mutations from selected IDs', async () => {
+    const fetcher = respond('105');
+    const client = createFishCircleClient('', token, vi.fn());
+    expect(await client.unreadReminderCount(signal())).toBe(105);
+    expect(fetcher.mock.calls[0]![0]).toBe('/api/event_remind/my/unread/count');
+    expect(fetcher.mock.calls[0]![1].method).toBe('GET');
+    for (const bad of [true, null, '', '-1', '1.5', -1, 1.5, '9007199254740993']) {
+      respond(bad);
+      await expect(client.unreadReminderCount(signal())).rejects.toThrow('数量异常');
+    }
+    const mutations = respond(true);
+    await client.allReminderAction('read', signal());
+    await client.allReminderAction('delete', signal());
+    expect(mutations.mock.calls.map((call) => call[0])).toEqual([
+      '/api/event_remind/batch/set/read',
+      '/api/event_remind/all/delete',
+    ]);
+    expect(JSON.parse(mutations.mock.calls[1]![1].body)).toEqual({});
+    respond(false);
+    await expect(client.allReminderAction('delete', signal())).rejects.toThrow('服务器未确认');
   });
 });

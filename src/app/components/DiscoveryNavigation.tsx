@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import styles from './DiscoveryNavigation.module.css';
 import { AboutMenu } from './AboutMenu';
+import { NotificationBadge } from '@/features/fish-circle/notifications';
 
 export function DiscoveryNavigation({
   circleEntry,
@@ -15,9 +16,10 @@ export function DiscoveryNavigation({
     <nav className={styles.sidebar} aria-label="发现菜单">
       <h2 className={hideMobileHeading ? styles.desktopHeading : undefined}>发现</h2>
       {circleEntry ?? (
-        <NavLink to="/moments/fish-circle">
+        <NavLink to="/moments/fish-circle" style={{ position: 'relative' }}>
           <Aperture size={19} aria-hidden="true" />
           朋友圈
+          <NotificationBadge />
         </NavLink>
       )}
       <DiscoveryGameLink />

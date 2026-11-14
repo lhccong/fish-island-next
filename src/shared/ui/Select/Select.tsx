@@ -8,6 +8,7 @@ interface SelectProps {
   value: string;
   options: readonly { value: string; label: string; disabled?: boolean }[];
   disabled?: boolean;
+  appearance?: 'default' | 'pixel';
   placeholder?: string;
   onValueChange: (value: string) => void;
 }
@@ -17,6 +18,7 @@ export function Select({
   value,
   options,
   disabled = false,
+  appearance = 'default',
   placeholder = '请选择',
   onValueChange,
 }: SelectProps) {
@@ -31,7 +33,11 @@ export function Select({
   }, [disabled]);
   return (
     <Primitive.Root value={value} onValueChange={onValueChange} disabled={disabled}>
-      <Primitive.Trigger ref={trigger} className={styles.trigger} aria-label={label}>
+      <Primitive.Trigger
+        ref={trigger}
+        className={`${styles.trigger} ${appearance === 'pixel' ? styles.pixel : ''}`}
+        aria-label={label}
+      >
         <Primitive.Value placeholder={placeholder}>
           {selected?.label ?? placeholder}
         </Primitive.Value>
@@ -41,7 +47,7 @@ export function Select({
       </Primitive.Trigger>
       <Primitive.Portal>
         <Primitive.Content
-          className={styles.content}
+          className={`${styles.content} ${appearance === 'pixel' ? styles.pixel : ''}`}
           position="popper"
           sideOffset={6}
           collisionPadding={8}

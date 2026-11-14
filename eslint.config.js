@@ -7,7 +7,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const internalImports = {
-  group: ['@/features/*/*', '@/shells/*/*', '@/skins/*/*'],
+  group: ['@/features/*/*', '!@/features/fish-circle/notifications', '@/shells/*/*', '@/skins/*/*'],
   message: '跨模块仅允许从模块 index.ts 公开入口导入。',
 };
 function restrict(files, groups) {

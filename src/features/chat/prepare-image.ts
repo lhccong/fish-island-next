@@ -13,7 +13,7 @@ export async function prepareChatImage(file: File, signal: AbortSignal): Promise
   }
   signal.throwIfAborted();
   const bitmap = await createImageBitmap(file).catch(() => {
-    throw new Error('图片无法读取，请重新复制有效图片');
+    throw new Error('图片无法读取，请重新选择或复制有效图片');
   });
   try {
     signal.throwIfAborted();
@@ -45,7 +45,7 @@ export async function prepareChatImage(file: File, signal: AbortSignal): Promise
       if (longest <= 320) break;
       scale *= Math.max(320 / longest, 0.75);
     }
-    throw new Error('图片压缩后仍过大，请缩小图片后粘贴');
+    throw new Error('图片压缩后仍过大，请缩小图片后重试');
   } finally {
     bitmap.close();
   }

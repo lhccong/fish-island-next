@@ -5,6 +5,7 @@ test('全部主题明暗红包表单默认值、汇总和窄视口', async ({ pa
   test.setTimeout(120000);
   await setupChatMenu(page, 'wechat', 'light');
   const mobile = page.viewportSize()!.width <= 760;
+  if (mobile) await page.getByRole('button', { name: '更多聊天工具' }).tap();
   const launcher = page.getByRole('button', { name: '发红包', exact: true });
   for (const skin of builtinSkins)
     for (const mode of ['light', 'dark']) {

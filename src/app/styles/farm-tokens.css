@@ -1,0 +1,14 @@
+:root {
+  --color-farm-soil: #815b3e;
+  --color-farm-furrow: #6b4934;
+  --color-farm-edge: #a77c50;
+  --color-farm-soil-ink: #fff2d9;
+  --color-farm-grass-ink: #294127;
+}
+:root[data-color-mode='dark'] {
+  --color-farm-soil: #473526;
+  --color-farm-furrow: #392a20;
+  --color-farm-edge: #715339;
+  --color-farm-soil-ink: #f5dfbd;
+  --color-farm-grass-ink: #ceddc4;
+}

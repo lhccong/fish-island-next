@@ -19,8 +19,8 @@ export const trade = (id: string, type = 1) => ({
   amount: 100,
   statusName: type === 1 ? '已完成' : '待结算',
 });
-export async function fixture(page: Page) {
-  await setup(page);
+export async function fixture(page: Page, authenticated = false) {
+  if (!authenticated) await setup(page);
   const state = {
     chart: 'ready',
     quote: 'ready',

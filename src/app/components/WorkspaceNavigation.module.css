@@ -26,6 +26,7 @@
   width: 100%;
 }
 .item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,7 +52,7 @@
   flex-direction: column;
   gap: var(--space-2);
 }
-.item > span {
+.item > span:not([aria-label]) {
   display: none;
 }
 .account {
@@ -125,7 +126,7 @@
   height: 16px;
   stroke-width: 1;
 }
-.navigation[data-shell='wps'] .item > span {
+.navigation[data-shell='wps'] .item > span:not([aria-label]) {
   display: inline;
 }
 .navigation[data-shell='wps'] .item[aria-current='page'] {
@@ -208,7 +209,7 @@
     color: var(--color-muted);
     background: transparent;
   }
-  .navigation .item > span {
+  .navigation .item > span:not([aria-label]) {
     display: inline;
   }
   .navigation .desktopEntry {

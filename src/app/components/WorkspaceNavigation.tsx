@@ -6,6 +6,7 @@ import { WpsChrome } from './WpsChrome';
 import { WpsOfficeTools } from './WpsOfficeTools';
 import styles from './WorkspaceNavigation.module.css';
 import { WorkspaceAccount } from './WorkspaceAccount';
+import { NotificationBadge } from '@/features/fish-circle/notifications';
 
 export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId }) {
   const location = useLocation();
@@ -43,6 +44,7 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
         >
           <Compass size={23} aria-hidden="true" />
           <span>鱼小圈</span>
+          <NotificationBadge />
         </Link>
         <NavLink
           to="/discover"
@@ -51,6 +53,7 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
         >
           <Compass size={23} aria-hidden="true" />
           <span>发现</span>
+          <NotificationBadge />
         </NavLink>
       </nav>
       <div className={styles.bottom}>

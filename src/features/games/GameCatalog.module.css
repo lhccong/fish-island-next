@@ -1,13 +1,14 @@
 .catalog {
-  max-width: 980px;
-  padding: var(--space-4) var(--space-5) max(var(--space-6), env(safe-area-inset-bottom));
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-5) var(--space-5) max(var(--space-6), env(safe-area-inset-bottom));
   color: var(--color-text);
 }
 .recent {
   padding: var(--space-4);
   border-radius: var(--radius-control);
   background: var(--color-surface);
-  min-height: 154px;
+  border: 1px solid var(--color-border);
 }
 .heading {
   display: flex;
@@ -19,7 +20,7 @@
 .heading h2 {
   margin: 0;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 .heading > span {
   display: flex;
@@ -28,13 +29,13 @@
   font-size: 12px;
 }
 .recentGame {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  width: 120px;
-  min-height: 108px;
-  padding: var(--space-2);
+  gap: var(--space-1) var(--space-3);
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  text-align: left;
+  min-width: 0;
+  padding: var(--space-3);
   border: 0;
   border-radius: var(--radius-control);
   background: transparent;
@@ -55,7 +56,16 @@
   color: var(--color-game-ink);
   background: linear-gradient(135deg, var(--color-game-sky), var(--color-game-sun));
 }
+.recentGame .icon {
+  grid-row: span 2;
+}
+.recentGame > span:nth-child(2) {
+  align-self: end;
+  font-size: 13px;
+  font-weight: 500;
+}
 .recentGame small {
+  align-self: start;
   color: var(--color-accent-text);
 }
 .empty {
@@ -77,21 +87,25 @@
   margin-top: var(--space-5);
 }
 .card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  width: min(100%, 420px);
-  border: 0;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--color-border);
   padding: 0;
   border-radius: var(--radius-control);
   overflow: hidden;
   text-align: left;
-  background: var(--color-game-ink);
+  color: var(--color-text);
+  background: var(--color-surface);
   cursor: pointer;
 }
-.card:hover .play {
-  background: var(--color-game-sun);
+.card:hover {
+  border-color: var(--color-accent-text);
 }
 .art {
+  flex-shrink: 0;
   position: relative;
   height: 260px;
   overflow: hidden;
@@ -177,41 +191,6 @@
   max-width: 150px;
   line-height: 1.6;
 }
-.caption {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  color: var(--color-game-frame);
-  background: var(--color-game-ink);
-}
-.caption h3 {
-  margin: 5px 0;
-  font-size: 20px;
-}
-.caption p {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.6;
-  opacity: 0.85;
-}
-.caption div > span {
-  font-size: 11px;
-  opacity: 0.8;
-}
-.play {
-  display: grid;
-  place-items: center;
-  min-width: 64px;
-  min-height: 44px;
-  border-radius: 6px;
-  background: var(--color-game-frame);
-  color: var(--color-game-ink);
-  font-size: 13px;
-  white-space: nowrap;
-}
 .note {
   color: var(--color-muted);
   font-size: 12px;
@@ -234,21 +213,19 @@
     width: 132px;
     height: 220px;
   }
-  .caption {
-    padding: var(--space-3);
-  }
-  .caption h3 {
-    font-size: 18px;
-  }
 }
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-5);
   align-items: stretch;
 }
 .stockCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control);
@@ -262,6 +239,9 @@
   border-color: var(--color-accent-text);
 }
 .stockArt {
+  flex-shrink: 0;
+  width: 100%;
+  overflow: hidden;
   height: 260px;
   padding: 25px;
   position: relative;
@@ -289,9 +269,31 @@
 .stockCaption {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  flex: 1;
+  width: 100%;
   gap: 12px;
   padding: 16px;
+}
+.stockCaption > div {
+  min-width: 0;
+}
+.stockCaption > span {
+  flex-shrink: 0;
+  color: var(--color-accent-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 32px;
+}
+.stockCaption div > span,
+.stockCaption p {
+  color: var(--color-muted);
+}
+.card:focus-visible,
+.stockCard:focus-visible,
+.recentGame:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
 }
 .stockCaption h3 {
   font-size: 20px;
@@ -302,7 +304,7 @@
   margin: 0;
   line-height: 1.6;
 }
-.stockCaption span {
+.stockCaption div > span {
   font-size: 11px;
 }
 @media (max-width: 760px) {
@@ -315,12 +317,97 @@
     padding: 20px;
   }
   .stockCard {
-    width: min(100%, 420px);
+    width: 100%;
+  }
+  .stockCaption {
+    padding: var(--space-4);
+    gap: var(--space-2);
+  }
+  .stockCaption > span {
+    line-height: 44px;
+    font-size: 14px;
+  }
+  .stockCaption h3 {
+    font-size: 18px;
   }
 }
 
 .recentGames {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: var(--space-2);
+}
+.farmArt {
+  flex-shrink: 0;
+  width: 100%;
+  position: relative;
+  height: 260px;
+  padding: 25px;
+  background: var(--color-pet-meadow);
+  color: var(--color-farm-grass-ink);
+  overflow: hidden;
+}
+.farmArt > span {
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.farmArt h3 {
+  font-size: 32px;
+  line-height: 1.4;
+  margin: 24px 0;
+  position: relative;
+  z-index: 1;
+}
+.miniField {
+  position: absolute;
+  right: -12px;
+  bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  gap: 10px;
+  transform: rotate(-8deg);
+}
+.miniField span {
+  display: grid;
+  place-items: center;
+  height: 54px;
+  background: var(--color-pet-path);
+  border: 3px solid var(--color-pet-wood);
+  box-shadow: 4px 4px 0 var(--color-pet-shadow);
+}
+@media (max-width: 760px) {
+  .farmArt {
+    height: 240px;
+    padding: 20px;
+  }
+  .miniField {
+    bottom: -22px;
+    right: -20px;
+    grid-template-columns: repeat(3, 48px);
+    gap: 8px;
+  }
+  .miniField span {
+    height: 46px;
+  }
+}
+
+.entry {
+  position: relative;
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+.entry .stockCaption {
+  padding-right: 76px;
+}
+.windowLauncher {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+.entry > button:first-child {
+  flex: 1;
 }

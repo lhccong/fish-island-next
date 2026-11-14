@@ -11,3 +11,5 @@ createRoot(document.getElementById('root')!).render(
 );
 import '@/app/styles/reader-tokens.css';
 import '@/app/styles/pet-tokens.css';
+import '@/app/styles/farm-tokens.css';
+import '@/app/styles/pixel-tokens.css';
