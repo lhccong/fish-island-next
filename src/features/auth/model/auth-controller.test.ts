@@ -106,6 +106,8 @@ function setup(initial: SessionToken | null = token) {
     subscribe: () => () => {},
   };
   const service: AuthPort = {
+    register: vi.fn().mockResolvedValue(undefined),
+    sendRegistrationCode: vi.fn().mockResolvedValue(undefined),
     avatarFrames: vi.fn().mockResolvedValue({ items: [], total: 0 }),
     exchangeAvatarFrame: vi.fn().mockResolvedValue(undefined),
     setAvatarFrame: vi.fn().mockResolvedValue(undefined),

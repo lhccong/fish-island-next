@@ -24,8 +24,14 @@ for (const skin of builtinSkins)
           await page.keyboard.up('ArrowRight');
         }
         await expect(actor).not.toHaveAttribute('style', before!);
+        const beforeCare = state.mineRequests;
         await page.getByRole('button', { name: /喂食 · 5/ }).click();
-        await expect(page.getByText('已喂食伙伴', { exact: true })).toBeVisible();
+        await expect(page.getByRole('meter', { name: '饱食', exact: true })).toHaveAttribute(
+          'value',
+          '90',
+        );
+        await expect(page.getByText('已喂食伙伴', { exact: true })).toHaveCount(0);
+        expect(state.mineRequests).toBe(beforeCare);
         expect(state.actions).toContain('pet/feed');
         await page.screenshot({ path: info.outputPath('camp-ready.png'), fullPage: true });
         state.feedFail = true;
@@ -108,9 +114,8 @@ for (const skin of builtinSkins)
             await page.getByRole('option', { name: '首领挑战', exact: true }).click();
             await dialog.getByRole('button', { name: '开始挑战', exact: true }).click();
             await dialog.getByRole('button', { name: '开始挑战', exact: true }).click();
-            const skip = dialog.getByRole('button', { name: '跳过演出', exact: true });
-            await expect(skip).toBeVisible();
-            await skip.click();
+            // The short replay may finish while the viewport is scrolling into view.
+            // Assert the stable settlement instead of racing the transient skip control.
             await expect(
               dialog.getByRole('heading', { name: '挑战胜利', exact: true }),
             ).toBeVisible();
@@ -155,12 +160,14 @@ for (const skin of builtinSkins)
         await assertPetLayout(page);
         await bag.getByRole('button', { name: '关闭面板', exact: true }).click();
         state.empty = true;
+        const beforeHeld = state.heldMineRequests;
         state.hold = true;
         await page.reload();
         await expect(page.getByText('正在整理营地资料…', { exact: true })).toBeVisible({
           timeout: 30000,
         });
         await assertPetLayout(page);
+        await expect.poll(() => state.heldMineRequests).toBeGreaterThan(beforeHeld);
         state.hold = false;
         state.release();
         await expect(page.getByRole('heading', { name: '营地正等着第一位伙伴' })).toBeVisible();

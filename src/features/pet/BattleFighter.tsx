@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { BattleRound, Challenger } from '@/domain/pet';
 import { PetSprite } from './PetSprite';
+import { BossSprite } from './BossSprite';
 import { BattleFeedback } from './BattleFeedback';
 import styles from './PixelBattle.module.css';
 
@@ -10,12 +11,14 @@ export function BattleFighter({
   current,
   frame,
   playing,
+  boss = false,
 }: {
   fighter: Challenger;
   side: 'self' | 'opponent';
   current: BattleRound | undefined;
   frame: number;
   playing: boolean;
+  boss?: boolean;
 }) {
   const sprite = useRef<HTMLDivElement>(null);
   const attacking = playing && current?.attacker === side;
@@ -59,12 +62,16 @@ export function BattleFighter({
     >
       <div className={styles.platform} />
       <div ref={sprite} className={styles.sprite}>
-        <PetSprite
-          url={fighter.url}
-          name={fighter.name}
-          size={side === 'self' ? 136 : 112}
-          action={attacking ? (side === 'self' ? 'run' : 'run-left') : 'idle'}
-        />
+        {boss ? (
+          <BossSprite name={fighter.name} size={112} />
+        ) : (
+          <PetSprite
+            url={fighter.url}
+            name={fighter.name}
+            size={side === 'self' ? 136 : 112}
+            action={attacking ? (side === 'self' ? 'run' : 'run-left') : 'idle'}
+          />
+        )}
       </div>
       {playing && current && (
         <BattleFeedback current={current} attacking={attacking} frame={frame} />

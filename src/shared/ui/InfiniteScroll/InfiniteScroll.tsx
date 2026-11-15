@@ -31,7 +31,7 @@ export function InfiniteScroll({
         if (entries.some((entry) => entry.isIntersecting)) onLoadMore();
       },
       {
-        root: target.closest('[data-radix-scroll-area-viewport]'),
+        root: target.closest('[data-radix-scroll-area-viewport], [data-scroll-viewport]'),
         rootMargin: edge === 'start' ? '80px 0px 0px 0px' : '0px 0px 80px 0px',
       },
     );

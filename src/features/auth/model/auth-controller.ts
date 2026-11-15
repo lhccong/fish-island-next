@@ -224,6 +224,8 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   }
 
   return {
+    register: service.register,
+    sendRegistrationCode: service.sendRegistrationCode,
     refreshUser: async (signal: AbortSignal) => {
       const version = epoch;
       const user = await withCredential((token) => service.current(token, signal));

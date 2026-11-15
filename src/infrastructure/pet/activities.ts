@@ -10,6 +10,8 @@ type Request = (
 function prize(value: unknown): SupplyPrize {
   const data = record(value);
   return {
+    prizeKey: String(data.turntablePrizeId ?? data.id ?? data.prizeId ?? ''),
+    qualityLevel: number(data.quality),
     convertedPoints: data.convertedToPoints === true ? number(data.convertedPoints) : null,
     id:
       data.id !== undefined
@@ -26,7 +28,16 @@ function prize(value: unknown): SupplyPrize {
 }
 function supply(value: unknown): Supply {
   const data = record(value);
+  const progress = data.userProgress ? record(data.userProgress) : null;
   return {
+    ...(progress
+      ? {
+          progress: {
+            total: number(progress.totalDrawCount),
+            lastDrawTime: text(progress.lastDrawTime),
+          },
+        }
+      : {}),
     id: id(data.id),
     name: text(data.name),
     cost: number(data.costPoints),
@@ -82,8 +93,15 @@ export function createPetActivities(
       );
       return { cost: number(data.costPoints), prizes: list(data.prizeList, prize) };
     },
-    async drawRecords(current, signal) {
-      return page(await request(`turntable/records?current=${current}&pageSize=12`, signal), prize);
+    async drawRecords(current, signal, turntableId) {
+      const query = new URLSearchParams({
+        current: String(current),
+        pageSize: '13',
+        sortField: 'createTime',
+        sortOrder: 'descend',
+        ...(turntableId ? { turntableId } : {}),
+      });
+      return page(await request(`turntable/records?${query}`, signal), prize);
     },
   };
 }

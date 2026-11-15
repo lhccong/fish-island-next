@@ -7,7 +7,7 @@ import { PetWorkspace } from '@/features/pet';
 import styles from './GamesPage.module.css';
 
 export function PetPage() {
-  const { session } = useAuth();
+  const { session, refreshUser } = useAuth();
   const [params] = useSearchParams();
   if (session.status !== 'authenticated') return null;
   return (
@@ -15,6 +15,7 @@ export function PetPage() {
       sidebarLabel="发现导航"
       mobileHeader="back-only"
       slots={{
+        contentFill: true,
         sidebar: <DiscoveryNavigation />,
         header: (
           <>
@@ -28,7 +29,13 @@ export function PetPage() {
           <PetWorkspace
             key={session.user.id}
             service={petService}
+            onLotterySettled={refreshUser}
             userId={session.user.id}
+            points={
+              session.user.points === undefined
+                ? undefined
+                : session.user.points - (session.user.usedPoints ?? 0)
+            }
             openTournament={params.get('challenge') === 'tournament'}
           />
         ),

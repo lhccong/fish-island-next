@@ -24,6 +24,10 @@ for (const skin of builtinSkins)
         const held = new Promise<void>((resolve) => {
           release = resolve;
         });
+        let releaseChallenge = () => {};
+        const heldChallenge = new Promise<void>((resolve) => {
+          releaseChallenge = resolve;
+        });
         await page.route('**/api/pet/tournament/**', async (route) => {
           const url = new URL(route.request().url());
           if (url.pathname.endsWith('/leaderboard')) {
@@ -52,6 +56,7 @@ for (const skin of builtinSkins)
             return route.fulfill({ json: { code: 0, data: mine } });
           expect(route.request().method()).toBe('POST');
           posts++;
+          if (posts === 1) await heldChallenge;
           if (reject)
             return route.fulfill({ json: { code: 50000, message: '伙伴状态不足，请恢复后再试' } });
           mine = Number(url.searchParams.get('targetRank'));
@@ -74,6 +79,9 @@ for (const skin of builtinSkins)
           });
         });
         await page.getByRole('button', { name: /^武道大会/ }).click();
+        await expect(page.getByRole('dialog', { name: '武道大会', exact: true })).toBeVisible();
+        await expect(page.getByRole('combobox', { name: '挑战分类' })).toHaveCount(0);
+        await expect(page.getByText('伙伴切磋', { exact: true })).toHaveCount(0);
         const board = page.getByRole('region', { name: '武道大会', exact: true });
         await expect(board.getByRole('status')).toContainText('正在整理');
         await assertPetLayout(page);
@@ -89,16 +97,21 @@ for (const skin of builtinSkins)
         await expect(board.getByRole('listitem')).toHaveCount(10);
         await assertPetLayout(page);
         await board.getByRole('button', { name: '挑战排位', exact: true }).first().click();
-        let dialog = page.getByRole('dialog', { name: '挑战排位', exact: true });
-        await dialog.getByRole('button', { name: '确认', exact: true }).click();
-        await expect(dialog.getByRole('alert')).toContainText('伙伴状态不足');
-        reject = false;
-        await dialog.getByRole('button', { name: '确认', exact: true }).click();
-        await expect(dialog.getByRole('status')).toContainText('挑战胜利');
-        await expect(dialog.getByText('本次结算未返回战斗回合，以服务端名次为准。')).toBeVisible();
+        await expect(page.getByRole('dialog', { name: '挑战排位', exact: true })).toHaveCount(0);
+        const battle = page.getByRole('dialog', { name: '武道大会战斗', exact: true });
+        await expect(battle.getByRole('status')).toContainText('正在挑战');
+        await expect(battle.getByRole('button', { name: '确认', exact: true })).toHaveCount(0);
         await assertPetLayout(page);
-        await page.keyboard.press('Escape');
-        await expect(board.getByRole('button', { name: '刷新榜单', exact: true })).toBeFocused();
+        releaseChallenge();
+        await expect(battle.getByRole('alert')).toContainText('伙伴状态不足');
+        expect(posts).toBe(1);
+        await battle.getByRole('button', { name: '返回榜单', exact: true }).click();
+        reject = false;
+        await board.getByRole('button', { name: '挑战排位', exact: true }).first().click();
+        await expect(battle.getByRole('status').filter({ hasText: '挑战胜利' })).toBeVisible();
+        await expect(battle.getByText('本次结算未返回战斗回合，以服务端名次为准。')).toBeVisible();
+        await assertPetLayout(page);
+        await battle.getByRole('button', { name: '返回榜单', exact: true }).click();
         empty = false;
         mine = 8;
         await board.getByRole('button', { name: '刷新榜单', exact: true }).click();
@@ -125,9 +138,16 @@ for (const skin of builtinSkins)
         ).toBeFocused();
         if (skin.id === 'wechat') await page.screenshot({ path: info.outputPath('board.png') });
         await rows.first().getByRole('button', { name: '挑战排位', exact: true }).click();
-        dialog = page.getByRole('dialog', { name: '挑战排位', exact: true });
-        await dialog.getByRole('button', { name: '确认', exact: true }).click();
-        await expect(dialog.getByRole('status')).toContainText('当前名次：1');
+        const dialog = battle;
+        await expect(dialog.getByLabel('挑战演出', { exact: true })).toBeVisible();
+        await dialog.getByRole('button', { name: '跳过演出', exact: true }).click();
+        if (skin.id === 'wechat') await page.screenshot({ path: info.outputPath('battle.png') });
+        await expect(dialog.getByRole('status').filter({ hasText: '挑战胜利' })).toContainText(
+          '当前名次：1',
+        );
+        await dialog.getByRole('button', { name: '重播战斗', exact: true }).click();
+        await dialog.getByRole('button', { name: '跳过演出', exact: true }).click();
+        await dialog.getByText('战斗回合记录 · 32 回合', { exact: true }).click();
         const viewport = dialog.locator('[data-radix-scroll-area-viewport]');
         await viewport.hover();
         if (width > 760) await page.mouse.wheel(0, 400);
@@ -155,9 +175,6 @@ for (const skin of builtinSkins)
         await viewport.evaluate((el) => {
           el.scrollTop = el.scrollHeight;
         });
-        await expect(
-          dialog.getByRole('button', { name: '返回榜单', exact: true }),
-        ).toBeInViewport();
         await expect(dialog.getByRole('listitem').last()).toBeInViewport();
         await page.keyboard.press('Escape');
         await expect(board.getByRole('button', { name: '刷新榜单', exact: true })).toBeFocused();
@@ -179,13 +196,10 @@ test('an uncertain tournament submission cannot be resubmitted before checking t
   await page.goto('/point/tournament', { waitUntil: 'domcontentloaded' });
   const board = page.getByRole('region', { name: '武道大会', exact: true });
   await board.getByRole('button', { name: '挑战排位', exact: true }).first().click();
-  const dialog = page.getByRole('dialog', { name: '挑战排位', exact: true });
-  await dialog.getByRole('button', { name: '确认', exact: true }).click();
-  await expect(dialog.getByRole('alert')).toContainText('未能确认挑战结果');
-  await expect(dialog.getByRole('button', { name: '确认', exact: true })).toBeDisabled();
+  const battle = page.getByRole('dialog', { name: '武道大会战斗', exact: true });
+  await expect(battle.getByRole('alert')).toContainText('未能确认挑战结果');
   expect(submissions).toBe(1);
-  await dialog.getByRole('button', { name: '返回榜单', exact: true }).click();
-  await expect(board.getByRole('button', { name: '刷新榜单', exact: true })).toBeFocused();
+  await battle.getByRole('button', { name: '返回榜单', exact: true }).click();
   await expect(board.getByRole('button', { name: '挑战排位', exact: true }).first()).toBeDisabled();
   await board.getByRole('button', { name: '刷新榜单', exact: true }).click();
   await expect(board.getByText('正在刷新榜单…', { exact: true })).toHaveCount(0);
@@ -205,6 +219,13 @@ test('switching every theme and color mode preserves tournament state without ne
   await page.goto('/point/tournament', { waitUntil: 'domcontentloaded' });
   const board = page.getByRole('region', { name: '武道大会', exact: true });
   await expect(board.getByRole('listitem')).toHaveCount(10);
+  await board.getByRole('button', { name: '挑战排位', exact: true }).first().click();
+  const battle = page.getByRole('dialog', { name: '武道大会战斗', exact: true });
+  await expect(battle.getByRole('status').filter({ hasText: '挑战胜利' })).toContainText(
+    '当前名次：1',
+  );
+  await battle.getByRole('button', { name: '返回榜单', exact: true }).click();
+  await expect(board.getByRole('button', { name: '刷新榜单', exact: true })).toBeEnabled();
   const original = await board.elementHandle();
   const count = reads;
   // The existing camp dialog is modal; activate the global theme trigger to test retained state.
@@ -226,5 +247,9 @@ test('switching every theme and color mode preserves tournament state without ne
   }
   await page.keyboard.press('Escape');
   await expect(board.getByRole('listitem')).toHaveCount(10);
+  await board.getByRole('button', { name: '查看战斗结果', exact: true }).click();
+  await expect(battle.getByRole('status').filter({ hasText: '挑战胜利' })).toContainText(
+    '当前名次：1',
+  );
   await original?.dispose();
 });

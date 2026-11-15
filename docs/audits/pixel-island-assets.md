@@ -2,6 +2,12 @@
 
 工具：内置 imagegen。PNG 为正式项目资源，透明素材保留 alpha；CSS 仅调整背景位置与透明度，不反色。没有将用户提供的截图或其中的聊天记录写入仓库。
 
+## social-coast.png
+
+保存路径：`public/skins/pixel-island/social-coast.png`。用于「我的海岛」页签下的海岸横幅。
+
+生成要求摘要：横向、低高度的清晰像素海岸，左侧椰树、靠左的红色邮筒、浅色海天，右侧木码头与海鸥。无房屋、人物、界面、文字或水印；保持薄荷绿海水与奶油沙滩，边到边铺满。素材保持原色，明暗模式由周围语义背景和边框适配。
+
 ## harbor.png
 
 保存路径：`public/skins/pixel-island/harbor.png`。

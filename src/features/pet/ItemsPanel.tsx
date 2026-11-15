@@ -7,6 +7,7 @@ import { usePetOperation } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
 import { ItemIcon } from './ItemIcon';
+import { InventoryGrid } from './InventoryGrid';
 import { formatPetStat } from './format-stat';
 import styles from './Panels.module.css';
 
@@ -15,15 +16,23 @@ export function ItemsPanel({
   kind,
   pet,
   onChange,
+  onManage,
+  revision = 0,
 }: {
   service: PetPort;
   kind: 'bag' | 'shop' | 'catalog';
   pet: Companion;
   onChange: () => void;
+  onManage?: () => void;
+  revision?: number;
 }) {
   const load = useCallback(
-    (page: number, signal: AbortSignal) => service.items(kind, page, signal),
-    [service, kind],
+    (page: number, signal: AbortSignal) => {
+      // An explicit inventory mutation invalidates the inline snapshot.
+      void revision;
+      return service.items(kind, page, signal);
+    },
+    [service, kind, revision],
   );
   const resource = usePetPages(load);
   const operation = usePetOperation();
@@ -32,6 +41,37 @@ export function ItemsPanel({
     resource.reload();
     onChange();
   }
+  function equip(id: string) {
+    void operation.run((signal) => service.itemAction('equip', id, signal), '已穿戴装备', refresh);
+  }
+  const pagination = (
+    <InfiniteScroll
+      label="物品"
+      hasMore={resource.hasMore}
+      loading={resource.loadingMore}
+      error={resource.error}
+      onLoadMore={resource.loadMore}
+    />
+  );
+  if (onManage)
+    return (
+      <>
+        <OperationNotice notice={operation.notice} />
+        <ResourceView state={resource.state} reload={resource.reload}>
+          {(data) => (
+            <InventoryGrid
+              items={data.records}
+              total={data.total}
+              pet={pet}
+              pending={operation.pending}
+              onEquip={equip}
+              onManage={onManage}
+              pagination={pagination}
+            />
+          )}
+        </ResourceView>
+      </>
+    );
   return (
     <>
       <OperationNotice notice={operation.notice} />
@@ -120,16 +160,7 @@ export function ItemsPanel({
                   </dl>
                   <div className={styles.actions}>
                     {kind === 'bag' && item.slot && (
-                      <Button
-                        disabled={operation.pending}
-                        onClick={() =>
-                          void operation.run(
-                            (s) => service.itemAction('equip', item.id, s),
-                            '已穿戴装备',
-                            refresh,
-                          )
-                        }
-                      >
+                      <Button disabled={operation.pending} onClick={() => equip(item.id)}>
                         穿戴
                       </Button>
                     )}
@@ -153,13 +184,7 @@ export function ItemsPanel({
                 </article>
               ))}
             </div>
-            <InfiniteScroll
-              label="物品"
-              hasMore={resource.hasMore}
-              loading={resource.loadingMore}
-              error={resource.error}
-              onLoadMore={resource.loadMore}
-            />
+            {pagination}
           </>
         )}
       </ResourceView>

@@ -5,6 +5,7 @@ export interface PetItem {
   icon: string;
   description: string;
   category: string;
+  subType: string;
   slot: string;
   quantity: number;
   level: number;
@@ -131,7 +132,11 @@ export interface PetPort {
     count: number,
     signal: AbortSignal,
   ): Promise<{ cost: number; prizes: SupplyPrize[] }>;
-  drawRecords(page: number, signal: AbortSignal): Promise<PetPage<SupplyPrize>>;
+  drawRecords(
+    page: number,
+    signal: AbortSignal,
+    turntableId?: string,
+  ): Promise<PetPage<SupplyPrize>>;
   mine(signal: AbortSignal): Promise<Companion | null>;
   create(name: string, signal: AbortSignal): Promise<void>;
   care(action: 'feed' | 'pat', petId: string, signal: AbortSignal): Promise<Companion>;
@@ -140,6 +145,7 @@ export interface PetPort {
     kind: 'bag' | 'catalog' | 'shop',
     page: number,
     signal: AbortSignal,
+    category?: 'consumable',
   ): Promise<PetPage<PetItem>>;
   itemAction(
     action: 'equip' | 'unequip' | 'purchase' | 'decompose',
@@ -167,6 +173,8 @@ export interface PetPort {
   ): Promise<boolean>;
 }
 export interface SupplyPrize {
+  prizeKey?: string;
+  qualityLevel?: number;
   convertedPoints: number | null;
   id: string;
   name: string;
@@ -176,6 +184,7 @@ export interface SupplyPrize {
   time: string;
 }
 export interface Supply {
+  progress?: { total: number; lastDrawTime: string };
   id: string;
   name: string;
   cost: number;

@@ -112,13 +112,14 @@ export function createPetClient(
     async rename(petId, name, signal) {
       confirmed(await request('pet/update/name', signal, { petId, name }));
     },
-    async items(kind, current, signal) {
+    async items(kind, current, signal, category) {
       const path =
         kind === 'bag'
           ? 'itemInstances/my/list/page/vo'
           : `itemTemplates/list/page/${kind === 'shop' ? 'purchasable' : 'vo'}`;
-      return page(await request(path, signal, { current, pageSize: 12 }), (v) =>
-        item(v, kind === 'bag'),
+      return page(
+        await request(path, signal, { current, pageSize: 12, ...(category ? { category } : {}) }),
+        (v) => item(v, kind === 'bag'),
       );
     },
     async itemAction(action, itemId, signal) {

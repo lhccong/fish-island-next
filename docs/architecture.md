@@ -26,7 +26,7 @@ ADR-007 将登录入口更新为当前页面上的路由弹窗，使用 backgrou
 
 ADR-009 迁移 `/oauth2/authorize` 摸鱼岛 SSO 授权页；domain/sso 定义端口，infrastructure/sso 适配公开应用信息与授权接口，features/sso 管理授权交互，app 组合鉴权与回调导航。保留旧版样式和参数协议。
 
-尚未完成：注册、找回密码、第三方登录回调、完整消息类型、断线补拉与历史缓存、完整平台聊天外壳、皮肤导入、性能基线采样。已安装依赖不等于功能已实现。禁止从旧项目复制整个聊天页面。
+本次注册迁移见 ADR-080；账号密码注册的滑块协议尚未迁移。其余能力的实现范围以各功能 ADR 为准；已安装依赖不等于功能已实现。禁止从旧项目复制整个聊天页面。
 
 ADR-008 新增企业微信内置主题、工作台导航主题弹窗与皮肤 ID 本地持久化。复用当前工作台布局，不重挂载热榜或输入区；内置 token 扩展不改变第三方导入白名单。
 
@@ -46,6 +46,10 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-078 将伙伴页重排为像素装备、营地挑战与内嵌行囊工作台，复用 pet 业务与分页、既有 pixel 明暗 token；按容器宽度重排并保留详细面板，见 ADR-078。
+
+ADR-078 的 contentFill/ScrollArea.fillContent 仅控制短内容填满实际视口，用于伙伴页背景覆盖；默认关闭，不改变业务、滚动容器与状态所有权。
+
 ADR-076 迁移七项管理工作台，domain/admin、infrastructure/admin、features/admin 分层，app 注入账号端口并同时守卫管理菜单与懒加载路由。沿用服务端权限、共享控件、全部外壳与滚动分页，见 ADR-076。
 
 ADR-070 迁移账号头像框，沿用 auth 资料端口与就地更新流程；shared/ui 负责纯图片叠层，聊天协议保留发送者头像框快照，分页及弹窗状态独立，见 ADR-070。
@@ -55,6 +59,8 @@ ADR-069 将聊天消息和在线成员名称统一为按需打开用户卡片，
 ADR-067 迁移经典斗地主，domain/landlords、infrastructure/landlords、features/landlords 分层，app 注入账号唯一 WebSocket，房间、手牌选择、聊天和排行状态独立；见 ADR-067。
 
 ADR-064 迁移账号签到、月度日历和补签，domain/sign-in、infrastructure/sign-in、features/sign-in 分层，app 通过账号资料插槽注入，独立请求状态不影响聊天。见 ADR-064。
+
+ADR-064 补充工作台导航签到直达入口与账号作用域的今日状态 Provider；app 注入，资料与导航共享未签到提醒，日历继续按需加载，外观变化不新增请求。
 
 ADR-063 迁移谁是卧底同屏游戏与联机房间，domain/undercover 定义规则和端口，infrastructure/undercover 适配旧协议，features/undercover 分离对局、房间、消息与草稿，app 注入并复用账号唯一 WebSocket，见 ADR-063。
 
@@ -315,3 +321,7 @@ ADR-074 新增 pixel-island 内置主题与显式映射的 island 外壳呈现�
 ADR-075 新增按账号隔离的本机我的小岛：domain/my-island 定义偏好模型，infrastructure/my-island 适配存储，features/my-island 独立管理待办、笔记、快捷入口及模块设置。app 注入到聊天组合；像素主题桌面侧栏与手机独立面板共用状态。
 
 ADR-077 由 app 组合我的海岛的手账/鱼小圈页签，fish-circle 公开独立侧栏 Provider 与紧凑呈现，复用原分页、动态交互和编辑器。首开激活、换肤不重取，见 ADR-077。
+
+ADR-079 恢复旧版九宫格抽奖流程，补充真实进度、奖池项匹配与转盘记录过滤，像素呈现复用既有分层与 token，详见 ADR-079。
+
+ADR-080 接入邮箱验证码注册，扩展既有 auth 端口及登录弹窗，独立表单管理请求和草稿；成功返回邮箱预填的登录页，不自动登录。详见 ADR-080。

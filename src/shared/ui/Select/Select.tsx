@@ -1,5 +1,5 @@
 import * as Primitive from '@radix-ui/react-select';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './Select.module.css';
 
@@ -11,6 +11,7 @@ interface SelectProps {
   appearance?: 'default' | 'pixel';
   placeholder?: string;
   onValueChange: (value: string) => void;
+  pagination?: ReactNode;
 }
 
 export function Select({
@@ -21,6 +22,7 @@ export function Select({
   appearance = 'default',
   placeholder = '请选择',
   onValueChange,
+  pagination,
 }: SelectProps) {
   const selected = options.find((option) => option.value === value);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -63,7 +65,7 @@ export function Select({
           <Primitive.ScrollUpButton className={styles.scroll}>
             <ChevronUp size={16} aria-hidden="true" />
           </Primitive.ScrollUpButton>
-          <Primitive.Viewport className={styles.viewport}>
+          <Primitive.Viewport className={styles.viewport} data-scroll-viewport>
             {options.map((option) => (
               <Primitive.Item
                 className={styles.option}
@@ -77,6 +79,7 @@ export function Select({
                 </Primitive.ItemIndicator>
               </Primitive.Item>
             ))}
+            {pagination}
           </Primitive.Viewport>
           <Primitive.ScrollDownButton className={styles.scroll}>
             <ChevronDown size={16} aria-hidden="true" />

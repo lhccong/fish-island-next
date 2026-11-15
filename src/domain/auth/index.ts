@@ -44,11 +44,20 @@ export interface LoginCredentials {
   account: string;
   password: string;
 }
+export interface RegistrationValues {
+  account: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  code: string;
+}
 export interface AuthResult {
   user: AuthUser;
   token: SessionToken;
 }
 export interface AuthPort {
+  register(values: RegistrationValues, signal: AbortSignal): Promise<void>;
+  sendRegistrationCode(email: string, signal: AbortSignal): Promise<void>;
   avatarFrames(
     page: number,
     token: SessionToken,

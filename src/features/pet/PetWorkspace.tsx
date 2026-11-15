@@ -1,8 +1,5 @@
-import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
-  Apple,
-  Heart,
   PawPrint,
   Backpack,
   Palette,
@@ -14,16 +11,18 @@ import {
   Gift,
 } from 'lucide-react';
 import type { PetPort } from '@/domain/pet';
-import { Button } from '@/shared/ui/Button';
 import { usePetOperation, usePetResource } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { CampScene } from './CampScene';
 import { CompanionSummary } from './CompanionSummary';
+import { CareActions } from './CareActions';
+import { PetWelcome } from './PetWelcome';
 import { PanelDialog } from './PanelDialog';
 import { CarePanel } from './CarePanel';
 import { ItemsPanel } from './ItemsPanel';
 import { SkinsPanel } from './SkinsPanel';
 import { ChallengePanel } from './ChallengePanel';
+import { TournamentPanel } from './TournamentPanel';
 import { AutoFeedPanel } from './AutoFeedPanel';
 import { ForgePanel } from './ForgePanel';
 import { SupplyPanel } from './SupplyPanel';
@@ -51,9 +50,9 @@ const panels = [
   { id: 'forge', title: '锻造台', icon: Hammer, description: '升级装备、锁定和刷新词条。' },
   {
     id: 'supplies',
-    title: '幸运补给',
+    title: '抽奖转盘',
     icon: Gift,
-    description: '查看活动奖励与领取记录，积分消耗需确认。',
+    description: '转动九宫格，抽取装备与道具。',
   },
 ] as const;
 type PanelId = (typeof panels)[number]['id'];
@@ -62,170 +61,159 @@ export function PetWorkspace({
   service,
   userId,
   openTournament = false,
+  points,
+  onLotterySettled,
 }: {
   service: PetPort;
   userId: string;
   openTournament?: boolean;
+  points?: number | undefined;
+  onLotterySettled?: ((signal: AbortSignal) => Promise<unknown>) | undefined;
 }) {
   const load = useCallback((signal: AbortSignal) => service.mine(signal), [service]);
   const resource = usePetResource(load);
   const pet = resource.data ?? null;
   const [panel, setPanel] = useState<PanelId | null>(openTournament ? 'challenge' : null);
   const [challengeMode, setChallengeMode] = useState(openTournament ? 'tournament' : 'rank');
-  const [name, setName] = useState('');
+  const [inventoryRevision, setInventoryRevision] = useState(0);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const navigationRef = useRef<HTMLElement | null>(null);
   const operation = usePetOperation();
   const selected = panels.find((item) => item.id === panel);
   const busy = operation.pending || resource.state.status === 'loading';
   const onChange = resource.reload;
+  function openPanel(id: PanelId) {
+    returnFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (id === 'challenge') setChallengeMode('rank');
+    setPanel(id);
+  }
+  function inventoryChanged() {
+    onChange();
+    setInventoryRevision((value) => value + 1);
+  }
   return (
     <section aria-label="伙伴营地" className={styles.scroll}>
       <div className={styles.workspace}>
         <header className={styles.intro}>
-          <div>
-            <span className={styles.eyebrow}>FISH ISLAND · COMPANIONS</span>
-            <h1>伙伴营地</h1>
-            <p>一起散步，一起长大。</p>
-          </div>
-          <span className={styles.tag}>
-            <span />
-            岛屿日常
-          </span>
-        </header>
-        <ResourceView state={resource.state} reload={resource.reload}>
-          {(data) =>
-            data ? (
-              <CompanionSummary pet={data} />
-            ) : (
-              <section className={styles.welcome}>
-                <PawPrint size={28} aria-hidden="true" />
-                <div>
-                  <h2>营地正等着第一位伙伴</h2>
-                  <p>给它起个名字，开启你们的岛屿日常。</p>
-                </div>
-                <form
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    void operation.run(
-                      (signal) => service.create(name.trim(), signal),
-                      '伙伴已加入营地',
-                      onChange,
-                    );
-                  }}
-                >
-                  <input
-                    aria-label="新伙伴名字"
-                    placeholder="输入伙伴名字"
-                    maxLength={20}
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    required
-                  />
-                  <Button type="submit" disabled={busy || !name.trim()}>
-                    {operation.pending ? (
-                      <LoadingIndicator compact>正在领养…</LoadingIndicator>
-                    ) : (
-                      '领养伙伴'
-                    )}
-                  </Button>
-                </form>
-              </section>
-            )
-          }
-        </ResourceView>
-        <OperationNotice notice={operation.notice} />
-        <CampScene pet={pet} />
-        <div className={styles.careBar}>
-          <span>{pet ? '陪伴，让每一天都有回应。' : '领养后可解锁养成、装备与挑战。'}</span>
-          <div>
-            <Button
-              variant="secondary"
-              disabled={!pet || busy}
-              onClick={() =>
-                pet &&
-                void operation.run(
-                  (signal) => service.care('pat', pet.id, signal),
-                  '已抚摸伙伴',
-                  onChange,
-                )
-              }
-            >
-              <Heart size={15} />
-              抚摸 · 3 积分
-            </Button>
-            <Button
-              disabled={!pet || busy}
-              onClick={() =>
-                pet &&
-                void operation.run(
-                  (signal) => service.care('feed', pet.id, signal),
-                  '已喂食伙伴',
-                  onChange,
-                )
-              }
-            >
-              <Apple size={15} />
-              喂食 · 5 积分
-            </Button>
-          </div>
-        </div>
-        <ChallengeEntrances
-          disabled={!pet}
-          onSelect={(mode) => {
-            setChallengeMode(mode);
-            setPanel('challenge');
-          }}
-        />
-        <nav className={styles.tools} aria-label="伙伴功能">
-          {panels.map(({ id, title, icon: Icon }, index) => (
-            <button
-              key={id}
-              type="button"
-              className={styles.tool}
-              disabled={!pet}
-              onClick={() => {
-                if (id === 'challenge') setChallengeMode('rank');
-                setPanel(id);
-              }}
-            >
-              <span className={styles.toolIcon} data-tone={index % 3}>
+          <h1>
+            <PawPrint size={22} aria-hidden="true" />
+            伙伴营地
+          </h1>
+          <nav ref={navigationRef} className={styles.tools} aria-label="伙伴功能">
+            {panels.map(({ id, title, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                className={styles.tool}
+                aria-label={title}
+                title={title}
+                disabled={!pet}
+                onClick={() => openPanel(id)}
+              >
                 <Icon size={22} aria-hidden="true" />
-              </span>
-              <strong>{title}</strong>
-              <small>
-                {
-                  [
-                    '成长与属性',
-                    '物品与装备',
-                    '伙伴新模样',
-                    '切磋与试炼',
-                    '收集与了解',
-                    '旅途的补给',
-                    '日常照料',
-                    '词条与升级',
-                    '活动与奖励',
-                  ][index]
-                }
-              </small>
-            </button>
-          ))}
-        </nav>
-        <p className={styles.footnote}>营地移动仅为本地互动 · 养成与挑战结果以服务端记录为准</p>
+              </button>
+            ))}
+          </nav>
+        </header>
+        <div className={styles.dashboard}>
+          <section className={styles.companion} aria-label="伙伴与装备">
+            <ResourceView state={resource.state} reload={resource.reload}>
+              {(data) =>
+                data ? (
+                  <CompanionSummary pet={data} onOpen={openPanel} compact />
+                ) : (
+                  <PetWelcome
+                    pending={operation.pending}
+                    disabled={busy}
+                    onCreate={(name) =>
+                      void operation.run(
+                        (signal) => service.create(name, signal),
+                        '伙伴已加入营地',
+                        onChange,
+                      )
+                    }
+                  />
+                )
+              }
+            </ResourceView>
+            <OperationNotice notice={operation.notice?.error ? operation.notice : null} />
+            <CareActions
+              disabled={!pet || busy}
+              pending={operation.pending}
+              onCare={(action) =>
+                pet &&
+                void operation.run(
+                  (signal) => service.care(action, pet.id, signal),
+                  action === 'feed' ? '已喂食伙伴' : '已抚摸伙伴',
+                  resource.accept,
+                )
+              }
+              onAuto={() => openPanel('auto')}
+            />
+          </section>
+          <div className={styles.adventure}>
+            <CampScene pet={pet} />
+            <ChallengeEntrances
+              disabled={!pet}
+              onSelect={(mode) => {
+                openPanel('challenge');
+                setChallengeMode(mode);
+              }}
+            />
+            <p className={styles.footnote}>营地散步 · 不消耗积分，不产生收益</p>
+          </div>
+          <aside className={styles.inventory} aria-label="营地行囊">
+            {pet ? (
+              <ItemsPanel
+                service={service}
+                kind="bag"
+                pet={pet}
+                onChange={onChange}
+                revision={inventoryRevision}
+                onManage={() => openPanel('bag')}
+              />
+            ) : (
+              <div className={styles.locked}>
+                <Backpack size={32} aria-hidden="true" />
+                <p>领养伙伴后开启行囊</p>
+              </div>
+            )}
+          </aside>
+        </div>
       </div>
       {selected && pet && (
         <PanelDialog
-          title={selected.title}
-          description={selected.description}
-          onClose={() => setPanel(null)}
-          appearance={panel === 'challenge' ? 'pixel' : 'default'}
+          title={
+            panel === 'challenge' && challengeMode === 'tournament' ? '武道大会' : selected.title
+          }
+          description={
+            panel === 'challenge' && challengeMode === 'tournament'
+              ? '查看排位，直接挑战更高名次。'
+              : selected.description
+          }
+          onClose={() => {
+            if (!returnFocusRef.current?.isConnected)
+              returnFocusRef.current =
+                navigationRef.current?.querySelector<HTMLButtonElement>(
+                  `[aria-label="${selected.title}"]`,
+                ) ?? null;
+            setPanel(null);
+          }}
+          appearance="pixel"
+          returnFocusRef={returnFocusRef}
         >
           {panel === 'care' && <CarePanel service={service} pet={pet} onChange={onChange} />}
           {(panel === 'bag' || panel === 'catalog' || panel === 'shop') && (
-            <ItemsPanel service={service} kind={panel} pet={pet} onChange={onChange} />
+            <ItemsPanel service={service} kind={panel} pet={pet} onChange={inventoryChanged} />
           )}
           {panel === 'skins' && (
             <SkinsPanel service={service} currentUrl={pet.url} onChange={onChange} />
           )}
-          {panel === 'challenge' && (
+          {panel === 'challenge' && challengeMode === 'tournament' && (
+            <TournamentPanel service={service} userId={userId} onChange={onChange} />
+          )}
+          {panel === 'challenge' && challengeMode !== 'tournament' && (
             <ChallengePanel
               service={service}
               pet={pet}
@@ -235,8 +223,19 @@ export function PetWorkspace({
             />
           )}
           {panel === 'auto' && <AutoFeedPanel service={service} petId={pet.id} />}
-          {panel === 'forge' && <ForgePanel service={service} petId={pet.id} onChange={onChange} />}
-          {panel === 'supplies' && <SupplyPanel service={service} onChange={onChange} />}
+          {panel === 'forge' && (
+            <ForgePanel service={service} petId={pet.id} onChange={inventoryChanged} />
+          )}
+          {panel === 'supplies' && (
+            <SupplyPanel
+              service={service}
+              onChange={async (signal) => {
+                inventoryChanged();
+                await onLotterySettled?.(signal);
+              }}
+              points={points}
+            />
+          )}
         </PanelDialog>
       )}
     </section>

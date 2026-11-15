@@ -115,16 +115,11 @@
 .row > button:last-child {
   flex-shrink: 0;
 }
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 8px 0 4px;
-}
 .result {
   background: var(--color-accent-soft);
   padding: 16px;
   border-radius: 8px;
+  overflow-wrap: anywhere;
 }
 .rounds {
   padding-left: 24px;

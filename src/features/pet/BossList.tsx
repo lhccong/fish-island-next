@@ -3,7 +3,7 @@ import type { BattleTarget, PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
-import { PetSprite } from './PetSprite';
+import { BossSprite } from './BossSprite';
 import { PixelLandscape } from './PixelLandscape';
 import { BossRanks } from './BossRanks';
 import { ChallengerStats } from './ChallengerStats';
@@ -40,7 +40,7 @@ export function BossList({
               <article className={styles.bossCard} key={boss.id}>
                 <div className={styles.bossPortrait}>
                   <PixelLandscape />
-                  <PetSprite url={boss.url} name={boss.name} size={120} />
+                  <BossSprite name={boss.name} />
                 </div>
                 <div className={styles.bossInfo}>
                   <h3>{boss.name}</h3>

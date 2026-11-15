@@ -31,6 +31,7 @@ export function BattleStage({
       <BattleFighter
         fighter={preview.opponent}
         side="opponent"
+        boss={!tower && !duel}
         current={current}
         frame={frame}
         playing={playing}

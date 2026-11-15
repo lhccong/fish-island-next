@@ -1,4 +1,8 @@
 .modal {
+  height: min(720px, calc(100dvh - 32px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   width: min(520px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   padding: var(--space-7) var(--space-8) var(--space-6);
@@ -22,13 +26,46 @@
   margin: 0 0 var(--space-5);
   font-size: 14px;
 }
-.tab {
-  width: max-content;
+.tabs {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
   margin: 0 auto var(--space-5);
+}
+.tabs button {
+  min-height: 44px;
   padding: var(--space-2) var(--space-4);
-  border-bottom: 2px solid var(--color-accent);
-  color: var(--color-accent-text);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
   font-size: 14px;
+}
+.tabs button[aria-pressed='true'] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.tabs button:hover {
+  background: var(--color-hover);
+}
+.body {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+}
+.loginBody {
+  height: 100%;
+}
+.logo,
+.modal > h2,
+.modal > p {
+  flex-shrink: 0;
+}
+.success {
+  color: var(--color-accent-text);
+  font-size: 13px;
+  line-height: 1.7;
 }
 @media (max-width: 760px) {
   .modal {

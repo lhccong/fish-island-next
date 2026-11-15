@@ -4,6 +4,7 @@ import type { AutoFeed, PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
 import { usePetOperation, usePetResource } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
+import { FoodSelect } from './FoodSelect';
 import styles from './Panels.module.css';
 
 export function AutoFeedPanel({ service, petId }: { service: PetPort; petId: string }) {
@@ -48,16 +49,13 @@ function AutoFeedForm({
         );
       }}
     >
-      {!initial && <p>尚未设置自动喂食。食物编号可在物品资料中确认。</p>}
-      <label>
-        食物编号
-        <input
-          required
-          maxLength={100}
-          value={value.foodCode}
-          onChange={(event) => setValue({ ...value, foodCode: event.target.value.trim() })}
-        />
-      </label>
+      <FoodSelect
+        service={service}
+        value={value.foodCode}
+        savedName={initial?.foodName || ''}
+        disabled={operation.pending}
+        onChange={(foodCode) => setValue({ ...value, foodCode })}
+      />
       <label>
         触发饱食值（1–99）
         <input

@@ -3,7 +3,13 @@ import type { LoginCredentials } from '@/domain/auth';
 import { useAuth } from './use-auth';
 import { LoginForm } from './ui/LoginForm';
 
-export function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
+export function LoginPanel({
+  onSuccess,
+  initialAccount = '',
+}: {
+  onSuccess: () => void;
+  initialAccount?: string;
+}) {
   const { login, pending } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const active = useRef(true);
@@ -22,5 +28,12 @@ export function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
         setError(failure instanceof Error ? failure.message : '登录失败，请稍后重试');
     }
   }
-  return <LoginForm onSubmit={submit} pending={pending !== null} error={error} />;
+  return (
+    <LoginForm
+      initialAccount={initialAccount}
+      onSubmit={submit}
+      pending={pending !== null}
+      error={error}
+    />
+  );
 }

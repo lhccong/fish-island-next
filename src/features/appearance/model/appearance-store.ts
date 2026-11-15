@@ -10,6 +10,7 @@ interface AppearanceState {
 
 const storageKey = 'fish-island:skin';
 const modeStorageKey = 'fish-island:color-mode';
+const defaultSkinId: BuiltinSkinId = 'pixel-island';
 
 function readColorMode(): ColorMode {
   try {
@@ -22,9 +23,9 @@ function readColorMode(): ColorMode {
 function readSkinId(): BuiltinSkinId {
   try {
     const saved = localStorage.getItem(storageKey);
-    return builtinSkins.find((skin) => skin.id === saved)?.id ?? 'wechat';
+    return builtinSkins.find((skin) => skin.id === saved)?.id ?? defaultSkinId;
   } catch {
-    return 'wechat';
+    return defaultSkinId;
   }
 }
 

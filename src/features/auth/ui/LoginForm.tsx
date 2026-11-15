@@ -1,17 +1,19 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { Button } from '@/shared/ui/Button';
 import { useState, type FormEvent } from 'react';
 import { Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
 import type { LoginCredentials } from '@/domain/auth';
 import styles from './LoginForm.module.css';
 
 interface LoginFormProps {
+  initialAccount?: string;
   onSubmit: (values: LoginCredentials, remember: boolean) => Promise<void>;
   pending: boolean;
   error: string | null;
 }
 
-export function LoginForm({ onSubmit, pending, error }: LoginFormProps) {
-  const [account, setAccount] = useState('');
+export function LoginForm({ onSubmit, pending, error, initialAccount = '' }: LoginFormProps) {
+  const [account, setAccount] = useState(initialAccount);
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -86,9 +88,11 @@ export function LoginForm({ onSubmit, pending, error }: LoginFormProps) {
           {error}
         </p>
       )}
-      <button className={styles.submit} type="submit" disabled={pending}>
-        {pending ? <LoadingIndicator compact>{'正在登录…'}</LoadingIndicator> : '登录'}
-      </button>
+      <div className={styles.actions}>
+        <Button type="submit" disabled={pending}>
+          {pending ? <LoadingIndicator compact>{'正在登录…'}</LoadingIndicator> : '登录'}
+        </Button>
+      </div>
       <p className={styles.note}>与原摸鱼岛共用账号，邮箱同样使用密码登录。</p>
     </form>
   );

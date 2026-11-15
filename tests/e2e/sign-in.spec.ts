@@ -53,9 +53,16 @@ for (const viewport of [
           const gate = new Promise<void>((resolve) => {
             release = resolve;
           });
-          await page.route('**/api/sign/status', (route) =>
-            route.fulfill({ json: { code: 0, data: { todaySigned: signed } } }),
-          );
+          let statusReads = 0;
+          let statusAvailable = false;
+          await page.route('**/api/sign/status', (route) => {
+            statusReads++;
+            return route.fulfill({
+              json: !statusAvailable
+                ? { code: 50000, message: '签到状态暂不可用' }
+                : { code: 0, data: { todaySigned: signed } },
+            });
+          });
           await page.route('**/api/sign/month?*', async (route) => {
             reads++;
             if (calendarState === 'loading') await gate;
@@ -117,9 +124,23 @@ for (const viewport of [
             });
           });
           await page.goto('/');
-          await page.getByRole('button', { name: '用户菜单', exact: true }).click();
-          await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
-          await page.getByRole('button', { name: '每日签到', exact: true }).click();
+          const entry = page.locator('[data-sign-in-entry]:visible');
+          await expect(entry).toBeVisible();
+          await expect.poll(() => statusReads).toBeGreaterThan(0);
+          await expect(entry.locator('svg')).toBeVisible();
+          await expect(entry).toHaveText(skin.id === 'pixel-island' ? '签到' : '');
+          await expect(entry.locator('[data-sign-in-reminder]')).toHaveCount(0);
+          statusAvailable = true;
+          await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+          await expect(entry).toHaveAccessibleName('每日签到，今日未签到');
+          await expect(entry.locator('[data-sign-in-reminder]')).toBeVisible();
+          const entryBox = await entry.boundingBox();
+          expect(entryBox!.width).toBeGreaterThanOrEqual(44);
+          expect(entryBox!.height).toBeGreaterThanOrEqual(44);
+          await entry.focus();
+          await page.screenshot({ path: info.outputPath('sign-in-entry.png') });
+          if (viewport.width <= 760) await entry.tap();
+          else await page.keyboard.press('Enter');
           const dialog = page.getByRole('dialog', { name: '每日签到', exact: true });
           const scroll = dialog.getByRole('region', { name: '签到详情' });
           await expect(dialog.getByText('正在读取签到记录…')).toBeVisible();
@@ -142,8 +163,10 @@ for (const viewport of [
           await page.screenshot({ path: info.outputPath(`sign-in-top-${skin.id}-${mode}.png`) });
           await dialog.getByRole('button', { name: '立即签到' }).click();
           await expect(dialog.getByRole('alert')).toContainText('签到失败，请重试');
+          await expect(entry.locator('[data-sign-in-reminder]')).toHaveCount(1);
           await dialog.getByRole('button', { name: '立即签到' }).click();
           await expect(dialog.getByRole('button', { name: '今日已签到' })).toBeDisabled();
+          await expect(entry.locator('[data-sign-in-reminder]')).toHaveCount(0);
           await expect(
             dialog.getByRole('status').filter({ hasText: '获得 10 积分' }),
           ).toBeVisible();
@@ -169,6 +192,7 @@ for (const viewport of [
           await expect(dialog.getByLabel('月度签到日历')).toBeVisible();
           if (skin.id === 'wechat' && mode === 'light') {
             const beforeSwitch = reads;
+            const beforeStatusSwitch = statusReads;
             for (const theme of builtinSkins)
               for (const colorMode of ['light', 'dark'] as const) {
                 await page.evaluate(
@@ -187,6 +211,7 @@ for (const viewport of [
                 await expect(dialog.getByRole('heading', { name: '2026年 10月' })).toBeVisible();
                 await expect(dialog.getByRole('button', { name: '今日已签到' })).toBeDisabled();
                 expect(reads).toBe(beforeSwitch);
+                expect(statusReads).toBe(beforeStatusSwitch);
               }
             await page.evaluate(async () => {
               const modulePath = '/src/features/appearance/index.ts';
@@ -215,8 +240,16 @@ for (const viewport of [
           const before = reads;
           await page.keyboard.press('Escape');
           await expect(dialog).toHaveCount(0);
-          await expect(page.getByRole('button', { name: '每日签到', exact: true })).toBeFocused();
+          await expect(entry).toBeFocused();
+          await expect(entry).toHaveAccessibleName('每日签到，今日已签到');
           expect(reads).toBe(before);
+          await expect(page.locator('body')).toHaveJSProperty('scrollWidth', viewport.width);
+          await page.getByRole('button', { name: '用户菜单', exact: true }).click();
+          await page.getByRole('menuitem', { name: '个人资料与签到', exact: true }).click();
+          const profileEntry = page.getByRole('button', { name: '每日签到', exact: true });
+          await expect(profileEntry.locator('[data-sign-in-reminder]')).toHaveCount(0);
+          await profileEntry.click();
+          await expect(dialog.getByRole('button', { name: '今日已签到' })).toBeDisabled();
           sockets.forEach((socket) => socket.close());
         });
       }

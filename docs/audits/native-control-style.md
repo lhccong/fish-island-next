@@ -66,3 +66,11 @@
 ## 管理工作台（ADR-076）
 
 入口：桌面主导航/手机发现 → 管理页，仅管理员可见。`src/app/components/AdminEntry.tsx` 与 `AdminNavigation.tsx` 使用路由链接和朋友圈同款列表导航，取消下拉菜单；`src/features/admin/fields.tsx` 的所有选择值均复用共享 Select；删除、封禁、举报处理与编辑使用共享 Dialog、Button 和 reserved ScrollArea。旧版 Ant Design/ProTable 不复制，无新增原生 select、alert/confirm/prompt。日期字段保留原生日期输入语义与手机系统能力，输入外观使用语义颜色统一。整改状态：新迁移入口与七项页面已采用共享控件，验收范围见 [管理工作台验收](admin-workspace.md)。
+
+## 伙伴工作台（ADR-078）
+
+入口：伙伴 → 自动喂食。源码：src/features/pet/AutoFeedPanel.tsx、FoodSelect.tsx。食物编号文本框已改为 shared/ui/Select 的 pixel 呈现，从背包实际食物选择，触发器和展开面板统一样式；长列表由 shared/ui/InfiniteScroll 绑定 Radix Select 视口自动续载，无原生 select/option、翻页操作项或系统确认框。空库存、加载失败重试及已有配置保留均有显式反馈。
+
+## 邮箱注册（ADR-080）
+
+入口：登录弹窗 → 注册。源码：src/features/auth/RegisterForm.tsx、src/features/auth/LoginDialog.tsx。完整邮箱输入替代旧版后缀选择器；发送、提交使用共享 Button，正文使用 reserved ScrollArea，反馈和操作固定分区。没有引入原生 select/option、系统提示框或第二套 UI。登录提交同步使用共享 Button。

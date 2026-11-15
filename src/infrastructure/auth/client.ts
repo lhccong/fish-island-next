@@ -39,6 +39,24 @@ export function createAuthClient(baseUrl: string): AuthPort {
     }
   }
   return {
+    async sendRegistrationCode(email, signal) {
+      if ((await request('/email/send', 'POST', signal, undefined, { email })) !== true)
+        throw new AuthError('rejected', '服务器未确认验证码发送成功');
+    },
+    async register(values, signal) {
+      const id = await request('/email/register', 'POST', signal, undefined, {
+        userAccount: values.account,
+        email: values.email,
+        userPassword: values.password,
+        checkPassword: values.confirmPassword,
+        code: values.code,
+      });
+      if (!(
+        (typeof id === 'number' && Number.isFinite(id) && id > 0) ||
+        (typeof id === 'string' && /^[1-9]\d*$/.test(id))
+      ))
+        throw new AuthError('invalid-response', '服务器未确认注册成功，请稍后重试');
+    },
     ...avatarFrameMethods(request),
     async titles(token, signal) {
       const data = await request('/title/list', 'GET', signal, token);

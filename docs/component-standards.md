@@ -115,6 +115,8 @@ ADR-031 的 shared/ui/Slider 完整统一 range 滑轨、滑块、焦点与禁�
 
 ## 8. 滚动分页
 
+ADR-078 允许共享 Select 接收无业务含义的 pagination 插槽，其 Radix Viewport 标记 data-scroll-viewport；InfiniteScroll 优先绑定最近的此类视口或 ScrollArea 视口。下拉分页仅在展开后观察，关闭释放，不使用操作选项模拟翻页。
+
 所有分页列表使用 `shared/ui/InfiniteScroll` 的边界观察器触发续载，禁止页码、跳页、上一页/下一页及“加载更多”按钮。重试按钮仅用于失败恢复。组件寻找最近的实际滚动视口，保留原滚动容器与 gutter；列表不足一屏时允许继续加载，结束或错误时停止观察。业务分页状态由所属 feature 持有，普通页码列表可复用无业务依赖的 `useInfinitePages`，按稳定 ID 合并，串行请求，取消旧作用域请求。已有内容在追加加载/失败时保持可用，筛选或业务刷新从首批重新读取，主题及模式不参与请求依赖。详见 ADR-034。
 
 ## 9. 加载反馈

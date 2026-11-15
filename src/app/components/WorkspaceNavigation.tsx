@@ -9,6 +9,7 @@ import { WorkspaceAccount } from './WorkspaceAccount';
 import { NotificationBadge } from '@/features/fish-circle/notifications';
 import { PixelIcon } from '@/shared/ui/PixelIcon';
 import { AdminEntry } from './AdminEntry';
+import { WorkspaceSignIn } from './WorkspaceSignIn';
 
 export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId }) {
   const location = useLocation();
@@ -74,6 +75,10 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
           <NotificationBadge />
         </NavLink>
         <AdminEntry placement="rail" />
+        <WorkspaceSignIn
+          className={styles.item ?? ''}
+          label={shellId === 'pixel-island' ? '签到' : undefined}
+        />
       </nav>
       <div className={styles.bottom}>
         <ThemePicker presentation={shellId === 'wps' ? 'ribbon' : 'rail'} />

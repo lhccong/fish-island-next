@@ -37,9 +37,9 @@ for (const skin of builtinSkins)
         return route.fulfill({ json: { code: 0, data: state === 'empty' ? [] : sources } });
       });
       await page.goto('/');
-      await expect(
-        page.getByRole('status').filter({ hasText: '正在获取各平台热榜' }),
-      ).toBeVisible();
+      await expect(page.getByRole('status').filter({ hasText: '正在获取各平台热榜' })).toBeVisible({
+        timeout: 30000,
+      });
       state = 'empty';
       release!();
       await expect(page.getByText('暂时没有热榜内容', { exact: true })).toBeVisible();

@@ -1,3 +1,32 @@
+.launcherIcon {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.iconTrigger {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px;
+}
+.reminder {
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+button.navigationTrigger {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  font-weight: 500;
+}
+button.navigationTrigger > span {
+  display: inline-flex;
+}
 .dialog {
   display: flex;
   flex-direction: column;

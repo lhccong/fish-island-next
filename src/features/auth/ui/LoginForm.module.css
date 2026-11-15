@@ -1,7 +1,19 @@
 .form {
+  padding: 4px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+.registrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  min-height: 0;
+}
+.registrationFields {
+  flex: 1;
+  height: 0;
 }
 .form > label {
   font-size: 13px;
@@ -69,19 +81,22 @@
   font-size: 13px;
   line-height: 1.7;
 }
-.submit {
-  min-height: 48px;
-  padding: var(--space-3);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--color-action);
-  color: var(--color-on-accent);
-  font-size: 15px;
-  cursor: pointer;
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
-.submit:disabled {
-  cursor: wait;
-  opacity: 0.6;
+.codeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.codeRow > div {
+  flex: 1;
+  min-width: 0;
+}
+.codeRow > button {
+  flex-shrink: 0;
 }
 .note {
   text-align: center;

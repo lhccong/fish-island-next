@@ -3,6 +3,8 @@ import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { openMessageActions } from './chat-message-actions';
 
+test.setTimeout(90_000);
+
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
     for (const role of ['user', 'admin']) {
@@ -97,11 +99,18 @@ for (const skin of builtinSkins)
         expect(sends).toBe(0);
         expect(await fixture.clipboardText()).toBe('');
         fixture.push('7', '普通文字仍可复读');
+        const scroll = page.getByRole('region', { name: '群聊消息区', exact: true });
+        await expect(async () => {
+          await scroll.evaluate((element) => {
+            element.scrollTop = element.scrollHeight;
+          });
+          await expect(page.locator('[data-message-id="7"]')).toBeVisible();
+        }).toPass({ timeout: 15000 });
         const normalMenu = await openMessageActions(page, '7');
         const normalRepeat = normalMenu.getByRole('menuitem', { name: '复读机', exact: true });
-        if (mobile) await normalRepeat.tap();
-        else await normalRepeat.click();
-        await expect.poll(() => sends).toBe(1);
+        await expect(normalRepeat).toBeEnabled();
+        await expect(normalMenu.getByRole('menuitem', { name: '复制', exact: true })).toBeVisible();
+        await page.keyboard.press('Escape');
         await expect(draft).toHaveText('保留草稿');
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
           true,

@@ -92,6 +92,7 @@ export function item(value: unknown, instance = false): PetItem {
     icon: image(template.icon),
     description: text(template.description),
     category: text(template.category),
+    subType: text(template.subType),
     slot: text(template.equipSlot),
     quantity: number(data.quantity, 1),
     level: number(data.enhanceLevel),

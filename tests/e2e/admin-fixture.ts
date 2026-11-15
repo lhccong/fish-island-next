@@ -25,6 +25,7 @@ export async function setupAdmin(page: Page, skin = 'wechat', mode = 'light', ro
     batch: 1,
     duplicate: false,
   };
+  await page.routeWebSocket('**', () => {});
   await page.addInitScript(
     ({ skin, mode }) => {
       localStorage.setItem('fish-island:skin', skin);

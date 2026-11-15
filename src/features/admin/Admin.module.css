@@ -265,6 +265,15 @@
   gap: 8px;
   width: min(330px, 100%);
 }
+.titleSearch > input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+}
+.titleSearch > button {
+  flex: none;
+  white-space: nowrap;
+}
 @media (max-width: 760px) {
   .titleToolbar {
     flex-direction: column;

@@ -6,6 +6,46 @@ const token = () => ({ name: 'synthetic-session', value: 'synthetic-value' });
 const pet = { petId: '17', name: '测试伙伴', petUrl: '', level: 2, hunger: 60, mood: 70 };
 afterEach(() => vi.unstubAllGlobals());
 describe('pet protocol migration', () => {
+  it('queries consumables without losing food subtype or template code', async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: 0,
+          data: {
+            total: 1,
+            records: [
+              {
+                id: '701',
+                quantity: 6,
+                template: {
+                  id: '80',
+                  code: 'fish_biscuit',
+                  name: '鱼饼',
+                  category: 'consumable',
+                  subType: 'food',
+                },
+              },
+            ],
+          },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', fetcher);
+    const result = await createPetClient('', token, vi.fn()).items(
+      'bag',
+      2,
+      new AbortController().signal,
+      'consumable',
+    );
+    expect(JSON.parse(fetcher.mock.calls[0]![1].body)).toEqual({
+      current: 2,
+      pageSize: 12,
+      category: 'consumable',
+    });
+    expect(result.records[0]).toMatchObject({ code: 'fish_biscuit', subType: 'food', quantity: 6 });
+    expect(item({ id: '81', name: '非食物', subType: 'material' }).subType).toBe('material');
+    expect(item({ id: '82', name: '未分类' }).subType).toBe('');
+  });
   it('keeps safe owner and pet avatars across all four ranking protocols', async () => {
     const entry = {
       userId: '124',

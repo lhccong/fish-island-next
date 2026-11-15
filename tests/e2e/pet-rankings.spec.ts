@@ -137,12 +137,9 @@ for (const skin of builtinSkins)
             ).toBeFocused();
           }
           if (kind === 'tournament') {
-            await panel.getByRole('button', { name: '挑战排位', exact: true }).first().click();
-            const confirm = page.getByRole('dialog', { name: '挑战排位', exact: true });
-            await confirm.getByRole('button', { name: '取消', exact: true }).click();
-            await expect(
-              panel.getByRole('button', { name: '挑战排位', exact: true }).first(),
-            ).toBeFocused();
+            await expect(page.getByRole('dialog', { name: '挑战排位', exact: true })).toHaveCount(
+              0,
+            );
           }
           await closeAll(page);
         }

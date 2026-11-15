@@ -1,5 +1,9 @@
 # 外壳与皮肤协议
 
+ADR-078 的伙伴工作台在全部主题共用既有 color-pixel-paper/paper-inset/ink/muted/border/wood 系列明暗 token；局部映射 surface/text/muted/border 与 pet-panel/frame，不改变全局主题或 action 普通按钮色。桌面三栏按容器宽度重排，手机单栏及 44px 图标入口，原始图片保持原貌。内嵌行囊和详细面板复用请求/操作实现，主题模式切换保留分页、选中物品与营地位置。
+
+伙伴页使用已有 home-island.png 作为独立装饰背景，居中贴底；明亮以 pet-battle-sky/canvas 的 78% 混合色为底、插画透明度 56%，暗夜保留 canvas 基础背景、插画透明度 32%。不影响面板与图片透明度，不拦截触摸或滚动。自动喂食的共享 Select 同时对触发器与 Portal 使用 pixel 呈现。
+
 用户卡片封面在桌面以 cover 铺满正文右栏，与左侧 reserved 资料滚动区等高；手机重排为 140px 封面带和下方独立资料滚动区。管理员操作使用可键盘操作的共享 Button 折叠入口，默认收起、仅管理员可见；收起保留已加载状态及表单选择，不影响外观切换。
 
 ADR-070 的头像框弹窗使用 surface/text/muted/border/accent-soft/action 语义变量，桌面三列、手机双列；固定标题与积分、独立 reserved 滚动正文、固定反馈区。头像框透明图片由 shared/ui/AvatarFrame 叠加，不染色、不扩大布局尺寸、不阻挡点击；全部主题和明暗模式共用，切换不重置列表、穿戴状态、聊天草稿或连接。
@@ -9,6 +13,8 @@ ADR-069 聊天用户卡片复用 surface/canvas/text/muted/border/action 语义�
 状态：基础配色和微信工作台外壳已实现；完整聊天外壳、导入器和其他平台布局待实现。
 
 ## 1. 独立的外观维度
+
+新访客未保存主题时默认使用「摸鱼岛像素风」（`pixel-island`）；保存值无效或存储不可读时使用相同回退。已有有效主题选择优先恢复，明亮/暗夜模式仍独立恢复，默认明亮。
 
 ADR-019 新增独立的 `colorMode`（明亮 light / 暗夜 dark），与 shellId、skinId 正交组合。主题注册表保留明亮默认值，`getSkinTokens` 为实际工作台和预览提供相同的模式组合。暗夜基础背景 `#191A1C`，局部配色通过模式语义变量覆盖；图片、封面和插画不反色。仅内置可信配置使用组合结果，第三方导入白名单保持不变。
 
@@ -158,7 +164,7 @@ ADR-067 斗地主全部主题共用 surface/canvas/text/muted/border/action/acce
 
 你画我猜样式调整（2026-11-15）：题目/计时/房间操作收拢到同一信息带；画布工具置顶、作品独立留边，玩家以昵称首字作占位。窄容器单列画布，手机将猜词区前置于玩家列表之前。全部配色沿用现有语义 token，画纸/颜料保持原貌，不改变请求和状态边界。
 
-ADR-072 武道大会沿用 surface/canvas/text/muted/border/accent/action 语义变量，桌面前三席三列、窄容器和手机纵向；确认与记录使用 reserved 滚动区，全部主题明暗共享同一状态，不额外请求。
+ADR-072 武道大会沿用 surface/canvas/text/muted/border/accent/action 语义变量，桌面前三席三列、窄容器和手机纵向；挑战打开 pixel PanelDialog，复用 BattleStage 的双方形象、生命与装备呈现，并播放大会真实回合。战斗、记录共用 reserved 滚动区，手机沿用战斗场景重排及 44px 控件。全部主题明暗共享同一状态，不额外请求。
 
 ADR-071 积分商城复用 surface/canvas/text/muted/border/accent/action 语义变量；桌面道具网格、手机单列及四项分类，头像框复用现有呈现。明暗及全部主题保持分页、兑换确认和同步状态，普通按钮维持桌面 32px、手机 44px，正文使用 reserved ScrollArea。
 
@@ -167,3 +173,7 @@ ADR-074 新增 pixel-island（摸鱼岛像素风），app 显式映射到同名�
 ADR-075 的我的小岛复用 surface/text/muted/border/action 与既有 pixel 纸面/木框语义变量，桌面 reserved 侧栏、手机独立 Dialog。像素文字气泡使用木板框线和纸面，图片、红包、福袋与撤回保持原呈现；不增加消息行订阅，不影响主题切换或请求。
 
 ADR-077 的我的海岛侧栏使用 surface/text/muted/border/action 变量、邮筒海岸装饰和手账/鱼小圈分段页签。动态 island 变体按参考图呈现头像、时间、图像及横排操作；明暗保留照片原貌，手机独立面板复用同一数据与布局。
+
+ADR-079 抽奖转盘复用 pixel-paper/paper-inset/border/ink 与 life 稀有度语义色，普通操作使用主题 action；桌面双栏、手机三列奖格及纵向记录，明暗和主题切换保留抽奖状态。
+
+ADR-080 的登录/邮箱注册弹窗在全部主题及外壳共用，使用 surface/message-surface/text/muted/border/action/accent-text/danger 语义变量。固定标题、关闭与注册操作反馈，独立 reserved 正文滚动；手机 44px 操作、16px 输入字号和安全区域。明暗与换肤不重挂载表单或新增请求。

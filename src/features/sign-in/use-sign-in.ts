@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SignInPort, SignMonth } from '@/domain/sign-in';
+import { useSignInStatus } from './sign-in-status-context';
 
 type CalendarState =
   | { status: 'loading' }
@@ -7,6 +8,7 @@ type CalendarState =
   | { status: 'ready'; data: SignMonth; todaySigned: boolean };
 
 export function useSignIn(port: SignInPort, year: number, month: number) {
+  const { report } = useSignInStatus();
   const [loaded, setLoaded] = useState<{ key: string; value: CalendarState } | null>(null);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState('');
@@ -21,8 +23,10 @@ export function useSignIn(port: SignInPort, year: number, month: number) {
     scope.current = controller;
     void Promise.all([port.month(year, month, controller.signal), port.status(controller.signal)])
       .then(([data, todaySigned]) => {
-        if (!controller.signal.aborted)
+        if (!controller.signal.aborted) {
+          report(todaySigned);
           setLoaded({ key, value: { status: 'ready', data, todaySigned } });
+        }
       })
       .catch((error: unknown) => {
         if (!controller.signal.aborted)
@@ -35,7 +39,7 @@ export function useSignIn(port: SignInPort, year: number, month: number) {
           });
       });
     return () => controller.abort();
-  }, [port, year, month, key]);
+  }, [port, year, month, key, report]);
 
   async function submit(date?: string) {
     const controller = scope.current;
@@ -51,6 +55,7 @@ export function useSignIn(port: SignInPort, year: number, month: number) {
         ? port.makeUp(date, controller.signal)
         : port.sign(controller.signal));
       if (controller.signal.aborted) return;
+      if (!date) report(true);
       setNotice(
         `${date ? `${date} 补签` : '签到'}成功，获得 ${result.totalPoints} 积分${result.bonusPoints ? `（含连续奖励 ${result.bonusPoints}）` : ''}。${date ? '已消耗 20 积分。' : ''}${result.nextDayBonus ? `下次连续签到额外奖励 ${result.nextDayBonus} 积分。` : ''}`,
       );

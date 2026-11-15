@@ -8,6 +8,7 @@ interface ScrollAreaProps {
   className?: string;
   gutter?: 'overlay' | 'reserved';
   viewportRef?: Ref<HTMLDivElement>;
+  fillContent?: boolean;
 }
 
 export function ScrollArea({
@@ -16,12 +17,14 @@ export function ScrollArea({
   className = '',
   gutter = 'overlay',
   viewportRef,
+  fillContent = false,
 }: ScrollAreaProps) {
   return (
     <Primitive.Root
       type="auto"
       scrollHideDelay={650}
       data-gutter={gutter}
+      data-fill-content={fillContent}
       className={`${styles.root} ${className}`}
     >
       <Primitive.Viewport

@@ -11,6 +11,8 @@ export function useAuth() {
   const emailCodeRetryAt = useStore(controller.store, (state) => state.emailCodeRetryAt);
   const emailCodeTarget = useStore(controller.store, (state) => state.emailCodeTarget);
   return {
+    register: controller.register,
+    sendRegistrationCode: controller.sendRegistrationCode,
     refreshUser: controller.refreshUser,
     avatarFrames: controller.avatarFrames,
     exchangeAvatarFrame: controller.exchangeAvatarFrame,

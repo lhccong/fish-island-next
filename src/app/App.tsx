@@ -6,6 +6,7 @@ import { authController } from '@/app/config/auth';
 import { AppRoutes } from '@/app/AppRoutes';
 import { ChatConnectionProvider } from '@/app/providers/ChatConnectionProvider';
 import { NotificationSessionProvider } from '@/app/providers/NotificationSessionProvider';
+import { SignInSessionProvider } from '@/app/providers/SignInSessionProvider';
 
 export function App() {
   return (
@@ -15,7 +16,9 @@ export function App() {
         <ChatConnectionProvider>
           <SkinProvider>
             <NotificationSessionProvider>
-              <AppRoutes />
+              <SignInSessionProvider>
+                <AppRoutes />
+              </SignInSessionProvider>
             </NotificationSessionProvider>
           </SkinProvider>
         </ChatConnectionProvider>

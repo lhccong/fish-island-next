@@ -1,12 +1,12 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useRef, useState } from 'react';
-import type { PetPort, PetRank } from '@/domain/pet';
+import type { BattlePreview, PetPort, PetRank } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
-import { usePetResource } from './resource';
-import { ResourceView } from './Feedback';
+import { usePetOperation, usePetResource } from './resource';
+import { OperationNotice, ResourceView } from './Feedback';
 import { RankAvatar } from './RankAvatar';
 import { OtherCompanionPanel } from './OtherCompanionPanel';
-import { TournamentChallenge } from './TournamentChallenge';
+import { TournamentBattle } from './TournamentBattle';
 import styles from './Tournament.module.css';
 
 export function TournamentPanel({
@@ -28,10 +28,54 @@ export function TournamentPanel({
     [service],
   );
   const resource = usePetResource(load);
-  const [target, setTarget] = useState<{ rank: number; entry?: PetRank } | null>(null);
+  const operation = usePetOperation();
+  const [pendingRank, setPendingRank] = useState<number | null>(null);
+  const [battleOpen, setBattleOpen] = useState(false);
+  const [preview, setPreview] = useState<BattlePreview | null>(null);
+  const [settlement, setSettlement] = useState<{
+    target: { rank: number; entry?: PetRank };
+    result: Awaited<ReturnType<PetPort['compete']>>;
+  } | null>(null);
   const [other, setOther] = useState<string | null>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
   const refreshButton = useRef<HTMLButtonElement | null>(null);
+  function challenge(rank: number, entry?: PetRank) {
+    setPendingRank(rank);
+    setSettlement(null);
+    setPreview(null);
+    setBattleOpen(true);
+    void operation.run(
+      async (signal) => {
+        if (entry) {
+          const value = await service.preview({ kind: 'pet', id: entry.userId }, signal);
+          if (signal.aborted) return null;
+          setPreview(value);
+        }
+        try {
+          return await service.compete(rank, signal);
+        } catch (error) {
+          if (
+            !signal.aborted &&
+            (error instanceof TypeError ||
+              (error instanceof Error &&
+                /连接|HTTP|timeout|格式|异常|数值|未知|Unexpected|JSON/i.test(error.message)))
+          ) {
+            setUncertain(true);
+            throw new Error('未能确认挑战结果，请刷新榜单确认名次后再挑战。');
+          }
+          throw error;
+        }
+      },
+      '结算成功',
+      (result) => {
+        if (!result) return;
+        setSettlement({ target: { rank, ...(entry ? { entry } : {}) }, result });
+        returnFocus.current = refreshButton.current;
+        resource.reload();
+        onChange();
+      },
+    );
+  }
   return (
     <section className={styles.tournament} aria-label="武道大会">
       <header className={styles.heading}>
@@ -40,9 +84,9 @@ export function TournamentPanel({
           <p>与伙伴一起，向上挑战。</p>
         </div>
         <Button
-          variant="secondary"
-          disabled={resource.state.status === 'loading'}
           ref={refreshButton}
+          variant="secondary"
+          disabled={operation.pending || resource.state.status === 'loading'}
           onClick={resource.reload}
         >
           刷新榜单
@@ -58,6 +102,18 @@ export function TournamentPanel({
         <p role="alert">{resource.state.message}，请刷新榜单重试。</p>
       )}
       {uncertain && <p role="alert">上次挑战结果尚未确认，请刷新榜单后再挑战。</p>}
+      <OperationNotice notice={operation.notice?.error ? operation.notice : null} />
+      {(settlement || operation.pending) && (
+        <Button
+          variant="secondary"
+          onClick={(event) => {
+            returnFocus.current = event.currentTarget;
+            setBattleOpen(true);
+          }}
+        >
+          {operation.pending ? '查看进行中的挑战' : '查看战斗结果'}
+        </Button>
+      )}
       <ResourceView
         state={resource.data ? { status: 'ready', data: resource.data } : resource.state}
         reload={resource.reload}
@@ -123,16 +179,21 @@ export function TournamentPanel({
                         variant="secondary"
                         disabled={
                           uncertain ||
+                          operation.pending ||
                           resource.state.status !== 'ready' ||
                           mine ||
                           (data.mine !== null && data.mine <= rank)
                         }
                         onClick={(event) => {
                           returnFocus.current = event.currentTarget;
-                          setTarget({ rank, ...(entry ? { entry } : {}) });
+                          challenge(rank, entry);
                         }}
                       >
-                        挑战排位
+                        {operation.pending && pendingRank === rank ? (
+                          <LoadingIndicator compact>正在挑战…</LoadingIndicator>
+                        ) : (
+                          '挑战排位'
+                        )}
                       </Button>
                     </li>
                   );
@@ -143,21 +204,14 @@ export function TournamentPanel({
           );
         }}
       </ResourceView>
-      {target && (
-        <TournamentChallenge
-          service={service}
-          target={target}
+      {battleOpen && (
+        <TournamentBattle
+          preview={preview}
+          settlement={settlement}
+          pending={operation.pending}
+          notice={operation.notice?.error ? operation.notice : null}
+          onClose={() => setBattleOpen(false)}
           returnFocusRef={returnFocus}
-          onUnknown={() => {
-            returnFocus.current = refreshButton.current;
-            setUncertain(true);
-          }}
-          onClose={() => setTarget(null)}
-          onSettled={() => {
-            returnFocus.current = refreshButton.current;
-            resource.reload();
-            onChange();
-          }}
         />
       )}
       {other && (

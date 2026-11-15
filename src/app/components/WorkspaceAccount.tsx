@@ -1,8 +1,9 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useLocation, useNavigate } from 'react-router';
 import { AccountControl, useAuth } from '@/features/auth';
-import { lazy, Suspense, useRef, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import { signInPort } from '@/app/config/sign-in';
+import { SignInLauncher } from '@/features/sign-in';
 import {
   ContactRound,
   Ban,
@@ -21,10 +22,6 @@ import type { AccountTool } from '@/features/account-tools';
 import { accountTools, blacklist } from '@/app/config/account-tools';
 import { useWorkTimeVisibility, AccountToolPanel } from '@/features/account-tools';
 import styles from './AccountTools.module.css';
-
-const SignInLauncher = lazy(() =>
-  import('@/features/sign-in').then((module) => ({ default: module.SignInLauncher })),
-);
 
 export function WorkspaceAccount() {
   const { session, logout, notify } = useAuth();

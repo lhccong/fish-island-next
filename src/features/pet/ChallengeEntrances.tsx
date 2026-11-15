@@ -1,6 +1,6 @@
-import { ArrowUpRight } from 'lucide-react';
+import { Castle, Ghost, Swords } from 'lucide-react';
 import { PixelLandscape } from './PixelLandscape';
-import styles from './PixelBattle.module.css';
+import styles from './ChallengeEntrances.module.css';
 
 export function ChallengeEntrances({
   disabled,
@@ -15,34 +15,34 @@ export function ChallengeEntrances({
         type="button"
         className={styles.entrance}
         disabled={disabled}
+        title="宠物 Boss"
         onClick={() => onSelect('boss')}
       >
         <PixelLandscape />
-        <ArrowUpRight size={20} aria-hidden="true" />
+        <Ghost size={34} aria-hidden="true" />
         <strong>宠物 Boss</strong>
-        <span>迎战首领 · 争夺伤害贡献</span>
       </button>
       <button
         type="button"
         className={styles.entrance}
         disabled={disabled}
+        title="宠物爬塔"
         onClick={() => onSelect('tower')}
       >
         <PixelLandscape tower />
-        <ArrowUpRight size={20} aria-hidden="true" />
+        <Castle size={34} aria-hidden="true" />
         <strong>宠物爬塔</strong>
-        <span>逐层突破 · 挑战更高纪录</span>
       </button>
       <button
         type="button"
         className={styles.entrance}
         disabled={disabled}
+        title="武道大会"
         onClick={() => onSelect('tournament')}
       >
         <PixelLandscape />
-        <ArrowUpRight size={20} aria-hidden="true" />
+        <Swords size={34} aria-hidden="true" />
         <strong>武道大会</strong>
-        <span>每日排位 · 挑战更高席位</span>
       </button>
     </nav>
   );

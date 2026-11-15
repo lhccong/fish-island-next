@@ -57,7 +57,11 @@ export function WechatShell({
           {slots.contentScroll === false ? (
             slots.content
           ) : (
-            <ScrollArea key={slots.contentKey ?? 'workspace'} label="主内容滚动区">
+            <ScrollArea
+              key={slots.contentKey ?? 'workspace'}
+              label="主内容滚动区"
+              fillContent={slots.contentFill ?? false}
+            >
               {slots.content}
             </ScrollArea>
           )}

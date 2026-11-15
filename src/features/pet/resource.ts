@@ -27,7 +27,11 @@ export function usePetResource<T>(load: (signal: AbortSignal) => Promise<T>) {
     });
     return () => request.abort();
   }, [load, revision]);
-  return { state, data, reload: useCallback(() => setRevision((v) => v + 1), []) };
+  const accept = useCallback((value: T) => {
+    setData(value);
+    setState({ status: 'ready', data: value });
+  }, []);
+  return { state, data, accept, reload: useCallback(() => setRevision((v) => v + 1), []) };
 }
 export function usePetOperation() {
   const request = useRef<AbortController | null>(null);

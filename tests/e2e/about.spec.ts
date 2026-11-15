@@ -77,7 +77,6 @@ for (const skin of builtinSkins) {
       await page.getByRole('button', { name: '重新加载二维码' }).click();
       await expect(page.getByText('正在加载QQ群二维码…')).toBeVisible();
       await expect.poll(() => finishImage !== undefined).toBe(true);
-      finishImage?.();
       await expect(page.getByText('正在加载QQ群二维码…')).toBeHidden();
       expect(
         await page

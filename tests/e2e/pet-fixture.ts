@@ -8,6 +8,7 @@ import {
 
 const portrait = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130"><ellipse cx="60" cy="116" rx="32" ry="8" fill="#274d3a" opacity=".15"/><path d="M29 66 23 22q22 2 29 22 14-13 31-8L105 8q10 29-7 52 18 44-15 55H42Q14 104 29 66" fill="#e4be79" stroke="#775c3a" stroke-width="3"/><path d="M49 90q15-16 28 0v20H49" fill="#fff1cd"/><circle cx="45" cy="68" r="4" fill="#293d36"/><circle cx="79" cy="68" r="4" fill="#293d36"/><path d="m56 80 5 4 6-4M29 24l8 27M102 14 90 43" fill="none" stroke="#775c3a" stroke-width="3"/><path d="M53 41q-10-23 7-32 16 14 7 29" fill="#689f68" stroke="#446b48" stroke-width="3"/></svg>`;
 export async function setupPet(page: Page, skin: string, mode: string) {
+  await page.routeWebSocket(/\/ws\//, (socket) => socket.onMessage(() => {}));
   const activity = createActivityFixture();
   const template = {
     id: '40',
@@ -53,10 +54,13 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     panelFail: false,
     panelEmpty: false,
     bagEmpty: false,
+    foodsEmpty: false,
+    foodsFail: false,
     hold: false,
     release: () => {},
     feedFail: false,
     mineRequests: 0,
+    heldMineRequests: 0,
     actions: [] as string[],
     requests: [] as string[],
     owned: false,
@@ -101,6 +105,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
       if (path === 'pet/my/get') {
         state.mineRequests++;
         if (state.hold) {
+          state.heldMineRequests++;
           await new Promise<void>((resolve) => {
             state.release = resolve;
           });
@@ -145,14 +150,38 @@ export async function setupPet(page: Page, skin: string, mode: string) {
           state.bagEmpty = true;
           state.actions.push('batch');
           data = 20;
-        } else if (path === 'itemInstances/my/list/page/vo')
-          data = records(
-            Array.from({ length: state.bagEmpty ? 0 : 12 }, (_, n) => ({
-              ...item,
-              id: String(501 + n),
-            })),
-          );
-        else if (path.startsWith('itemTemplates/list/page/'))
+        } else if (path === 'itemInstances/my/list/page/vo') {
+          const category = (route.request().postDataJSON() as { category?: string }).category;
+          if (category === 'consumable' && state.foodsFail)
+            return route.fulfill({ status: 503, json: {} });
+          data =
+            category === 'consumable'
+              ? records(
+                  state.foodsEmpty
+                    ? []
+                    : [
+                        {
+                          id: '701',
+                          quantity: 6,
+                          template: {
+                            ...template,
+                            id: '80',
+                            code: 'synthetic_food',
+                            name: '普通鱼饼',
+                            category: 'consumable',
+                            subType: 'food',
+                            equipSlot: '',
+                          },
+                        },
+                      ],
+                )
+              : records(
+                  Array.from({ length: state.bagEmpty ? 0 : 12 }, (_, n) => ({
+                    ...item,
+                    id: String(501 + n),
+                  })),
+                );
+        } else if (path.startsWith('itemTemplates/list/page/'))
           data = records(
             Array.from({ length: 12 }, (_, n) => ({
               ...template,
@@ -251,12 +280,12 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     }
     return route.fulfill({ json: { code: 0, data } });
   });
-  await page.goto('/user/login?redirect=%2Fpet');
+  await page.goto('/user/login?redirect=%2Fpet', { waitUntil: 'domcontentloaded' });
   await page.getByRole('textbox', { name: '账号或邮箱', exact: true }).fill('synthetic-account');
   await page.getByLabel('密码', { exact: true }).fill('synthetic-password');
   await page.getByRole('button', { name: '登录', exact: true }).last().click();
   await expect(page).toHaveURL('/pet');
-  await page.goto('/pet');
+  await page.goto('/pet', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: '伙伴营地', exact: true })).toBeVisible({
     timeout: 90000,
   });

@@ -1,6 +1,6 @@
 export const campProps = [
   { x: 12, y: 35, kind: 'tree' },
-  { x: 85, y: 34, kind: 'tree' },
+  { x: 91, y: 34, kind: 'tree' },
   { x: 23, y: 43, kind: 'rock' },
   { x: 78, y: 58, kind: 'rock' },
   { x: 11, y: 70, kind: 'tree' },

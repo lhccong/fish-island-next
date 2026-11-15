@@ -54,7 +54,8 @@ for (const skin of builtinSkins)
         expect(state.skinUsed).toBe(true);
         await closePanel(page);
         dialog = await openPanel(page, '自动喂食');
-        await dialog.getByRole('textbox', { name: '食物编号' }).fill('synthetic_food');
+        await dialog.getByRole('combobox', { name: '选择食物', exact: true }).click();
+        await page.getByRole('option', { name: '普通鱼饼 ×6', exact: true }).click();
         await dialog.getByRole('spinbutton', { name: /触发饱食值/ }).fill('40');
         await dialog.getByRole('checkbox', { name: '启用自动喂食' }).check();
         await dialog.getByRole('button', { name: '保存设置', exact: true }).click();
@@ -88,9 +89,9 @@ for (const skin of builtinSkins)
         await dialog.getByRole('combobox', { name: '挑战分类' }).click();
         await page.getByRole('option', { name: '每日排位', exact: true }).click();
         await dialog.getByRole('button', { name: '挑战排位', exact: true }).first().click();
-        const tournament = page.getByRole('dialog', { name: '挑战排位', exact: true });
-        await tournament.getByRole('button', { name: '确认', exact: true }).click();
-        await expect(tournament.getByRole('status')).toContainText('挑战胜利');
+        await expect(page.getByRole('dialog', { name: '挑战排位', exact: true })).toHaveCount(0);
+        const tournament = page.getByRole('dialog', { name: '武道大会战斗', exact: true });
+        await expect(tournament.getByRole('status').filter({ hasText: '挑战胜利' })).toBeVisible();
         await tournament.getByRole('button', { name: '返回榜单', exact: true }).click();
         expect(state.activity.competitions).toBe(1);
         await dialog.getByRole('combobox', { name: '挑战分类' }).click();
@@ -110,16 +111,18 @@ for (const skin of builtinSkins)
         await expect(dialog.getByRole('alert')).toContainText('挑战次数不足');
         await expect(dialog.getByRole('heading', { name: '挑战胜利', exact: true })).toHaveCount(0);
         await closePanel(page);
-        dialog = await openPanel(page, '幸运补给');
-        await dialog.getByRole('button', { name: '领取一次', exact: true }).click();
-        await confirm(page, '领取一次');
+        dialog = await openPanel(page, '抽奖转盘');
+        await dialog.getByRole('button', { name: /^单抽 ·/, exact: false }).click();
         await expect(
-          dialog.getByRole('heading', { name: '本次补给 · 消耗 10 积分', exact: true }),
+          dialog.getByRole('heading', { name: '本次抽奖 · 消耗 10 积分', exact: true }),
         ).toBeVisible();
-        await dialog.getByRole('button', { name: '领取十次', exact: true }).click();
-        await confirm(page, '领取十次');
+        await dialog.getByRole('button', { name: /^十连抽 ·/, exact: false }).click();
+        await page
+          .getByRole('dialog', { name: '十连抽结果', exact: true })
+          .getByRole('button', { name: '关闭面板', exact: true })
+          .click();
         await expect(
-          dialog.getByRole('heading', { name: '本次补给 · 消耗 100 积分', exact: true }),
+          dialog.getByRole('heading', { name: '本次抽奖 · 消耗 100 积分', exact: true }),
         ).toBeVisible();
         expect(state.activity.draws).toBe(2);
         expect(state.activity.drawCount).toBe(11);

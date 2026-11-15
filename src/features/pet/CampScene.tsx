@@ -15,13 +15,11 @@ export function CampScene({ pet }: { pet: Companion | null }) {
         <CampLandscape />
       </div>
       <div className={styles.sceneLabel}>
-        <Trees size={16} />
+        <Trees size={16} aria-hidden="true" />
         <span>风眠草地</span>
-        <small>伙伴营地</small>
       </div>
-      <div className={styles.weather}>
-        <Leaf size={15} />
-        微风 · 宜散步
+      <div className={styles.weather} title="微风 · 宜散步" aria-label="微风 · 宜散步">
+        <Leaf size={16} aria-hidden="true" />
       </div>
       <button
         type="button"
@@ -71,9 +69,8 @@ export function CampScene({ pet }: { pet: Companion | null }) {
         </div>
       )}
       <div className={styles.hint}>
-        <Move size={14} />
-        {pet ? '点击草地散步 · WASD / 方向键移动' : '领养一位伙伴，让营地热闹起来'}
-        <small>营地散步不消耗积分，不产生收益</small>
+        <Move size={14} aria-hidden="true" />
+        {pet ? '点击散步 · WASD / ↑↓←→' : '领养伙伴后开启散步'}
       </div>
     </section>
   );
