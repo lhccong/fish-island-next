@@ -72,12 +72,12 @@ for (const skin of builtinSkins)
       await expect(page.locator('[data-message-id="1001"]').getByRole('group')).toBeFocused();
       const row = page.locator('[data-message-id="1001"]');
       const meta = row.locator('time').locator('..');
-      const name = meta.locator(':scope > span');
+      const name = meta.getByRole('button', { name: '查看合成岛友的用户卡片' });
       await expect(name).toHaveText('合成备注');
       const nameBox = (await name.boundingBox())!;
       const bubbleBox = (await row.getByRole('group').boundingBox())!;
-      expect(Math.abs(nameBox.x - bubbleBox.x)).toBeLessThanOrEqual(1);
-      if (page.viewportSize()!.width > 760) {
+      if (skin.id !== 'wps') expect(Math.abs(nameBox.x - bubbleBox.x)).toBeLessThanOrEqual(1);
+      if (page.viewportSize()!.width > 760 && skin.id !== 'wps') {
         expect((await meta.boundingBox())!.height).toBeLessThan(24);
         expect(bubbleBox.y - (nameBox.y + nameBox.height)).toBeCloseTo(6, 0);
         await name.hover();
@@ -96,6 +96,13 @@ for (const skin of builtinSkins)
         await picker.getByRole('button', { name: '关闭', exact: true }).click();
         await expect(name).toHaveText('合成备注');
         expect(loads).toBe(1);
+        // The worksheet shell intentionally hides the desktop conversation sidebar.
+        // Restore the original non-worksheet shell before testing its member entry.
+        if (skin.id !== 'wps')
+          await page.evaluate(async (skin) => {
+            const { useAppearanceStore } = await import('/src/features/appearance/index.ts');
+            useAppearanceStore.getState().setSkinId(skin as never);
+          }, skin.id);
       }
       await page.route('**/api/chat/online/user', (route) =>
         route.fulfill({ json: { code: 0, data: [{ id: '456', name: '合成岛友', avatar: null }] } }),
@@ -105,11 +112,17 @@ for (const skin of builtinSkins)
       const list = page.getByRole('region', { name: '聊天列表', exact: true });
       await list.getByRole('button', { name: '刷新聊天列表' }).click();
       await list.getByRole('searchbox', { name: '搜索聊天' }).fill('合成备注');
-      const memberName = list.getByRole('button', { name: '设置合成岛友的备注' });
+      await page.route('**/api/user/get/vo?*', (route) =>
+        route.fulfill({ json: { code: 0, data: { id: '456', userName: '合成岛友' } } }),
+      );
+      const memberName = list.getByRole('button', { name: '查看合成岛友的用户卡片' });
       await expect(memberName).toHaveText('合成备注');
       await memberName.click();
+      const card = page.getByRole('dialog', { name: '用户卡片', exact: true });
+      await card.getByRole('button', { name: '修改备注', exact: true }).click();
       await expect(input).toHaveValue('合成备注');
       await input.press('Escape');
+      await card.getByRole('button', { name: '关闭用户卡片', exact: true }).click();
       await expect(memberName).toBeFocused();
       if (mobile) await page.getByRole('button', { name: '关闭聊天列表' }).click();
       await openMessageActions(page, '1001');

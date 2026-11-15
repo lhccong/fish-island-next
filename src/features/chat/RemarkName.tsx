@@ -1,18 +1,23 @@
 import { useRef } from 'react';
-import { useRemark, useRemarks } from './remarks-context';
+import { useRemark } from './remarks-context';
+import { useUserCard } from './user-card-context';
 import styles from './Remarks.module.css';
 
 export function RemarkName({
   id,
   name,
   interactive = true,
+  level,
+  titleId,
 }: {
   id: string;
   name: string;
   interactive?: boolean;
+  level?: number | undefined;
+  titleId?: string | undefined;
 }) {
   const remark = useRemark(id);
-  const { open } = useRemarks();
+  const open = useUserCard();
   const ref = useRef<HTMLButtonElement>(null);
   if (!interactive)
     return <span title={remark ? `${remark}（${name}）` : name}>{remark || name}</span>;
@@ -21,9 +26,9 @@ export function RemarkName({
       ref={ref}
       type="button"
       className={styles.name}
-      title={remark ? `${remark}（${name}）· 修改备注` : `${name} · 设置备注`}
-      aria-label={`设置${name}的备注`}
-      onClick={() => open({ id, name, returnFocusRef: ref })}
+      title={remark ? `${remark}（${name}）` : name}
+      aria-label={`查看${name}的用户卡片`}
+      onClick={() => open({ id, name, level, titleId, returnFocusRef: ref })}
     >
       {remark || name}
     </button>

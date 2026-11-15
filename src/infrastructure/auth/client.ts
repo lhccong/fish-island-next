@@ -1,5 +1,6 @@
 import { AuthError, type AuthPort, type SessionToken } from '@/domain/auth';
 import { asRecord, decodeToken, decodeUser, safeImageUrl, unwrap } from './decode';
+import { avatarFrameMethods } from './avatar-frames';
 
 export function createAuthClient(baseUrl: string): AuthPort {
   const base = baseUrl.replace(/\/+$/, '');
@@ -16,7 +17,7 @@ export function createAuthClient(baseUrl: string): AuthPort {
     if (token) headers.set(token.name, token.value);
     try {
       const response = await fetch(
-        `${base}/api/${path.startsWith('/file/') ? path.slice(1) : `user${path}`}`,
+        `${base}/api/${path.startsWith('/file/') || path.startsWith('/api/avatar/') ? path.slice(1) : `user${path}`}`,
         {
           method,
           credentials: 'include',
@@ -38,6 +39,7 @@ export function createAuthClient(baseUrl: string): AuthPort {
     }
   }
   return {
+    ...avatarFrameMethods(request),
     async titles(token, signal) {
       const data = await request('/title/list', 'GET', signal, token);
       if (!Array.isArray(data)) throw new AuthError('invalid-response', '称号列表格式异常');

@@ -7,3 +7,4 @@ export { MobileOnlineUsers } from './MobileOnlineUsers';
 export { createChatRealtimeController } from './realtime-controller';
 export { ChatRealtimeProvider } from './ChatRealtimeProvider';
 export { RemarksProvider } from './RemarksProvider';
+export { UserCardProvider } from './UserCardProvider';

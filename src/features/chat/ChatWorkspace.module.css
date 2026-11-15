@@ -240,6 +240,12 @@
   width: 40px;
   height: 40px;
 }
+.avatar[data-size='compact'] {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+}
 .memberName {
   width: 100%;
   text-overflow: ellipsis;

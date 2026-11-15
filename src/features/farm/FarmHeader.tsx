@@ -1,5 +1,5 @@
 import { ArrowLeft, Leaf, RefreshCw } from 'lucide-react';
-import type { Farmer, Friend } from '@/domain/farm';
+import type { Farmer, FarmVisit } from '@/domain/farm';
 import { Button } from '@/shared/ui/Button';
 import { FarmAvatar } from './FarmAvatar';
 import styles from './Farm.module.css';
@@ -14,7 +14,7 @@ export function FarmHeader({
 }: {
   farmer: Farmer | undefined;
   balance: number | undefined;
-  friend: Friend | null;
+  friend: FarmVisit | null;
   busy: boolean;
   loading: boolean;
   onHome: () => void;
@@ -39,7 +39,13 @@ export function FarmHeader({
         <dl className={styles.stats} aria-label="农场概况">
           <div>
             <dt>等级</dt>
-            <dd>Lv.{friend?.level ?? farmer.level}</dd>
+            <dd>
+              {friend
+                ? friend.level === undefined
+                  ? '未提供'
+                  : `Lv.${friend.level}`
+                : `Lv.${farmer.level}`}
+            </dd>
           </div>
           <div>
             <dt>积分</dt>

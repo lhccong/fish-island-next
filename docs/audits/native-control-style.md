@@ -1,5 +1,9 @@
 # 浏览器默认控件样式排查与整改
 
+## 头像框迁移（ADR-070）
+
+入口：账号菜单 → 头像框。源码：`src/features/auth/AvatarFramesDialog.tsx`。操作复用 Button、兑换确认复用 Dialog、列表复用 reserved ScrollArea 与 InfiniteScroll；没有原生 select/option 或 alert/confirm/prompt，旧商城的 Ant Design 控件没有复制。全部主题、双模式、桌面/375px/390px 验证范围及限制见 [头像框验收](avatar-frames-migration.md)。
+
 ## 谁是卧底迁移（ADR-063）
 
 入口：游戏 → 谁是卧底。源码：`src/features/undercover/LocalSetup.tsx`、`LocalTurn.tsx`、`CreateRoomDialog.tsx`、`RoomPlayers.tsx`。人数、卧底数、词语来源、模式、时长与投票目标均使用共享 Radix Select；结束、退出和投票确认使用共享 Dialog，操作使用 Button，房间设置和发言记录使用 reserved ScrollArea。没有复制旧版 Ant Design 或原生系统选项列表，没有引入 alert/confirm/prompt。验收范围和限制见 [谁是卧底验收](undercover-migration.md)。

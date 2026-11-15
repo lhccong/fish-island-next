@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type RefObject } from 'react';
 import type { PetPort } from '@/domain/pet';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
@@ -12,10 +12,12 @@ export function OtherCompanionPanel({
   service,
   userId,
   onClose,
+  returnFocusRef,
 }: {
   service: PetPort;
   userId: string;
   onClose: () => void;
+  returnFocusRef?: RefObject<HTMLElement | null> | undefined;
 }) {
   const load = useCallback(
     (signal: AbortSignal) => service.other(userId, signal),
@@ -23,7 +25,12 @@ export function OtherCompanionPanel({
   );
   const resource = usePetResource(load);
   return (
-    <PanelDialog title="伙伴资料" description="查看这位岛友的伙伴与装备属性。" onClose={onClose}>
+    <PanelDialog
+      title="伙伴资料"
+      description="查看这位岛友的伙伴与装备属性。"
+      onClose={onClose}
+      returnFocusRef={returnFocusRef}
+    >
       <ResourceView state={resource.state} reload={resource.reload}>
         {(pet) =>
           pet ? (

@@ -7,6 +7,7 @@ import {
   type SessionToken,
   type SessionVault,
   type ProfileUpdate,
+  type AvatarFrame,
 } from '@/domain/auth';
 
 type Session =
@@ -223,6 +224,24 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   }
 
   return {
+    avatarFrames: (page: number, signal: AbortSignal) =>
+      withCredential((token) => service.avatarFrames(page, token, signal)),
+    exchangeAvatarFrame: (frame: AvatarFrame) => {
+      const session = store.getState().session;
+      if (session.status !== 'authenticated') return Promise.resolve(false);
+      const available = (session.user.points ?? 0) - (session.user.usedPoints ?? 0);
+      if (available < frame.points) return Promise.reject(new Error('可用积分不足'));
+      return mutateProfile(
+        (token, signal) => service.exchangeAvatarFrame(frame.id, token, signal),
+        {
+          usedPoints: (session.user.usedPoints ?? 0) + frame.points,
+        },
+      );
+    },
+    setAvatarFrame: (frame: AvatarFrame) =>
+      mutateProfile((token, signal) => service.setAvatarFrame(frame.id, token, signal), {
+        avatarFrameUrl: frame.url,
+      }),
     titles: (signal: AbortSignal) => withCredential((token) => service.titles(token, signal)),
     membership: (signal: AbortSignal) =>
       withCredential((token) => service.membership(token, signal)),

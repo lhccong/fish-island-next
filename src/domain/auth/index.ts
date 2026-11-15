@@ -2,6 +2,9 @@ export interface AuthUser {
   id: string;
   name: string;
   avatarUrl: string | null;
+  avatarFrameUrl?: string;
+  points?: number;
+  usedPoints?: number;
   role: string;
   profile?: string;
   coverUrl?: string;
@@ -13,6 +16,13 @@ export interface AuthUser {
 export interface ProfileTitle {
   id: string;
   name: string;
+}
+export interface AvatarFrame {
+  id: string;
+  name: string;
+  url: string;
+  points: number;
+  owned: boolean;
 }
 export interface Membership {
   type: number;
@@ -39,6 +49,13 @@ export interface AuthResult {
   token: SessionToken;
 }
 export interface AuthPort {
+  avatarFrames(
+    page: number,
+    token: SessionToken,
+    signal: AbortSignal,
+  ): Promise<{ items: AvatarFrame[]; total: number }>;
+  exchangeAvatarFrame(id: string, token: SessionToken, signal: AbortSignal): Promise<void>;
+  setAvatarFrame(id: string, token: SessionToken, signal: AbortSignal): Promise<void>;
   login(credentials: LoginCredentials, signal: AbortSignal): Promise<AuthResult>;
   current(token: SessionToken, signal: AbortSignal): Promise<AuthUser>;
   logout(token: SessionToken, signal: AbortSignal): Promise<void>;

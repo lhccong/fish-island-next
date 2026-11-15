@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { farmService } from '@/app/config/farm';
@@ -9,6 +9,7 @@ import { GameWindowLauncher } from '@/app/components/GameWindowLauncher';
 export function FarmPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   if (session.status !== 'authenticated') return null;
   return (
     <WorkspaceLayout
@@ -25,7 +26,12 @@ export function FarmPage() {
         ),
         content: (
           <FarmWorkspace
-            key={session.user.id}
+            key={`${session.user.id}:${params.get('userId') || ''}`}
+            initialFriend={
+              params.get('userId') && params.get('userId') !== session.user.id
+                ? { id: params.get('userId')!, name: '岛友', avatar: '' }
+                : null
+            }
             service={farmService}
             onPet={() => navigate('/pet')}
           />

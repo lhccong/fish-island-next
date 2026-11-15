@@ -115,6 +115,7 @@ export const MessageRow = memo(function MessageRow({
               id: message.senderId,
               name: message.senderName,
               avatar: message.senderAvatar ?? null,
+              avatarFrameUrl: message.senderAvatarFrame,
             }}
           />
         </button>
@@ -122,7 +123,12 @@ export const MessageRow = memo(function MessageRow({
       <div className={styles.messageBody}>
         <div className={styles.meta}>
           <div className={styles.identity}>
-            <RemarkName id={message.senderId} name={message.senderName} interactive={false} />
+            <RemarkName
+              id={message.senderId}
+              name={message.senderName}
+              level={message.senderLevel}
+              titleId={message.senderTitleId}
+            />
             {presentation !== 'worksheet' && (
               <SenderTitle titleId={message.senderTitleId} level={message.senderLevel} />
             )}

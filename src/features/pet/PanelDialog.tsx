@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './Panels.module.css';
@@ -9,16 +9,19 @@ export function PanelDialog({
   onClose,
   children,
   appearance = 'default',
+  returnFocusRef,
 }: {
   title: string;
   description: string;
   onClose: () => void;
   children: ReactNode;
   appearance?: 'default' | 'pixel';
+  returnFocusRef?: RefObject<HTMLElement | null> | undefined;
 }) {
   return (
     <Dialog
       open
+      {...(returnFocusRef ? { returnFocusRef } : {})}
       onOpenChange={(open) => {
         if (!open) onClose();
       }}

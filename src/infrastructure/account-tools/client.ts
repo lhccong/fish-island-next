@@ -1,5 +1,7 @@
 import { AuthError, type SessionToken } from '@/domain/auth';
 import type { AccountToolsPort, DeveloperApp } from '@/domain/account-tools';
+import type { UserCardPort } from '@/domain/account-tools';
+import { decodeUserCard } from './user-card';
 
 function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -13,7 +15,7 @@ export function createAccountToolsClient(
   base: string,
   credential: () => SessionToken | null,
   expired: () => void,
-): AccountToolsPort {
+): AccountToolsPort & UserCardPort {
   async function request(path: string, signal: AbortSignal, method = 'GET', body?: object) {
     const token = credential();
     if (!token) throw new AuthError('unauthorized', '请先登录');
@@ -40,6 +42,35 @@ export function createAccountToolsClient(
     }
   }
   return {
+    async userCard(id, signal) {
+      const card = decodeUserCard(
+        await request(`user/get/vo?id=${encodeURIComponent(id)}`, signal),
+      );
+      if (card && card.id !== id) throw new Error('服务器返回的用户资料不匹配，请重试');
+      return card;
+    },
+    async followingState(id, signal) {
+      const value = await request(
+        `follow/is-following?followUserId=${encodeURIComponent(id)}`,
+        signal,
+      );
+      if (typeof value !== 'boolean') throw new Error('未取得关注状态，请重试');
+      return value;
+    },
+    async muteInfo(id, signal) {
+      const value = record(
+        await request(`user/mute/info?userId=${encodeURIComponent(id)}`, signal),
+      );
+      if (typeof value.isMuted !== 'boolean') throw new Error('未取得禁言状态，请重试');
+      return { muted: value.isMuted, remaining: text(value.remainingTime) };
+    },
+    async mute(id, duration, signal) {
+      const value =
+        duration === null
+          ? await request(`user/mute/remove?userId=${encodeURIComponent(id)}`, signal, 'POST')
+          : await request('user/mute/add', signal, 'POST', { userId: id, duration });
+      if (value !== true) throw new Error('服务器未确认禁言操作，请重试');
+    },
     async card(id, signal) {
       const v = record(await request(`user/get/vo?id=${encodeURIComponent(id)}`, signal));
       const number = (key: string) =>

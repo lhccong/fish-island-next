@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Droplets, Mail, Sprout, Users, Wheat } from 'lucide-react';
-import { isMature, watering, type FarmPort, type Friend } from '@/domain/farm';
+import { isMature, watering, type FarmPort, type FarmVisit } from '@/domain/farm';
 import { Button } from '@/shared/ui/Button';
 import { Toast } from '@/shared/ui/Toast';
 import { useFarm } from './use-farm';
@@ -10,8 +10,16 @@ import { LandDialog } from './LandDialog';
 import { FarmSocial } from './FarmSocial';
 import { FarmHeader } from './FarmHeader';
 import styles from './Farm.module.css';
-export function FarmWorkspace({ service, onPet }: { service: FarmPort; onPet: () => void }) {
-  const [friend, setFriend] = useState<Friend | null>(null);
+export function FarmWorkspace({
+  service,
+  onPet,
+  initialFriend = null,
+}: {
+  service: FarmPort;
+  onPet: () => void;
+  initialFriend?: FarmVisit | null;
+}) {
+  const [friend, setFriend] = useState<FarmVisit | null>(initialFriend);
   return (
     <FarmSession
       key={friend?.id ?? 'mine'}
@@ -29,8 +37,8 @@ function FarmSession({
   onPet,
 }: {
   service: FarmPort;
-  friend: Friend | null;
-  onVisit: (friend: Friend | null) => void;
+  friend: FarmVisit | null;
+  onVisit: (friend: FarmVisit | null) => void;
   onPet: () => void;
 }) {
   const farm = useFarm(service, friend?.id ?? null);

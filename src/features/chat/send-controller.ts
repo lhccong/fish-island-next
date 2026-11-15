@@ -73,6 +73,7 @@ export function createSendController(
           senderId: user.id,
           senderName: user.name,
           senderAvatar: user.avatarUrl,
+          ...(user.avatarFrameUrl ? { senderAvatarFrame: user.avatarFrameUrl } : {}),
           content,
           createdAt: Date.now(),
           revoked: false,

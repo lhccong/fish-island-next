@@ -6,6 +6,7 @@ import { CircleFeed } from './CircleFeed';
 import { CircleAvatar } from './CircleAvatar';
 import styles from './Circle.module.css';
 interface Props {
+  initialUserId?: string;
   user: AuthUser;
   service: FishCirclePort;
   onExit: () => void;
@@ -24,8 +25,9 @@ export function FishCircleWorkspace({
   renderLayout,
   renderDiscoveryNavigation,
   onExit,
+  initialUserId = '',
 }: Props) {
-  const [view, setView] = useState({ id: '', name: '' });
+  const [view, setView] = useState({ id: initialUserId, name: initialUserId ? '岛友' : '' });
   return (
     <CircleFeed
       key={view.id}

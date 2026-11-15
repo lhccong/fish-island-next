@@ -14,11 +14,13 @@ function Participant({ id, showTitle }: { id: string; showTitle: boolean }) {
     <li className={styles.participant} aria-label={label} title={label}>
       <span className={styles.avatar}>
         <MemberAvatar
+          size="compact"
           key={`${message.senderId}:${message.senderAvatar ?? ''}`}
           member={{
             id: message.senderId,
             name: message.senderName,
             avatar: message.senderAvatar ?? null,
+            avatarFrameUrl: message.senderAvatarFrame,
           }}
         />
       </span>

@@ -1,0 +1,95 @@
+.dialog {
+  width: min(680px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  height: min(760px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+.summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-block: 8px 16px;
+  color: var(--color-muted);
+}
+.summary strong {
+  color: var(--color-text);
+  font-size: 22px;
+}
+.scroll {
+  min-height: 0;
+  flex: 1;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.body {
+  padding: 4px;
+}
+.card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.card[data-selected='true'] {
+  border-color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.preview {
+  padding: 20px;
+}
+.card h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.card p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.card button {
+  margin-top: auto;
+}
+.feedback {
+  flex-shrink: 0;
+  min-height: 28px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.feedback p {
+  margin: 8px 0 0;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@media (max-width: 760px) {
+  .dialog {
+    width: calc(100vw - 24px);
+    height: min(
+      760px,
+      calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+    );
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .card {
+    padding-inline: 6px;
+  }
+}

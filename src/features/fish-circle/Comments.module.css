@@ -21,6 +21,7 @@
 .scroller > [data-radix-scroll-area-viewport] {
   height: auto;
   max-height: inherit;
+  overscroll-behavior-y: auto;
 }
 .comments[data-composing='true'] .scroller {
   max-height: min(320px, 35dvh);

@@ -1,4 +1,4 @@
-import type { OnlineMember, OnlineMembersPort } from '@/domain/chat';
+import { chatImageUrl, type OnlineMember, type OnlineMembersPort } from '@/domain/chat';
 import type { SessionToken } from '@/domain/auth';
 
 function record(value: unknown): Record<string, unknown> {
@@ -31,6 +31,9 @@ export function decodeOnlineMembers(value: unknown): readonly OnlineMember[] {
       id: String(data.id),
       name: typeof data.name === 'string' && data.name.trim() ? data.name.trim() : '未命名岛友',
       avatar,
+      ...(chatImageUrl(data.avatarFramerUrl)
+        ? { avatarFrameUrl: chatImageUrl(data.avatarFramerUrl)! }
+        : {}),
     });
   }
   return [...members.values()];

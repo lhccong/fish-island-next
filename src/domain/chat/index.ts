@@ -27,6 +27,7 @@ export interface ReceivedMessage {
   senderTitleId?: string;
   senderLevel?: number;
   senderAvatar?: string | null;
+  senderAvatarFrame?: string;
   content: string;
   createdAt: number;
   revoked: boolean;
@@ -64,6 +65,7 @@ export interface OnlineMember {
   id: string;
   name: string;
   avatar: string | null;
+  avatarFrameUrl?: string | undefined;
 }
 
 export interface OnlineMembersPort {

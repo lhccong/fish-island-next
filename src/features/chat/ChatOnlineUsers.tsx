@@ -147,6 +147,7 @@ export function ChatOnlineUsers({
                               key={`${entry.id}:${entry.member.avatar}`}
                               member={entry.member}
                               size="list"
+                              showFrame={false}
                             />
                           ) : (
                             <CoverAvatar conversation={entry} />

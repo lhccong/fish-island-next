@@ -41,6 +41,7 @@ export interface Friend {
   level: number;
   canSteal: boolean;
 }
+export type FarmVisit = Pick<Friend, 'id' | 'name' | 'avatar'> & { level?: number };
 export interface Visitor {
   id: string;
   name: string;

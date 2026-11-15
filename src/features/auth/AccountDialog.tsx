@@ -1,6 +1,6 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useRef, useState, type ReactNode } from 'react';
 import { DropdownMenu, type DropdownMenuItem } from '@/shared/ui/DropdownMenu';
-import { LogOut, Pencil, UserRound } from 'lucide-react';
+import { LogOut, Pencil, UserRound, ScanFace } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
@@ -9,6 +9,8 @@ import { ProfileEditor } from './ProfileEditor';
 import { useAuth } from './use-auth';
 import styles from './ui/Profile.module.css';
 import accountStyles from './ui/AccountControl.module.css';
+
+const AvatarFramesDialog = lazy(() => import('./AvatarFramesDialog'));
 
 export function AccountDialog({
   user,
@@ -25,6 +27,7 @@ export function AccountDialog({
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
   const [open, setOpen] = useState(false);
+  const [framesOpen, setFramesOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   return (
     <>
@@ -38,7 +41,7 @@ export function AccountDialog({
             type="button"
             aria-label="用户菜单"
           >
-            <SourceAvatar name={user.name} src={user.avatarUrl} />
+            <SourceAvatar name={user.name} src={user.avatarUrl} frameUrl={user.avatarFrameUrl} />
           </button>
         }
         items={[
@@ -52,6 +55,11 @@ export function AccountDialog({
             },
           },
           ...menuItems,
+          {
+            label: '头像框',
+            icon: <ScanFace size={16} aria-hidden="true" />,
+            onSelect: () => setFramesOpen(true),
+          },
           {
             label: '个人资料与签到',
             icon: <UserRound size={16} aria-hidden="true" />,
@@ -69,6 +77,15 @@ export function AccountDialog({
           },
         ]}
       />
+      {framesOpen && (
+        <Suspense>
+          <AvatarFramesDialog
+            user={user}
+            returnFocusRef={triggerRef}
+            onClose={() => setFramesOpen(false)}
+          />
+        </Suspense>
+      )}
       <Dialog
         returnFocusRef={triggerRef}
         title={editing ? '修改个人信息' : '个人资料'}
@@ -101,7 +118,12 @@ export function AccountDialog({
           <>
             <div className={styles.identity}>
               <div className={styles.avatar}>
-                <SourceAvatar name={user.name} src={user.avatarUrl} size="profile" />
+                <SourceAvatar
+                  name={user.name}
+                  src={user.avatarUrl}
+                  frameUrl={user.avatarFrameUrl}
+                  size="profile"
+                />
               </div>
               <div className={styles.identityText}>
                 <h3>{user.name}</h3>

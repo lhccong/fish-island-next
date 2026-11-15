@@ -5,7 +5,7 @@ interface ClipboardFixture {
   fail: boolean;
 }
 type FixtureWindow = Window & { chatMenuClipboard: ClipboardFixture };
-export async function setupChatMenu(page: Page, skin: string, mode: string) {
+export async function setupChatMenu(page: Page, skin: string, mode: string, role = 'user') {
   let socket!: WebSocketRoute;
   let connections = 0;
   let historyRequests = 0;
@@ -45,7 +45,7 @@ export async function setupChatMenu(page: Page, skin: string, mode: string) {
         data: {
           id: '123',
           userName: '本人合成',
-          userRole: 'user',
+          userRole: role,
           saTokenInfo: { tokenName: 'synthetic-session', tokenValue: 'synthetic-value' },
         },
       },

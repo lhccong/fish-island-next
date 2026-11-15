@@ -1,3 +1,4 @@
+export type { UserCard, UserCardPort, UserMute } from './user-card';
 export interface DeveloperApp {
   id: string;
   appName: string;

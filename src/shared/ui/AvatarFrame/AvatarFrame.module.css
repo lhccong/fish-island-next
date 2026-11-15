@@ -1,0 +1,19 @@
+.frame {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  isolation: isolate;
+}
+.frame > :first-child {
+  border-radius: 50%;
+}
+.overlay {
+  position: absolute;
+  z-index: 1;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  object-fit: contain;
+  pointer-events: none;
+}

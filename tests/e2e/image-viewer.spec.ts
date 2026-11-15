@@ -6,6 +6,49 @@ import { setup as setupCircle } from './fish-circle-fixture';
 test.setTimeout(60000);
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
+    test(`${skin.id} ${mode}: viewer fits small and wide images`, async ({ page }, info) => {
+      const fixture = await setupChatMenu(page, skin.id, mode);
+      await page.route('https://viewer.test/wide.svg', (route) =>
+        route.fulfill({
+          contentType: 'image/svg+xml',
+          body: '<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="900"><rect width="1800" height="900" fill="#cad8dc"/></svg>',
+        }),
+      );
+      fixture.push('9001', '[img]https://menu.test/image.png[/img]');
+      fixture.push('9002', '[img]https://viewer.test/wide.svg[/img]');
+      const trigger = page.locator('[data-message-id="9001"]').getByRole('button', {
+        name: '放大聊天图片',
+      });
+      await trigger.click();
+      const dialog = page.getByRole('dialog', { name: '图片预览', exact: true });
+      const stage = dialog.getByRole('region', { name: '图片画布' });
+      await expect(stage).toHaveAttribute('data-preview-state', 'ready');
+      await expect(dialog.getByRole('button', { name: '原始比例', exact: true })).toHaveText(
+        '100%',
+      );
+      const small = (await dialog.boundingBox())!;
+      expect(small.height).toBeLessThan(400);
+      expect(small.width).toBeLessThanOrEqual(572);
+      await page.screenshot({ path: info.outputPath('viewer-small.png') });
+      await dialog.getByRole('button', { name: '下一张', exact: true }).click();
+      await expect(stage).toHaveAttribute('data-preview-state', 'ready');
+      await expect
+        .poll(async () => (await dialog.boundingBox())!.width)
+        .toBeGreaterThan(small.width);
+      const wide = (await dialog.boundingBox())!;
+      expect(wide.x).toBeGreaterThanOrEqual(12);
+      expect(wide.y).toBeGreaterThanOrEqual(24);
+      expect(wide.x + wide.width).toBeLessThanOrEqual(page.viewportSize()!.width - 12);
+      expect(wide.y + wide.height).toBeLessThanOrEqual(page.viewportSize()!.height - 24);
+      expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+      const image = (await stage.getByRole('img').boundingBox())!;
+      const area = (await stage.boundingBox())!;
+      expect(image.width).toBeLessThanOrEqual(area.width + 1);
+      expect(image.height).toBeLessThanOrEqual(area.height + 1);
+      await page.keyboard.press('Escape');
+      await expect(trigger).toBeFocused();
+    });
+
     test(`${skin.id} ${mode}: chat viewer controls, recovery and state`, async ({ page }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode);
       await page.context().route('https://viewer.test/*.svg', (route) =>

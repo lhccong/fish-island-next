@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { ImageToolbar } from './ImageToolbar';
 import { useImageTransform } from './use-image-transform';
+import { useViewerSize } from './use-viewer-size';
 import styles from './ImageViewer.module.css';
 
 export interface PreviewImage {
@@ -21,6 +22,11 @@ export function ImageViewer({ images, initialIndex = 0, onClose, returnFocusRef 
   const [index, setIndex] = useState(Math.max(0, Math.min(initialIndex, images.length - 1)));
   const [thumbnails, setThumbnails] = useState(false);
   const image = images[index];
+  const [loaded, setLoaded] = useState({ url: '', width: 360, height: 240 });
+  const size = useViewerSize(
+    loaded.url === image?.url ? loaded : { width: 360, height: 240 },
+    thumbnails && images.length > 1,
+  );
   return (
     <Dialog
       open
@@ -30,6 +36,7 @@ export function ImageViewer({ images, initialIndex = 0, onClose, returnFocusRef 
       description="使用工具栏缩放、旋转或切换图片。放大后可拖动，触屏支持双指缩放。左右方向键切图，Esc 关闭。"
       showCloseAction={false}
       className={styles.dialog ?? ''}
+      style={size}
       {...(returnFocusRef ? { returnFocusRef } : {})}
       onOpenChange={(open) => {
         if (!open) onClose();
@@ -44,6 +51,7 @@ export function ImageViewer({ images, initialIndex = 0, onClose, returnFocusRef 
         onNavigate={setIndex}
         onThumbnails={() => setThumbnails((value) => !value)}
         onClose={onClose}
+        onImageSize={(width, height) => setLoaded({ url: image?.url ?? '', width, height })}
       />
       {thumbnails && images.length > 1 && (
         <div className={styles.thumbnails}>
@@ -78,6 +86,7 @@ function ImageCanvas({
   onNavigate,
   onThumbnails,
   onClose,
+  onImageSize,
 }: {
   image: PreviewImage | undefined;
   index: number;
@@ -86,6 +95,7 @@ function ImageCanvas({
   onNavigate: (index: number) => void;
   onThumbnails: () => void;
   onClose: () => void;
+  onImageSize: (width: number, height: number) => void;
 }) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [attempt, setAttempt] = useState(0);
@@ -177,6 +187,7 @@ function ImageCanvas({
                 width: event.currentTarget.naturalWidth,
                 height: event.currentTarget.naturalHeight,
               });
+              onImageSize(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight);
               setStatus('ready');
             }}
             onError={() => setStatus('error')}

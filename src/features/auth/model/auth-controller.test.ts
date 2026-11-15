@@ -11,6 +11,43 @@ const profileUpdate = {
   profile: '新的简介',
 };
 
+it('confirms exchange once, preserves the deducted balance on readback failure and wears without restoring the session', async () => {
+  const { controller, service } = setup();
+  vi.mocked(service.current).mockResolvedValueOnce({ ...user, points: 100, usedPoints: 20 });
+  await controller.restore();
+  const states: string[] = [];
+  controller.store.subscribe((state) => states.push(state.session.status));
+  const frame = {
+    id: '7',
+    name: '海风',
+    url: 'https://frame.test/a.png',
+    points: 50,
+    owned: false,
+  };
+  vi.mocked(service.current).mockRejectedValueOnce(new Error('offline'));
+  const results = await Promise.all([
+    controller.exchangeAvatarFrame(frame),
+    controller.exchangeAvatarFrame(frame),
+  ]);
+  expect(results).toEqual([true, false]);
+  expect(service.exchangeAvatarFrame).toHaveBeenCalledTimes(1);
+  expect(controller.store.getState().session).toMatchObject({ user: { usedPoints: 70 } });
+  await expect(controller.exchangeAvatarFrame(frame)).rejects.toThrow('积分不足');
+  vi.mocked(service.current).mockRejectedValueOnce(new Error('offline'));
+  expect(await controller.setAvatarFrame(frame)).toBe(true);
+  expect(controller.store.getState().session).toMatchObject({
+    user: { avatarFrameUrl: frame.url },
+  });
+  vi.mocked(service.setAvatarFrame).mockRejectedValueOnce(new Error('rejected'));
+  await expect(controller.setAvatarFrame({ ...frame, id: '-1', url: '' })).rejects.toThrow(
+    'rejected',
+  );
+  expect(controller.store.getState().session).toMatchObject({
+    user: { avatarFrameUrl: frame.url },
+  });
+  expect(states).not.toContain('checking');
+});
+
 it('synchronizes independent email and title operations without replacing the session lifecycle', async () => {
   const { controller, service } = setup();
   await controller.restore();
@@ -47,6 +84,9 @@ function setup(initial: SessionToken | null = token) {
     subscribe: () => () => {},
   };
   const service: AuthPort = {
+    avatarFrames: vi.fn().mockResolvedValue({ items: [], total: 0 }),
+    exchangeAvatarFrame: vi.fn().mockResolvedValue(undefined),
+    setAvatarFrame: vi.fn().mockResolvedValue(undefined),
     titles: vi.fn().mockResolvedValue([]),
     membership: vi.fn().mockResolvedValue(null),
     sendEmailCode: vi.fn().mockResolvedValue(undefined),

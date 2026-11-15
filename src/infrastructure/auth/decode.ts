@@ -45,6 +45,10 @@ export function decodeUser(value: unknown): AuthUser {
     id,
     name: typeof user.userName === 'string' && user.userName.trim() ? user.userName : '鱼岛用户',
     avatarUrl,
+    avatarFrameUrl: safeImageUrl(user.avatarFramerUrl),
+    points: typeof user.points === 'number' && Number.isFinite(user.points) ? user.points : 0,
+    usedPoints:
+      typeof user.usedPoints === 'number' && Number.isFinite(user.usedPoints) ? user.usedPoints : 0,
     role: typeof user.userRole === 'string' ? user.userRole : 'user',
     profile: typeof user.userProfile === 'string' ? user.userProfile : '',
     coverUrl: safeImageUrl(user.momentsBgUrl),

@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/features/auth';
 import { blacklist } from '@/app/config/account-tools';
 import { ChatRealtimeProvider, RemarksProvider } from '@/features/chat';
+import { ChatUserCards } from '@/app/components/ChatUserCards';
 import {
   chatRealtime,
   chatRemarks,
@@ -31,7 +32,9 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
       imageUploadPort={chatImageUpload}
     >
       <RemarksProvider key={userId} port={chatRemarks} userId={userId}>
-        {children}
+        <ChatUserCards user={session.status === 'authenticated' ? session.user : undefined}>
+          {children}
+        </ChatUserCards>
       </RemarksProvider>
     </ChatRealtimeProvider>
   );

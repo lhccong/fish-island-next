@@ -18,6 +18,13 @@
 .name:hover {
   background: var(--color-hover);
 }
+@media (min-width: 761px) {
+  .name {
+    min-height: 0;
+    padding: 0;
+    vertical-align: baseline;
+  }
+}
 .dialog {
   display: flex;
   flex-direction: column;
