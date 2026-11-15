@@ -44,9 +44,10 @@ for (const skin of builtinSkins) {
       await expect(nav.getByRole('link')).toHaveText([
         '朋友圈',
         '伙伴',
+        '文章',
         '游戏',
         '阅读',
-        '积分商城',
+        '店铺',
         '关于',
       ]);
       const aboutLink = nav.getByRole('link', { name: '关于', exact: true });

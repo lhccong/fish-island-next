@@ -10,6 +10,9 @@ import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
 import { GameWindowsProvider } from '@/app/components/GameWindowsProvider';
+const ForumPage = lazy(() =>
+  import('@/app/pages/ForumPage').then((m) => ({ default: m.ForumPage })),
+);
 const PointsShopPage = lazy(() =>
   import('@/app/pages/PointsShopPage').then((m) => ({ default: m.PointsShopPage })),
 );
@@ -93,6 +96,7 @@ export function AppRoutes() {
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
             <Route path="/discover" element={<DiscoveryPage />} />
+            <Route path="/post/*" element={<ForumPage />} />
             <Route
               path="/admin"
               element={

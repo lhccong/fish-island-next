@@ -139,7 +139,11 @@ export interface PetPort {
   ): Promise<PetPage<SupplyPrize>>;
   mine(signal: AbortSignal): Promise<Companion | null>;
   create(name: string, signal: AbortSignal): Promise<void>;
-  care(action: 'feed' | 'pat', petId: string, signal: AbortSignal): Promise<Companion>;
+  care(
+    action: 'feed' | 'pat',
+    petId: string,
+    signal: AbortSignal,
+  ): Promise<Pick<Companion, 'id' | 'level' | 'exp' | 'hunger' | 'mood'>>;
   rename(petId: string, name: string, signal: AbortSignal): Promise<void>;
   items(
     kind: 'bag' | 'catalog' | 'shop',

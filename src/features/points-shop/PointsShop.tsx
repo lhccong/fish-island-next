@@ -26,7 +26,7 @@ export function PointsShop({
   const available =
     points === undefined || usedPoints === undefined ? null : Math.max(0, points - usedPoints);
   return (
-    <section className={styles.shop} aria-label="积分商城">
+    <section className={styles.shop} aria-label="店铺">
       <div className={styles.summary}>
         <div>
           <span>可用积分</span>
@@ -36,7 +36,7 @@ export function PointsShop({
           累计 {points?.toLocaleString() ?? '—'} · 已用 {usedPoints?.toLocaleString() ?? '—'}
         </p>
       </div>
-      <nav className={styles.tabs} aria-label="商城分类">
+      <nav className={styles.tabs} aria-label="店铺分类">
         {tabs.map((name) => (
           <button
             key={name}
@@ -85,7 +85,7 @@ export function PointsShop({
         />
       )}
       {tab === '相关介绍' && (
-        <ScrollArea label="商城介绍" gutter="reserved" className={styles.scroll ?? ''}>
+        <ScrollArea label="店铺介绍" gutter="reserved" className={styles.scroll ?? ''}>
           <div className={styles.body}>
             <h2>摸鱼会员月卡</h2>
             <p>

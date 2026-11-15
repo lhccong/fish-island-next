@@ -107,7 +107,17 @@ export function createPetClient(
       id(await request('pet/create', signal, { name }));
     },
     async care(action, petId, signal) {
-      return companion(await request(`pet/${action}?${query({ petId })}`, signal, undefined, true));
+      const data = record(
+        await request(`pet/${action}?${query({ petId })}`, signal, undefined, true),
+      );
+      if (id(data.petId) !== petId) throw new Error('伙伴编号不匹配，请刷新后重试');
+      return {
+        id: petId,
+        level: number(data.level, 1),
+        exp: number(data.exp),
+        hunger: number(data.hunger),
+        mood: number(data.mood),
+      };
     },
     async rename(petId, name, signal) {
       confirmed(await request('pet/update/name', signal, { petId, name }));

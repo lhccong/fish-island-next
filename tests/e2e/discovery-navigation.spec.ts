@@ -13,9 +13,10 @@ for (const skin of builtinSkins)
       await expect(nav.getByRole('link')).toHaveText([
         '朋友圈',
         '伙伴',
+        '文章',
         '游戏',
         '阅读',
-        '积分商城',
+        '店铺',
         '关于',
       ]);
       const partner = nav.getByRole('link', { name: '伙伴', exact: true });
@@ -60,7 +61,7 @@ async function completeMenu(page: Page) {
   }
   const entries = nav.locator(':scope > a, :scope > button').filter({ visible: true });
   const mobile = (page.viewportSize()?.width ?? 1280) <= 760;
-  await expect(entries).toHaveCount(mobile ? 7 : 6);
+  await expect(entries).toHaveCount(mobile ? 8 : 7);
   await expect(
     (mobile ? nav : page.getByRole('navigation', { name: '主要功能' })).getByRole('link', {
       name: '管理页',

@@ -44,6 +44,7 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
             location.pathname.startsWith('/discover/') ||
             location.pathname === '/discover' ||
             location.pathname === '/reader' ||
+            location.pathname.startsWith('/post') ||
             location.pathname === '/about' ||
             location.pathname.startsWith('/rank/') ||
             location.pathname === '/pet' ||

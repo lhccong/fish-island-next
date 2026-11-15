@@ -11,10 +11,10 @@ export async function setupRecordAvatars(page: Page) {
 }
 
 export async function expectRecordAvatarsAndTitles(scroll: Locator) {
-  await expect(scroll.getByRole('listitem').first()).toContainText('手气王');
-  await expect(scroll.getByRole('listitem').last()).toContainText('倒霉王');
-  await expect(scroll.getByText('手气王', { exact: true })).toHaveCount(1);
-  await expect(scroll.getByText('倒霉王', { exact: true })).toHaveCount(1);
+  await expect(scroll.getByRole('listitem').first()).toContainText('欧皇');
+  await expect(scroll.getByRole('listitem').last()).toContainText('非酋');
+  await expect(scroll.getByText('欧皇', { exact: true })).toHaveCount(1);
+  await expect(scroll.getByText('非酋', { exact: true })).toHaveCount(1);
   await expect
     .poll(() =>
       scroll

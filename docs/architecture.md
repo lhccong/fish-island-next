@@ -46,6 +46,8 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-081 迁移摸鱼论坛：domain/forum 定义帖子、评论及端口，infrastructure/forum 校验并适配旧协议，features/forum 独立持有列表、编辑草稿及评论生命周期，app 注入会话并懒加载 /post。Markdown 使用 marked 单一解析器和现有 DOMPurify 安全边界；全部外壳共用滚动分页及语义 token，见 ADR-081。
+
 ADR-078 将伙伴页重排为像素装备、营地挑战与内嵌行囊工作台，复用 pet 业务与分页、既有 pixel 明暗 token；按容器宽度重排并保留详细面板，见 ADR-078。
 
 ADR-078 的 contentFill/ScrollArea.fillContent 仅控制短内容填满实际视口，用于伙伴页背景覆盖；默认关闭，不改变业务、滚动容器与状态所有权。

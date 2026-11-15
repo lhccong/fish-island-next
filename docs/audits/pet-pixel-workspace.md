@@ -53,6 +53,14 @@ npx playwright test -c playwright.pet-background.config.ts
 
 ## 边界
 
+### 2026-11-15 喂养/抚摸属性丢失修复复验
+
+- 核对后端 FishPetServiceImpl：feedPet/patPet 返回基础实体，不填充 equipStats/equippedItems。care 端口改为只返回养成状态，界面合并状态并保留完整装备和属性；不增加 mine 请求。
+- 本次修改的格式、ESLint、15 项宠物协议测试通过；全量单元测试 100 文件、411 项通过。npm run check 在论坛模块格式检查失败；独立执行的类型检查及构建也被论坛模块类型错误阻断，未改动该模块。
+- Edge 合成接口回归首轮通过 8 项：pixel-island 明暗 × 1440/375/390，以及 WPS 明亮 × 1440/375；另通过 pixel-island 明暗 × 375 的触屏模拟。覆盖喂养提交、成功、抚摸成功、冷却失败、属性与装备保留、经验更新和无额外 mine 请求，自动喂食加载失败重试及空库存。
+- 其余主题/模式/视口及 390 触屏回归未完成：页面停留在懒加载或会话恢复，等待伙伴标题超时；重试仍出现页面加载超时。不能据此宣称全主题验收完成。未执行真实服务端操作，未新增布局、样式或控件。
+- 本次清理已核对目录所属范围，但自动审批拒绝递归删除，原因仅返回 `blocked by policy`。截图、追踪及报告仍保留在 `E:\owner-project\fish-island-next\.tmp-pet-care-edge`、`E:\owner-project\fish-island-next\.tmp-pet-care-verification`、`E:\owner-project\fish-island-next\.tmp-pet-care-touch-375`、`E:\owner-project\fish-island-next\.tmp-pet-care-touch-390`，需后续清理。本文件其他小节记录的历史产物不属于本次任务。
+
 使用合成 HTTP 数据与本地精灵测试资源，未执行真实后端账号/积分/冷却联调，未在实体手机或 Safari 验收；不以这些结果宣称真实业务或完整性能达标。
 
 ## 本次临时产物

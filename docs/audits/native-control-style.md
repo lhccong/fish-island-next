@@ -74,3 +74,7 @@
 ## 邮箱注册（ADR-080）
 
 入口：登录弹窗 → 注册。源码：src/features/auth/RegisterForm.tsx、src/features/auth/LoginDialog.tsx。完整邮箱输入替代旧版后缀选择器；发送、提交使用共享 Button，正文使用 reserved ScrollArea，反馈和操作固定分区。没有引入原生 select/option、系统提示框或第二套 UI。登录提交同步使用共享 Button。
+
+## 摸鱼论坛（ADR-081）
+
+入口：发现 → 摸鱼论坛。源码：src/features/forum/ForumTabs.tsx、ForumTags.tsx、ForumPostMenu.tsx、ForumEditor.tsx、CommentReply.tsx。标签使用受控按钮，分类提供 tablist/方向键语义；帖子三点操作使用共享 DropdownMenu，删除使用共享 Dialog 二次确认。编辑、回复、抽奖使用共享 Button 和 reserved ScrollArea；系统文件选择器保留文件和软键盘能力。不复制旧 Ant Design 控件，无原生 select/option 或 alert/confirm/prompt。整改状态：迁移界面已统一，验证范围见 forum-migration.md。

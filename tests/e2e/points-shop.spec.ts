@@ -41,7 +41,7 @@ for (const width of [1280, 375, 390]) {
             description: '增加一个月会员时间',
             type: i === 3 ? '2' : '1',
             points: i === 2 ? 99999 : 100,
-            imgUrl: '',
+            imgUrl: i === 1 ? 'https://frame.test/1.svg' : '',
           });
           await page.route('**/api/props/list/page?*', async (route) => {
             reads++;
@@ -126,7 +126,7 @@ for (const width of [1280, 375, 390]) {
             });
           });
           await page.goto('/avatarFrames', { waitUntil: 'domcontentloaded' });
-          const store = page.getByRole('region', { name: '积分商城', exact: true });
+          const store = page.getByRole('region', { name: '店铺', exact: true });
           const frameScroll = page.getByRole('region', { name: '头像框列表' });
           await expect(
             page.getByRole('heading', { name: '海风头像框 1', exact: true }),
@@ -172,6 +172,10 @@ for (const width of [1280, 375, 390]) {
             .getByRole('article')
             .filter({ has: page.getByRole('heading', { name: '会员月卡 1', exact: true }) });
           await expect(first).toBeVisible();
+          await expect(first.getByRole('img', { name: '会员月卡 1', exact: true })).toBeVisible();
+          expect(
+            await first.evaluate((element) => element.scrollWidth <= element.clientWidth),
+          ).toBe(true);
           await expect(store.getByRole('button', { name: '积分不足' })).toBeDisabled();
           await expect(store.getByRole('button', { name: '暂不支持兑换' })).toBeDisabled();
           await first.getByRole('button').click();
@@ -260,6 +264,13 @@ for (const width of [1280, 375, 390]) {
           await page.screenshot({ path: info.outputPath('shop-bottom.png') });
           await store.getByRole('button', { name: '相关介绍', exact: true }).click();
           await expect(store.getByRole('link', { name: '前往支持' })).toBeVisible();
+          await page.goto('/discover');
+          const navigation = page
+            .getByRole('navigation', { name: '发现菜单' })
+            .filter({ visible: true });
+          await expect(navigation.getByRole('link', { name: '店铺', exact: true })).toBeVisible();
+          await navigation.getByRole('link', { name: '文章', exact: true }).click();
+          await expect(page.getByRole('heading', { name: '文章', exact: true })).toBeVisible();
         });
       }
   });

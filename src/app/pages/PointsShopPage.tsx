@@ -18,7 +18,7 @@ export function PointsShopPage() {
         sidebar: <DiscoveryNavigation />,
         header: (
           <div className={styles.header}>
-            <h1>积分商城</h1>
+            <h1>店铺</h1>
           </div>
         ),
         contentScroll: false,

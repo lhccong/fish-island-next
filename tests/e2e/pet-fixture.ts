@@ -130,7 +130,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
           return route.fulfill({ json: { code: 40000, message: '尚在冷却，请稍后重试' } });
         pet.hunger = 90;
         pet.mood = 95;
-        data = pet;
+        data = { ...pet, equipStats: null, equippedItems: null };
       } else if (path === 'pet/update/name') {
         expect((route.request().postDataJSON() as { petId: string }).petId).toBe('17');
         pet.name = (route.request().postDataJSON() as { name: string }).name;

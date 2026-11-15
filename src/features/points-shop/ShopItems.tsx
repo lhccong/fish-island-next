@@ -60,32 +60,40 @@ export function ShopItems({
           <div className={styles.grid}>
             {items.map((item) => (
               <article key={item.id} className={styles.card}>
-                <ItemImage item={item} />
-                <h2>{item.name}</h2>
-                <p>{item.description}</p>
-                <strong>{item.points.toLocaleString()} 积分</strong>
-                <Button
-                  disabled={
-                    busy ||
-                    balanceError ||
-                    available === null ||
-                    !item.supported ||
-                    available < item.points
-                  }
-                  onClick={() => {
-                    setSelected(item);
-                    setError('');
-                    setSuccess('');
-                  }}
-                >
-                  {!item.supported
-                    ? '暂不支持兑换'
-                    : available === null
-                      ? '积分未同步'
-                      : available < item.points
-                        ? '积分不足'
-                        : '立即兑换'}
-                </Button>
+                <div className={styles.product}>
+                  <ItemImage item={item} />
+                  <div className={styles.details}>
+                    <h2>{item.name}</h2>
+                    <p>{item.description}</p>
+                  </div>
+                </div>
+                <div className={styles.purchase}>
+                  <strong>
+                    {item.points.toLocaleString()} <span>积分</span>
+                  </strong>
+                  <Button
+                    disabled={
+                      busy ||
+                      balanceError ||
+                      available === null ||
+                      !item.supported ||
+                      available < item.points
+                    }
+                    onClick={() => {
+                      setSelected(item);
+                      setError('');
+                      setSuccess('');
+                    }}
+                  >
+                    {!item.supported
+                      ? '暂不支持兑换'
+                      : available === null
+                        ? '积分未同步'
+                        : available < item.points
+                          ? '积分不足'
+                          : '立即兑换'}
+                  </Button>
+                </div>
               </article>
             ))}
           </div>

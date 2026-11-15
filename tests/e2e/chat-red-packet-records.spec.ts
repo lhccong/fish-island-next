@@ -32,8 +32,8 @@ test('record titles handle ties, equal amounts and single recipients', async ({ 
     amounts = scenario.amounts;
     await trigger.click();
     await expect(dialog.getByRole('listitem')).toHaveCount(amounts.length);
-    await expect(dialog.getByText('手气王', { exact: true })).toHaveCount(scenario.count);
-    await expect(dialog.getByText('倒霉王', { exact: true })).toHaveCount(scenario.count);
+    await expect(dialog.getByText('欧皇', { exact: true })).toHaveCount(scenario.count);
+    await expect(dialog.getByText('非酋', { exact: true })).toHaveCount(scenario.count);
     expect(
       await dialog
         .getByRole('region', { name: '红包领取记录' })

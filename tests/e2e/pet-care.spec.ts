@@ -11,8 +11,30 @@ for (const skin of builtinSkins)
       }, info) => {
         await page.setViewportSize({ width, height: width > 760 ? 1000 : 844 });
         const state = await setupPet(page, skin.id, mode);
+        state.pet.equippedItems.hand = {
+          id: '501',
+          quantity: 1,
+          enhanceLevel: 3,
+          template: {
+            id: '40',
+            name: '苔纹护腕',
+            icon: 'https://camp.test/item.svg',
+            description: '',
+            category: 'equipment',
+            equipSlot: 'hand',
+            rarity: 2,
+            baseAttack: 8,
+            baseDefense: 4,
+            purchasePoint: 20,
+          },
+        };
+        await page.reload();
         const heading = page.getByRole('heading', { name: /小苔/ });
         await expect(heading).toBeVisible();
+        const attributes = page.locator('dl[aria-label="伙伴属性"]');
+        const originalAttributes = (await attributes.textContent())!;
+        const equipped = page.getByRole('button', { name: /苔纹护腕/, exact: false }).first();
+        await expect(equipped).toBeVisible();
         const element = await heading.elementHandle();
         const feed = page.getByRole('button', { name: '喂食 · 5 积分', exact: true });
         await feed.scrollIntoViewIfNeeded();
@@ -27,7 +49,10 @@ for (const skin of builtinSkins)
           });
           state.pet.hunger = 92;
           state.pet.mood = 96;
-          await route.fulfill({ json: { code: 0, data: state.pet } });
+          state.pet.exp++;
+          await route.fulfill({
+            json: { code: 0, data: { ...state.pet, equipStats: null, equippedItems: null } },
+          });
         });
         await feed.click();
         await expect.poll(() => submitted).toBe(true);
@@ -42,6 +67,24 @@ for (const skin of builtinSkins)
         );
         await expect(feed).toBeEnabled();
         expect(await element!.evaluate((el) => el.isConnected)).toBe(true);
+        expect(state.mineRequests).toBe(requests);
+        await expect(attributes).toHaveText(originalAttributes);
+        await expect(equipped).toBeVisible();
+        await expect(page.getByLabel(`当前经验 ${state.pet.exp}`, { exact: true })).toBeVisible();
+        const pat = page.getByRole('button', { name: '抚摸 · 3 积分', exact: true });
+        await pat.click();
+        await expect(pat).toBeEnabled();
+        await expect(page.getByRole('meter', { name: '心情', exact: true })).toHaveAttribute(
+          'value',
+          '95',
+        );
+        await expect(attributes).toHaveText(originalAttributes);
+        await expect(equipped).toBeVisible();
+        state.feedFail = true;
+        await pat.click();
+        await expect(page.getByRole('alert')).toContainText('尚在冷却');
+        await expect(attributes).toHaveText(originalAttributes);
+        await expect(equipped).toBeVisible();
         expect(state.mineRequests).toBe(requests);
         await expect(page.getByText('已喂食伙伴', { exact: true })).toHaveCount(0);
         const backdrop = await page

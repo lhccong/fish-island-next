@@ -1,4 +1,4 @@
-import { Aperture, Gamepad2, BookOpen, PawPrint, ShoppingBag } from 'lucide-react';
+import { Aperture, Gamepad2, BookOpen, PawPrint, ShoppingBag, MessagesSquare } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import styles from './DiscoveryNavigation.module.css';
@@ -27,11 +27,15 @@ export function DiscoveryNavigation({
         <PawPrint size={19} aria-hidden="true" />
         伙伴
       </NavLink>
+      <NavLink to="/post">
+        <MessagesSquare size={19} aria-hidden="true" />
+        文章
+      </NavLink>
       <DiscoveryGameLink />
       <DiscoveryReaderLink />
       <NavLink to="/utils/avatar-frames">
         <ShoppingBag size={19} aria-hidden="true" />
-        积分商城
+        店铺
       </NavLink>
       <AboutMenu />
       <AdminEntry />

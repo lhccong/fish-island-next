@@ -79,14 +79,13 @@
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 360px));
   gap: 16px;
 }
 .card {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+  gap: 20px;
   min-width: 0;
   padding: 20px;
   border: 1px solid var(--color-border);
@@ -100,20 +99,57 @@
 .card p {
   color: var(--color-muted);
   font-size: 13px;
+  line-height: 1.7;
 }
-.card strong {
+.product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.details {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.details h2 {
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.purchase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-top: auto;
-  font-size: 15px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.purchase strong {
+  color: var(--color-accent-text);
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.purchase strong span {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-muted);
 }
 .image {
   display: grid;
   place-items: center;
-  height: 112px;
-  width: 100%;
+  flex: 0 0 80px;
+  height: 80px;
+  width: 80px;
+  padding: 4px;
   color: var(--color-muted);
   background: var(--color-canvas);
   border-radius: var(--radius-control);
   font-size: 13px;
+  text-align: center;
 }
 .image img {
   max-width: 100%;

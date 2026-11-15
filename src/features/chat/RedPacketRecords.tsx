@@ -50,7 +50,7 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
       }
       returnFocusRef={trigger}
       title="红包记录"
-      description="按领取积分从高到低排列，手气王和倒霉王按当前记录评定，同分并列；全部同分时不标注"
+      description="按领取积分从高到低排列，欧皇和非酋按当前记录评定，同分并列；全部同分时不标注"
       hideDescription
       dismissLabel="关闭红包记录"
       showCloseAction={false}
@@ -94,10 +94,10 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
                   <span className={styles.recordResult}>
                     <span className={styles.amount}>{record.amount} 积分</span>
                     {highest > lowest && record.amount === highest && (
-                      <span className={styles.lucky}>手气王</span>
+                      <span className={styles.lucky}>欧皇</span>
                     )}
                     {highest > lowest && record.amount === lowest && (
-                      <span className={styles.unlucky}>倒霉王</span>
+                      <span className={styles.unlucky}>非酋</span>
                     )}
                   </span>
                 </li>

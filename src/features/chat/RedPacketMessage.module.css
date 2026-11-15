@@ -160,10 +160,21 @@
 }
 .lucky,
 .unlucky {
-  padding: 2px var(--space-1);
-  border-radius: var(--radius-control);
+  display: inline-block;
+  margin: 2px;
+  padding: 1px 6px;
+  border-radius: 0;
+  box-shadow:
+    -2px 0 0 currentColor,
+    2px 0 0 currentColor,
+    0 -2px 0 currentColor,
+    0 2px 0 currentColor,
+    inset 0 -2px 0 color-mix(in srgb, currentColor 12%, transparent);
   font-size: 12px;
+  font-weight: 600;
   line-height: 1.5;
+  letter-spacing: 1px;
+  white-space: nowrap;
 }
 .lucky {
   background: var(--color-red-packet-surface);

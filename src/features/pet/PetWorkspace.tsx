@@ -146,7 +146,7 @@ export function PetWorkspace({
                 void operation.run(
                   (signal) => service.care(action, pet.id, signal),
                   action === 'feed' ? '已喂食伙伴' : '已抚摸伙伴',
-                  resource.accept,
+                  (result) => resource.accept({ ...pet, ...result }),
                 )
               }
               onAuto={() => openPanel('auto')}
