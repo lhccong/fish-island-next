@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -15,7 +16,7 @@ export function DrawGame({
   const navigate = useNavigate();
   const location = useLocation();
   const [localRoom, setLocalRoom] = useState<string | null>(null);
-  if (session.status === 'checking') return <p role="status">正在恢复登录状态…</p>;
+  if (session.status === 'checking') return <LoadingIndicator>正在恢复登录状态…</LoadingIndicator>;
   if (session.status === 'error')
     return (
       <div role="alert">

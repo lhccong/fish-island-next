@@ -53,6 +53,8 @@ export interface ChatRealtimePort {
 }
 
 export interface ChatPreferencesPort {
+  readHideAvatarFrames(): boolean;
+  writeHideAvatarFrames(value: boolean): void;
   readDeferImages(): boolean;
   writeDeferImages(value: boolean): void;
   readShowAvatars(): boolean;

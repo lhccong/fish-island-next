@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useState } from 'react';
 import type { AutoFeed, PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
@@ -88,7 +89,11 @@ function AutoFeedForm({
             operation.pending || !value.foodCode || value.threshold < 1 || value.threshold > 99
           }
         >
-          {operation.pending ? '保存中…' : '保存设置'}
+          {operation.pending ? (
+            <LoadingIndicator compact>{'保存中…'}</LoadingIndicator>
+          ) : (
+            '保存设置'
+          )}
         </Button>
       </div>
     </form>

@@ -11,6 +11,28 @@ const profileUpdate = {
   profile: '新的简介',
 };
 
+it('refreshes shop balance without checking or reviving a logged-out account', async () => {
+  const { controller, service } = setup();
+  await controller.restore();
+  const states: string[] = [];
+  controller.store.subscribe((state) => states.push(state.session.status));
+  vi.mocked(service.current).mockResolvedValueOnce({ ...user, points: 1000, usedPoints: 200 });
+  await controller.refreshUser(new AbortController().signal);
+  expect(controller.store.getState().session).toMatchObject({ user: { usedPoints: 200 } });
+  expect(states).not.toContain('checking');
+  let resolve!: (value: typeof user) => void;
+  vi.mocked(service.current).mockReturnValueOnce(
+    new Promise((done) => {
+      resolve = done;
+    }),
+  );
+  const pending = controller.refreshUser(new AbortController().signal);
+  await controller.logout();
+  resolve(user);
+  await expect(pending).rejects.toThrow('账号已改变');
+  expect(controller.store.getState().session.status).toBe('anonymous');
+});
+
 it('confirms exchange once, preserves the deducted balance on readback failure and wears without restoring the session', async () => {
   const { controller, service } = setup();
   vi.mocked(service.current).mockResolvedValueOnce({ ...user, points: 100, usedPoints: 20 });

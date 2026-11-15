@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import { Button } from '@/shared/ui/Button';
@@ -17,11 +18,7 @@ export function ProfileMilestones({ user }: { user: AuthUser }) {
     <div className={styles.milestones}>
       <section className={styles.milestoneSection} aria-label="会员信息">
         <h3>会员信息</h3>
-        {resource.status === 'loading' && (
-          <p className={styles.hint} role="status">
-            正在读取会员信息…
-          </p>
-        )}
+        {resource.status === 'loading' && <LoadingIndicator>正在读取会员信息…</LoadingIndicator>}
         {resource.status === 'error' && (
           <div className={styles.sectionError} role="alert">
             {resource.message}

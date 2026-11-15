@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useId, useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -56,7 +57,7 @@ export function RemarkEditor({
           <ScrollArea label="备注表单" gutter="reserved">
             <div className={styles.body}>
               <p className={styles.original}>原名：{target.name}</p>
-              {state.status === 'loading' && <p role="status">正在加载备注…</p>}
+              {state.status === 'loading' && <LoadingIndicator>正在加载备注…</LoadingIndicator>}
               {state.status === 'error' && (
                 <Button variant="secondary" onClick={() => void controller.load()}>
                   重试加载备注
@@ -87,7 +88,7 @@ export function RemarkEditor({
             关闭
           </Button>
           <Button type="submit" disabled={state.status !== 'ready' || state.saving}>
-            {state.saving ? '保存中…' : '保存'}
+            {state.saving ? <LoadingIndicator compact>{'保存中…'}</LoadingIndicator> : '保存'}
           </Button>
         </div>
       </form>

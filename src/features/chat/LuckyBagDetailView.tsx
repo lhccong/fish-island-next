@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -27,7 +28,7 @@ export function LuckyBagDetailView({ id }: { id: string }) {
     <>
       <ScrollArea label="福袋详情内容" gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.content}>
-          {loading && <p role="status">福袋加载中…</p>}
+          {loading && <LoadingIndicator>福袋加载中…</LoadingIndicator>}
           {error && <p role="alert">{error}</p>}
           {detail && (
             <>
@@ -93,7 +94,13 @@ export function LuckyBagDetailView({ id }: { id: string }) {
             void entry.join();
           }}
         >
-          {joining ? '参与中…' : detail?.joined ? '已参与' : '参与福袋'}
+          {joining ? (
+            <LoadingIndicator compact>{'参与中…'}</LoadingIndicator>
+          ) : detail?.joined ? (
+            '已参与'
+          ) : (
+            '参与福袋'
+          )}
         </Button>
       </div>
     </>

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import type { GomokuSocialPort } from '@/domain/gomoku';
@@ -94,7 +95,11 @@ export function GomokuWorkspace({
       <div className={styles.topline}>
         <h2>五子棋</h2>
         <span role="status" aria-label="五子棋连接状态" className={styles.connection}>
-          {connectionLabel[s.connection]}
+          {s.connection === 'connecting' || s.connection === 'reconnecting' ? (
+            <LoadingIndicator compact>{connectionLabel[s.connection]}</LoadingIndicator>
+          ) : (
+            connectionLabel[s.connection]
+          )}
         </span>
       </div>
       {s.error && (
@@ -136,9 +141,9 @@ export function GomokuWorkspace({
               connected={s.connection === 'connected'}
             />
             {busy && (
-              <p role="status" className={styles.feedback}>
+              <LoadingIndicator>
                 {s.phase === 'creating' ? '正在创建房间…' : '正在加入房间…'}
-              </p>
+              </LoadingIndicator>
             )}
           </>
         ) : (

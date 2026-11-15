@@ -93,3 +93,14 @@
     padding-inline: 6px;
   }
 }
+
+.embedded {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.summary[hidden] {
+  display: none;
+}

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useState } from 'react';
 import { Smile } from 'lucide-react';
 import { Popover } from '@/shared/ui/Popover';
@@ -20,7 +21,7 @@ export function EmoticonLauncher() {
       }
     >
       {open && (
-        <Suspense fallback={<p role="status">正在加载表情包面板…</p>}>
+        <Suspense fallback={<LoadingIndicator>正在加载表情包面板…</LoadingIndicator>}>
           <Panel onSelect={() => setOpen(false)} />
         </Suspense>
       )}

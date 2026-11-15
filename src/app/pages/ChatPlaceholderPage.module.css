@@ -93,7 +93,16 @@
 .more[aria-expanded='true'] {
   background: var(--color-hover);
 }
+.mobileAppearance {
+  display: none;
+}
 @media (max-width: 760px) {
+  .formulaIsland {
+    display: none;
+  }
+  .mobileAppearance {
+    display: block;
+  }
   .formulaDetails {
     display: none;
   }
@@ -101,4 +110,8 @@
     min-height: 56px;
     padding: 4px 12px;
   }
+}
+.islandSidebar {
+  height: 100%;
+  min-height: 0;
 }

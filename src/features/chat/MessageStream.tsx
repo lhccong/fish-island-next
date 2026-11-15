@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
+import { ArrowDown } from 'lucide-react';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
@@ -16,6 +17,7 @@ const key = (_index: number, id: string) => id;
 const listComponents = { Header: HistoryBoundary };
 interface RowContext {
   showAvatars: boolean;
+  showAvatarFrames: boolean;
   presentation: ChatPresentation;
   firstItemIndex: number;
 }
@@ -23,6 +25,7 @@ const row = (index: number, id: string, context: RowContext) => (
   <MessageRow
     id={id}
     showAvatars={context.showAvatars}
+    showAvatarFrames={context.showAvatarFrames}
     presentation={context.presentation}
     rowNumber={
       context.presentation === 'worksheet' ? index - context.firstItemIndex + 1 : undefined
@@ -41,8 +44,13 @@ export function MessageStream({
   const firstItemIndex = useStore(controller.store, (state) => state.viewFirstItemIndex);
   const initialized = useStore(controller.history.store, (state) => state.initialized);
   const rowContext = useMemo(
-    () => ({ showAvatars: avatars.showAvatars, presentation, firstItemIndex }),
-    [avatars.showAvatars, presentation, firstItemIndex],
+    () => ({
+      showAvatars: avatars.showAvatars,
+      showAvatarFrames: !avatars.hideAvatarFrames,
+      presentation,
+      firstItemIndex,
+    }),
+    [avatars.showAvatars, avatars.hideAvatarFrames, presentation, firstItemIndex],
   );
   useEffect(() => {
     const deactivate = controller.history.activate();
@@ -55,6 +63,20 @@ export function MessageStream({
   }, [controller, navigation]);
   const [viewport, setViewport] = useState<HTMLDivElement | null>(null);
   const [atBottom, setAtBottom] = useState(true);
+  const atBottomRef = useRef(true);
+  const [newMessageCount, setNewMessageCount] = useState(0);
+  const updateBottom = (bottom: boolean) => {
+    atBottomRef.current = bottom;
+    setAtBottom(bottom);
+    if (bottom) setNewMessageCount(0);
+  };
+  useEffect(
+    () =>
+      controller.subscribeIncoming((message) => {
+        if (!atBottomRef.current && !message.delivery) setNewMessageCount((count) => count + 1);
+      }),
+    [controller],
+  );
   const list = useRef<VirtuosoHandle>(null);
   const [following, setFollow] = useState(true);
   useEffect(() => {
@@ -133,7 +155,7 @@ export function MessageStream({
                 computeItemKey={key}
                 itemContent={row}
                 atBottomThreshold={64}
-                atBottomStateChange={setAtBottom}
+                atBottomStateChange={updateBottom}
                 // Let Virtuoso coordinate measurement and scrolling; external resize writes
                 // race its anchor compensation when the bounded message window advances.
                 followOutput={following ? 'auto' : false}
@@ -141,22 +163,30 @@ export function MessageStream({
             )
           )}
         </ScrollArea>
-      </div>
-      <div className={styles.streamFooter}>
-        <MessageNavigationNotice />
         {!atBottom && ids.length > 0 && (
           <div className={styles.latest}>
             <Button
               variant="secondary"
+              className={styles.latestButton}
+              aria-label="查看最新消息"
+              title={newMessageCount > 0 ? `${newMessageCount} 条新消息，点击查看` : '查看最新消息'}
               onClick={() => {
                 setFollow(true);
                 list.current?.scrollToIndex({ index: 'LAST', align: 'end', behavior: 'auto' });
               }}
             >
-              查看最新消息
+              <ArrowDown size={18} aria-hidden="true" />
+              {newMessageCount > 0 && (
+                <span className={styles.latestBadge} aria-label={`${newMessageCount} 条新消息`}>
+                  {newMessageCount > 99 ? '99+' : newMessageCount}
+                </span>
+              )}
             </Button>
           </div>
         )}
+      </div>
+      <div className={styles.streamFooter}>
+        <MessageNavigationNotice />
       </div>
     </section>
   );

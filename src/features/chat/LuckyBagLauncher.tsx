@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { Gift, List } from 'lucide-react';
 import { useStore } from 'zustand';
@@ -64,7 +65,7 @@ export function LuckyBagLauncher() {
         dismissLabel="关闭福袋面板"
         showCloseAction={false}
       >
-        <Suspense fallback={<p role="status">福袋加载中…</p>}>
+        <Suspense fallback={<LoadingIndicator>福袋加载中…</LoadingIndicator>}>
           {open && panel === 'send' && <Form onClose={() => setOpen(false)} />}
           {open && panel === 'active' && <Active />}
         </Suspense>

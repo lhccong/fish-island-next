@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import type { LuckyBagDetail } from '@/domain/chat';
@@ -52,13 +53,15 @@ export function LuckyBagMessage({
         <span className={styles.cardText}>
           <strong>{detail?.name || '福袋'}</strong>
           <span>
-            {detail
-              ? `${detail.totalAmount} 积分 · ${status}`
-              : error
-                ? '加载失败，点击重试'
-                : loading
-                  ? '福袋加载中…'
-                  : '查看福袋'}
+            {detail ? (
+              `${detail.totalAmount} 积分 · ${status}`
+            ) : error ? (
+              '加载失败，点击重试'
+            ) : loading ? (
+              <LoadingIndicator compact>{'福袋加载中…'}</LoadingIndicator>
+            ) : (
+              '查看福袋'
+            )}
           </span>
         </span>
       </Button>

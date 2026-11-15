@@ -1,4 +1,23 @@
-export type BuiltinSkinId = 'wechat' | 'wecom' | 'feishu' | 'dingtalk' | 'wps';
+export type BuiltinSkinId = 'wechat' | 'wecom' | 'feishu' | 'dingtalk' | 'wps' | 'pixel-island';
+
+// Trusted built-in presentation overrides; never part of the import whitelist.
+export type SkinPresentationTokens = Partial<
+  Record<
+    | '--color-text'
+    | '--color-muted'
+    | '--color-border'
+    | '--color-divider'
+    | '--color-rail-text'
+    | '--color-rail-highlight'
+    | '--color-scrollbar'
+    | '--color-scrollbar-hover'
+    | '--color-message-surface'
+    | '--radius-control'
+    | '--radius-panel'
+    | '--shadow-panel',
+    string
+  >
+>;
 
 export interface SkinTokens {
   '--color-accent': string;

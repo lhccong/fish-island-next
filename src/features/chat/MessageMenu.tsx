@@ -47,6 +47,7 @@ export function MessageMenu({
   const { controller, user, userId, draft, composerRef, emoticons, navigation, blacklist } =
     useChatRealtime();
   const remarks = useRemarks();
+  const reward = hasRewardMessageContent(message.content);
   const focusDraft = useRef(false);
   const closeFocus = () => {
     const target = focusDraft.current ? composerRef.current : returnFocusRef.current;
@@ -59,6 +60,7 @@ export function MessageMenu({
     composerRef.current?.focus({ preventScroll: true });
   };
   const copy = async () => {
+    if (reward) return;
     try {
       if (!navigator.clipboard) throw new Error('Clipboard unavailable');
       await navigator.clipboard.writeText(messageClipboardText(message.content));
@@ -118,13 +120,17 @@ export function MessageMenu({
           void emoticons.add(part.url);
         },
       })),
-    {
-      label: '复制',
-      icon: <Copy size={16} aria-hidden="true" />,
-      onSelect: () => {
-        void copy();
-      },
-    },
+    ...(!reward
+      ? [
+          {
+            label: '复制',
+            icon: <Copy size={16} aria-hidden="true" />,
+            onSelect: () => {
+              void copy();
+            },
+          },
+        ]
+      : []),
     {
       label: '引用',
       icon: <Quote size={16} aria-hidden="true" />,
@@ -135,7 +141,7 @@ export function MessageMenu({
       icon: <AtSign size={16} aria-hidden="true" />,
       onSelect: () => prepare(() => draft.mention(message.senderName)),
     },
-    ...(hasRewardMessageContent(message.content)
+    ...(reward
       ? []
       : [
           {
@@ -149,7 +155,7 @@ export function MessageMenu({
             },
           },
         ]),
-    ...(self
+    ...(user?.role === 'admin' || (self && !reward)
       ? [
           {
             label:

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -105,7 +106,7 @@ export function CreateRoomDialog({
               onOpenChange(false);
           }}
         >
-          {pending ? '正在创建…' : '创建房间'}
+          {pending ? <LoadingIndicator compact>{'正在创建…'}</LoadingIndicator> : '创建房间'}
         </Button>
       </div>
     </Dialog>

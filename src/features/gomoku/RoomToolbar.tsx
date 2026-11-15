@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -47,7 +48,11 @@ export function RoomToolbar({
               复制邀请链接
             </Button>
             <Button disabled={inviteBusy} onClick={onInvite}>
-              {inviteBusy ? '邀请处理中…' : '邀请聊天室岛友'}
+              {inviteBusy ? (
+                <LoadingIndicator compact>{'邀请处理中…'}</LoadingIndicator>
+              ) : (
+                '邀请聊天室岛友'
+              )}
             </Button>
           </>
         )}

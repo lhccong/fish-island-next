@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState, type RefObject } from 'react';
 import type { Crop } from '@/domain/farm';
 import { Button } from '@/shared/ui/Button';
@@ -97,7 +98,7 @@ export function SeedDialog({
               if (crop && (await onPlant(crop.id))) onClose();
             }}
           >
-            {busy ? '播种中…' : '确认播种'}
+            {busy ? <LoadingIndicator compact>{'播种中…'}</LoadingIndicator> : '确认播种'}
           </Button>
         </div>
       </div>

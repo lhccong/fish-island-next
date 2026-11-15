@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import styles from './Tools.module.css';
 export function Feedback({
   busy,
@@ -10,7 +11,7 @@ export function Feedback({
 }) {
   return (
     <div className={styles.feedback} aria-live="polite">
-      {busy && <p role="status">正在处理…</p>}
+      {busy && <LoadingIndicator compact>正在处理…</LoadingIndicator>}
       {error && <p role="alert">{error}</p>}
       {notice && <p role="status">{notice}</p>}
     </div>

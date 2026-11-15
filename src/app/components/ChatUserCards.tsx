@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useCallback, useState, useRef, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { UserCardProvider } from '@/features/chat';
@@ -48,7 +49,7 @@ export function ChatUserCards({
               }}
               dismissLabel="关闭伙伴资料"
             >
-              <p role="status">正在加载…</p>
+              <LoadingIndicator>正在加载…</LoadingIndicator>
             </Dialog>
           }
         >

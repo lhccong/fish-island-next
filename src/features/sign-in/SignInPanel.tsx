@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { shiftMonth, type SignInPort } from '@/domain/sign-in';
@@ -61,7 +62,7 @@ export function SignInPanel({ port }: { port: SignInPort }) {
               回到本月
             </Button>
           )}
-          {state.status === 'loading' && <p role="status">正在读取签到记录…</p>}
+          {state.status === 'loading' && <LoadingIndicator>正在读取签到记录…</LoadingIndicator>}
           {state.status === 'error' && (
             <div role="alert">
               <p>{state.message}</p>
@@ -131,11 +132,13 @@ export function SignInPanel({ port }: { port: SignInPort }) {
               void submit();
             }}
           >
-            {pending
-              ? '处理中…'
-              : state.status === 'ready' && state.todaySigned
-                ? '今日已签到'
-                : '立即签到'}
+            {pending ? (
+              <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
+            ) : state.status === 'ready' && state.todaySigned ? (
+              '今日已签到'
+            ) : (
+              '立即签到'
+            )}
           </Button>
         </div>
       </footer>

@@ -1,8 +1,9 @@
-import { Aperture, Gamepad2, BookOpen, PawPrint } from 'lucide-react';
+import { Aperture, Gamepad2, BookOpen, PawPrint, ShoppingBag } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import styles from './DiscoveryNavigation.module.css';
 import { AboutMenu } from './AboutMenu';
+import { AdminEntry } from './AdminEntry';
 import { NotificationBadge } from '@/features/fish-circle/notifications';
 
 export function DiscoveryNavigation({
@@ -22,13 +23,18 @@ export function DiscoveryNavigation({
           <NotificationBadge />
         </NavLink>
       )}
-      <DiscoveryGameLink />
-      <DiscoveryReaderLink />
-      <AboutMenu />
       <NavLink to="/pet">
         <PawPrint size={19} aria-hidden="true" />
         伙伴
       </NavLink>
+      <DiscoveryGameLink />
+      <DiscoveryReaderLink />
+      <NavLink to="/utils/avatar-frames">
+        <ShoppingBag size={19} aria-hidden="true" />
+        积分商城
+      </NavLink>
+      <AboutMenu />
+      <AdminEntry />
     </nav>
   );
 }

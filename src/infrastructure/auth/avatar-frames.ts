@@ -34,11 +34,15 @@ export function avatarFrameMethods(
           pageSize: 12,
         }),
       );
+      const total =
+        typeof data.total === 'string' && /^(?:0|[1-9]\d*)$/.test(data.total)
+          ? Number(data.total)
+          : data.total;
       if (
         !Array.isArray(data.records) ||
-        typeof data.total !== 'number' ||
-        !Number.isSafeInteger(data.total) ||
-        data.total < 0
+        typeof total !== 'number' ||
+        !Number.isSafeInteger(total) ||
+        total < 0
       )
         throw new AuthError('invalid-response', '头像框列表格式异常，请重试');
       const items = data.records.map((value: unknown) => {
@@ -62,7 +66,7 @@ export function avatarFrameMethods(
           owned: frame.hasOwned,
         };
       });
-      return { items, total: data.total };
+      return { items, total };
     },
     exchangeAvatarFrame: (id, token, signal) => write('exchange', id, token, signal),
     setAvatarFrame: (id, token, signal) => write('set', id, token, signal),

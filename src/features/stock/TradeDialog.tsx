@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import type { StockPort } from '@/domain/stock';
 import { Button } from '@/shared/ui/Button';
@@ -114,7 +115,11 @@ export function TradeDialog({
             type="submit"
             disabled={pending || (buy ? target.balance === null : target.available === null)}
           >
-            {pending ? '正在提交…' : `确认${buy ? '买入' : '卖出'}`}
+            {pending ? (
+              <LoadingIndicator compact>{'正在提交…'}</LoadingIndicator>
+            ) : (
+              `确认${buy ? '买入' : '卖出'}`
+            )}
           </Button>
         </div>
       </form>

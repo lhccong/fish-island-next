@@ -1,4 +1,5 @@
-import { AtSign, MapPin, LoaderCircle, X } from 'lucide-react';
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { AtSign, MapPin, X } from 'lucide-react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
@@ -26,11 +27,11 @@ export function MessageNavigationNotice() {
       {state.feedback && (
         <span role="status" className={styles.navigationFeedback}>
           {state.pending ? (
-            <LoaderCircle size={15} aria-hidden="true" />
+            <LoadingIndicator compact>{state.feedback}</LoadingIndicator>
           ) : (
             <MapPin size={15} aria-hidden="true" />
           )}
-          <span>{state.feedback}</span>
+          {!state.pending && <span>{state.feedback}</span>}
         </span>
       )}
       {state.pending && (

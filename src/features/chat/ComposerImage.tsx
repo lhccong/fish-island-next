@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import { X } from 'lucide-react';
@@ -22,13 +23,15 @@ export function ComposerImage() {
       )}
       {(state.status !== 'ready' || failedUrl === state.url) && (
         <span role="status" data-tone={state.status === 'error' ? 'error' : 'info'}>
-          {state.status === 'uploading'
-            ? '图片上传中…'
-            : state.status === 'error'
-              ? state.error
-              : failedUrl === state.url
-                ? '图片预览加载失败'
-                : ''}
+          {state.status === 'uploading' ? (
+            <LoadingIndicator compact>{'图片上传中…'}</LoadingIndicator>
+          ) : state.status === 'error' ? (
+            state.error
+          ) : failedUrl === state.url ? (
+            '图片预览加载失败'
+          ) : (
+            ''
+          )}
         </span>
       )}
       <div className={styles.controls}>

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import { Button } from '@/shared/ui/Button';
@@ -125,11 +126,7 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
           <ProfileMilestones user={user} />
         </div>
       </ScrollArea>
-      {uploading && (
-        <p className={styles.hint} role="status">
-          正在上传图片…
-        </p>
-      )}
+      {uploading && <LoadingIndicator compact>正在上传图片…</LoadingIndicator>}
       {error && (
         <p className={styles.error} role="alert">
           {error}
@@ -145,7 +142,11 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
           取消
         </Button>
         <Button type="submit" disabled={busy}>
-          {pending === 'profile' ? '保存中…' : '保存修改'}
+          {pending === 'profile' ? (
+            <LoadingIndicator compact>{'保存中…'}</LoadingIndicator>
+          ) : (
+            '保存修改'
+          )}
         </Button>
       </div>
     </form>

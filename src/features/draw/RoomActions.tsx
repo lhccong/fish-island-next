@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { DrawRoom, DrawPort } from '@/domain/draw';
 import { Button } from '@/shared/ui/Button';
@@ -109,7 +110,7 @@ export function RoomActions({
                 });
             }}
           >
-            {busy ? '处理中…' : '确认操作'}
+            {busy ? <LoadingIndicator compact>{'处理中…'}</LoadingIndicator> : '确认操作'}
           </Button>
         </div>
         {error && <p role="alert">{error}</p>}

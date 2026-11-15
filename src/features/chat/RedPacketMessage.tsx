@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -65,7 +66,11 @@ export function RedPacketMessage({ id }: { id: string }) {
             }
             title={description}
           >
-            {description}
+            {state.loading && state.amount === null && !state.grabError ? (
+              <LoadingIndicator compact>{description}</LoadingIndicator>
+            ) : (
+              description
+            )}
           </span>
         </span>
       </span>
@@ -102,13 +107,15 @@ export function RedPacketMessage({ id }: { id: string }) {
               });
             }}
           >
-            {state.grabbing
-              ? '领取中…'
-              : state.amount !== null
-                ? '已领取'
-                : quiz
-                  ? '提交答案'
-                  : '抢红包'}
+            {state.grabbing ? (
+              <LoadingIndicator compact>{'领取中…'}</LoadingIndicator>
+            ) : state.amount !== null ? (
+              '已领取'
+            ) : quiz ? (
+              '提交答案'
+            ) : (
+              '抢红包'
+            )}
           </Button>
           <RedPacketRecords id={id} port={packets.port} />
         </span>

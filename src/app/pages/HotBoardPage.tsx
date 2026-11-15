@@ -9,12 +9,13 @@ const hotBoardClient = createHotBoardClient(apiBaseUrl);
 
 export function HotBoardPage() {
   const { session } = useAuth();
-  const isTable = useAppearanceStore((state) => state.skinId === 'wps');
+  const skinId = useAppearanceStore((state) => state.skinId);
+  const isTable = skinId === 'wps';
   return (
     <HotBoardWorkspace
       service={hotBoardClient}
       currentUser={session.status === 'authenticated' ? session.user : null}
-      presentation={isTable ? 'table' : 'cards'}
+      presentation={isTable ? 'table' : skinId === 'pixel-island' ? 'island' : 'cards'}
       renderLayout={(slots) => (
         <WorkspaceLayout
           slots={slots}

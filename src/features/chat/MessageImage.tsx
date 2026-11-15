@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ChevronsUp } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
@@ -105,7 +106,11 @@ function LoadedMessageImage({ url, onCollapse }: { url: string; onCollapse?: () 
             />
           )}
         </button>
-        {state === 'loading' && <span className={styles.imageStatus}>图片加载中…</span>}
+        {state === 'loading' && (
+          <span className={styles.imageStatus}>
+            <LoadingIndicator>图片加载中…</LoadingIndicator>
+          </span>
+        )}
         {state === 'error' && (
           <span className={styles.imageStatus}>
             <span>图片加载失败</span>

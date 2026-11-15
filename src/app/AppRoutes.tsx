@@ -1,12 +1,21 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, type Location } from 'react-router';
 import { HotBoardPage } from '@/app/pages/HotBoardPage';
 import { RequireAuth } from '@/app/components/RequireAuth';
+import { RequireAdmin } from '@/app/components/RequireAdmin';
+import { adminSections } from '@/app/components/admin-sections';
 import { PageLoading } from '@/app/components/PageLoading';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
 import { GameWindowsProvider } from '@/app/components/GameWindowsProvider';
+const PointsShopPage = lazy(() =>
+  import('@/app/pages/PointsShopPage').then((m) => ({ default: m.PointsShopPage })),
+);
+const AdminPage = lazy(() =>
+  import('@/app/pages/AdminPage').then((m) => ({ default: m.AdminPage })),
+);
 const AboutPage = lazy(() =>
   import('@/app/pages/AboutPage').then((module) => ({ default: module.AboutPage })),
 );
@@ -84,6 +93,34 @@ export function AppRoutes() {
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
             <Route path="/discover" element={<DiscoveryPage />} />
+            <Route
+              path="/admin"
+              element={
+                <RequireAdmin>
+                  <AdminPage section="overview" />
+                </RequireAdmin>
+              }
+            />
+            {adminSections.map((s) => (
+              <Route
+                key={s.id}
+                path={s.path}
+                element={
+                  <RequireAdmin>
+                    <AdminPage section={s.id} />
+                  </RequireAdmin>
+                }
+              />
+            ))}
+            <Route path="/avatarFrames" element={<Navigate to="/utils/avatar-frames" replace />} />
+            <Route
+              path="/utils/avatar-frames"
+              element={
+                <RequireAuth>
+                  <PointsShopPage />
+                </RequireAuth>
+              }
+            />
             <Route path="/about" element={<Navigate to="/rank/reward" replace />} />
             <Route path="/rank" element={<Navigate to="/rank/reward" replace />} />
             <Route path="/rank/about" element={<AboutPage section="about" />} />
@@ -140,6 +177,14 @@ export function AppRoutes() {
                   <PetPage />
                 </RequireAuth>
               }
+            />
+            <Route
+              path="/point/tournament"
+              element={<Navigate to="/pet?challenge=tournament" replace />}
+            />
+            <Route
+              path="/game/tournament"
+              element={<Navigate to="/pet?challenge=tournament" replace />}
             />
             <Route path="/reader" element={<ReaderPage onOpen={() => setReaderEnabled(true)} />} />
             <Route
@@ -200,8 +245,8 @@ export function AppRoutes() {
       {isLogin && (
         <Suspense
           fallback={
-            <div className={styles.loading} role="status">
-              正在打开登录…
+            <div className={styles.loading}>
+              <LoadingIndicator compact>正在打开登录…</LoadingIndicator>
             </div>
           }
         >

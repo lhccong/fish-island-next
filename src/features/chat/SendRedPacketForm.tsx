@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -114,8 +115,10 @@ export default function SendRedPacketForm({ onClose }: { onClose: () => void }) 
       </div>
       <div className={styles.feedback}>
         {error && <p role="alert">{error}</p>}
-        {phase === 'creating' && <p role="status">正在创建红包，请稍候…</p>}
-        {phase === 'publishing' && <p role="status">红包已创建，正在发布到群聊…</p>}
+        {phase === 'creating' && <LoadingIndicator compact>正在创建红包，请稍候…</LoadingIndicator>}
+        {phase === 'publishing' && (
+          <LoadingIndicator compact>红包已创建，正在发布到群聊…</LoadingIndicator>
+        )}
         {phase === 'success' && <p role="status">红包发送成功</p>}
       </div>
       <div className={styles.actions}>
@@ -144,13 +147,15 @@ export default function SendRedPacketForm({ onClose }: { onClose: () => void }) 
           </Button>
         ) : (
           <Button key="submit" type="submit" disabled={!editing || !user}>
-            {phase === 'creating'
-              ? '创建中…'
-              : phase === 'publishing'
-                ? '发布中…'
-                : phase === 'uncertain'
-                  ? '等待确认'
-                  : '发送红包'}
+            {phase === 'creating' ? (
+              <LoadingIndicator compact>{'创建中…'}</LoadingIndicator>
+            ) : phase === 'publishing' ? (
+              <LoadingIndicator compact>{'发布中…'}</LoadingIndicator>
+            ) : phase === 'uncertain' ? (
+              '等待确认'
+            ) : (
+              '发送红包'
+            )}
           </Button>
         )}
       </div>

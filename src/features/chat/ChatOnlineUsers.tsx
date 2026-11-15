@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import { useRemarks } from './remarks-context';
@@ -108,11 +109,7 @@ export function ChatOnlineUsers({
               </p>
             )}
             {appearance.custom && <CustomChatEntries query={query} />}
-            {!appearance.custom && loading && (
-              <p className={styles.notice} role="status">
-                正在加载列表…
-              </p>
-            )}
+            {!appearance.custom && loading && <LoadingIndicator>正在加载列表…</LoadingIndicator>}
             {!appearance.custom && state.status === 'error' && (
               <div className={styles.notice} role="alert">
                 <p>暂时无法加载列表，请检查网络后重试</p>

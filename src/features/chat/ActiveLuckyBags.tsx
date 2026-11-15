@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useStore } from 'zustand';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
@@ -12,7 +13,7 @@ export default function ActiveLuckyBags() {
     <>
       <ScrollArea label="进行中的福袋列表" gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.content}>
-          {state.loading && <p role="status">福袋列表加载中…</p>}
+          {state.loading && <LoadingIndicator>福袋列表加载中…</LoadingIndicator>}
           {state.error && <p role="alert">{state.error}</p>}
           {!state.loading && !state.error && state.bags.length === 0 && (
             <p>暂无进行中的福袋，可以发送一个邀请岛友参与。</p>

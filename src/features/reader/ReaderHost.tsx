@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useLayoutEffect, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -7,7 +8,6 @@ import {
   Maximize2,
   Minimize2,
   PictureInPicture2,
-  LoaderCircle,
   RefreshCw,
   Settings,
   X,
@@ -226,9 +226,8 @@ function ReaderSurface({ controller }: { controller: ReaderController }) {
               </div>
             )}
             {status === 'loading' ? (
-              <div role="status" className={styles.readerState}>
-                <LoaderCircle size={24} aria-hidden="true" />
-                <p>正在加载章节…</p>
+              <div className={styles.readerState}>
+                <LoadingIndicator>正在加载章节…</LoadingIndicator>
               </div>
             ) : status === 'error' ? (
               <div role="alert" className={styles.readerState}>

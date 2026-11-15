@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 import type { DrawPort, DrawRealtimePort, DrawIdentity, DrawSettings } from '@/domain/draw';
@@ -116,7 +117,7 @@ export function DrawWorkspace({
           )}
         </div>
       </div>
-      {data.status === 'loading' && <p role="status">正在同步房间…</p>}
+      {data.status === 'loading' && <LoadingIndicator>正在同步房间…</LoadingIndicator>}
       {data.error && (
         <div className={styles.feedback} role="alert">
           {data.error}

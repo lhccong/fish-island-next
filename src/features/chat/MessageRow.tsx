@@ -1,10 +1,10 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useMessageLocationPulse } from './use-message-location-pulse';
 import { MessageQuote } from './MessageQuote';
 import { RemarkName } from './RemarkName';
 import { SenderTitle } from './SenderTitle';
 import { RepeatButton } from './RepeatButton';
 import { RepetitionParticipants } from './RepetitionParticipants';
-import { LoaderCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { parseMessageContent } from '@/domain/chat';
 import { memo, useMemo, useRef, useSyncExternalStore } from 'react';
@@ -19,15 +19,17 @@ import type { ChatPresentation } from './chat-presentation';
 export const MessageRow = memo(function MessageRow({
   id,
   showAvatars,
+  showAvatarFrames,
   presentation = 'conversation',
   rowNumber,
 }: {
   id: string;
   showAvatars: boolean;
+  showAvatarFrames: boolean;
   presentation?: ChatPresentation;
   rowNumber: number | undefined;
 }) {
-  const { controller, userId, draft, composerRef, navigation, blacklist } = useChatRealtime();
+  const { controller, userId, user, draft, composerRef, navigation, blacklist } = useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
     state.target === id ? state.revision : 0,
   );
@@ -49,7 +51,7 @@ export const MessageRow = memo(function MessageRow({
     self,
     connected,
     status: revoke,
-    onRevoke: () => controller.revoke(message.id, userId),
+    onRevoke: () => controller.revoke(message.id, userId, user?.role),
     returnFocusRef: bubbleRef,
   };
   const local = message.delivery === 'sending' || message.delivery === 'failed';
@@ -110,6 +112,7 @@ export const MessageRow = memo(function MessageRow({
           }}
         >
           <MemberAvatar
+            showFrame={showAvatarFrames}
             key={`${message.senderId}:${message.senderAvatar ?? ''}`}
             member={{
               id: message.senderId,
@@ -148,7 +151,7 @@ export const MessageRow = memo(function MessageRow({
         <div className={styles.bubbleLine} data-repeat={!!group}>
           {self && message.delivery === 'sending' && (
             <span role="status" aria-label="消息发送中" className={styles.sending}>
-              <LoaderCircle size={16} aria-hidden="true" />
+              <LoadingIndicator compact>发送中…</LoadingIndicator>
             </span>
           )}
           {local ? (
@@ -160,7 +163,11 @@ export const MessageRow = memo(function MessageRow({
           )}
           {group && <RepeatButton content={message.content} />}
           {group && group.length >= 3 && (
-            <RepetitionParticipants ids={group} showTitles={presentation !== 'worksheet'} />
+            <RepetitionParticipants
+              ids={group}
+              showTitles={presentation !== 'worksheet'}
+              showFrames={showAvatarFrames}
+            />
           )}
         </div>
         <div className={styles.rowFeedback}>
@@ -172,11 +179,13 @@ export const MessageRow = memo(function MessageRow({
               </Button>
             </div>
           )}
-          {self && !message.revoked && revoke && (
+          {!message.revoked && revoke && (
             <div className={styles.revoke}>
-              <span role="status">
-                {revoke === 'pending' ? '等待撤回确认…' : '撤回未确认，请从消息菜单重试'}
-              </span>
+              {revoke === 'pending' ? (
+                <LoadingIndicator compact>等待撤回确认…</LoadingIndicator>
+              ) : (
+                <span role="status">撤回未确认，请从消息菜单重试</span>
+              )}
             </div>
           )}
         </div>

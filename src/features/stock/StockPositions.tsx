@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { Position } from '@/domain/stock';
 import { Button } from '@/shared/ui/Button';
 import type { Resource } from './use-resource';
@@ -24,7 +25,7 @@ export function StockPositions({
     <section className={styles.listPanel} aria-label="我的持仓">
       <h2>我的持仓</h2>
       {state.status === 'loading' ? (
-        <p role="status">正在加载持仓…</p>
+        <LoadingIndicator>正在加载持仓…</LoadingIndicator>
       ) : state.status === 'error' ? (
         <div role="alert">
           <p>{state.message}</p>

@@ -23,7 +23,7 @@ it('maps legacy frame pagination, ownership, IDs and query mutations', async () 
                 hasOwned: false,
               },
             ],
-            total: 25,
+            total: '25',
           },
         }),
       ),
@@ -57,6 +57,24 @@ it('maps legacy frame pagination, ownership, IDs and query mutations', async () 
   expect(fetcher.mock.calls[1]?.[1].headers.get(token.name)).toBe(token.value);
   await expect(client.exchangeAvatarFrame('-1', token, signal)).rejects.toThrow('有效');
   expect(fetcher).toHaveBeenCalledTimes(3);
+});
+
+it('accepts numeric and string page totals while rejecting malformed or unsafe totals', async () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal('fetch', fetcher);
+  const client = createAuthClient('https://example.test');
+  for (const total of [0, '0', 25, '25']) {
+    fetcher.mockResolvedValueOnce(
+      new Response(JSON.stringify({ code: 0, data: { records: [], total } })),
+    );
+    expect((await client.avatarFrames(1, token, signal)).total).toBe(Number(total));
+  }
+  for (const total of [null, '', ' ', '1e2', '1.5', '-1', -1, true, '9007199254740992']) {
+    fetcher.mockResolvedValueOnce(
+      new Response(JSON.stringify({ code: 0, data: { records: [], total } })),
+    );
+    await expect(client.avatarFrames(1, token, signal)).rejects.toThrow('列表格式异常');
+  }
 });
 
 it('rejects unconfirmed mutations and invalid catalog records; discards executable images', async () => {

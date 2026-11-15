@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { farmService } from '@/app/config/farm';
@@ -30,7 +31,7 @@ export function GameWindowContent({ game }: { game: GameId }) {
   if (game === 'life') return <LifeGame />;
   if (game === 'draw') return <DrawGame />;
   if (game === 'undercover') return <UndercoverGame />;
-  if (session.status === 'checking') return <p role="status">正在恢复登录状态…</p>;
+  if (session.status === 'checking') return <LoadingIndicator>正在恢复登录状态…</LoadingIndicator>;
   if (session.status === 'error')
     return (
       <div role="alert">

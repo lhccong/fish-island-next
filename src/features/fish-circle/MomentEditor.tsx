@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useRef, useState, type RefObject } from 'react';
 import { MapPin, Plus, X } from 'lucide-react';
 import type { Draft, FishCirclePort, Moment } from '@/domain/fish-circle';
@@ -145,7 +146,7 @@ export function MomentEditor({ service, original, onSaved, onClose, returnFocusR
               : '可直接粘贴图片上传'}
           </span>
         </div>
-        {upload.pending && <p role="status">正在上传图片…</p>}
+        {upload.pending && <LoadingIndicator compact>正在上传图片…</LoadingIndicator>}
         {hint && <p role="status">{hint}</p>}
         <label className={styles.location}>
           <MapPin size={16} aria-hidden="true" />
@@ -178,7 +179,13 @@ export function MomentEditor({ service, original, onSaved, onClose, returnFocusR
             type="submit"
             disabled={busy || (!draft.content.trim() && !draft.media.length)}
           >
-            {save.pending ? '正在保存…' : original ? '保存修改' : '发布'}
+            {save.pending ? (
+              <LoadingIndicator compact>{'正在保存…'}</LoadingIndicator>
+            ) : original ? (
+              '保存修改'
+            ) : (
+              '发布'
+            )}
           </Button>
         </div>
       </form>

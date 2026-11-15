@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useLocation, useNavigate } from 'react-router';
 import { AccountControl, useAuth } from '@/features/auth';
 import { lazy, Suspense, useRef, useState } from 'react';
@@ -107,7 +108,7 @@ export function WorkspaceAccount() {
             </Dialog>
           ) : (
             tool && (
-              <Suspense fallback={<p role="status">正在打开账号工具…</p>}>
+              <Suspense fallback={<LoadingIndicator>正在打开账号工具…</LoadingIndicator>}>
                 <AccountToolPanel
                   key={`${session.user.id}:${tool}`}
                   tool={tool}

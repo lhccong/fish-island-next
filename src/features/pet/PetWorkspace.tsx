@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useState } from 'react';
 import {
   Apple,
@@ -57,12 +58,20 @@ const panels = [
 ] as const;
 type PanelId = (typeof panels)[number]['id'];
 
-export function PetWorkspace({ service, userId }: { service: PetPort; userId: string }) {
+export function PetWorkspace({
+  service,
+  userId,
+  openTournament = false,
+}: {
+  service: PetPort;
+  userId: string;
+  openTournament?: boolean;
+}) {
   const load = useCallback((signal: AbortSignal) => service.mine(signal), [service]);
   const resource = usePetResource(load);
   const pet = resource.data ?? null;
-  const [panel, setPanel] = useState<PanelId | null>(null);
-  const [challengeMode, setChallengeMode] = useState('rank');
+  const [panel, setPanel] = useState<PanelId | null>(openTournament ? 'challenge' : null);
+  const [challengeMode, setChallengeMode] = useState(openTournament ? 'tournament' : 'rank');
   const [name, setName] = useState('');
   const operation = usePetOperation();
   const selected = panels.find((item) => item.id === panel);
@@ -112,7 +121,11 @@ export function PetWorkspace({ service, userId }: { service: PetPort; userId: st
                     required
                   />
                   <Button type="submit" disabled={busy || !name.trim()}>
-                    {operation.pending ? '正在领养…' : '领养伙伴'}
+                    {operation.pending ? (
+                      <LoadingIndicator compact>正在领养…</LoadingIndicator>
+                    ) : (
+                      '领养伙伴'
+                    )}
                   </Button>
                 </form>
               </section>

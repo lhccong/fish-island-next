@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
@@ -82,7 +83,13 @@ export function EmailBinding({ boundEmail, disabled }: { boundEmail: string; dis
             }
           }}
         >
-          {sending ? '发送中…' : remaining ? `${remaining}秒后重发` : '获取验证码'}
+          {sending ? (
+            <LoadingIndicator compact>{'发送中…'}</LoadingIndicator>
+          ) : remaining ? (
+            `${remaining}秒后重发`
+          ) : (
+            '获取验证码'
+          )}
         </Button>
         <input
           aria-label="邮箱验证码"

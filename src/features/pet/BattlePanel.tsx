@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useEffect, useState } from 'react';
 import type { BattlePreview, BattleResult, BattleTarget, Companion, PetPort } from '@/domain/pet';
 import { companionBattleHealth } from '@/domain/pet';
@@ -119,11 +120,13 @@ function BattlePlayback({
       />
       <div className={styles.console}>
         <p aria-live="polite">
-          {operation.pending
-            ? '伙伴已出发，正在等待战斗结果…'
-            : current
-              ? roundNarration(current, preview.self.name, preview.opponent.name)
-              : `${preview.opponent.name}正在前方等着你。准备好出战了吗？`}
+          {operation.pending ? (
+            <LoadingIndicator compact>{'伙伴已出发，正在等待战斗结果…'}</LoadingIndicator>
+          ) : current ? (
+            roundNarration(current, preview.self.name, preview.opponent.name)
+          ) : (
+            `${preview.opponent.name}正在前方等着你。准备好出战了吗？`
+          )}
         </p>
         <div className={styles.controls}>
           {!result && (
@@ -165,11 +168,13 @@ function BattlePlayback({
                 )
               }
             >
-              {operation.pending
-                ? '正在提交挑战…'
-                : target.kind === 'tower'
-                  ? '开始试炼'
-                  : '开始挑战'}
+              {operation.pending ? (
+                <LoadingIndicator compact>{'正在提交挑战…'}</LoadingIndicator>
+              ) : target.kind === 'tower' ? (
+                '开始试炼'
+              ) : (
+                '开始挑战'
+              )}
             </Button>
           )}
           {playing && (

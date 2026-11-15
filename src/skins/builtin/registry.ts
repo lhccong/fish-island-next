@@ -13,6 +13,24 @@ const workspaceTokens = {
 
 export const builtinSkins: readonly SkinDefinition[] = [
   {
+    id: 'pixel-island',
+    name: '摸鱼岛像素风',
+    tokens: {
+      '--color-accent': '#167c78',
+      '--color-accent-soft': '#d9f2e9',
+      '--color-accent-text': '#155e5d',
+      '--color-selected-muted': '#e0f5ef',
+      '--color-rail': '#bce7db',
+      '--color-sidebar': '#f4f5e9',
+      '--color-message-outgoing': '#b8e7d8',
+      '--color-message-incoming': '#e3f2e9',
+      '--color-rail-active': '#a3d9cd',
+      '--color-hover': '#e0ece1',
+      '--color-canvas': '#f4f7ef',
+      '--color-surface': '#fffcf2',
+    },
+  },
+  {
     id: 'wps',
     name: 'WPS 表格',
     tokens: {

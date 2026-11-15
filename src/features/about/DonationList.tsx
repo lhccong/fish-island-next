@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { AboutPort } from '@/domain/about';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -20,9 +21,9 @@ export function DonationList({
   const { records, total } = state.data;
   const feedback =
     state.status === 'loading' ? (
-      <p className={styles.feedback} role="status">
+      <LoadingIndicator compact={records.length > 0}>
         正在加载{details ? '打赏动态' : '排行榜'}…
-      </p>
+      </LoadingIndicator>
     ) : state.status === 'error' ? (
       <div className={styles.feedback}>
         <p role="alert">{state.error}</p>

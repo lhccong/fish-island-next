@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useEffectEvent, useMemo, useState, useSyncExternalStore } from 'react';
 import type { LandlordsPort, RankingPort } from '@/domain/landlords';
 import { Button } from '@/shared/ui/Button';
@@ -60,8 +61,8 @@ export function LandlordsWorkspace({
           )}
         </div>
       </div>
-      {state.loading && <p role="status">正在同步牌桌…</p>}
-      {state.pending && !state.loading && <p role="status">正在等待服务端确认…</p>}
+      {state.loading && <LoadingIndicator>正在同步牌桌…</LoadingIndicator>}
+      {state.pending && !state.loading && <LoadingIndicator>正在等待服务端确认…</LoadingIndicator>}
       {state.error && (
         <div role="alert" className={styles.error}>
           <p>{state.error}</p>

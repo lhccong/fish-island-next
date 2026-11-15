@@ -15,11 +15,20 @@ const timeFormat = new Intl.DateTimeFormat('zh-CN', {
 interface HotSourceConversationProps {
   source: HotSource;
   currentUser: Pick<AuthUser, 'name' | 'avatarUrl'> | null;
+  decoration?: 'none' | 'island';
 }
 
-export function HotSourceConversation({ source, currentUser }: HotSourceConversationProps) {
+export function HotSourceConversation({
+  source,
+  currentUser,
+  decoration = 'none',
+}: HotSourceConversationProps) {
   return (
-    <section className={styles.conversation} aria-label={`${source.name}消息`}>
+    <section
+      className={styles.conversation}
+      aria-label={`${source.name}消息`}
+      data-decoration={decoration}
+    >
       <div className={styles.timestamp}>
         {source.updatedAt ? (
           <time dateTime={source.updatedAt}>{timeFormat.format(new Date(source.updatedAt))}</time>

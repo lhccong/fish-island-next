@@ -7,6 +7,7 @@
   min-height: 0;
 }
 .viewport {
+  position: relative;
   width: 100%;
   height: 100%;
   overscroll-behavior: contain;
@@ -69,5 +70,22 @@
   .root:focus-within .scrollbar,
   .scrollbar[data-state='visible']:active {
     opacity: 1;
+  }
+}
+
+.viewport > div > [data-loading-indicator='region']:only-child {
+  position: absolute;
+  inset: 4px;
+  min-height: 0;
+}
+.viewport > div:has(> [data-loading='true']) {
+  height: 100%;
+}
+.root[data-gutter='reserved'] .viewport > div > [data-loading-indicator='region']:only-child {
+  inset-inline-end: var(--scroll-area-reserved-gutter, var(--space-6));
+}
+@media (max-width: 760px) {
+  .root[data-gutter='reserved'] .viewport > div > [data-loading-indicator='region']:only-child {
+    inset-inline-end: var(--scroll-area-reserved-gutter, var(--space-5));
   }
 }

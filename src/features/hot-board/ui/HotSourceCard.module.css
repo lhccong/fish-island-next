@@ -12,6 +12,53 @@
   box-shadow: var(--shadow-hot-card);
   transform: translateY(-2px);
 }
+.card[data-presentation='island'] {
+  border: 5px solid var(--color-pixel-wood);
+  border-radius: 2px;
+  background: var(--color-pixel-paper);
+  box-shadow:
+    3px 3px 0 var(--color-pixel-wood-dark),
+    inset 0 0 0 2px var(--color-pixel-wood-light);
+  --color-hot-surface: var(--color-pixel-paper);
+  --color-hot-text: var(--color-pixel-ink);
+  --color-hot-muted: var(--color-pixel-muted);
+  --color-hot-border: color-mix(in srgb, var(--color-pixel-border) 35%, transparent);
+}
+.card[data-presentation='island']:hover {
+  transform: none;
+  box-shadow:
+    3px 3px 0 var(--color-pixel-wood-dark),
+    inset 0 0 0 2px var(--color-pixel-wood-light);
+}
+.card[data-presentation='island'] .header {
+  gap: 4px 8px;
+  height: auto;
+  min-height: 62px;
+  flex-wrap: wrap;
+  padding: 6px 12px;
+  border-bottom: 3px solid var(--color-pixel-wood);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 15px, var(--color-hot-border) 15px 16px),
+    var(--color-pixel-paper-inset);
+}
+.card[data-presentation='island'] .ribbon {
+  top: -9px;
+  right: 8px;
+  padding-inline: 10px;
+  border: 2px solid var(--color-pixel-wood-dark);
+  background: var(--color-pixel-wood);
+  color: var(--color-on-accent);
+  box-shadow: 2px 2px 0 var(--color-pixel-wood-dark);
+  font-size: 12px;
+  height: 24px;
+  line-height: 20px;
+}
+.card[data-presentation='island'] .ribbon::after {
+  display: none;
+}
+.card[data-presentation='island'] .body {
+  padding: 8px;
+}
 .header {
   display: flex;
   align-items: center;

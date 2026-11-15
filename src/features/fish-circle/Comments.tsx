@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -188,7 +189,11 @@ export function Comments({
         <div className={styles.scrollContent}>
           {anchor.message && (
             <p className={styles.targetNotice} role="status">
-              {anchor.message}
+              {anchor.searching ? (
+                <LoadingIndicator compact>{anchor.message}</LoadingIndicator>
+              ) : (
+                anchor.message
+              )}
             </p>
           )}
           {anchor.paused && (
@@ -196,7 +201,7 @@ export function Comments({
               继续查找该评论
             </Button>
           )}
-          {result.status === 'loading' && <p role="status">正在加载评论…</p>}
+          {result.status === 'loading' && <LoadingIndicator>正在加载评论…</LoadingIndicator>}
           {result.status === 'error' && (
             <p role="alert">
               {result.message}

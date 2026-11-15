@@ -3,7 +3,15 @@ import { senderTitle } from '@/domain/chat';
 import { MemberAvatar } from './MemberAvatar';
 import { useChatRealtime } from './realtime-context';
 import styles from './Repetition.module.css';
-function Participant({ id, showTitle }: { id: string; showTitle: boolean }) {
+function Participant({
+  id,
+  showTitle,
+  showFrame,
+}: {
+  id: string;
+  showTitle: boolean;
+  showFrame: boolean;
+}) {
   const { controller } = useChatRealtime();
   const message = useStore(controller.store, (state) => state.messages[id]);
   if (!message) return null;
@@ -14,6 +22,7 @@ function Participant({ id, showTitle }: { id: string; showTitle: boolean }) {
     <li className={styles.participant} aria-label={label} title={label}>
       <span className={styles.avatar}>
         <MemberAvatar
+          showFrame={showFrame}
           size="compact"
           key={`${message.senderId}:${message.senderAvatar ?? ''}`}
           member={{
@@ -30,9 +39,11 @@ function Participant({ id, showTitle }: { id: string; showTitle: boolean }) {
 export function RepetitionParticipants({
   ids,
   showTitles = true,
+  showFrames = true,
 }: {
   ids: readonly string[];
   showTitles?: boolean;
+  showFrames?: boolean;
 }) {
   const { controller } = useChatRealtime();
   // Identity changes are delivered through the group's stable IDs; each participant subscribes to its entity.
@@ -45,7 +56,7 @@ export function RepetitionParticipants({
     <div className={styles.participants} role="group" aria-label={`连续复读：${ids.length}条`}>
       <ul className={styles.people} aria-label="复读参与者">
         {[...participants.values()].map((id) => (
-          <Participant key={id} id={id} showTitle={showTitles} />
+          <Participant key={id} id={id} showTitle={showTitles} showFrame={showFrames} />
         ))}
       </ul>
     </div>

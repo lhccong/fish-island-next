@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import type { LandlordsPort } from '@/domain/landlords';
 import { Button } from '@/shared/ui/Button';
@@ -89,7 +90,7 @@ export function RoomChat({
           onChange={(e) => setDraft(e.target.value)}
         />
         <Button type="submit" disabled={sending || !draft.trim()}>
-          {sending ? '发送中…' : '发送'}
+          {sending ? <LoadingIndicator compact>{'发送中…'}</LoadingIndicator> : '发送'}
         </Button>
       </form>
       {error && <p role="alert">{error}</p>}

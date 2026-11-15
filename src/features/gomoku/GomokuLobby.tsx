@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useId, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import type { GomokuController } from './controller';
@@ -27,7 +28,7 @@ export function GomokuLobby({
       </div>
       <div className={styles.lobbyActions}>
         <Button onClick={() => controller.create()} disabled={busy || !connected}>
-          {busy ? '正在准备房间…' : '创建联机房间'}
+          {busy ? <LoadingIndicator compact>{'正在准备房间…'}</LoadingIndicator> : '创建联机房间'}
         </Button>
         <form
           className={styles.join}

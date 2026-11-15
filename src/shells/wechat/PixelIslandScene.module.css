@@ -1,0 +1,13 @@
+.scene {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: url('/skins/pixel-island/harbor.png') center 58% / cover no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .scene {
+    background-position: 27% 57%;
+  }
+}

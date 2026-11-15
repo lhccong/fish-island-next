@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import type { AuthUser, AvatarFrame } from '@/domain/auth';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -12,10 +13,12 @@ const noFrame: AvatarFrame = { id: '-1', name: '不使用头像框', url: '', po
 
 export default function AvatarFramesDialog({
   user,
+  embedded = false,
   returnFocusRef,
   onClose,
 }: {
   user: AuthUser;
+  embedded?: boolean;
   returnFocusRef: RefObject<HTMLElement | null>;
   onClose: () => void;
 }) {
@@ -68,27 +71,17 @@ export default function AvatarFramesDialog({
       if (mounted.current) setBusy(false);
     }
   }
-  return (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open && !busy) onClose();
-      }}
-      returnFocusRef={returnFocusRef}
-      title="头像框"
-      description="为你的头像挑一个装扮"
-      hideDescription
-      dismissLabel="关闭头像框"
-      showCloseAction={false}
-      className={styles.dialog ?? ''}
-    >
-      <div className={styles.summary}>
+  const content = (
+    <>
+      <div className={styles.summary} hidden={embedded}>
         <span>可用积分</span>
         <strong>{available}</strong>
       </div>
       <ScrollArea label="头像框列表" gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.body}>
-          {pages.result.status === 'loading' && <p role="status">正在加载头像框…</p>}
+          {pages.result.status === 'loading' && (
+            <LoadingIndicator>正在加载头像框…</LoadingIndicator>
+          )}
           {pages.result.status === 'error' && (
             <div role="alert">
               <p>{pages.result.message}</p>
@@ -168,7 +161,7 @@ export default function AvatarFramesDialog({
         </div>
       </ScrollArea>
       <div className={styles.feedback}>
-        {busy && <p role="status">正在保存…</p>}
+        {busy && <LoadingIndicator compact>正在保存…</LoadingIndicator>}
         {feedback.error && !confirmation && <p role="alert">{feedback.error}</p>}
         {feedback.success && <p role="status">{feedback.success}</p>}
       </div>
@@ -191,11 +184,29 @@ export default function AvatarFramesDialog({
               disabled={busy || pending !== null}
               onClick={() => void act(confirmation, true)}
             >
-              {busy ? '兑换中…' : '确认兑换'}
+              {busy ? <LoadingIndicator compact>{'兑换中…'}</LoadingIndicator> : '确认兑换'}
             </Button>
           </div>
         </Dialog>
       )}
+    </>
+  );
+  if (embedded) return <section className={styles.embedded}>{content}</section>;
+  return (
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open && !busy) onClose();
+      }}
+      returnFocusRef={returnFocusRef}
+      title="头像框"
+      description="为你的头像挑一个装扮"
+      hideDescription
+      dismissLabel="关闭头像框"
+      showCloseAction={false}
+      className={styles.dialog ?? ''}
+    >
+      {content}
     </Dialog>
   );
 }

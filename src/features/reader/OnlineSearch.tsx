@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { useEffect, useRef, useState } from 'react';
 import { AlertCircle, BookOpen, LoaderCircle, Search } from 'lucide-react';
@@ -176,12 +177,7 @@ export function OnlineSearch({
           </div>
         )
       )}
-      {status === 'loading' && (
-        <p className={styles.loading} role="status">
-          <LoaderCircle size={15} aria-hidden="true" />
-          正在搜索书源…
-        </p>
-      )}
+      {status === 'loading' && <LoadingIndicator compact>正在搜索书源…</LoadingIndicator>}
     </div>
   );
 }

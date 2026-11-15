@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState, type RefObject } from 'react';
 import type { FishCirclePort, MomentAction } from '@/domain/fish-circle';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -82,7 +83,11 @@ export function MomentActionDialog({
           </button>
           {!result && (
             <button type="submit" disabled={operation.pending}>
-              {operation.pending ? '处理中…' : '确认'}
+              {operation.pending ? (
+                <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
+              ) : (
+                '确认'
+              )}
             </button>
           )}
         </div>

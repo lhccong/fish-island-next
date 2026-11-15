@@ -33,27 +33,35 @@ export function WorkspaceLayout({
   const skinId = useAppearanceStore((state) => state.skinId);
   const { pathname } = useLocation();
   const gamePage = pathname.startsWith('/game/');
-  const backTo = pathname.startsWith('/game/stock/')
-    ? '/game/stock'
-    : gamePage
-      ? '/discover/games'
-      : pathname === '/chat'
-        ? '/'
-        : '/discover';
-  const backLabel = pathname.startsWith('/game/stock/')
-    ? '返回股市概览'
-    : gamePage
-      ? '返回游戏'
-      : pathname === '/chat'
-        ? '返回热榜'
-        : '返回发现';
+  const adminPage = pathname.startsWith('/admin/');
+  const backTo = adminPage
+    ? '/admin'
+    : pathname.startsWith('/game/stock/')
+      ? '/game/stock'
+      : gamePage
+        ? '/discover/games'
+        : pathname === '/chat'
+          ? '/'
+          : '/discover';
+  const backLabel = adminPage
+    ? '返回管理页'
+    : pathname.startsWith('/game/stock/')
+      ? '返回股市概览'
+      : gamePage
+        ? '返回游戏'
+        : pathname === '/chat'
+          ? '返回热榜'
+          : '返回发现';
   const mobileRoot = pathname === '/' || pathname === '/discover' || pathname === '/user/login';
-  const shellId: ShellId = skinId === 'wps' ? 'wps' : 'wechat';
+  const shellId: ShellId =
+    skinId === 'wps' ? 'wps' : skinId === 'pixel-island' ? 'pixel-island' : 'wechat';
   const mobileNavigationMode = mobileNavigation ?? (mobileRoot ? 'tabs' : 'hidden');
   return (
     <WechatShell
       {...(sidebarLabel ? { sidebarLabel } : {})}
       navigationLayout={shellId === 'wps' ? 'ribbon' : 'rail'}
+      presentation={shellId === 'pixel-island' ? 'island' : 'default'}
+      showScene={pathname === '/' || pathname === '/chat' || pathname === '/discover'}
       hideSidebar={hideSidebar}
       {...(sidebarVariant ? { sidebarVariant } : {})}
       hideMobileHeader={hideMobileHeader}
@@ -63,7 +71,11 @@ export function WorkspaceLayout({
         ...slots,
         status: <AccountToolsHost />,
         header: (
-          <div className={styles.header} data-mobile-header={mobileHeader}>
+          <div
+            className={styles.header}
+            data-mobile-header={mobileHeader}
+            data-island={shellId === 'pixel-island'}
+          >
             {!mobileRoot && (
               <Link
                 className={styles.back}

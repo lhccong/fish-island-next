@@ -1,0 +1,19 @@
+.ink {
+  fill: currentColor;
+}
+.paper {
+  fill: var(--color-surface);
+}
+.detail {
+  fill: var(--color-accent);
+}
+.wood {
+  fill: var(--color-pixel-wood);
+}
+.icon {
+  display: block;
+  flex-shrink: 0;
+}
+.gold {
+  fill: var(--color-pixel-wood-light);
+}

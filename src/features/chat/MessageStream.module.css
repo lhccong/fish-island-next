@@ -148,6 +148,34 @@
 .row[data-self='true'] .bubble {
   background: var(--color-message-outgoing);
 }
+:global([data-chat-decoration='island'])
+  .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
+    [data-revoked='true']
+  ) {
+  --color-muted: var(--color-pixel-muted);
+  --color-border: var(--color-pixel-border);
+  color: var(--color-pixel-ink);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 23px,
+      color-mix(in srgb, var(--color-pixel-border) 12%, transparent) 23px 24px
+    ),
+    var(--color-pixel-paper);
+  border: 3px solid var(--color-pixel-wood);
+  border-radius: 2px;
+  box-shadow:
+    2px 2px 0 var(--color-pixel-wood-dark),
+    inset 0 0 0 1px var(--color-pixel-wood-light);
+}
+:global([data-chat-decoration='island'])
+  .row[data-self='true']
+  .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
+    [data-revoked='true']
+  ) {
+  border-color: var(--color-accent-text);
+  background-color: var(--color-pixel-paper-inset);
+}
 .row .bubble[data-red-packet-content='true'],
 .row .bubble[data-image-only='true'] {
   padding: 0;
@@ -172,9 +200,48 @@
   color: var(--color-muted);
 }
 .latest {
-  margin-left: auto;
+  position: absolute;
+  right: 104px;
+  bottom: 12px;
+  z-index: 2;
+  padding-top: 6px;
+}
+.latest .latestButton {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+.latestBadge {
+  position: absolute;
+  top: -7px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 2px solid var(--color-surface);
+  border-radius: 999px;
+  background: var(--color-danger);
+  color: var(--color-on-accent);
+  font-size: 10px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+:global([data-color-mode='dark']) .latestBadge {
+  color: var(--color-canvas);
 }
 @media (max-width: 760px) {
+  .latest {
+    right: 100px;
+    bottom: 8px;
+  }
+  .latest .latestButton {
+    width: 44px;
+    height: 44px;
+  }
   .row {
     padding: 10px 24px 10px 16px;
   }

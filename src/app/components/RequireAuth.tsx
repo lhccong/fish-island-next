@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -9,7 +10,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   if (session.status === 'checking')
     return (
       <main className={styles.page}>
-        <p role="status">正在恢复登录状态…</p>
+        <LoadingIndicator>正在恢复登录状态…</LoadingIndicator>
       </main>
     );
   if (session.status === 'error')

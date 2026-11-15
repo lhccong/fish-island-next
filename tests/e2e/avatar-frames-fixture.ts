@@ -111,7 +111,7 @@ export async function frameFixture(page: Page, skin: string, mode: string) {
       json: {
         code: 0,
         data: {
-          total: state.catalog === 'empty' ? 0 : 13,
+          total: state.catalog === 'empty' ? '0' : '13',
           records:
             state.catalog === 'empty'
               ? []

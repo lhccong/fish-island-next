@@ -12,13 +12,16 @@ import { MomentMenu } from './MomentMenu';
 import { CircleAvatar } from './CircleAvatar';
 import { formatMomentTime } from './format-time';
 import styles from './MomentCard.module.css';
+import { MomentText } from './MomentText';
 interface Props {
   moment: Moment;
   user: AuthUser;
   service: FishCirclePort;
   onRefresh: () => void;
   onViewUser: (id: string, name: string) => void;
-  variant?: 'feed' | 'detail';
+  variant?: 'feed' | 'detail' | 'island';
+  onLikeChange?: (liked: boolean, count: number) => void;
+  onCommentDelta?: (delta: number) => void;
   commentTarget?: CommentTarget | null;
 }
 export function MomentCard({
@@ -29,13 +32,19 @@ export function MomentCard({
   onViewUser,
   variant = 'feed',
   commentTarget = null,
+  onLikeChange,
+  onCommentDelta,
 }: Props) {
-  const [likes, setLikes] = useState({ liked: moment.liked, count: moment.likes });
-  const [commentCount, setCommentCount] = useState(moment.comments);
+  const [localLikes, setLikes] = useState({ liked: moment.liked, count: moment.likes });
+  const likes =
+    variant === 'island' && onLikeChange
+      ? { liked: moment.liked, count: moment.likes }
+      : localLikes;
+  const [localCommentCount, setCommentCount] = useState(moment.comments);
+  const commentCount = variant === 'island' && onCommentDelta ? moment.comments : localCommentCount;
   const [comments, setComments] = useState(false);
   const [editing, setEditing] = useState(false);
   const [action, setAction] = useState<MomentAction | null>(null);
-  const [expanded, setExpanded] = useState(false);
   const [notice, setNotice] = useState('');
   const operation = useOperation();
   const moreRef = useRef<HTMLButtonElement>(null);
@@ -82,18 +91,18 @@ export function MomentCard({
             </button>
             {moment.visibility === 1 && <span className={styles.private}>仅自己可见</span>}
           </div>
+          {variant === 'island' && (
+            <time className={styles.islandTime} dateTime={moment.createdAt}>
+              {formatMomentTime(moment.createdAt)}
+            </time>
+          )}
         </div>
         <div className={styles.body}>
-          <p className={styles.text}>
-            {expanded || moment.content.length <= 500
-              ? moment.content
-              : `${moment.content.slice(0, 500)}…`}
-          </p>
-          {moment.content.length > 500 && (
-            <button type="button" onClick={() => setExpanded(!expanded)}>
-              {expanded ? '收起全文' : '展开全文'}
-            </button>
-          )}
+          <MomentText
+            content={moment.content}
+            compact={variant === 'island'}
+            className={styles.text ?? ''}
+          />
           <MediaGrid media={moment.media} />
           {moment.location && (
             <p className={styles.location}>
@@ -107,9 +116,11 @@ export function MomentCard({
             </p>
           )}
           <div className={styles.footer}>
-            <time className={styles.time} dateTime={moment.createdAt}>
-              {formatMomentTime(moment.createdAt)}
-            </time>
+            {variant !== 'island' && (
+              <time className={styles.time} dateTime={moment.createdAt}>
+                {formatMomentTime(moment.createdAt)}
+              </time>
+            )}
             <div className={styles.actions}>
               <button
                 type="button"
@@ -121,6 +132,10 @@ export function MomentCard({
                     .run((signal) => service.like(moment.id, signal))
                     .then((liked) => {
                       if (liked !== undefined) {
+                        onLikeChange?.(
+                          liked,
+                          Math.max(0, likes.count + (liked === likes.liked ? 0 : liked ? 1 : -1)),
+                        );
                         setLikes((old) => ({
                           liked,
                           count: Math.max(
@@ -160,6 +175,7 @@ export function MomentCard({
                       if (ok) onRefresh();
                     });
                 }}
+                direction={variant === 'island' ? 'horizontal' : 'vertical'}
               />
             </div>
           </div>
@@ -171,7 +187,10 @@ export function MomentCard({
           )}
         </div>
       </div>
-      {(variant === 'detail' || comments || moment.comments > 0 || commentTarget) && (
+      {(variant === 'detail' ||
+        comments ||
+        (variant !== 'island' && moment.comments > 0) ||
+        commentTarget) && (
         <div className={styles.commentsPane}>
           <Comments
             onStartReply={() => setComments(true)}
@@ -182,7 +201,10 @@ export function MomentCard({
             userId={user.id}
             canManage={owner || admin}
             admin={admin}
-            onCountChange={(delta) => setCommentCount((n) => Math.max(0, n + delta))}
+            onCountChange={(delta) => {
+              setCommentCount((n) => Math.max(0, n + delta));
+              onCommentDelta?.(delta);
+            }}
           />
         </div>
       )}

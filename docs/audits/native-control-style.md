@@ -62,3 +62,7 @@
 ## 斗地主迁移（ADR-067）
 
 入口：游戏 → 斗地主。src/features/landlords/Ranking.tsx 排序使用共享 Select；Lobby.tsx 加入房间及离房确认使用共享 Dialog，表单和榜单使用 reserved ScrollArea，操作使用共享 Button。未引入原生 select、alert/confirm/prompt；详细验证与限制见 [斗地主验收](landlords-migration.md)。
+
+## 管理工作台（ADR-076）
+
+入口：桌面主导航/手机发现 → 管理页，仅管理员可见。`src/app/components/AdminEntry.tsx` 与 `AdminNavigation.tsx` 使用路由链接和朋友圈同款列表导航，取消下拉菜单；`src/features/admin/fields.tsx` 的所有选择值均复用共享 Select；删除、封禁、举报处理与编辑使用共享 Dialog、Button 和 reserved ScrollArea。旧版 Ant Design/ProTable 不复制，无新增原生 select、alert/confirm/prompt。日期字段保留原生日期输入语义与手机系统能力，输入外观使用语义颜色统一。整改状态：新迁移入口与七项页面已采用共享控件，验收范围见 [管理工作台验收](admin-workspace.md)。

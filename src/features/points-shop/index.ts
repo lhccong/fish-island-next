@@ -1,0 +1,1 @@
+export { PointsShop } from './PointsShop';

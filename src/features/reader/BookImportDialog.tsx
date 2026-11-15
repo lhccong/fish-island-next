@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useRef, useState, type RefObject } from 'react';
 import { FileUp } from 'lucide-react';
 import { importTextBook, type ReaderService } from '@/domain/reader';
@@ -45,7 +46,7 @@ export function BookImportDialog({
         <div className={styles.import}>
           <Button variant="secondary" disabled={importing} onClick={() => fileRef.current?.click()}>
             <FileUp size={16} aria-hidden="true" />
-            {importing ? '正在导入…' : '导入 TXT'}
+            {importing ? <LoadingIndicator compact>{'正在导入…'}</LoadingIndicator> : '导入 TXT'}
           </Button>
           <span>本地文件 · UTF-8 / GB18030 · 最大 10 MB</span>
         </div>

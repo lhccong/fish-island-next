@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import styles from './InfiniteScroll.module.css';
 
 export function InfiniteScroll({
@@ -47,10 +48,10 @@ export function InfiniteScroll({
             重试{label}
           </Button>
         </div>
+      ) : loading ? (
+        <LoadingIndicator compact>正在加载{label}…</LoadingIndicator>
       ) : (
-        <p>
-          {loading ? `正在加载${label}…` : (summary ?? (hasMore ? '继续下滑加载' : '已全部加载'))}
-        </p>
+        <p>{summary ?? (hasMore ? '继续下滑加载' : '已全部加载')}</p>
       )}
     </div>
   );

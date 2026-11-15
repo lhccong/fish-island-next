@@ -150,6 +150,42 @@
 .navigation .mobileEntry {
   display: none;
 }
+@media (min-width: 761px) {
+  .navigation[data-shell='pixel-island'] {
+    position: relative;
+    isolation: isolate;
+    gap: 24px;
+    padding: 18px 6px;
+  }
+  .navigation[data-shell='pixel-island']::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: auto 0 92px;
+    height: 160px;
+    background: url('/skins/pixel-island/shore.svg') center bottom / 100% auto no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  .navigation[data-shell='pixel-island'] .item {
+    width: 60px;
+    min-height: 60px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .navigation[data-shell='pixel-island'] .item > span:not([aria-label]) {
+    display: inline;
+  }
+  .navigation[data-shell='pixel-island'] .item[aria-current='page'] {
+    background: var(--color-surface);
+    box-shadow:
+      2px 0 0 var(--color-accent-text),
+      -2px 0 0 var(--color-accent-text),
+      0 2px 0 var(--color-accent-text),
+      0 -2px 0 var(--color-accent-text),
+      3px 4px 0 var(--color-border);
+  }
+}
 @media (max-width: 760px) {
   .navigation,
   .navigation[data-shell='wps'] {

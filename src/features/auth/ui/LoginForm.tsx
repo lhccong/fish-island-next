@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState, type FormEvent } from 'react';
 import { Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
 import type { LoginCredentials } from '@/domain/auth';
@@ -86,7 +87,7 @@ export function LoginForm({ onSubmit, pending, error }: LoginFormProps) {
         </p>
       )}
       <button className={styles.submit} type="submit" disabled={pending}>
-        {pending ? '正在登录…' : '登录'}
+        {pending ? <LoadingIndicator compact>{'正在登录…'}</LoadingIndicator> : '登录'}
       </button>
       <p className={styles.note}>与原摸鱼岛共用账号，邮箱同样使用密码登录。</p>
     </form>

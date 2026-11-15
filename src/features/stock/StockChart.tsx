@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useState } from 'react';
 import { indices, type StockPort } from '@/domain/stock';
 import { Select } from '@/shared/ui/Select';
@@ -43,7 +44,7 @@ export function StockChart({
         />
       </div>
       {state.status === 'loading' ? (
-        <p role="status">正在加载日 K 与成交标记…</p>
+        <LoadingIndicator>正在加载日 K 与成交标记…</LoadingIndicator>
       ) : state.status === 'error' ? (
         <div role="alert">
           <p>{state.message}</p>

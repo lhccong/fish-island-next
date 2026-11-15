@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -137,7 +138,7 @@ export function WebsiteSettingsForm() {
         </div>
       </ScrollArea>
       <div className={styles.feedback}>
-        {busy && <p role="status">正在处理图标…</p>}
+        {busy && <LoadingIndicator compact>正在处理图标…</LoadingIndicator>}
         {error && <p role="alert">{error}</p>}
         {feedback && <p role="status">{feedback}</p>}
       </div>

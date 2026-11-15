@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -111,7 +112,7 @@ function EmoticonList({
   const pages = useInfinitePages(load);
   return (
     <ScrollArea label="表情包列表" gutter="reserved" className={styles.scroll ?? ''}>
-      {pages.result.status === 'loading' && <p role="status">正在加载表情包…</p>}
+      {pages.result.status === 'loading' && <LoadingIndicator>正在加载表情包…</LoadingIndicator>}
       {pages.result.status === 'error' && (
         <div role="alert">
           <p>{pages.result.message}</p>

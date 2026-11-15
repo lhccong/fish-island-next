@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { AuthUser } from '@/domain/auth';
@@ -120,11 +121,7 @@ export function CircleFeed({
         )}
         <div className={styles.timeline}>
           {notice && <p role="status">{notice}</p>}
-          {result.status === 'loading' && (
-            <p className={styles.state} role="status">
-              正在加载鱼小圈…
-            </p>
-          )}
+          {result.status === 'loading' && <LoadingIndicator>正在加载鱼小圈…</LoadingIndicator>}
           {result.status === 'error' && (
             <div className={styles.state} role="alert">
               <p>{result.message}</p>

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { BookOpen, Plus, Settings, Trash2, List } from 'lucide-react';
 import { type ReaderService } from '@/domain/reader';
@@ -66,7 +67,7 @@ export function ReaderWorkspace({
         )}
         {notice && <p role="status">{notice}</p>}
         {!initialized ? (
-          <p role="status">正在读取书架…</p>
+          <LoadingIndicator>正在读取书架…</LoadingIndicator>
         ) : storageError && books.length === 0 ? (
           <div className={styles.empty}>
             <h3>书架暂时无法读取</h3>

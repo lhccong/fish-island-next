@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useEffect, useRef } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import type { CircleReminder, FishCirclePort } from '@/domain/fish-circle';
@@ -44,11 +45,7 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
       </div>
       <ScrollArea label="动态详情内容" gutter="reserved" className={styles.scroll || ''}>
         <div className={styles.content}>
-          {result.status === 'loading' && (
-            <p className={styles.state} role="status">
-              正在加载动态详情…
-            </p>
-          )}
+          {result.status === 'loading' && <LoadingIndicator>正在加载动态详情…</LoadingIndicator>}
           {result.status === 'error' && (
             <div className={styles.state} role="alert">
               <p>{result.message}</p>

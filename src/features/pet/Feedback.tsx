@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { ReactNode } from 'react';
 import { Button } from '@/shared/ui/Button';
 import type { Resource } from './resource';
@@ -12,12 +13,7 @@ export function ResourceView<T>({
   reload: () => void;
   children: (data: T) => ReactNode;
 }) {
-  if (state.status === 'loading')
-    return (
-      <div className={styles.feedback} role="status">
-        正在整理营地资料…
-      </div>
-    );
+  if (state.status === 'loading') return <LoadingIndicator>正在整理营地资料…</LoadingIndicator>;
   if (state.status === 'error')
     return (
       <div className={styles.feedback} role="alert">

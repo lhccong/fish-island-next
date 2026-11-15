@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useState } from 'react';
 import type { AccountToolsPort, DeveloperApp } from '@/domain/account-tools';
 import { Button } from '@/shared/ui/Button';
@@ -56,7 +57,7 @@ export function DeveloperApps({ port }: { port: AccountToolsPort }) {
       </div>
       <ScrollArea label="开放平台应用列表" gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.fields}>
-          {state.status === 'loading' && <p role="status">正在读取应用…</p>}
+          {state.status === 'loading' && <LoadingIndicator>正在读取应用…</LoadingIndicator>}
           {state.status === 'error' && (
             <div>
               <p role="alert">{state.message}</p>

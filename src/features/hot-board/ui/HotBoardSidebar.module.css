@@ -130,3 +130,32 @@
   background: var(--color-accent);
   border-radius: 50%;
 }
+.sidebar[data-decoration='island'] .search {
+  border: 2px solid var(--color-border);
+  box-shadow: 2px 2px 0 var(--color-border);
+}
+.sidebar[data-decoration='island'] .item {
+  margin: 4px 8px;
+  width: calc(100% - 16px);
+  border: 2px solid var(--color-pixel-wood);
+  background: var(--color-pixel-paper);
+  color: var(--color-pixel-ink);
+  box-shadow: 2px 2px 0 var(--color-pixel-wood-dark);
+}
+.sidebar[data-decoration='island'] .itemText small {
+  color: var(--color-pixel-muted);
+}
+.sidebar[data-decoration='island'] .item[aria-pressed='true'] .itemText small {
+  color: var(--color-selected-muted);
+}
+.sidebar[data-decoration='island'] .item[aria-pressed='true'] {
+  background: var(--color-action);
+  border-color: var(--color-action);
+  color: var(--color-on-accent);
+}
+.sidebar[data-decoration='island'] .item:hover {
+  background: var(--color-hover);
+}
+.sidebar[data-decoration='island'] .item[aria-pressed='true']:hover {
+  background: var(--color-action);
+}

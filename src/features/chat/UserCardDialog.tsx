@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { Bug, Sprout, Aperture } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
@@ -79,7 +80,7 @@ export function UserCardDialog({
       <div className={styles.content} data-cover={!!card?.cover}>
         <ScrollArea label="用户卡片内容" gutter="reserved" className={styles.scroll ?? ''}>
           <div className={styles.body}>
-            {state.status === 'loading' && <p role="status">正在读取用户资料…</p>}
+            {state.status === 'loading' && <LoadingIndicator>正在读取用户资料…</LoadingIndicator>}
             {state.status === 'error' && (
               <div>
                 <p role="alert">{state.message}</p>
@@ -146,11 +147,13 @@ export function UserCardDialog({
                         }
                         onClick={() => void resource.toggleFollow()}
                       >
-                        {resource.busy
-                          ? '处理中…'
-                          : state.status === 'ready' && state.following
-                            ? '取消关注'
-                            : '关注'}
+                        {resource.busy ? (
+                          <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
+                        ) : state.status === 'ready' && state.following ? (
+                          '取消关注'
+                        ) : (
+                          '关注'
+                        )}
                       </Button>
                     )}
                   </div>

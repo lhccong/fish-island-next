@@ -7,6 +7,8 @@ import { WpsOfficeTools } from './WpsOfficeTools';
 import styles from './WorkspaceNavigation.module.css';
 import { WorkspaceAccount } from './WorkspaceAccount';
 import { NotificationBadge } from '@/features/fish-circle/notifications';
+import { PixelIcon } from '@/shared/ui/PixelIcon';
+import { AdminEntry } from './AdminEntry';
 
 export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId }) {
   const location = useLocation();
@@ -18,11 +20,19 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
       </div>
       <nav className={styles.items} aria-label="主要功能">
         <NavLink to="/" end className={styles.item ?? ''} aria-label="热榜">
-          <ContactRound size={23} aria-hidden="true" />
+          {shellId === 'pixel-island' ? (
+            <PixelIcon name="flame" />
+          ) : (
+            <ContactRound size={23} aria-hidden="true" />
+          )}
           <span>热榜</span>
         </NavLink>
         <NavLink to="/chat" className={styles.item ?? ''} aria-label="聊天">
-          <MessageCircle size={23} aria-hidden="true" />
+          {shellId === 'pixel-island' ? (
+            <PixelIcon name="message" />
+          ) : (
+            <MessageCircle size={23} aria-hidden="true" />
+          )}
           <span>聊天</span>
         </NavLink>
         <Link
@@ -42,7 +52,11 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
               : undefined
           }
         >
-          <Compass size={23} aria-hidden="true" />
+          {shellId === 'pixel-island' ? (
+            <PixelIcon name="palm" />
+          ) : (
+            <Compass size={23} aria-hidden="true" />
+          )}
           <span>鱼小圈</span>
           <NotificationBadge />
         </Link>
@@ -51,10 +65,15 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
           className={`${styles.item} ${styles.mobileEntry}`}
           aria-label="发现"
         >
-          <Compass size={23} aria-hidden="true" />
+          {shellId === 'pixel-island' ? (
+            <PixelIcon name="palm" />
+          ) : (
+            <Compass size={23} aria-hidden="true" />
+          )}
           <span>发现</span>
           <NotificationBadge />
         </NavLink>
+        <AdminEntry placement="rail" />
       </nav>
       <div className={styles.bottom}>
         <ThemePicker presentation={shellId === 'wps' ? 'ribbon' : 'rail'} />

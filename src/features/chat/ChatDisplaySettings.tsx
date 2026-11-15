@@ -16,6 +16,15 @@ export function ChatDisplaySettings() {
       </div>
       {avatarPreference.notice && <p role="status">{avatarPreference.notice}</p>}
       <div className={styles.setting}>
+        <span>隐藏头像框</span>
+        <Switch
+          label="隐藏头像框"
+          checked={avatarPreference.hideAvatarFrames}
+          onCheckedChange={avatarPreference.changeFrames}
+        />
+      </div>
+      {avatarPreference.frameNotice && <p role="status">{avatarPreference.frameNotice}</p>}
+      <div className={styles.setting}>
         <span>默认不渲染图片</span>
         <Switch
           label="默认不渲染图片"

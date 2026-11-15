@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useRef, useState, type RefObject } from 'react';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
@@ -199,8 +200,8 @@ function ImageCanvas({
           </span>
         )}
         {image && status === 'loading' && (
-          <span className={styles.status} role="status">
-            大图加载中…
+          <span className={styles.status}>
+            <LoadingIndicator>大图加载中…</LoadingIndicator>
           </span>
         )}
         {image && status === 'error' && (

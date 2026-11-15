@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { DrawPort, DrawIdentity } from '@/domain/draw';
 import { Button } from '@/shared/ui/Button';
@@ -62,7 +63,7 @@ export function GuessComposer({
           }}
         />
         <Button type="submit" disabled={disabled || busy || !draft.trim()}>
-          {busy ? '提交中…' : '提交猜词'}
+          {busy ? <LoadingIndicator compact>{'提交中…'}</LoadingIndicator> : '提交猜词'}
         </Button>
       </div>
       {feedback && <p role="status">{feedback}</p>}

@@ -1,0 +1,149 @@
+.statistics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.stat:hover {
+  background: var(--color-hover);
+}
+.stat strong {
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+.stat small {
+  font-size: 14px;
+  font-weight: 400;
+}
+.trend {
+  min-width: 0;
+  padding: 24px;
+  background: var(--color-surface);
+  border-radius: var(--radius-panel);
+}
+.trend h2 {
+  margin: 0 0 20px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.controls > label {
+  max-width: 190px;
+  flex: 1 1 150px;
+}
+.controls .cycle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cycle button[aria-pressed='true'] {
+  background: var(--color-action);
+  border-color: var(--color-action);
+  color: var(--color-on-accent);
+}
+.chart {
+  display: block;
+  width: 100%;
+  height: 350px;
+  color: var(--color-accent-text);
+}
+.chart line {
+  stroke: var(--color-border);
+}
+.chart text {
+  fill: var(--color-muted);
+  font-size: 12px;
+}
+.chart polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.chart circle {
+  fill: currentColor;
+}
+.accessible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .statistics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .stat {
+    padding: 16px;
+    gap: 10px;
+  }
+  .stat strong {
+    font-size: 24px;
+  }
+  .trend {
+    padding: 12px;
+  }
+  .controls {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .controls > label {
+    max-width: none;
+    flex-basis: 100%;
+  }
+  .controls .cycle {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .chart {
+    height: 240px;
+  }
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 380px;
+  min-width: 0;
+}
+.range > span {
+  flex: none;
+  font-size: 13px;
+}
+.range > div {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .range {
+    flex-basis: 100%;
+  }
+  .range > span {
+    font-size: 14px;
+  }
+}

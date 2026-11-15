@@ -1,5 +1,6 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
-import { Check, Heart, ScanLine, CircleCheck, LoaderCircle } from 'lucide-react';
+import { Check, Heart, ScanLine, CircleCheck } from 'lucide-react';
 import type { AboutPort } from '@/domain/about';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -129,8 +130,12 @@ export function PaymentDialog({
                   打开支付页面
                 </a>
               )}
-              <p role="status">
-                {payment.checking ? '正在查询支付结果…' : '等待支付结果，支付后可手动查询'}
+              <p>
+                {payment.checking ? (
+                  <LoadingIndicator compact>正在查询支付结果…</LoadingIndicator>
+                ) : (
+                  '等待支付结果，支付后可手动查询'
+                )}
               </p>
               <p className={styles.muted}>关闭弹窗会停止查询；未确认支付的订单不会显示为成功。</p>
             </div>
@@ -156,12 +161,12 @@ export function PaymentDialog({
               type="submit"
               disabled={!valid || payment.step === 'creating'}
             >
+              {payment.step !== 'creating' && <Heart size={15} aria-hidden="true" />}
               {payment.step === 'creating' ? (
-                <LoaderCircle size={15} className={paymentStyles.spinner} aria-hidden="true" />
+                <LoadingIndicator compact>{'创建订单中…'}</LoadingIndicator>
               ) : (
-                <Heart size={15} aria-hidden="true" />
+                `确认打赏 ￥${valid ? amount : '--'}`
               )}
-              {payment.step === 'creating' ? '创建订单中…' : `确认打赏 ￥${valid ? amount : '--'}`}
             </Button>
           )}
           {payment.step === 'waiting' && (

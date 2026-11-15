@@ -1,8 +1,9 @@
 import { useState, type CSSProperties } from 'react';
 import { Check, Palette } from 'lucide-react';
-import { builtinSkins, getSkinTokens } from '@/skins/builtin';
+import { builtinSkins, getSkinTokens, getSkinPresentationTokens } from '@/skins/builtin';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
+import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { useAppearanceStore } from './model/appearance-store';
 import styles from './ThemePicker.module.css';
 import { ColorModePicker } from './ColorModePicker';
@@ -48,48 +49,58 @@ export function ThemePicker({ presentation = 'rail' }: { presentation?: 'rail' |
         <WebsiteSettingsForm />
       ) : (
         <>
-          <ColorModePicker />
-          <div className={styles.options} role="group" aria-label="主题选择">
-            {builtinSkins.map((skin) => (
-              <button
-                className={styles.option}
-                key={skin.id}
-                type="button"
-                aria-label={skin.name}
-                aria-pressed={skinId === skin.id}
-                onClick={() => setSkinId(skin.id)}
-              >
-                <span
-                  className={styles.preview}
-                  style={getSkinTokens(skin.id, colorMode) as CSSProperties}
-                  aria-hidden="true"
-                >
-                  <span className={styles.previewRail}>
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className={styles.previewSidebar}>
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className={styles.previewChat}>
-                    <i className={styles.previewHeading} />
-                    <i className={styles.incoming} />
-                    <i className={styles.outgoing} />
-                    <i className={styles.previewInput} />
-                  </span>
-                </span>
-                <span className={styles.caption}>
-                  <span>{skin.name}</span>
-                  <span className={styles.selection} aria-hidden="true">
-                    {skinId === skin.id && <Check size={12} strokeWidth={3} />}
-                  </span>
-                </span>
-              </button>
-            ))}
-          </div>
+          <ScrollArea label="主题选项" gutter="reserved" className={styles.scroll ?? ''}>
+            <div className={styles.body}>
+              <ColorModePicker />
+              <div className={styles.options} role="group" aria-label="主题选择">
+                {builtinSkins.map((skin) => (
+                  <button
+                    className={styles.option}
+                    key={skin.id}
+                    type="button"
+                    aria-label={skin.name}
+                    aria-pressed={skinId === skin.id}
+                    onClick={() => setSkinId(skin.id)}
+                  >
+                    <span
+                      className={styles.preview}
+                      data-skin={skin.id}
+                      style={
+                        {
+                          ...getSkinTokens(skin.id, colorMode),
+                          ...getSkinPresentationTokens(skin.id, colorMode),
+                        } as CSSProperties
+                      }
+                      aria-hidden="true"
+                    >
+                      <span className={styles.previewRail}>
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                      <span className={styles.previewSidebar}>
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                      <span className={styles.previewChat}>
+                        <i className={styles.previewHeading} />
+                        <i className={styles.incoming} />
+                        <i className={styles.outgoing} />
+                        <i className={styles.previewInput} />
+                      </span>
+                    </span>
+                    <span className={styles.caption}>
+                      <span>{skin.name}</span>
+                      <span className={styles.selection} aria-hidden="true">
+                        {skinId === skin.id && <Check size={12} strokeWidth={3} />}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
           <div className={styles.footer}>
             <Button variant="secondary" onClick={() => setWebsite(true)}>
               网站设置

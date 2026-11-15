@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
 import type { AuthUser } from '@/domain/auth';
@@ -53,11 +54,7 @@ export function OnlineLobby({
           )}
         </div>
       </div>
-      {state.status === 'loading' && (
-        <p role="status" className={styles.notice}>
-          正在同步房间…
-        </p>
-      )}
+      {state.status === 'loading' && <LoadingIndicator>正在同步房间…</LoadingIndicator>}
       {state.error && (
         <div role="alert" className={styles.notice}>
           <p>{state.error}</p>

@@ -14,6 +14,7 @@ export function ChatWorkspace({
   onRenameGroup,
   presentation = 'conversation',
   toolbarAction,
+  decoration = 'none',
 }: {
   membersOpen: boolean;
   onCloseMembers: () => void;
@@ -21,10 +22,16 @@ export function ChatWorkspace({
   onRenameGroup: (name: string) => void;
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
+  decoration?: 'none' | 'island';
 }) {
   const { state, refresh } = useChatMembers();
   const messages = (
-    <div key="messages" className={styles.messages}>
+    <div
+      key="messages"
+      className={styles.messages}
+      data-decoration={decoration}
+      data-chat-decoration={decoration}
+    >
       <MessageStream presentation={presentation} />
     </div>
   );

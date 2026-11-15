@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import { useRemarks } from './remarks-context';
@@ -40,7 +41,7 @@ export function OnlineMembers({
     <ul className={styles.memberGrid} id="online-members-grid">
       {visible.map((member) => (
         <li key={member.id} title={member.name}>
-          <MemberAvatar key={`${member.id}:${member.avatar}`} member={member} />
+          <MemberAvatar key={`${member.id}:${member.avatar}`} member={member} showFrame={false} />
           <span className={styles.memberName}>
             <RemarkName id={member.id} name={member.name} />
           </span>
@@ -85,9 +86,7 @@ export function OnlineMembers({
         <ScrollArea label="在线成员滚动区">
           <div className={styles.memberBody}>
             {(state.status === 'idle' || state.status === 'loading') && (
-              <p role="status" className={styles.memberState}>
-                正在获取在线成员…
-              </p>
+              <LoadingIndicator>正在获取在线成员…</LoadingIndicator>
             )}
             {state.status === 'error' && (
               <div role="alert" className={styles.memberState}>

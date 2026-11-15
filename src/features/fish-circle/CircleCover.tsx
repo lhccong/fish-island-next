@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowLeft, Camera } from 'lucide-react';
 import type { CircleProfile, FishCirclePort } from '@/domain/fish-circle';
@@ -90,11 +91,7 @@ export function CircleCover({
           封面资料加载失败，重试
         </button>
       )}
-      {state.status === 'loading' && (
-        <span className={styles.loading} role="status">
-          正在加载封面资料…
-        </span>
-      )}
+      {state.status === 'loading' && <LoadingIndicator>正在加载封面资料…</LoadingIndicator>}
       <div className={styles.profile}>
         <div className={styles.info}>
           <h2>{name}</h2>

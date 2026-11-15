@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type { GomokuSocialPort, PublicGameMessage } from '@/domain/gomoku';
@@ -105,7 +106,7 @@ export function PublicGameChat({ port }: { port: GomokuSocialPort }) {
           }}
         />
         <Button type="submit" disabled={pending || !draft.trim()}>
-          {pending ? '发送中…' : '发送'}
+          {pending ? <LoadingIndicator compact>{'发送中…'}</LoadingIndicator> : '发送'}
         </Button>
       </form>
       {error && (

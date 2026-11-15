@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useState } from 'react';
 import type { FishCirclePort } from '@/domain/fish-circle';
 import { useOperation } from './use-operation';
@@ -43,7 +44,13 @@ export function FollowControl({ userId, service }: { userId: string; service: Fi
               });
           }}
         >
-          {following === null ? '正在加载关注…' : following ? '取消关注' : '关注'}
+          {following === null ? (
+            <LoadingIndicator compact>{'正在加载关注…'}</LoadingIndicator>
+          ) : following ? (
+            '取消关注'
+          ) : (
+            '关注'
+          )}
         </button>
       )}
       {operation.error && <span role="alert">{operation.error}</span>}

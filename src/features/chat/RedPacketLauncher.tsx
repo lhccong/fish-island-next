@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
@@ -26,7 +27,7 @@ export function RedPacketLauncher() {
       }
     >
       {open && (
-        <Suspense fallback={<p role="status">正在加载红包表单…</p>}>
+        <Suspense fallback={<LoadingIndicator>正在加载红包表单…</LoadingIndicator>}>
           <Form onClose={() => setOpen(false)} />
         </Suspense>
       )}

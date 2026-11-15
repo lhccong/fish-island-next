@@ -87,9 +87,11 @@ for (const skin of builtinSkins)
         dialog = await openPanel(page, '挑战');
         await dialog.getByRole('combobox', { name: '挑战分类' }).click();
         await page.getByRole('option', { name: '每日排位', exact: true }).click();
-        await dialog.getByRole('button', { name: '挑战排位', exact: true }).click();
-        await confirm(page, '挑战排位');
-        await expect(dialog.getByRole('status')).toContainText('挑战胜利');
+        await dialog.getByRole('button', { name: '挑战排位', exact: true }).first().click();
+        const tournament = page.getByRole('dialog', { name: '挑战排位', exact: true });
+        await tournament.getByRole('button', { name: '确认', exact: true }).click();
+        await expect(tournament.getByRole('status')).toContainText('挑战胜利');
+        await tournament.getByRole('button', { name: '返回榜单', exact: true }).click();
         expect(state.activity.competitions).toBe(1);
         await dialog.getByRole('combobox', { name: '挑战分类' }).click();
         await page.getByRole('option', { name: '逐层试炼', exact: true }).click();

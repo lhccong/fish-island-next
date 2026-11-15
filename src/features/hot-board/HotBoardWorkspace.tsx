@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState, type ReactNode } from 'react';
 import { SearchX } from 'lucide-react';
 import type { HotBoardPort } from '@/domain/hot-board';
@@ -17,7 +18,7 @@ import styles from './ui/HotBoard.module.css';
 interface HotBoardWorkspaceProps {
   service: HotBoardPort;
   currentUser: Pick<AuthUser, 'name' | 'avatarUrl'> | null;
-  presentation?: 'cards' | 'table';
+  presentation?: 'cards' | 'table' | 'island';
   renderLayout: (slots: {
     sidebar: ReactNode;
     header: ReactNode;
@@ -66,6 +67,7 @@ export function HotBoardWorkspace({
     ) : null,
     sidebar: (
       <HotBoardSidebar
+        decoration={presentation === 'island' ? 'island' : 'none'}
         sources={resource.sources}
         selectedId={effectiveSourceId}
         onSelect={selectSource}
@@ -79,6 +81,7 @@ export function HotBoardWorkspace({
           onBack={selected ? clearFilters : null}
           sourcePicker={
             <MobileSourcePicker
+              decoration={presentation === 'island' ? 'island' : 'none'}
               sources={resource.sources}
               selectedId={effectiveSourceId}
               onSelect={selectSource}
@@ -98,7 +101,11 @@ export function HotBoardWorkspace({
           onRefresh={refresh}
         />
       ) : (
-        <div className={selected ? styles.detail : styles.board}>
+        <div
+          className={selected ? styles.detail : styles.board}
+          data-presentation={presentation}
+          data-loading={resource.status === 'loading' && resource.sources.length === 0}
+        >
           {!selected && (
             <HotBoardToolbar
               sources={resource.sources}
@@ -131,30 +138,27 @@ export function HotBoardWorkspace({
             </div>
           )}
           {resource.status === 'loading' && (
-            <p className={styles.feedback} role="status">
+            <LoadingIndicator compact={resource.sources.length > 0}>
               {resource.sources.length ? '正在刷新热榜…' : '正在获取各平台热榜…'}
-            </p>
+            </LoadingIndicator>
           )}
-          {resource.status === 'loading' && resource.sources.length === 0 ? (
-            <div className={styles.grid} aria-hidden="true">
-              {[1, 2, 3, 4].map((id) => (
-                <div key={id} className={styles.skeleton}>
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              ))}
-            </div>
-          ) : null}
+
           {visible.length > 0 ? (
             selected && visible[0] ? (
-              <HotSourceConversation source={visible[0]} currentUser={currentUser} />
+              <HotSourceConversation
+                source={visible[0]}
+                currentUser={currentUser}
+                decoration={presentation === 'island' ? 'island' : 'none'}
+              />
             ) : (
               <div className={styles.grid}>
                 {visible.map((source) => (
-                  <HotSourceCard key={source.id} source={source} onOpen={selectSource} />
+                  <HotSourceCard
+                    key={source.id}
+                    source={source}
+                    onOpen={selectSource}
+                    presentation={presentation === 'island' ? 'island' : 'default'}
+                  />
                 ))}
               </div>
             )

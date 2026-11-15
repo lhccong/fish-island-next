@@ -39,10 +39,9 @@ export function createPetActivities(
 ): Pick<PetPort, 'tournament' | 'compete' | 'supplies' | 'supply' | 'draw' | 'drawRecords'> {
   return {
     async tournament(signal) {
-      const [ranks, mine] = await Promise.all([
-        request('pet/tournament/leaderboard', signal),
-        request('pet/tournament/my/rank', signal),
-      ]);
+      // Reading the leaderboard auto-enrols the current companion on the server.
+      const ranks = await request('pet/tournament/leaderboard', signal);
+      const mine = await request('pet/tournament/my/rank', signal);
       return {
         mine: mine === null ? null : number(mine),
         ranks: list(ranks, (value) => {

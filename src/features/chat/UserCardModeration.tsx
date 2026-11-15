@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState, useId } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { UserCardPort, UserMute } from '@/domain/account-tools';
@@ -54,7 +55,7 @@ function ModerationControls({ port, id }: { port: UserCardPort; id: string }) {
   }
   return (
     <div className={styles.moderationControls}>
-      {!info && !error && <p role="status">正在读取禁言状态…</p>}
+      {!info && !error && <LoadingIndicator>正在读取禁言状态…</LoadingIndicator>}
       {error && <p role="alert">{error}</p>}
       {notice && <p role="status">{notice}</p>}
       {!info && error && (
@@ -97,7 +98,7 @@ function ModerationControls({ port, id }: { port: UserCardPort; id: string }) {
                   取消
                 </Button>
                 <Button disabled={busy} onClick={() => void submit()}>
-                  {busy ? '提交中…' : '确认'}
+                  {busy ? <LoadingIndicator compact>{'提交中…'}</LoadingIndicator> : '确认'}
                 </Button>
               </div>
             </>

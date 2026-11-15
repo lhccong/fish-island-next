@@ -1,28 +1,38 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Flame, Search } from 'lucide-react';
 import type { HotSource } from '@/domain/hot-board';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './HotBoardSidebar.module.css';
+import { IslandSourceScene } from './IslandSourceScene';
 
 interface HotBoardSidebarProps {
   sources: readonly HotSource[];
   selectedId: string;
   onSelect: (id: string) => void;
   loading: boolean;
+  decoration?: 'none' | 'island';
 }
 
-export function HotBoardSidebar({ sources, selectedId, onSelect, loading }: HotBoardSidebarProps) {
+export function HotBoardSidebar({
+  sources,
+  selectedId,
+  onSelect,
+  loading,
+  decoration = 'none',
+}: HotBoardSidebarProps) {
   const [query, setQuery] = useState('');
   const filtered = sources.filter((source) =>
     source.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
   );
   return (
-    <div className={styles.sidebar}>
+    <div className={styles.sidebar} data-decoration={decoration}>
       <div className={styles.heading}>
-        <span>发现</span>
-        <span>热榜订阅</span>
+        <span>{decoration === 'island' ? '摸鱼岛' : '发现'}</span>
+        <span>{decoration === 'island' ? '热榜码头' : '热榜订阅'}</span>
       </div>
+      {decoration === 'island' && <IslandSourceScene />}
       <label className={styles.search}>
         <Search size={15} aria-hidden="true" />
         <input
@@ -68,12 +78,15 @@ export function HotBoardSidebar({ sources, selectedId, onSelect, loading }: HotB
             </button>
           ))}
           {!filtered.length && (
-            <p className={styles.notice}>{loading ? '正在加载来源…' : '没有匹配的来源'}</p>
+            <p className={styles.notice}>
+              {loading ? <LoadingIndicator>{'正在加载来源…'}</LoadingIndicator> : '没有匹配的来源'}
+            </p>
           )}
         </nav>
       </ScrollArea>
       <div className={styles.bottom}>
-        <span className={styles.dot} /> 微信风格 · 鱼岛工作台
+        <span className={styles.dot} />{' '}
+        {decoration === 'island' ? '摸鱼岛 · 像素海岸' : '微信风格 · 鱼岛工作台'}
       </div>
     </div>
   );

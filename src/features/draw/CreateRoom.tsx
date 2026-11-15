@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { DrawSettings } from '@/domain/draw';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -98,7 +99,7 @@ export function CreateRoom({
             })
           }
         >
-          {busy ? '创建中…' : '确认创建'}
+          {busy ? <LoadingIndicator compact>{'创建中…'}</LoadingIndicator> : '确认创建'}
         </Button>
       </div>
     </Dialog>

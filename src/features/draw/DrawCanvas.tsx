@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import type { DrawPort } from '@/domain/draw';
 import { Button } from '@/shared/ui/Button';
@@ -188,7 +189,13 @@ export function DrawCanvas({
       </div>
       {editable && (
         <div className={styles.canvasFeedback}>
-          <div role="status">{sync || '落笔后自动同步'}</div>
+          <div role="status">
+            {sync === '正在同步画作…' ? (
+              <LoadingIndicator compact>{sync}</LoadingIndicator>
+            ) : (
+              sync || '落笔后自动同步'
+            )}
+          </div>
           {error && (
             <div role="alert">
               {error}

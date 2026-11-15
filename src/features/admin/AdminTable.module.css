@@ -1,0 +1,147 @@
+.viewport {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 4px 4px 16px;
+  color: var(--color-text);
+}
+.viewport:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: -2px;
+}
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  text-align: left;
+}
+.table[data-section='user'] {
+  min-width: 1320px;
+}
+.table[data-section='equipment'] {
+  min-width: 1000px;
+}
+.table[data-section='report'] {
+  min-width: 1600px;
+}
+.table th {
+  height: 48px;
+  padding: 12px 16px;
+  font-weight: 500;
+  background: var(--color-sidebar);
+  white-space: nowrap;
+}
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+.table th button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.table th button:hover {
+  color: var(--color-accent-text);
+}
+.cell {
+  min-width: 0;
+  max-width: 280px;
+  white-space: pre-wrap;
+}
+.actionColumn {
+  min-width: 150px;
+  width: 1%;
+  white-space: nowrap;
+}
+.table[data-section='user'] .actionColumn {
+  min-width: 450px;
+}
+.viewport[data-section='report'] .actionColumn {
+  position: sticky;
+  right: -4px;
+  z-index: 1;
+  box-shadow: -4px 0 8px color-mix(in srgb, var(--color-border) 35%, transparent);
+}
+.feedback {
+  height: 240px;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .viewport {
+    overflow: visible;
+    padding: 4px;
+  }
+  .table,
+  .table[data-section],
+  .table tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .table tr[data-admin-record] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+  }
+  .table td {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    width: auto;
+    font-size: 14px;
+  }
+  .table td[data-label]::before {
+    content: attr(data-label);
+    color: var(--color-muted);
+  }
+  .table td[data-primary='true'] {
+    order: -1;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  .cell {
+    max-width: none;
+  }
+  .table[data-section] .actionColumn {
+    display: block;
+    position: static;
+    min-width: 0;
+    width: auto;
+    white-space: normal;
+    box-shadow: none;
+  }
+  .table td.feedback {
+    display: block;
+    height: auto;
+    min-height: 240px;
+  }
+}

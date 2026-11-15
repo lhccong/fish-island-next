@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { equipmentSlots, type Companion, type PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
@@ -64,7 +65,11 @@ export function CarePanel({
               type="submit"
               disabled={operation.pending || !name.trim() || name.trim() === pet.name}
             >
-              {operation.pending ? '保存中…' : '保存名字'}
+              {operation.pending ? (
+                <LoadingIndicator compact>{'保存中…'}</LoadingIndicator>
+              ) : (
+                '保存名字'
+              )}
             </Button>
           </div>
         </form>

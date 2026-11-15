@@ -6,6 +6,8 @@ import styles from './Tools.module.css';
 import { isWorkDay, timeMinute as minute, validSchedule } from '@/domain/account-tools';
 import { Select } from '@/shared/ui/Select';
 import { readSchedule, scheduleKey } from './work-schedule';
+import { WorkTimeOrb } from './WorkTimeOrb';
+import workStyles from './WorkTime.module.css';
 export function WorkTime({ visible }: { visible: boolean }) {
   const [saved, setSaved] = useState(readSchedule);
   const [draft, setDraft] = useState(saved);
@@ -26,27 +28,40 @@ export function WorkTime({ visible }: { visible: boolean }) {
   const remaining = Math.max(0, Math.round((target - current) * 60));
   const countdown = `${Math.floor(remaining / 3600)}时${Math.floor((remaining % 3600) / 60)}分${remaining % 60}秒`;
   const label = current < start ? '上班' : current < lunch ? '午饭' : '下班';
+  const working = isWorkDay(now, saved);
+  const progress = working ? Math.min(1, Math.max(0, (current - start) / (end - start))) : 0;
+  const status = !working ? '今天休息' : remaining ? `距${label}` : '已下班';
+  const clock = remaining
+    ? [Math.floor(remaining / 3600), Math.floor((remaining % 3600) / 60), remaining % 60]
+        .map((value) => String(value).padStart(2, '0'))
+        .join(':')
+    : '辛苦了';
   if (!visible) return null;
   return (
     <>
-      <div className={styles.timer}>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            setDraft(saved);
-            setNotice('');
-            setError('');
-            setOpen(true);
-          }}
-          aria-label="工作时间设置"
-        >
-          {!isWorkDay(now, saved)
-            ? '今天休息'
-            : remaining
-              ? `距${label} ${countdown}`
-              : '今日工作已结束'}
-        </Button>
-      </div>
+      <WorkTimeOrb
+        label={status}
+        time={!working ? '好好放松' : clock}
+        progress={progress}
+        suspended={open}
+        phase={
+          !working
+            ? 'rest'
+            : !remaining
+              ? 'done'
+              : current < start
+                ? 'start'
+                : current < lunch
+                  ? 'lunch'
+                  : 'end'
+        }
+        onOpen={() => {
+          setDraft(saved);
+          setNotice('');
+          setError('');
+          setOpen(true);
+        }}
+      />
       <Dialog
         title="工作时间"
         description="仅在此浏览器计算时间和收入估算，不代表考勤。按当日时间计算，暂不支持跨夜班次。"
@@ -79,6 +94,28 @@ export function WorkTime({ visible }: { visible: boolean }) {
         >
           <ScrollArea label="工作时间内容" gutter="reserved" className={styles.scroll ?? ''}>
             <div className={`${styles.fields} ${styles.formGrid}`}>
+              <section className={workStyles.overview} aria-label="今日工作概览">
+                <div className={workStyles.summary}>
+                  <span>{status}</span>
+                  <strong>{!working ? '好好放松' : remaining ? countdown : '辛苦了'}</strong>
+                </div>
+                <div className={workStyles.timeline}>
+                  <span>
+                    上班<b>{saved.start}</b>
+                  </span>
+                  <span>
+                    午饭<b>{saved.lunch}</b>
+                  </span>
+                  <span>
+                    下班<b>{saved.end}</b>
+                  </span>
+                </div>
+                {saved.salary > 0 && (
+                  <p className={workStyles.income}>
+                    今日收入估算 ¥{((progress * saved.salary) / saved.days).toFixed(2)}
+                  </p>
+                )}
+              </section>
               <div className={styles.timeFields}>
                 {(
                   [
@@ -153,17 +190,6 @@ export function WorkTime({ visible }: { visible: boolean }) {
               <p className={`${styles.hint} ${styles.span}`}>
                 按所选工作制计算，不包含法定节假日调休。
               </p>
-              {saved.salary > 0 && (
-                <p>
-                  今日收入估算：¥
-                  {(isWorkDay(now, saved)
-                    ? ((Math.min(Math.max(current - start, 0), end - start) / (end - start)) *
-                        saved.salary) /
-                      saved.days
-                    : 0
-                  ).toFixed(2)}
-                </p>
-              )}
             </div>
           </ScrollArea>
           <div className={styles.feedback}>
@@ -171,6 +197,9 @@ export function WorkTime({ visible }: { visible: boolean }) {
             {notice && <p role="status">{notice}</p>}
           </div>
           <div className={styles.actions}>
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              取消
+            </Button>
             <Button type="submit">保存</Button>
           </div>
         </form>

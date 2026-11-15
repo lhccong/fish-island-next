@@ -18,6 +18,20 @@
   flex: 1;
   min-height: 0;
 }
+.messages[data-decoration='island'] {
+  position: relative;
+  isolation: isolate;
+}
+.messages[data-decoration='island']::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: url('/skins/pixel-island/harbor.png') 30% center / cover no-repeat;
+  opacity: 0.16;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
 .empty {
   display: flex;
   align-items: center;

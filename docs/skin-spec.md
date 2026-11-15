@@ -157,3 +157,13 @@ ADR-066 你画我猜以主题 surface/canvas/text/muted/border/action 呈现工�
 ADR-067 斗地主全部主题共用 surface/canvas/text/muted/border/action/accent 语义变量，牌面红色使用 danger 并保留花色文字；明暗模式不反色图片。手机手牌分行、44px 选牌控件、自然换行操作；外观切换保留手牌选择、对局与聊天草稿，不额外请求或重连。
 
 你画我猜样式调整（2026-11-15）：题目/计时/房间操作收拢到同一信息带；画布工具置顶、作品独立留边，玩家以昵称首字作占位。窄容器单列画布，手机将猜词区前置于玩家列表之前。全部配色沿用现有语义 token，画纸/颜料保持原貌，不改变请求和状态边界。
+
+ADR-072 武道大会沿用 surface/canvas/text/muted/border/accent/action 语义变量，桌面前三席三列、窄容器和手机纵向；确认与记录使用 reserved 滚动区，全部主题明暗共享同一状态，不额外请求。
+
+ADR-071 积分商城复用 surface/canvas/text/muted/border/accent/action 语义变量；桌面道具网格、手机单列及四项分类，头像框复用现有呈现。明暗及全部主题保持分页、兑换确认和同步状态，普通按钮维持桌面 32px、手机 44px，正文使用 reserved ScrollArea。
+
+ADR-074 新增 pixel-island（摸鱼岛像素风），app 显式映射到同名外壳标识，并复用 WechatShell 的 island 呈现。十二色契约保持不变；受信任 SkinPresentationTokens 只允许文字/边框/滑轨/面板/圆角/阴影覆盖，SkinProvider 切换时清理。海景铺满既有标题栏，不新增高度；桌面导航采用自有像素图标与海岸装饰，侧栏使用像素列表框线。手机保留既有分层底栏。热榜 island 呈现复用现有像素纸面/木板局部变量，低透明度海景作为正文背景。全部业务继续使用现有语义变量，暗夜画布 #191A1C，插画保持原色。主题选择使用固定头尾及 reserved ScrollArea。第三方白名单不变。
+
+ADR-075 的我的小岛复用 surface/text/muted/border/action 与既有 pixel 纸面/木框语义变量，桌面 reserved 侧栏、手机独立 Dialog。像素文字气泡使用木板框线和纸面，图片、红包、福袋与撤回保持原呈现；不增加消息行订阅，不影响主题切换或请求。
+
+ADR-077 的我的海岛侧栏使用 surface/text/muted/border/action 变量、邮筒海岸装饰和手账/鱼小圈分段页签。动态 island 变体按参考图呈现头像、时间、图像及横排操作；明暗保留照片原貌，手机独立面板复用同一数据与布局。

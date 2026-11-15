@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import {
   ArrowDownWideNarrow,
@@ -56,7 +57,11 @@ export function WpsHotTable({
   }
 
   return (
-    <section className={styles.sheet} aria-label="热榜多维表格">
+    <section
+      className={styles.sheet}
+      aria-label="热榜多维表格"
+      data-loading={status === 'loading' && sources.length === 0}
+    >
       <header className={styles.heading}>
         <h1>
           <Table2 size={18} aria-hidden="true" />
@@ -113,9 +118,9 @@ export function WpsHotTable({
         </label>
       </div>
       {status === 'loading' && (
-        <p className={styles.feedback} role="status">
+        <LoadingIndicator compact={sources.length > 0}>
           {sources.length ? '正在刷新热榜…' : '正在获取各平台热榜…'}
-        </p>
+        </LoadingIndicator>
       )}
       {status === 'error' && (
         <div className={styles.error} role="alert">

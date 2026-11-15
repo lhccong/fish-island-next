@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useStore } from 'zustand';
 import { useChatRealtime } from './realtime-context';
 import styles from './MessageStream.module.css';
@@ -15,7 +16,11 @@ export function ConnectionStatus() {
   const state = useStore(controller.store, (value) => value.connection);
   return (
     <span className={styles.connection} role="status" aria-label="聊天室连接状态">
-      {labels[state]}
+      {state === 'connecting' || state === 'reconnecting' ? (
+        <LoadingIndicator compact>{labels[state]}</LoadingIndicator>
+      ) : (
+        labels[state]
+      )}
     </span>
   );
 }

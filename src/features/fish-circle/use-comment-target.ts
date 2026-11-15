@@ -70,6 +70,7 @@ export function useCommentTarget({
   return {
     match,
     message,
+    searching: ready && match?.status === 'missing' && !error && hasMore && items.length < limit,
     paused: !!target && match?.status === 'missing' && hasMore && items.length >= limit,
     continueSearch: () => setLimit(items.length + 200),
   };

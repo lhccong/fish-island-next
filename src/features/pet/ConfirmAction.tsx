@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -54,7 +55,7 @@ export function ConfirmAction({
             })
           }
         >
-          {operation.pending ? '处理中…' : '确认'}
+          {operation.pending ? <LoadingIndicator compact>{'处理中…'}</LoadingIndicator> : '确认'}
         </Button>
       </div>
     </Dialog>

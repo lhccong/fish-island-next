@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { Position, Quote } from '@/domain/stock';
 import { Button } from '@/shared/ui/Button';
 import type { Resource } from './use-resource';
@@ -36,11 +37,13 @@ export function StockStats({
       <article>
         <span>可用积分</span>
         <strong className={styles.down}>
-          {balance.status === 'ready'
-            ? amount(balance.data)
-            : balance.status === 'loading'
-              ? '加载中…'
-              : '—'}
+          {balance.status === 'ready' ? (
+            amount(balance.data)
+          ) : balance.status === 'loading' ? (
+            <LoadingIndicator compact>{'加载中…'}</LoadingIndicator>
+          ) : (
+            '—'
+          )}
           <small>{balance.status === 'ready' ? ' 积分' : ''}</small>
         </strong>
         {balance.status === 'error' && (

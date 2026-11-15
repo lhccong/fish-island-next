@@ -1,6 +1,6 @@
 import { useLayoutEffect, type ReactNode } from 'react';
 import { useAppearanceStore } from '@/features/appearance';
-import { getSkinTokens } from '@/skins/builtin';
+import { getSkinTokens, getSkinPresentationTokens } from '@/skins/builtin';
 
 export function SkinProvider({ children }: { children: ReactNode }) {
   const skinId = useAppearanceStore((state) => state.skinId);
@@ -10,7 +10,10 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     root.dataset.skin = skinId;
     root.dataset.colorMode = colorMode;
     root.style.colorScheme = colorMode;
-    const entries = Object.entries(getSkinTokens(skinId, colorMode));
+    const entries = Object.entries({
+      ...getSkinTokens(skinId, colorMode),
+      ...getSkinPresentationTokens(skinId, colorMode),
+    });
     entries.forEach(([name, value]) => root.style.setProperty(name, value));
     return () => {
       entries.forEach(([name]) => root.style.removeProperty(name));

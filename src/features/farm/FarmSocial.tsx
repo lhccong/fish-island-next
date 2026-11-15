@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FarmPort, Friend, Visitor, Farmer } from '@/domain/farm';
 import { Button } from '@/shared/ui/Button';
@@ -116,7 +117,7 @@ export function FarmSocial({
       </nav>
       <ScrollArea label="农场列表" gutter="reserved" className={styles.dialogScroll ?? ''}>
         <div className={socialStyles.body}>
-          {loading && <p role="status">正在加载…</p>}
+          {loading && <LoadingIndicator>正在加载…</LoadingIndicator>}
           {error && (
             <p role="alert">
               {error}{' '}
@@ -154,7 +155,7 @@ export function FarmSocial({
               disabled={reading || loading || !visitors.some((v) => !v.read)}
               onClick={() => void markRead()}
             >
-              {reading ? '标记中…' : '全部已读'}
+              {reading ? <LoadingIndicator compact>{'标记中…'}</LoadingIndicator> : '全部已读'}
             </Button>
           )}
         </div>

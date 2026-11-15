@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import type { RedPacketPort, RedPacketRecord } from '@/domain/chat';
 import { Button } from '@/shared/ui/Button';
@@ -56,7 +57,7 @@ export function RedPacketRecords({ id, port }: { id: string; port: RedPacketPort
       className={`${styles.dialog}`}
     >
       <ScrollArea label="红包领取记录" gutter="reserved" className={`${styles.records}`}>
-        {state.status === 'loading' && <p role="status">记录加载中…</p>}
+        {state.status === 'loading' && <LoadingIndicator>记录加载中…</LoadingIndicator>}
         {state.status === 'error' && (
           <div role="alert">
             <p>{state.message}</p>

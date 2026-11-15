@@ -1,0 +1,26 @@
+.image,
+.fallback {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-control);
+  background: var(--color-sidebar);
+  color: var(--color-muted);
+}
+.image {
+  position: relative;
+}
+.image img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+.image img[data-loaded='false'] {
+  visibility: hidden;
+}
+.image > [role='status'] {
+  position: absolute;
+  inset: 0;
+  font-size: 10px;
+}

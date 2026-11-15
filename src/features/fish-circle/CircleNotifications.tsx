@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { useCallback, useRef, useState, type CSSProperties } from 'react';
 import { Bell, CheckCheck, RefreshCw, Trash2, MoreHorizontal } from 'lucide-react';
@@ -165,7 +166,7 @@ export function CircleNotifications({ service, onViewDetail }: Props) {
         </div>
         {error && <p role="alert">{error}</p>}
         {notifications.error && <p role="alert">未读数暂不可用，刷新消息通知可重试。</p>}
-        {pending && <p role="status">正在处理通知…</p>}
+        {pending && <LoadingIndicator compact>正在处理通知…</LoadingIndicator>}
         {notice && <p role="status">{notice}</p>}
         {(deleting || deleteAll) && (
           <div className={styles.confirm}>
@@ -214,11 +215,7 @@ export function CircleNotifications({ service, onViewDetail }: Props) {
         )}
         <ScrollArea label="互动消息列表" gutter="reserved" className={styles.list || ''}>
           <div className={styles.entries}>
-            {result.status === 'loading' && (
-              <p className={styles.state} role="status">
-                正在加载消息通知…
-              </p>
-            )}
+            {result.status === 'loading' && <LoadingIndicator>正在加载消息通知…</LoadingIndicator>}
             {result.status === 'error' && (
               <div className={styles.state} role="alert">
                 <p>{result.message}</p>

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useState } from 'react';
 import type { AccountToolsPort } from '@/domain/account-tools';
 import { Button } from '@/shared/ui/Button';
@@ -31,7 +32,7 @@ export function FollowList({
         className={styles.scroll ?? ''}
       >
         <div className={styles.fields}>
-          {pages.result.status === 'loading' && <p role="status">正在读取列表…</p>}
+          {pages.result.status === 'loading' && <LoadingIndicator>正在读取列表…</LoadingIndicator>}
           {pages.result.status === 'error' && (
             <div>
               <p role="alert">{pages.result.message}</p>

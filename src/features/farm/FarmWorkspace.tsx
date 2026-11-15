@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useRef, useState } from 'react';
 import { Droplets, Mail, Sprout, Users, Wheat } from 'lucide-react';
 import { isMature, watering, type FarmPort, type FarmVisit } from '@/domain/farm';
@@ -124,11 +125,7 @@ function FarmSession({
           pending={farm.busy || (farm.loading && !!data)}
         />
       )}
-      {farm.loading && !data && (
-        <p className={styles.feedback} role="status">
-          正在照看田地…
-        </p>
-      )}
+      {farm.loading && !data && <LoadingIndicator>正在照看田地…</LoadingIndicator>}
       {farm.error && (
         <div className={styles.feedback} role="alert">
           <p>{farm.error}</p>

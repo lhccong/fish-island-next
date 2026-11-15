@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useId, useRef, useState } from 'react';
 import { ImagePlus, X } from 'lucide-react';
 import type { Comment, FishCirclePort, Media } from '@/domain/fish-circle';
@@ -150,10 +151,10 @@ export function CommentComposer({ service, momentId, reply, onCancelReply, onSen
           className={styles.send || ''}
           disabled={busy || (!content.trim() && !images.length)}
         >
-          {send.pending ? '正在发送…' : '发送评论'}
+          {send.pending ? <LoadingIndicator compact>{'正在发送…'}</LoadingIndicator> : '发送评论'}
         </Button>
       </div>
-      {upload.pending && <p role="status">正在上传评论图片…</p>}
+      {upload.pending && <LoadingIndicator compact>正在上传评论图片…</LoadingIndicator>}
       {(mediaError || send.error || upload.error) && (
         <p role="alert">{mediaError || send.error || upload.error}</p>
       )}

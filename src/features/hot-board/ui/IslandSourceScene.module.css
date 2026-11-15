@@ -1,0 +1,22 @@
+.scene {
+  flex-shrink: 0;
+  height: 108px;
+  margin: 0 12px 16px;
+  border: 3px solid var(--color-pixel-wood);
+  background: url('/skins/pixel-island/harbor.png') left center / cover no-repeat;
+  box-shadow: 2px 2px 0 var(--color-pixel-wood-dark);
+  image-rendering: pixelated;
+}
+@media (max-width: 760px) {
+  .scene {
+    height: 100px;
+    margin: 0 4px;
+    background-position: 15% center;
+  }
+}
+@media (max-height: 620px) {
+  .scene {
+    height: 60px;
+    background-position: 25% 60%;
+  }
+}

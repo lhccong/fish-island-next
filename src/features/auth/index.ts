@@ -5,3 +5,4 @@ export { LoginPanel } from './LoginPanel';
 export { LoginDialog } from './LoginDialog';
 export { AuthNotice } from './AuthNotice';
 export { AccountControl } from './AccountControl';
+export { AvatarFramesPanel } from './LazyAvatarFramesPanel';

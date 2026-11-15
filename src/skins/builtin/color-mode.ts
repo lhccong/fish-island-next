@@ -14,6 +14,13 @@ const darkAccents: Record<
     | '--color-message-outgoing'
   >
 > = {
+  'pixel-island': {
+    '--color-accent': '#236f67',
+    '--color-accent-soft': '#233e39',
+    '--color-accent-text': '#91ddc8',
+    '--color-selected-muted': '#e4f8f0',
+    '--color-message-outgoing': '#274a40',
+  },
   wechat: {
     '--color-accent': '#147b4b',
     '--color-accent-soft': '#203c2e',

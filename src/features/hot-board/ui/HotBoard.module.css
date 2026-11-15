@@ -7,6 +7,17 @@
 .detail {
   min-height: 100%;
 }
+.board[data-presentation='island'],
+.detail[data-presentation='island'] {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+.board[data-presentation='island'] .empty {
+  background: var(--color-surface);
+  border: 2px solid var(--color-pixel-wood);
+  box-shadow: 3px 3px 0 var(--color-pixel-wood-dark);
+}
 .detail > .error,
 .detail > .feedback {
   margin: var(--space-4);
@@ -83,4 +94,9 @@
   .board {
     padding: var(--space-4);
   }
+}
+
+.board[data-loading='true'] {
+  display: flex;
+  flex-direction: column;
 }

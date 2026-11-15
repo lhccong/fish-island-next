@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useContext, useState } from 'react';
 import { Smile } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
@@ -54,7 +55,7 @@ function SavedEmoticons({ onSelect }: { onSelect: (url: string) => void }) {
   const pages = useInfinitePages(load);
   return (
     <ScrollArea label="评论表情包列表" gutter="reserved" className={styles.scroll || ''}>
-      {pages.result.status === 'loading' && <p role="status">正在加载表情包…</p>}
+      {pages.result.status === 'loading' && <LoadingIndicator>正在加载表情包…</LoadingIndicator>}
       {pages.result.status === 'error' && (
         <div role="alert">
           <p>{pages.result.message}</p>

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Globe, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react';
 import { AuthError, type AuthUser } from '@/domain/auth';
@@ -102,7 +103,9 @@ export function SsoAuthorization({ request, user, service, onExpired, onAllow, o
           </div>
           <section className={styles.infoCard} aria-label="应用信息与权限">
             <p className={styles.sectionTitle}>应用信息</p>
-            {application.status === 'loading' && <p role="status">正在加载应用信息…</p>}
+            {application.status === 'loading' && (
+              <LoadingIndicator>正在加载应用信息…</LoadingIndicator>
+            )}
             {application.status === 'error' && (
               <div role="alert">
                 <p>{application.message}</p>
@@ -172,7 +175,7 @@ export function SsoAuthorization({ request, user, service, onExpired, onAllow, o
               void allow();
             }}
           >
-            {pending ? '正在授权…' : '允许'}
+            {pending ? <LoadingIndicator compact>{'正在授权…'}</LoadingIndicator> : '允许'}
           </button>
         )}
         <button

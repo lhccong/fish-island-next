@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useState } from 'react';
 import type { LuckyBagPort, LuckyBagRecord } from '@/domain/chat';
 import { Button } from '@/shared/ui/Button';
@@ -31,7 +32,7 @@ export function LuckyBagRecords({ id, port }: { id: string; port: LuckyBagPort }
     <section aria-label="福袋中奖记录">
       <h3>中奖记录</h3>
       {state.loading ? (
-        <p role="status">记录加载中…</p>
+        <LoadingIndicator>记录加载中…</LoadingIndicator>
       ) : state.error ? (
         <p role="alert">{state.error}</p>
       ) : state.records.length === 0 ? (

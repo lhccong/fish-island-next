@@ -42,6 +42,36 @@
   background: inherit;
   transform: rotate(45deg);
 }
+.conversation[data-decoration='island'] .bubble,
+.conversation[data-decoration='island'] .outgoing p {
+  border: 3px solid var(--color-pixel-wood);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 23px,
+      color-mix(in srgb, var(--color-pixel-border) 12%, transparent) 23px 24px
+    ),
+    var(--color-pixel-paper);
+  box-shadow:
+    2px 2px 0 var(--color-pixel-wood-dark),
+    inset 0 0 0 1px var(--color-pixel-wood-light);
+  color: var(--color-pixel-ink);
+}
+.conversation[data-decoration='island'] .bubble::before,
+.conversation[data-decoration='island'] .outgoing p::after {
+  display: none;
+}
+.conversation[data-decoration='island'] .title {
+  color: var(--color-pixel-ink);
+}
+.conversation[data-decoration='island'] .title:hover {
+  color: var(--color-accent-text);
+}
+.conversation[data-decoration='island'] .outgoing p {
+  border-color: var(--color-accent-text);
+  background-color: var(--color-pixel-paper-inset);
+}
 .title {
   display: block;
   margin: 0;

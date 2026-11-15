@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Check, ChevronDown, Flame, Search } from 'lucide-react';
 import type { HotSource } from '@/domain/hot-board';
@@ -5,12 +6,14 @@ import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import styles from './MobileSourcePicker.module.css';
+import { IslandSourceScene } from './IslandSourceScene';
 
 interface MobileSourcePickerProps {
   sources: readonly HotSource[];
   selectedId: string;
   onSelect: (id: string) => void;
   loading: boolean;
+  decoration?: 'none' | 'island';
 }
 
 export function MobileSourcePicker({
@@ -18,6 +21,7 @@ export function MobileSourcePicker({
   selectedId,
   onSelect,
   loading,
+  decoration = 'none',
 }: MobileSourcePickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -52,6 +56,7 @@ export function MobileSourcePicker({
         </button>
       }
     >
+      {decoration === 'island' && <IslandSourceScene />}
       <label className={styles.search}>
         <Search size={17} aria-hidden="true" />
         <input
@@ -61,7 +66,7 @@ export function MobileSourcePicker({
           onChange={(event) => setQuery(event.target.value)}
         />
       </label>
-      <ScrollArea label="可选热榜来源" className={styles.scroll ?? ''}>
+      <ScrollArea label="可选热榜来源" gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.options}>
           <button
             type="button"
@@ -95,11 +100,13 @@ export function MobileSourcePicker({
           ))}
           {!filtered.length && (
             <p className={styles.empty}>
-              {loading
-                ? '正在加载来源…'
-                : query.trim()
-                  ? '没有匹配的来源，试试其他关键词'
-                  : '暂无热榜来源'}
+              {loading ? (
+                <LoadingIndicator>{'正在加载来源…'}</LoadingIndicator>
+              ) : query.trim() ? (
+                '没有匹配的来源，试试其他关键词'
+              ) : (
+                '暂无热榜来源'
+              )}
             </p>
           )}
         </div>

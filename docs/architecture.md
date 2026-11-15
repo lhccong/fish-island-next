@@ -46,6 +46,8 @@ ADR-015 仅将鱼小圈左侧发现栏更新为微信样式并交换热榜/鱼�
 
 ## 2. 技术决策
 
+ADR-076 迁移七项管理工作台，domain/admin、infrastructure/admin、features/admin 分层，app 注入账号端口并同时守卫管理菜单与懒加载路由。沿用服务端权限、共享控件、全部外壳与滚动分页，见 ADR-076。
+
 ADR-070 迁移账号头像框，沿用 auth 资料端口与就地更新流程；shared/ui 负责纯图片叠层，聊天协议保留发送者头像框快照，分页及弹窗状态独立，见 ADR-070。
 
 ADR-069 将聊天消息和在线成员名称统一为按需打开用户卡片，由 app 注入 account-tools 资料/关注/禁言端口，chat 独立宿主管理弹窗与取消生命周期；保留备注和本机黑名单，详见 ADR-069。
@@ -98,7 +100,7 @@ ADR-039 迁移摸鱼股市，domain/stock、infrastructure/stock、features/stoc
 
 ADR-038 新增 HTTP 群聊发送，由服务端补齐身份和引用、落库后全员广播；独立发送用例管理临时消息、取消与失败重试，按 clientMessageId 合并 HTTP/WS 确认。详见 ADR-038。
 
-ADR-037 提供消息右键/键盘上下文菜单和手机长按/更多菜单：复制、引用、@TA、复读机及本人撤回。shared/ui 封装既有 Radix 栈 ContextMenu，feature 复用单一撤回用例和独立账号草稿 store；引用和 @TA 准备草稿，复读机复用 ADR-043 的发送用例直接发送原文并保留草稿，详见 ADR-037。
+ADR-037 提供消息右键/键盘上下文菜单和手机长按/更多菜单：复制、引用、@TA、复读机及本人撤回，管理员还可撤回他人消息；红包、福袋仅管理员可撤回，所有账号均不提供复制或复读。shared/ui 封装既有 Radix 栈 ContextMenu，feature 复用单一撤回用例和独立账号草稿 store；引用和 @TA 准备草稿，复读机复用 ADR-043 的发送用例直接发送原文并保留草稿，详见 ADR-037。
 
 ADR-036 补齐聊天室首次 HTTP 历史与向上滚动续读；历史和实时共用归一化实体、去重与撤回墓碑，独立历史控制器管理取消、重试和游标。当前窗口上限为 1000 条，边界明确提示，不宣称无限历史或断线续传，详见 ADR-036。
 
@@ -299,3 +301,17 @@ ADR-062 迁移联机五子棋 /game/piece：独立 domain/gomoku、infrastructur
 ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；聊天精确订阅屏蔽偏好。详见 ADR-065。
 
 ADR-066 迁移你画我猜：domain/draw、infrastructure/draw、features/draw 分层；app 复用账号连接，整幅画布串行保存，独立游戏路由与窗口共享实现，见 ADR-066。
+
+工作时间悬浮球（2026-11-15）：沿用 ADR-065 的独立宿主和本机设置，入口改为可拖动圆形计时器，位置按视口比例持久化；不占工作区状态行高度。手机避让安全区与底部导航，全部主题及明暗共用语义颜色，详见 ADR-065 补充。
+
+ADR-072 将武道大会归入伙伴营地，与 Boss、爬塔并列入口；旧 /point/tournament 跳转 /pet?challenge=tournament，复用 pet 端口及排位面板，支持空位、挑战结算与对手资料。
+
+ADR-071 迁移积分商城：domain/points-shop、infrastructure/points-shop、features/points-shop 分层，app 注入头像框呈现与账号静默刷新，复用头像框业务，补齐道具兑换及积分流水；见 ADR-071。
+
+ADR-073 统一加载反馈：shared/ui/LoadingIndicator 提供主体居中与紧凑呈现，页面、弹窗、懒加载、图片及滚动分页复用同一纯表现组件；不改变业务状态、请求或订阅边界。
+
+ADR-074 新增 pixel-island 内置主题与显式映射的 island 外壳呈现，复用现有业务 slots；受信任呈现 token 由 SkinProvider 应用与清理，不扩展第三方导入权限。主题弹窗采用 reserved 正文滚动，详见 ADR-074。
+
+ADR-075 新增按账号隔离的本机我的小岛：domain/my-island 定义偏好模型，infrastructure/my-island 适配存储，features/my-island 独立管理待办、笔记、快捷入口及模块设置。app 注入到聊天组合；像素主题桌面侧栏与手机独立面板共用状态。
+
+ADR-077 由 app 组合我的海岛的手账/鱼小圈页签，fish-circle 公开独立侧栏 Provider 与紧凑呈现，复用原分页、动态交互和编辑器。首开激活、换肤不重取，见 ADR-077。

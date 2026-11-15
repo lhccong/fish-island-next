@@ -245,15 +245,6 @@
   font-size: 14px;
   line-height: 1.9;
 }
-.timer {
-  display: flex;
-  justify-content: flex-end;
-  flex-shrink: 0;
-  min-width: 0;
-  padding: 4px 16px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-}
 @media (max-width: 760px) {
   .apps:has([data-view='list'][data-many='false']) {
     --tool-height: 556px;

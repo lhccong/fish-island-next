@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useState } from 'react';
 import type { RankingEntry, RankingPort } from '@/domain/landlords';
 import { Button } from '@/shared/ui/Button';
@@ -64,7 +65,7 @@ export function Ranking({ port }: { port: RankingPort }) {
       <p className={styles.muted}>至少完成 5 局 · 前 50 名</p>
       <ScrollArea label="斗地主排行榜" gutter="reserved" className={styles.ranking ?? ''}>
         {state.status === 'loading' ? (
-          <p role="status">正在加载排行…</p>
+          <LoadingIndicator>正在加载排行…</LoadingIndicator>
         ) : state.status === 'error' ? (
           <div role="alert">
             <p>{state.error}</p>

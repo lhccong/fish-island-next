@@ -7,12 +7,14 @@ import styles from './HotSourceCard.module.css';
 export function HotSourceCard({
   source,
   onOpen,
+  presentation = 'default',
 }: {
   source: HotSource;
   onOpen: (id: string) => void;
+  presentation?: 'default' | 'island';
 }) {
   return (
-    <section className={styles.card} aria-label={source.name}>
+    <section className={styles.card} aria-label={source.name} data-presentation={presentation}>
       <span className={styles.ribbon}>{source.badgeLabel}</span>
       <header className={styles.header}>
         <button

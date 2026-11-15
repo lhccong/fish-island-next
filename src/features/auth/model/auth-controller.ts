@@ -224,6 +224,12 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   }
 
   return {
+    refreshUser: async (signal: AbortSignal) => {
+      const version = epoch;
+      const user = await withCredential((token) => service.current(token, signal));
+      if (version === epoch && !signal.aborted)
+        store.setState({ session: { status: 'authenticated', user } });
+    },
     avatarFrames: (page: number, signal: AbortSignal) =>
       withCredential((token) => service.avatarFrames(page, token, signal)),
     exchangeAvatarFrame: (frame: AvatarFrame) => {

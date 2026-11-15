@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { AuthUser } from '@/domain/auth';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -53,7 +54,7 @@ export function PersonalCard({ user, port }: { user: AuthUser; port: AccountTool
             </div>
           </div>
           <p className={details.profile}>{user.profile || '还没有填写个人简介'}</p>
-          {!stats && !error && <p role="status">正在读取卡片…</p>}
+          {!stats && !error && <LoadingIndicator>正在读取卡片…</LoadingIndicator>}
           {error && (
             <div>
               <p role="alert">{error}</p>

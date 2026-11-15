@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -102,7 +103,7 @@ export default function SendLuckyBagForm({ onClose }: { onClose: () => void }) {
       </ScrollArea>
       <div className={styles.feedback}>
         {error && <p role="alert">{error}</p>}
-        {phase === 'creating' && <p role="status">正在发送福袋，请稍候…</p>}
+        {phase === 'creating' && <LoadingIndicator compact>正在发送福袋，请稍候…</LoadingIndicator>}
         {phase === 'success' && <p role="status">福袋发送成功，消息由系统发布到群聊</p>}
       </div>
       <div className={styles.actions}>
@@ -121,7 +122,13 @@ export default function SendLuckyBagForm({ onClose }: { onClose: () => void }) {
           </Button>
         ) : (
           <Button key="submit" type="submit" disabled={!editing || !user}>
-            {phase === 'creating' ? '发送中…' : phase === 'uncertain' ? '等待确认' : '发送福袋'}
+            {phase === 'creating' ? (
+              <LoadingIndicator compact>{'发送中…'}</LoadingIndicator>
+            ) : phase === 'uncertain' ? (
+              '等待确认'
+            ) : (
+              '发送福袋'
+            )}
           </Button>
         )}
       </div>

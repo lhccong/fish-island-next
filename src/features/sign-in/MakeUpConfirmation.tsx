@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { RefObject } from 'react';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
@@ -40,7 +41,7 @@ export function MakeUpConfirmation({
           取消补签
         </Button>
         <Button disabled={pending} onClick={onConfirm}>
-          {pending ? '补签中…' : '确认补签'}
+          {pending ? <LoadingIndicator compact>{'补签中…'}</LoadingIndicator> : '确认补签'}
         </Button>
       </div>
     </Dialog>

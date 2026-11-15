@@ -20,6 +20,11 @@
   text-decoration: none;
   font-size: 14px;
 }
+@media (min-width: 761px) {
+  .sidebar .mobileAdmin {
+    display: none;
+  }
+}
 .sidebar a:hover,
 .game:hover,
 .about:hover {

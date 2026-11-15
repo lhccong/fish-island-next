@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState, type ComponentProps, type ReactNode } from 'react';
 import { InlineAutocomplete } from '@/shared/ui/InlineAutocomplete';
 import { Button } from '@/shared/ui/Button';
@@ -33,7 +34,7 @@ export function ComposerMentions({
       : [];
   let feedback: ReactNode;
   if (state.status === 'idle' || state.status === 'loading')
-    feedback = <p role="status">正在获取在线成员…</p>;
+    feedback = <LoadingIndicator>正在获取在线成员…</LoadingIndicator>;
   else if (state.status === 'error')
     feedback = (
       <div>

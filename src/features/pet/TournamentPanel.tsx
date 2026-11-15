@@ -1,11 +1,13 @@
-import { useCallback, useState } from 'react';
-import type { PetPort } from '@/domain/pet';
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { useCallback, useRef, useState } from 'react';
+import type { PetPort, PetRank } from '@/domain/pet';
+import { Button } from '@/shared/ui/Button';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
-import { ConfirmAction } from './ConfirmAction';
-import { PetRankRow } from './PetRankRow';
-import rankingStyles from './Rankings.module.css';
-import styles from './Panels.module.css';
+import { RankAvatar } from './RankAvatar';
+import { OtherCompanionPanel } from './OtherCompanionPanel';
+import { TournamentChallenge } from './TournamentChallenge';
+import styles from './Tournament.module.css';
 
 export function TournamentPanel({
   service,
@@ -16,55 +18,156 @@ export function TournamentPanel({
   userId: string;
   onChange: () => void;
 }) {
-  const load = useCallback((signal: AbortSignal) => service.tournament(signal), [service]);
+  const [uncertain, setUncertain] = useState(false);
+  const load = useCallback(
+    async (signal: AbortSignal) => {
+      const data = await service.tournament(signal);
+      if (!signal.aborted) setUncertain(false);
+      return data;
+    },
+    [service],
+  );
   const resource = usePetResource(load);
-  const [outcome, setOutcome] = useState('');
+  const [target, setTarget] = useState<{ rank: number; entry?: PetRank } | null>(null);
+  const [other, setOther] = useState<string | null>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
+  const refreshButton = useRef<HTMLButtonElement | null>(null);
   return (
-    <>
-      <p className={styles.muted}>每日最多 10 次挑战，名次与剩余次数由服务端校验。</p>
-      {outcome && (
-        <div className={styles.notice} role="status">
-          {outcome}
+    <section className={styles.tournament} aria-label="武道大会">
+      <header className={styles.heading}>
+        <div>
+          <h2>武道大会</h2>
+          <p>与伙伴一起，向上挑战。</p>
         </div>
+        <Button
+          variant="secondary"
+          disabled={resource.state.status === 'loading'}
+          ref={refreshButton}
+          onClick={resource.reload}
+        >
+          刷新榜单
+        </Button>
+      </header>
+      <p className={styles.rule}>
+        每日最多 10 次挑战，只能挑战更高名次；空位可直接入席。名次与次数以服务端结算为准。
+      </p>
+      {resource.data && resource.state.status === 'loading' && (
+        <LoadingIndicator compact>正在刷新榜单…</LoadingIndicator>
       )}
-      <ResourceView state={resource.state} reload={resource.reload}>
-        {(data) => (
-          <>
-            <p>我的名次：{data.mine ?? '尚未上榜'}</p>
-            {!data.ranks.length && <div className={styles.feedback}>今日暂无排位记录。</div>}
-            <ol className={rankingStyles.list} hidden={!data.ranks.length}>
-              {data.ranks.map((entry) => (
-                <PetRankRow
-                  key={entry.id}
-                  rank={entry.rank}
-                  name={entry.name}
-                  owner={entry.owner}
-                  avatar={entry.ownerAvatar}
-                  petUrl={entry.url}
-                  metric={`Lv.${entry.level}`}
-                  mine={entry.userId === userId}
-                >
-                  <ConfirmAction
-                    label="挑战排位"
-                    disabled={entry.userId === userId}
-                    description={`挑战第 ${entry.rank} 位将消耗每日挑战次数，是否继续？`}
-                    action={async (signal) => {
-                      const result = await service.compete(entry.rank, signal);
-                      setOutcome(
-                        `${result.win ? '挑战胜利' : '本次未获胜'} · 当前名次：${result.rank ?? '未上榜'}`,
-                      );
-                    }}
-                    onSuccess={() => {
-                      resource.reload();
-                      onChange();
-                    }}
-                  />
-                </PetRankRow>
-              ))}
-            </ol>
-          </>
-        )}
+      {resource.data && resource.state.status === 'error' && (
+        <p role="alert">{resource.state.message}，请刷新榜单重试。</p>
+      )}
+      {uncertain && <p role="alert">上次挑战结果尚未确认，请刷新榜单后再挑战。</p>}
+      <ResourceView
+        state={resource.data ? { status: 'ready', data: resource.data } : resource.state}
+        reload={resource.reload}
+      >
+        {(data) => {
+          const occupied = new Map(data.ranks.map((entry) => [entry.rank, entry]));
+          const ranks = [
+            ...new Set([...Array.from({ length: 10 }, (_, i) => i + 1), ...occupied.keys()]),
+          ].sort((a, b) => a - b);
+          return (
+            <>
+              <dl className={styles.stats}>
+                <div>
+                  <dt>我的排名</dt>
+                  <dd>{data.mine ? `第 ${data.mine} 名` : '尚未上榜'}</dd>
+                </div>
+                <div>
+                  <dt>今日参赛</dt>
+                  <dd>{data.ranks.length} 人</dd>
+                </div>
+              </dl>
+              {!data.ranks.length && <p role="status">今日暂无排位记录。</p>}
+              <ol className={styles.list} aria-label="武道大会排名榜">
+                {ranks.map((rank) => {
+                  const entry = occupied.get(rank);
+                  const mine = entry?.userId === userId || data.mine === rank;
+                  return (
+                    <li key={rank} className={styles.row} data-mine={mine}>
+                      <span className={styles.rank}>#{rank}</span>
+                      {entry ? (
+                        <button
+                          type="button"
+                          className={styles.profile}
+                          aria-label={`查看${entry.owner}的伙伴`}
+                          onClick={(event) => {
+                            returnFocus.current = event.currentTarget;
+                            setOther(entry.userId);
+                          }}
+                        >
+                          <RankAvatar
+                            name={entry.owner}
+                            avatar={entry.ownerAvatar}
+                            petUrl={entry.url}
+                            petName={entry.name}
+                          />
+                          <span className={styles.identity}>
+                            <strong>
+                              {entry.owner}
+                              {mine ? '（我）' : ''}
+                            </strong>
+                            <span>
+                              {entry.name} · Lv.{entry.level}
+                            </span>
+                          </span>
+                        </button>
+                      ) : (
+                        <div className={styles.vacant}>
+                          <strong>虚位以待</strong>
+                          <span>带上伙伴，争夺此席</span>
+                        </div>
+                      )}
+                      <Button
+                        variant="secondary"
+                        disabled={
+                          uncertain ||
+                          resource.state.status !== 'ready' ||
+                          mine ||
+                          (data.mine !== null && data.mine <= rank)
+                        }
+                        onClick={(event) => {
+                          returnFocus.current = event.currentTarget;
+                          setTarget({ rank, ...(entry ? { entry } : {}) });
+                        }}
+                      >
+                        挑战排位
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ol>
+              <p className={styles.rule}>已全部加载 · {data.ranks.length} 位参赛者</p>
+            </>
+          );
+        }}
       </ResourceView>
-    </>
+      {target && (
+        <TournamentChallenge
+          service={service}
+          target={target}
+          returnFocusRef={returnFocus}
+          onUnknown={() => {
+            returnFocus.current = refreshButton.current;
+            setUncertain(true);
+          }}
+          onClose={() => setTarget(null)}
+          onSettled={() => {
+            returnFocus.current = refreshButton.current;
+            resource.reload();
+            onChange();
+          }}
+        />
+      )}
+      {other && (
+        <OtherCompanionPanel
+          service={service}
+          userId={other}
+          onClose={() => setOther(null)}
+          returnFocusRef={returnFocus}
+        />
+      )}
+    </section>
   );
 }

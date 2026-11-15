@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { petService } from '@/app/config/pet';
@@ -7,6 +8,7 @@ import styles from './GamesPage.module.css';
 
 export function PetPage() {
   const { session } = useAuth();
+  const [params] = useSearchParams();
   if (session.status !== 'authenticated') return null;
   return (
     <WorkspaceLayout
@@ -23,7 +25,12 @@ export function PetPage() {
           </>
         ),
         content: (
-          <PetWorkspace key={session.user.id} service={petService} userId={session.user.id} />
+          <PetWorkspace
+            key={session.user.id}
+            service={petService}
+            userId={session.user.id}
+            openTournament={params.get('challenge') === 'tournament'}
+          />
         ),
       }}
     />

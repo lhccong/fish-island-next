@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import styles from './AboutExtras.module.css';
@@ -7,7 +8,7 @@ export function AboutImage({ src, alt }: { src: string; alt: string }) {
   const [attempt, setAttempt] = useState(0);
   return (
     <div className={styles.image}>
-      {state === 'loading' && <p role="status">正在加载{alt}…</p>}
+      {state === 'loading' && <LoadingIndicator>正在加载{alt}…</LoadingIndicator>}
       {state !== 'error' && (
         <img
           key={attempt}

@@ -252,3 +252,8 @@
     margin: var(--space-2);
   }
 }
+
+.sheet[data-loading='true'] {
+  display: flex;
+  flex-direction: column;
+}

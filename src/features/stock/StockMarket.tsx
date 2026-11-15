@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { Quote } from '@/domain/stock';
 import { Button } from '@/shared/ui/Button';
 import { ShoppingCart, ArrowUpRight } from 'lucide-react';
@@ -20,7 +21,7 @@ export function StockMarket({
   return (
     <section aria-label="市场行情" className={styles.market}>
       {state.status === 'loading' ? (
-        <p role="status">正在加载市场行情…</p>
+        <LoadingIndicator>正在加载市场行情…</LoadingIndicator>
       ) : state.status === 'error' ? (
         <div className={styles.feedback} role="alert">
           <p>{state.message}</p>

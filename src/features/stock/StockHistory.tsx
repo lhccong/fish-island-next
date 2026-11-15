@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback } from 'react';
 import type { StockPort } from '@/domain/stock';
 import { InfiniteScroll, useInfinitePages } from '@/shared/ui/InfiniteScroll';
@@ -14,7 +15,7 @@ export function StockHistory({ service }: { service: StockPort }) {
     <section aria-label="交易记录" className={styles.listPanel}>
       <h2>交易记录</h2>
       {pages.result.status === 'loading' ? (
-        <p role="status">正在加载交易记录…</p>
+        <LoadingIndicator>正在加载交易记录…</LoadingIndicator>
       ) : pages.result.status === 'error' ? (
         <div role="alert">
           <p>{pages.result.message}</p>

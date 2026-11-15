@@ -7,7 +7,7 @@ export function ChallengeEntrances({
   onSelect,
 }: {
   disabled: boolean;
-  onSelect: (mode: 'boss' | 'tower') => void;
+  onSelect: (mode: 'boss' | 'tower' | 'tournament') => void;
 }) {
   return (
     <nav className={styles.hub} aria-label="冒险挑战">
@@ -32,6 +32,17 @@ export function ChallengeEntrances({
         <ArrowUpRight size={20} aria-hidden="true" />
         <strong>宠物爬塔</strong>
         <span>逐层突破 · 挑战更高纪录</span>
+      </button>
+      <button
+        type="button"
+        className={styles.entrance}
+        disabled={disabled}
+        onClick={() => onSelect('tournament')}
+      >
+        <PixelLandscape />
+        <ArrowUpRight size={20} aria-hidden="true" />
+        <strong>武道大会</strong>
+        <span>每日排位 · 挑战更高席位</span>
       </button>
     </nav>
   );

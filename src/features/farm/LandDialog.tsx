@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { RefObject } from 'react';
 import { isMature, remainingTime, watering, type FarmAction, type Land } from '@/domain/farm';
 import { Button } from '@/shared/ui/Button';
@@ -108,15 +109,17 @@ export function LandDialog({
               if (await onAction(action)) onClose();
             }}
           >
-            {busy
-              ? '处理中…'
-              : land.locked
-                ? '确认开垦'
-                : visiting
-                  ? '偷菜'
-                  : mature
-                    ? '收获'
-                    : '浇水'}
+            {busy ? (
+              <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
+            ) : land.locked ? (
+              '确认开垦'
+            ) : visiting ? (
+              '偷菜'
+            ) : mature ? (
+              '收获'
+            ) : (
+              '浇水'
+            )}
           </Button>
         )}
       </div>

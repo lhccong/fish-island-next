@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import { Button } from '@/shared/ui/Button';
@@ -49,11 +50,7 @@ export function ProfileTitles({ user, disabled }: { user: AuthUser; disabled: bo
             }}
           />
         </div>
-        {resource.status === 'loading' && (
-          <p className={styles.hint} role="status">
-            正在读取称号…
-          </p>
-        )}
+        {resource.status === 'loading' && <LoadingIndicator>正在读取称号…</LoadingIndicator>}
         {resource.status === 'error' && (
           <div className={styles.sectionError} role="alert">
             {resource.message}

@@ -5,6 +5,7 @@ import type {
   ChatHistoryPort,
   ReceivedMessage,
 } from '@/domain/chat';
+import { hasRewardMessageContent } from '@/domain/chat';
 import { createSendController } from './send-controller';
 import type { ChatSendPort } from '@/domain/chat';
 import { createMessageStore } from './message-store';
@@ -93,10 +94,17 @@ export function createChatRealtimeController(
     retry() {
       connection?.retry();
     },
-    revoke(id: string, userId: string) {
+    revoke(id: string, userId: string, role?: string) {
       const state = model.store.getState();
       const message = Object.values(state.messages).find((message) => message.id === id);
-      if (!message || message.revoked || message.senderId !== userId || pending.has(id)) return;
+      if (
+        !message ||
+        message.revoked ||
+        (role !== 'admin' &&
+          (message.senderId !== userId || hasRewardMessageContent(message.content))) ||
+        pending.has(id)
+      )
+        return;
       const update = (value: 'pending' | 'error') =>
         model.store.setState((current) => ({
           revokeState: { ...current.revokeState, [id]: value },

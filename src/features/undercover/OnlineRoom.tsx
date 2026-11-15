@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import type { UndercoverRoom, UndercoverRealtimePort } from '@/domain/undercover';
@@ -136,7 +137,7 @@ export function OnlineRoom({
               if (confirm && (await controller.action(confirm, room.id))) setConfirm(null);
             }}
           >
-            {pending ? '正在处理…' : '确认'}
+            {pending ? <LoadingIndicator compact>{'正在处理…'}</LoadingIndicator> : '确认'}
           </Button>
         </div>
       </Dialog>

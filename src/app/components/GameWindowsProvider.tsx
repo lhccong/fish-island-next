@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useRef, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import { FloatingWindow } from '@/shared/ui/FloatingWindow';
@@ -45,7 +46,7 @@ export function GameWindowsProvider({ children }: { children: ReactNode }) {
               <ScrollArea label={`${gameTitles[id]}内容`} gutter="reserved">
                 <div className={styles.content}>
                   <GameErrorBoundary>
-                    <Suspense fallback={<p role="status">正在打开游戏…</p>}>
+                    <Suspense fallback={<LoadingIndicator>正在打开游戏…</LoadingIndicator>}>
                       <GameWindowContent game={id} />
                     </Suspense>
                   </GameErrorBoundary>

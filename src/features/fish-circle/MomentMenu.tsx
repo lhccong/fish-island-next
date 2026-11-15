@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { EllipsisVertical, Gift, Trophy, Pencil, Trash2, Pin } from 'lucide-react';
+import { Ellipsis, EllipsisVertical, Gift, Trophy, Pencil, Trash2, Pin } from 'lucide-react';
 import type { MomentAction } from '@/domain/fish-circle';
 import { DropdownMenu } from '@/shared/ui/DropdownMenu';
 import styles from './MomentMenu.module.css';
@@ -12,6 +12,7 @@ interface Props {
   onEdit: () => void;
   onAction: (action: MomentAction) => void;
   onToggleTop: () => void;
+  direction?: 'horizontal' | 'vertical';
 }
 export function MomentMenu({
   triggerRef,
@@ -22,6 +23,7 @@ export function MomentMenu({
   onEdit,
   onAction,
   onToggleTop,
+  direction = 'vertical',
 }: Props) {
   return (
     <DropdownMenu
@@ -34,7 +36,11 @@ export function MomentMenu({
           aria-label="更多动态操作"
           disabled={pending}
         >
-          <EllipsisVertical size={16} aria-hidden="true" />
+          {direction === 'horizontal' ? (
+            <Ellipsis size={16} aria-hidden="true" />
+          ) : (
+            <EllipsisVertical size={16} aria-hidden="true" />
+          )}
         </button>
       }
       items={[

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import styles from './EmoticonPanel.module.css';
 
@@ -16,11 +17,13 @@ export function EmoticonPreview({ url }: { url: string }) {
         />
       )}
       <span role="status">
-        {status === 'loading'
-          ? '预览加载中…'
-          : status === 'error'
-            ? '图片加载失败，请关闭后重试'
-            : '表情包预览'}
+        {status === 'loading' ? (
+          <LoadingIndicator compact>{'预览加载中…'}</LoadingIndicator>
+        ) : status === 'error' ? (
+          '图片加载失败，请关闭后重试'
+        ) : (
+          '表情包预览'
+        )}
       </span>
     </div>
   );

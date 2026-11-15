@@ -5,7 +5,13 @@ interface ClipboardFixture {
   fail: boolean;
 }
 type FixtureWindow = Window & { chatMenuClipboard: ClipboardFixture };
-export async function setupChatMenu(page: Page, skin: string, mode: string, role = 'user') {
+export async function setupChatMenu(
+  page: Page,
+  skin: string,
+  mode: string,
+  role = 'user',
+  prepare?: () => Promise<void>,
+) {
   let socket!: WebSocketRoute;
   let connections = 0;
   let historyRequests = 0;
@@ -57,6 +63,7 @@ export async function setupChatMenu(page: Page, skin: string, mode: string, role
       body: '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240"><rect width="320" height="240" fill="#147a99"/></svg>',
     }),
   );
+  await prepare?.();
   await page.goto('/chat');
   await page.getByRole('textbox', { name: '账号或邮箱', exact: true }).fill('synthetic-account');
   await page.getByLabel('密码', { exact: true }).fill('synthetic-password');

@@ -41,7 +41,14 @@ for (const skin of builtinSkins) {
       });
       await page.goto('/discover');
       const nav = page.getByRole('navigation', { name: '发现菜单' }).filter({ visible: true });
-      await expect(nav.getByRole('link')).toHaveText(['朋友圈', '游戏', '阅读', '关于', '伙伴']);
+      await expect(nav.getByRole('link')).toHaveText([
+        '朋友圈',
+        '伙伴',
+        '游戏',
+        '阅读',
+        '积分商城',
+        '关于',
+      ]);
       const aboutLink = nav.getByRole('link', { name: '关于', exact: true });
       if (isMobile) await aboutLink.tap();
       else await aboutLink.click();

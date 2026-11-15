@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Users, AppWindow, Copy, BookOpen, Check } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
@@ -32,7 +33,7 @@ export function AboutWorkspace() {
               我们欢迎所有用户参与共建，您的每一条建议都是我们进步的动力。加入我们的QQ群，一起讨论和改进：
             </p>
             <div className={styles.contact}>
-              {imageState === 'loading' && <span role="status">正在加载QQ群二维码…</span>}
+              {imageState === 'loading' && <LoadingIndicator>正在加载QQ群二维码…</LoadingIndicator>}
               {imageState !== 'error' && (
                 <img
                   key={imageAttempt}
@@ -64,7 +65,11 @@ export function AboutWorkspace() {
                 </span>
                 <Button onClick={() => void copyGroup()} disabled={copyState === 'pending'}>
                   <Copy size={15} aria-hidden="true" />
-                  {copyState === 'pending' ? '复制中…' : '复制'}
+                  {copyState === 'pending' ? (
+                    <LoadingIndicator compact>{'复制中…'}</LoadingIndicator>
+                  ) : (
+                    '复制'
+                  )}
                 </Button>
               </div>
               <div className={styles.feedback} aria-live="polite">
