@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import {
   PawPrint,
   Backpack,
@@ -182,6 +183,7 @@ export function PetWorkspace({
           </aside>
         </div>
       </div>
+      <PageFooterOutlet />
       {selected && pet && (
         <PanelDialog
           title={

@@ -2,6 +2,7 @@ import type { WorkspaceShellSlots } from '@/shells/contracts';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './WechatShell.module.css';
 import { PixelIslandScene } from './PixelIslandScene';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 
 export function WechatShell({
   slots,
@@ -63,6 +64,7 @@ export function WechatShell({
               fillContent={slots.contentFill ?? false}
             >
               {slots.content}
+              <PageFooterOutlet />
             </ScrollArea>
           )}
         </main>

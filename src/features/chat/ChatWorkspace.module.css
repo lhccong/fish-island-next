@@ -119,6 +119,19 @@
   align-items: center;
   margin-top: 8px;
 }
+.composerFooter {
+  flex: 1;
+  min-width: 0;
+}
+.composerFooter footer {
+  font-size: 11px;
+}
+.composerFooter ~ .shortcutHint {
+  display: none;
+}
+.sheetBar > footer {
+  flex: 1;
+}
 .actions > span {
   font-size: 12px;
   color: var(--color-muted);
@@ -398,6 +411,9 @@
   }
 }
 @media (max-width: 760px) {
+  .composerFooter {
+    display: none;
+  }
   .workspace[data-presentation='worksheet'] {
     --chat-sheet-gutter: 20px;
   }

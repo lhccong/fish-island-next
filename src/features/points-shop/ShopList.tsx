@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { ReactNode } from 'react';
 import type { ShopPage } from '@/domain/points-shop';
@@ -52,6 +53,7 @@ export function ShopList<T extends { id: string }>({
           </>
         )}
       </div>
+      <PageFooterOutlet />
     </ScrollArea>
   );
 }

@@ -10,6 +10,8 @@ import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
 import { GameWindowsProvider } from '@/app/components/GameWindowsProvider';
+import { SiteFooter } from '@/app/components/SiteFooter';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 const ForumPage = lazy(() =>
   import('@/app/pages/ForumPage').then((m) => ({ default: m.ForumPage })),
 );
@@ -91,7 +93,7 @@ export function AppRoutes() {
     : location;
   return (
     <GameWindowsProvider>
-      <div aria-hidden={isLogin ? true : undefined}>
+      <div className={styles.page} aria-hidden={isLogin ? true : undefined}>
         <Suspense fallback={<PageLoading />}>
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
@@ -240,11 +242,13 @@ export function AppRoutes() {
                 <main>
                   <h1>页面不存在</h1>
                   <a href="/">返回首页</a>
+                  <PageFooterOutlet />
                 </main>
               }
             />
           </Routes>
         </Suspense>
+        <SiteFooter placement="mobile-overlay" showOnMobile={displayLocation.pathname === '/'} />
       </div>
       {isLogin && (
         <Suspense

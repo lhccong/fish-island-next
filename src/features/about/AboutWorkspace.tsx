@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useState } from 'react';
 import { Users, AppWindow, Copy, BookOpen, Check } from 'lucide-react';
@@ -119,6 +120,7 @@ export function AboutWorkspace() {
           </section>
         </article>
       </div>
+      <PageFooterOutlet />
     </ScrollArea>
   );
 }

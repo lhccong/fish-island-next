@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useRef, useState } from 'react';
 import type { ForumPort, ForumPost, ForumDraft } from '@/domain/forum';
 import { Button } from '@/shared/ui/Button';
@@ -133,6 +134,7 @@ export function ForumEditor({
             />
           </label>
         </div>
+        <PageFooterOutlet />
       </ScrollArea>
       <footer className={styles.footer}>
         {operation.message && <p role="alert">{operation.message}</p>}

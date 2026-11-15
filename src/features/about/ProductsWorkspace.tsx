@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useState } from 'react';
 import { Tv, Music, Rocket, Monitor, Smartphone } from 'lucide-react';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -86,6 +87,7 @@ export function ProductsWorkspace() {
           ))}
         </div>
       </div>
+      <PageFooterOutlet />
     </ScrollArea>
   );
 }

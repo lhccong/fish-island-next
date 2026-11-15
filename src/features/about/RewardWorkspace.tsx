@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useCallback, useState } from 'react';
 import { Heart, ArrowUpRight } from 'lucide-react';
 import type { AboutPort } from '@/domain/about';
@@ -34,6 +35,7 @@ export function RewardWorkspace({ service }: { service: AboutPort }) {
             <DonationList service={service} details revision={revision} />
           </div>
         </div>
+        <PageFooterOutlet />
       </ScrollArea>
       {open && <PaymentDialog service={service} onClose={() => setOpen(false)} onPaid={onPaid} />}
     </>

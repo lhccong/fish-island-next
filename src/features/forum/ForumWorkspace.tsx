@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import type { AuthUser } from '@/domain/auth';
 import type { ForumPost, ForumPort } from '@/domain/forum';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
@@ -53,6 +54,7 @@ export function ForumWorkspace({
           <div className={styles.status}>
             <p>登录后即可发布帖子。</p>
             <Button onClick={onLogin}>登录</Button>
+            <PageFooterOutlet />
           </div>
         )
       ) : id ? (
@@ -114,6 +116,7 @@ function PostResource({
     return (
       <div className={styles.status}>
         <LoadingIndicator>正在加载帖子…</LoadingIndicator>
+        <PageFooterOutlet />
       </div>
     );
   if (result.status === 'error')
@@ -131,6 +134,7 @@ function PostResource({
         <Button variant="secondary" onClick={() => onNavigate('/post')}>
           返回帖子列表
         </Button>
+        <PageFooterOutlet />
       </div>
     );
   if (edit)
@@ -148,6 +152,7 @@ function PostResource({
       <div className={styles.status}>
         <p>仅作者和管理员可以编辑这篇帖子。</p>
         <Button onClick={() => onNavigate(`/post/${id}`)}>返回帖子</Button>
+        <PageFooterOutlet />
       </div>
     );
   return (

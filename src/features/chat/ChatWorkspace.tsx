@@ -1,4 +1,5 @@
 import { MessageStream } from './MessageStream';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { ChatComposer } from './ChatComposer';
 import { OnlineMembers } from './OnlineMembers';
 import { useChatMembers } from './chat-members-context';
@@ -50,12 +51,13 @@ export function ChatWorkspace({
       <div className={styles.conversation}>
         {presentation === 'worksheet' ? [composer, messages] : [messages, composer]}
         {presentation === 'worksheet' && (
-          <footer className={styles.sheetBar} aria-label="当前工作表">
+          <div className={styles.sheetBar} aria-label="当前工作表">
             <span className={styles.sheetTab}>
               <Table2 size={15} aria-hidden="true" />
               <span title={groupName}>{groupName}</span>
             </span>
-          </footer>
+            <PageFooterOutlet />
+          </div>
         )}
       </div>
       {membersOpen && (

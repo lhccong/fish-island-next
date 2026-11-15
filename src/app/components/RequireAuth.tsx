@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import type { ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -11,6 +12,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     return (
       <main className={styles.page}>
         <LoadingIndicator>正在恢复登录状态…</LoadingIndicator>
+        <PageFooterOutlet />
       </main>
     );
   if (session.status === 'error')
@@ -30,6 +32,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
           </button>
           <Link to="/">返回热榜</Link>
         </section>
+        <PageFooterOutlet />
       </main>
     );
   if (session.status === 'anonymous')

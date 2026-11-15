@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useState, type ReactNode } from 'react';
 import type { PointsShopPort } from '@/domain/points-shop';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -97,6 +98,7 @@ export function PointsShop({
             <p>会员权益与支持方式请查看支持页面。</p>
             {support}
           </div>
+          <PageFooterOutlet />
         </ScrollArea>
       )}
     </section>

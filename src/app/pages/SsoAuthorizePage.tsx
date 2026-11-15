@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '@/features/auth';
 import { SsoAuthorization } from '@/features/sso';
 import { ssoService } from '@/app/config/sso';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 
 export function SsoAuthorizePage() {
   const [params] = useSearchParams();
@@ -13,20 +14,23 @@ export function SsoAuthorizePage() {
   }, [restore]);
   if (session.status !== 'authenticated') return null;
   return (
-    <SsoAuthorization
-      key={params.toString()}
-      request={{
-        clientId: params.get('client_id') || '',
-        redirectUri: params.get('redirect_uri') || '',
-        responseType: params.get('response_type') || 'code',
-        scope: params.get('scope') || 'read',
-        state: params.get('state') || '',
-      }}
-      user={session.user}
-      service={ssoService}
-      onExpired={expired}
-      onAllow={(url) => window.location.assign(url)}
-      onDeny={() => navigate('/')}
-    />
+    <>
+      <SsoAuthorization
+        key={params.toString()}
+        request={{
+          clientId: params.get('client_id') || '',
+          redirectUri: params.get('redirect_uri') || '',
+          responseType: params.get('response_type') || 'code',
+          scope: params.get('scope') || 'read',
+          state: params.get('state') || '',
+        }}
+        user={session.user}
+        service={ssoService}
+        onExpired={expired}
+        onAllow={(url) => window.location.assign(url)}
+        onDeny={() => navigate('/')}
+      />
+      <PageFooterOutlet />
+    </>
   );
 }

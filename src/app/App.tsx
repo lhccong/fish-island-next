@@ -7,6 +7,8 @@ import { AppRoutes } from '@/app/AppRoutes';
 import { ChatConnectionProvider } from '@/app/providers/ChatConnectionProvider';
 import { NotificationSessionProvider } from '@/app/providers/NotificationSessionProvider';
 import { SignInSessionProvider } from '@/app/providers/SignInSessionProvider';
+import { PageFooterProvider } from '@/shared/ui/PageFooter';
+import { SiteFooter } from '@/app/components/SiteFooter';
 
 export function App() {
   return (
@@ -17,7 +19,9 @@ export function App() {
           <SkinProvider>
             <NotificationSessionProvider>
               <SignInSessionProvider>
-                <AppRoutes />
+                <PageFooterProvider footer={<SiteFooter />}>
+                  <AppRoutes />
+                </PageFooterProvider>
               </SignInSessionProvider>
             </NotificationSessionProvider>
           </SkinProvider>

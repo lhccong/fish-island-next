@@ -4,6 +4,7 @@ import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { petService } from '@/app/config/pet';
 import { useAuth } from '@/features/auth';
 import { PetWorkspace } from '@/features/pet';
+import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './GamesPage.module.css';
 
 export function PetPage() {
@@ -15,7 +16,7 @@ export function PetPage() {
       sidebarLabel="发现导航"
       mobileHeader="back-only"
       slots={{
-        contentFill: true,
+        contentScroll: false,
         sidebar: <DiscoveryNavigation />,
         header: (
           <>
@@ -26,18 +27,20 @@ export function PetPage() {
           </>
         ),
         content: (
-          <PetWorkspace
-            key={session.user.id}
-            service={petService}
-            onLotterySettled={refreshUser}
-            userId={session.user.id}
-            points={
-              session.user.points === undefined
-                ? undefined
-                : session.user.points - (session.user.usedPoints ?? 0)
-            }
-            openTournament={params.get('challenge') === 'tournament'}
-          />
+          <ScrollArea label="主内容滚动区" fillContent>
+            <PetWorkspace
+              key={session.user.id}
+              service={petService}
+              onLotterySettled={refreshUser}
+              userId={session.user.id}
+              points={
+                session.user.points === undefined
+                  ? undefined
+                  : session.user.points - (session.user.usedPoints ?? 0)
+              }
+              openTournament={params.get('challenge') === 'tournament'}
+            />
+          </ScrollArea>
         ),
       }}
     />

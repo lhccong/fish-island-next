@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useCallback, useState } from 'react';
 import { PenLine, ListFilter } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
@@ -145,6 +146,7 @@ export function ForumList({
         </div>
         <ForumTopics service={service} onOpen={onOpen} />
       </div>
+      <PageFooterOutlet />
     </ScrollArea>
   );
 }

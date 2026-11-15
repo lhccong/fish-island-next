@@ -1,4 +1,5 @@
 import { useStore } from 'zustand';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useId, useRef, useState, type ReactNode } from 'react';
 import { Folder, Plus, Scissors } from 'lucide-react';
 import { EmoticonLauncher } from './EmoticonLauncher';
@@ -121,6 +122,11 @@ export function ChatComposer({
           </div>
         </div>
         <div className={styles.actions}>
+          {presentation === 'conversation' && (
+            <div className={styles.composerFooter}>
+              <PageFooterOutlet />
+            </div>
+          )}
           <div className={styles.composerFeedback}>
             <EmoticonFeedback />
             {feedback && (

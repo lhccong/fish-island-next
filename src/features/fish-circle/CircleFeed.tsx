@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { AuthUser } from '@/domain/auth';
@@ -183,7 +184,10 @@ export function CircleFeed({
     content: (
       <div className={styles.workspace}>
         <div className={styles.feedPane} hidden={selected !== null}>
-          <ScrollArea label="鱼小圈列表滚动区">{content}</ScrollArea>
+          <ScrollArea label="鱼小圈列表滚动区">
+            {content}
+            <PageFooterOutlet />
+          </ScrollArea>
         </div>
         {selected && (
           <ReminderDetail

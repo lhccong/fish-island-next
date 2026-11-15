@@ -1,4 +1,5 @@
 import { BookOpen, Check, Layers3, MessageCircle, Palette, Radio } from 'lucide-react';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ColorModePicker, useAppearanceStore } from '@/features/appearance';
 import { builtinSkins } from '@/skins/builtin';
@@ -115,6 +116,7 @@ export function InitializationPage() {
         <span>设计有边界，迭代有依据。</span>
         <span>ARCHITECTURE FIRST · 2026</span>
       </footer>
+      <PageFooterOutlet />
     </div>
   );
 }

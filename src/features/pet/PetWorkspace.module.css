@@ -1,4 +1,6 @@
 .scroll {
+  display: flex;
+  flex-direction: column;
   position: relative;
   isolation: isolate;
   container: pet-workspace / inline-size;
@@ -20,6 +22,8 @@
   background: var(--color-canvas);
 }
 .workspace {
+  flex: 1;
+  width: 100%;
   --color-surface: var(--color-pixel-paper);
   --color-text: var(--color-pixel-ink);
   --color-muted: var(--color-pixel-muted);

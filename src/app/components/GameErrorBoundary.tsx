@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import styles from './GameErrorBoundary.module.css';
 
 export class GameErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -15,6 +16,7 @@ export class GameErrorBoundary extends Component<{ children: ReactNode }, { fail
           重新加载
         </button>
         <a href="/discover/games">返回游戏目录</a>
+        <PageFooterOutlet />
       </main>
     ) : (
       this.props.children

@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useRef, useState } from 'react';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
@@ -52,6 +53,7 @@ export function WelfareWorkspace() {
             <p>欢迎常来看看优惠券和福利活动。</p>
           </section>
         </div>
+        <PageFooterOutlet />
       </ScrollArea>
       {preview && (
         <Dialog

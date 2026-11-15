@@ -1,4 +1,5 @@
 import { Fish } from 'lucide-react';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import styles from './PageLoading.module.css';
 
 export function PageLoading() {
@@ -12,6 +13,7 @@ export function PageLoading() {
         <h1 className={styles.title}>正在打开页面</h1>
         <p className={styles.hint}>稍等片刻，马上就好</p>
       </div>
+      <PageFooterOutlet />
     </main>
   );
 }

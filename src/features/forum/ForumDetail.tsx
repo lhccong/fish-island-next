@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useState } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import type { ForumPort, ForumPost } from '@/domain/forum';
@@ -158,6 +159,7 @@ export function ForumDetail({
           </Dialog>
         )}
       </article>
+      <PageFooterOutlet />
     </ScrollArea>
   );
 }

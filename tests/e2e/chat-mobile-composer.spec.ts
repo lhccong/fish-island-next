@@ -9,6 +9,8 @@ for (const skin of builtinSkins)
     test(`${skin.id} ${mode}: compact composer and expandable tools`, async ({ page }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode);
       const mobile = page.viewportSize()!.width <= 760;
+      if (mobile)
+        await expect(page.locator('footer[aria-label="网站备案与版权"]:visible')).toHaveCount(0);
       const composer = page.getByRole('region', { name: '群聊输入区', exact: true });
       const editor = page.getByRole('textbox', { name: '消息草稿', exact: true });
       const more = page.getByRole('button', { name: '更多聊天工具' });

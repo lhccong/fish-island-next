@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import type { AuthUser, AvatarFrame } from '@/domain/auth';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -159,6 +160,7 @@ export default function AvatarFramesDialog({
             </>
           )}
         </div>
+        {embedded && <PageFooterOutlet />}
       </ScrollArea>
       <div className={styles.feedback}>
         {busy && <LoadingIndicator compact>正在保存…</LoadingIndicator>}

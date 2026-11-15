@@ -1,3 +1,4 @@
+import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useEffect, useRef } from 'react';
 import type { AuthUser } from '@/domain/auth';
@@ -82,6 +83,7 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
             </div>
           )}
         </div>
+        <PageFooterOutlet />
       </ScrollArea>
     </section>
   );
