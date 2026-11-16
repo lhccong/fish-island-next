@@ -49,6 +49,14 @@ test('all themes: readable golden broadcasts, slow full playback and reduced mot
         await expect(card).toHaveAttribute('data-duration-ms', '3000');
         await expect(card).toHaveAttribute('data-distance', '0');
         expect(await text.evaluate((el) => el.getAnimations().length)).toBe(0);
+        await expect(card).toHaveCSS('opacity', '1');
+        const shortBounds = (await card.boundingBox())!;
+        expect(shortBounds.width).toBeLessThan(300);
+        expect(Math.abs(shortBounds.x + shortBounds.width / 2 - width / 2)).toBeLessThan(1);
+        expect(
+          await text.evaluate((el) => el.parentElement!.clientWidth - el.scrollWidth),
+        ).toBeLessThanOrEqual(1);
+        await page.screenshot({ path: info.outputPath(`${prefix}-short.png`) });
         await page.clock.fastForward(2999);
         await expect(banner).toBeVisible();
         await page.clock.fastForward(1);

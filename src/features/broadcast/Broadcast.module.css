@@ -12,7 +12,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  width: min(640px, 100%);
+  width: max-content;
+  max-width: min(640px, 100%);
   min-width: 0;
   min-height: 44px;
   padding: 9px 44px 9px 12px;
