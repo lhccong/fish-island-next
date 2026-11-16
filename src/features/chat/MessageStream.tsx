@@ -20,6 +20,7 @@ interface RowContext {
   showAvatarFrames: boolean;
   presentation: ChatPresentation;
   firstItemIndex: number;
+  compactWorksheet: boolean;
 }
 const row = (index: number, id: string, context: RowContext) => (
   <MessageRow
@@ -27,6 +28,7 @@ const row = (index: number, id: string, context: RowContext) => (
     showAvatars={context.showAvatars}
     showAvatarFrames={context.showAvatarFrames}
     presentation={context.presentation}
+    compactWorksheet={context.compactWorksheet}
     rowNumber={
       context.presentation === 'worksheet' ? index - context.firstItemIndex + 1 : undefined
     }
@@ -34,8 +36,10 @@ const row = (index: number, id: string, context: RowContext) => (
 );
 export function MessageStream({
   presentation = 'conversation',
+  compactWorksheet = false,
 }: {
   presentation?: ChatPresentation;
+  compactWorksheet?: boolean;
 }) {
   const { controller, navigation, avatarPreference: avatars } = useChatRealtime();
   const ids = useStore(controller.store, (state) => state.visibleIds);
@@ -49,8 +53,9 @@ export function MessageStream({
       showAvatarFrames: !avatars.hideAvatarFrames,
       presentation,
       firstItemIndex,
+      compactWorksheet,
     }),
-    [avatars.showAvatars, avatars.hideAvatarFrames, presentation, firstItemIndex],
+    [avatars.showAvatars, avatars.hideAvatarFrames, presentation, firstItemIndex, compactWorksheet],
   );
   useEffect(() => {
     const deactivate = controller.history.activate();
@@ -151,9 +156,13 @@ export function MessageStream({
   return (
     <section className={styles.stream} aria-label="群聊实时消息" data-presentation={presentation}>
       <ConnectionStatus />
-      {presentation === 'worksheet' && <WorksheetHeader />}
+      {presentation === 'worksheet' && <WorksheetHeader compact={compactWorksheet} />}
       <div className={styles.list}>
-        <ScrollArea label="群聊消息区" viewportRef={setViewport}>
+        <ScrollArea
+          label="群聊消息区"
+          viewportRef={setViewport}
+          gutter={compactWorksheet ? 'reserved' : 'overlay'}
+        >
           {ids.length === 0 ? (
             <>
               <HistoryBoundary />
@@ -171,8 +180,9 @@ export function MessageStream({
                 context={rowContext}
                 computeItemKey={key}
                 itemContent={row}
-                // Compensate variable-height rows before paint instead of one frame later.
-                skipAnimationFrameInResizeObserver
+                // Dense worksheet rows use Virtuoso's frame scheduling to batch cell resizing.
+                // Conversation/image rows retain synchronous anchor compensation (ADR-089).
+                skipAnimationFrameInResizeObserver={!compactWorksheet}
                 atBottomThreshold={64}
                 atBottomStateChange={updateBottom}
                 // Let Virtuoso coordinate measurement and scrolling; external resize writes

@@ -24,8 +24,7 @@ export function PointsShop({
 }) {
   const [tab, setTab] = useState<(typeof tabs)[number]>('头像框');
   const [itemsVisited, setItemsVisited] = useState(false);
-  const available =
-    points === undefined || usedPoints === undefined ? null : Math.max(0, points - usedPoints);
+  const available = points === undefined || usedPoints === undefined ? null : points - usedPoints;
   return (
     <section className={styles.shop} aria-label="店铺">
       <div className={styles.summary}>
@@ -34,7 +33,8 @@ export function PointsShop({
           <strong>{available === null ? '待同步' : available.toLocaleString()}</strong>
         </div>
         <p>
-          累计 {points?.toLocaleString() ?? '—'} · 已用 {usedPoints?.toLocaleString() ?? '—'}
+          等级积分 {points?.toLocaleString() ?? '—'} · 使用积分{' '}
+          {usedPoints?.toLocaleString() ?? '—'}
         </p>
       </div>
       <nav className={styles.tabs} aria-label="店铺分类">

@@ -5,7 +5,7 @@ export function releaseFrameFixture(page: Page) {
   pendingFixtures.get(page)?.();
 }
 
-export async function frameFixture(page: Page, skin: string, mode: string) {
+export async function frameFixture(page: Page, skin: string, mode: string, usedPoints = 100) {
   const user = {
     id: 'synthetic-frame-user',
     userName: '头像框岛友',
@@ -13,7 +13,7 @@ export async function frameFixture(page: Page, skin: string, mode: string) {
     userAvatar: '',
     avatarFramerUrl: '',
     points: 1000,
-    usedPoints: 100,
+    usedPoints,
   };
   const state = {
     catalog: 'loading',

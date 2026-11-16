@@ -68,3 +68,16 @@
   max-height: 120px;
   padding: 7px 4px;
 }
+:global([data-floating-excel='true']) .editor[data-presentation='worksheet'] {
+  height: 32px;
+  min-height: 32px;
+  padding: 5px 4px;
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  :global([data-floating-excel='true']) .editor[data-presentation='worksheet'] {
+    height: auto;
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

@@ -22,12 +22,14 @@ export const MessageRow = memo(function MessageRow({
   showAvatarFrames,
   presentation = 'conversation',
   rowNumber,
+  compactWorksheet = false,
 }: {
   id: string;
   showAvatars: boolean;
   showAvatarFrames: boolean;
   presentation?: ChatPresentation;
   rowNumber: number | undefined;
+  compactWorksheet?: boolean;
 }) {
   const { controller, userId, user, draft, composerRef, navigation, blacklist } = useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
@@ -80,7 +82,7 @@ export const MessageRow = memo(function MessageRow({
       ) : (
         <>
           {message.quote && <MessageQuote quote={message.quote} />}
-          <MessageContent parts={parts} accountId={userId} />
+          <MessageContent parts={parts} accountId={userId} compactImages={compactWorksheet} />
         </>
       )}
     </div>

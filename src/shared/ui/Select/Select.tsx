@@ -12,6 +12,7 @@ interface SelectProps {
   placeholder?: string;
   onValueChange: (value: string) => void;
   pagination?: ReactNode;
+  triggerIcon?: ReactNode;
 }
 
 export function Select({
@@ -23,6 +24,7 @@ export function Select({
   placeholder = '请选择',
   onValueChange,
   pagination,
+  triggerIcon,
 }: SelectProps) {
   const selected = options.find((option) => option.value === value);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -39,12 +41,22 @@ export function Select({
         ref={trigger}
         className={`${styles.trigger} ${appearance === 'pixel' ? styles.pixel : ''}`}
         aria-label={label}
+        data-icon-only={!!triggerIcon}
+        title={triggerIcon ? `${label}：${selected?.label ?? placeholder}` : undefined}
       >
-        <Primitive.Value placeholder={placeholder}>
-          {selected?.label ?? placeholder}
-        </Primitive.Value>
+        {triggerIcon ? (
+          <span className={styles.hiddenValue}>
+            <Primitive.Value placeholder={placeholder}>
+              {selected?.label ?? placeholder}
+            </Primitive.Value>
+          </span>
+        ) : (
+          <Primitive.Value placeholder={placeholder}>
+            {selected?.label ?? placeholder}
+          </Primitive.Value>
+        )}
         <Primitive.Icon className={styles.icon}>
-          <ChevronDown size={16} aria-hidden="true" />
+          {triggerIcon ?? <ChevronDown size={16} aria-hidden="true" />}
         </Primitive.Icon>
       </Primitive.Trigger>
       <Primitive.Portal>

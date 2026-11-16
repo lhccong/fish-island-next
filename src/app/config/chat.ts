@@ -20,6 +20,7 @@ import { gameRealtime } from '@/app/config/game-realtime';
 import { drawChannel } from '@/app/config/draw';
 import { landlordsChannel } from '@/app/config/landlords';
 import { undercoverChannel } from '@/app/config/undercover';
+import { broadcastChannel } from '@/app/config/broadcast';
 
 const vault = createBrowserSessionVault(apiBaseUrl);
 export const chatReport = createChatReport(
@@ -73,6 +74,7 @@ export const chatRealtime = createChatRealtimeController(
     },
     {
       receive(raw) {
+        broadcastChannel.receive(raw);
         gameRealtime.receive(raw);
         undercoverChannel.receive(raw);
         drawChannel.receive(raw);

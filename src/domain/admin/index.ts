@@ -1,5 +1,6 @@
-export type AdminSection = 'data' | 'user' | 'title' | 'tags' | 'word' | 'equipment' | 'report';
-export type AdminCollection = Exclude<AdminSection, 'data'>;
+export type AdminSection =
+  'data' | 'user' | 'title' | 'tags' | 'word' | 'equipment' | 'report' | 'broadcast';
+export type AdminCollection = Exclude<AdminSection, 'data' | 'broadcast'>;
 export function isAssignableTitle(id: string): boolean {
   return /^[1-9]\d*$/.test(id) && !(Number(id) >= 2 && Number(id) <= 10);
 }
@@ -96,6 +97,7 @@ export interface AdminTrend {
   count: number;
 }
 export interface AdminPort {
+  publishBroadcast(content: string, signal: AbortSignal): Promise<void>;
   list<K extends AdminCollection>(
     section: K,
     page: number,

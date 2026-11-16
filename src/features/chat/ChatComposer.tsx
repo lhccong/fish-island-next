@@ -15,6 +15,7 @@ import { ChatImageLauncher } from './ChatImageLauncher';
 import { ChatToolsMenu } from './ChatToolsMenu';
 import styles from './ChatWorkspace.module.css';
 import type { ChatPresentation } from './chat-presentation';
+import { WorksheetAddress } from './WorksheetAddress';
 
 export function ChatComposer({
   presentation = 'conversation',
@@ -22,12 +23,14 @@ export function ChatComposer({
   floating = false,
   onToggleFloating,
   toolsPresentation = 'inline',
+  compactWorksheet = false,
 }: {
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
   floating?: boolean;
   onToggleFloating?: () => void;
   toolsPresentation?: 'inline' | 'menu';
+  compactWorksheet?: boolean;
 }) {
   const [toolsOpen, setToolsOpen] = useState(false);
   const toolsId = useId();
@@ -80,57 +83,82 @@ export function ChatComposer({
       <ComposerImage />
       <div className={styles.inputRow}>
         <div className={styles.tools}>
-          <EmoticonLauncher />
-          <ChatImageLauncher inputRef={imageInput} />
-          {toolsPresentation === 'menu' ? (
-            <ChatToolsMenu
-              className={styles.moreTools ?? ''}
-              floating={floating}
-              onToggleFloating={onToggleFloating}
-              onUploadImage={() => imageInput.current?.click()}
-              imageDisabled={!user || image.status !== 'empty'}
-            />
+          {compactWorksheet ? (
+            <>
+              <ChatToolsMenu
+                className={styles.moreTools ?? ''}
+                triggerLabel="文件"
+                floating={floating}
+                onToggleFloating={onToggleFloating}
+                onUploadImage={() => imageInput.current?.click()}
+                imageDisabled={!user || image.status !== 'empty'}
+              />
+              <span className={styles.ribbonActive} aria-hidden="true">
+                开始
+              </span>
+              <span className={styles.ribbonLabel} aria-hidden="true">
+                插入
+              </span>
+              <div hidden>
+                <ChatImageLauncher inputRef={imageInput} />
+              </div>
+            </>
           ) : (
-            <Button
-              ref={toolsTrigger}
-              variant="secondary"
-              className={styles.moreTools}
-              aria-label="更多聊天工具"
-              aria-expanded={toolsOpen}
-              aria-controls={toolsId}
-              onClick={() => setToolsOpen((open) => !open)}
-            >
-              <Plus size={24} aria-hidden="true" />
-            </Button>
-          )}
-          <div id={toolsId} className={styles.extraTools}>
-            <RedPacketLauncher key={user?.id ?? ''} />
-            <LuckyBagLauncher key={`lucky:${user?.id ?? ''}`} />
-            {onToggleFloating && (
-              <Button
-                variant="secondary"
-                className={styles.iconButton}
-                aria-label={floating ? '返回完整聊天' : '小窗模式'}
-                title={floating ? '返回完整聊天' : '小窗模式'}
-                aria-pressed={floating}
-                onClick={onToggleFloating}
-              >
-                {floating ? (
-                  <Maximize2 size={20} aria-hidden="true" />
-                ) : (
-                  <PictureInPicture2 size={20} aria-hidden="true" />
+            <>
+              <EmoticonLauncher />
+              <ChatImageLauncher inputRef={imageInput} />
+              {toolsPresentation === 'menu' ? (
+                <ChatToolsMenu
+                  className={styles.moreTools ?? ''}
+                  floating={floating}
+                  onToggleFloating={onToggleFloating}
+                  onUploadImage={() => imageInput.current?.click()}
+                  imageDisabled={!user || image.status !== 'empty'}
+                />
+              ) : (
+                <Button
+                  ref={toolsTrigger}
+                  variant="secondary"
+                  className={styles.moreTools}
+                  aria-label="更多聊天工具"
+                  aria-expanded={toolsOpen}
+                  aria-controls={toolsId}
+                  onClick={() => setToolsOpen((open) => !open)}
+                >
+                  <Plus size={24} aria-hidden="true" />
+                </Button>
+              )}
+              <div id={toolsId} className={styles.extraTools}>
+                <RedPacketLauncher key={user?.id ?? ''} />
+                <LuckyBagLauncher key={`lucky:${user?.id ?? ''}`} />
+                {onToggleFloating && (
+                  <Button
+                    variant="secondary"
+                    className={styles.iconButton}
+                    aria-label={floating ? '返回完整聊天' : '小窗模式'}
+                    title={floating ? '返回完整聊天' : '小窗模式'}
+                    aria-pressed={floating}
+                    onClick={onToggleFloating}
+                  >
+                    {floating ? (
+                      <Maximize2 size={20} aria-hidden="true" />
+                    ) : (
+                      <PictureInPicture2 size={20} aria-hidden="true" />
+                    )}
+                  </Button>
                 )}
-              </Button>
-            )}
-            <button type="button" disabled aria-label="文件（暂未接入）">
-              <Folder size={20} />
-            </button>
-            <button type="button" disabled aria-label="截图（暂未接入）">
-              <Scissors size={20} />
-            </button>
-          </div>
+                <button type="button" disabled aria-label="文件（暂未接入）">
+                  <Folder size={20} />
+                </button>
+                <button type="button" disabled aria-label="截图（暂未接入）">
+                  <Scissors size={20} />
+                </button>
+              </div>
+            </>
+          )}
         </div>
         <div className={styles.editorSlot}>
+          {compactWorksheet && <WorksheetAddress />}
           {presentation === 'worksheet' && (
             <span className={styles.formulaIcon} aria-hidden="true">
               ƒx

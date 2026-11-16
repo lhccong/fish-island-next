@@ -18,12 +18,14 @@ export function ChatToolsMenu({
   onToggleFloating,
   onUploadImage,
   imageDisabled,
+  triggerLabel,
 }: {
   className: string;
   floating: boolean;
   onToggleFloating?: (() => void) | undefined;
   onUploadImage: () => void;
   imageDisabled: boolean;
+  triggerLabel?: string;
 }) {
   const trigger = useRef<HTMLButtonElement>(null);
   const [panel, setPanel] = useState<Panel>(null);
@@ -79,7 +81,7 @@ export function ChatToolsMenu({
         {...(panel !== null ? { onCloseFocus: () => undefined } : {})}
         trigger={
           <Button ref={trigger} variant="secondary" className={className} aria-label="更多聊天工具">
-            <Plus size={24} aria-hidden="true" />
+            {triggerLabel ?? <Plus size={24} aria-hidden="true" />}
           </Button>
         }
       />

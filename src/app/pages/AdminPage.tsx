@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import type { AdminFilter, AdminSection } from '@/domain/admin';
 import {
   AdminAnalytics,
+  BroadcastPublisher,
   UserList,
   TitleList,
   TagList,
@@ -41,6 +42,8 @@ export function AdminPage({ section }: { section: AdminSection | 'overview' }) {
           <div key={session.status === 'authenticated' ? session.user.id : 'anonymous'}>
             {section === 'overview' ? (
               <AdminNavigation hideHeading />
+            ) : section === 'broadcast' ? (
+              <BroadcastPublisher port={adminPort} />
             ) : section === 'data' ? (
               <AdminAnalytics port={adminPort} onUsers={(t) => navigate(`/admin/user?type=${t}`)} />
             ) : section === 'user' ? (

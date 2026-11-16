@@ -1,5 +1,9 @@
 # 浏览器默认控件样式排查与整改
 
+## 聊天小窗模式（ADR-092）
+
+入口：聊天 → 小窗模式 → 标题栏模式图标，以及 /chat/mini。源码：`src/features/chat/ChatWindow.tsx`。模式选择复用 shared/ui/Select 的单图标触发器及 Radix 选项面板，当前值位于隐藏的无障碍标签，图标 44px 命中区；不保留可见的默认按钮文字或系统下拉。消息菜单与文件菜单复用统一 ContextMenu/DropdownMenu，并修复浮窗遮挡。没有新增原生 select 或系统确认。验证记录见 ADR-092。
+
 ## 头像框迁移（ADR-070）
 
 入口：账号菜单 → 头像框。源码：`src/features/auth/AvatarFramesDialog.tsx`。操作复用 Button、兑换确认复用 Dialog、列表复用 reserved ScrollArea 与 InfiniteScroll；没有原生 select/option 或 alert/confirm/prompt，旧商城的 Ant Design 控件没有复制。全部主题、双模式、桌面/375px/390px 验证范围及限制见 [头像框验收](avatar-frames-migration.md)。

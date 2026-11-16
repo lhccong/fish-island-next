@@ -259,6 +259,8 @@
 }
 @media (min-width: 761px) {
   .navigation[data-shell='wps'] .bottom {
+    justify-self: end;
+    width: 52px;
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;

@@ -19,7 +19,15 @@ export function FloatingWindow({
   returnFocusRef,
   variant = 'default',
   actionName = '游戏',
+  headerAction,
+  titleContent,
+  appearance = 'default',
+  standalone = false,
 }: {
+  titleContent?: ReactNode;
+  appearance?: 'default' | 'worksheet';
+  standalone?: boolean;
+  headerAction?: ReactNode;
   variant?: 'default' | 'compact';
   actionName?: string;
   title: string;
@@ -68,7 +76,7 @@ export function FloatingWindow({
     return () => window.removeEventListener('resize', clamp);
   }, []);
   const start = (event: PointerEvent<HTMLElement>, resize: boolean) => {
-    if (event.button !== 0 || maximized || innerWidth <= 760) return;
+    if (event.button !== 0 || maximized || standalone || innerWidth <= 760) return;
     const target = event.currentTarget;
     const x = event.clientX,
       y = event.clientY,
@@ -125,6 +133,8 @@ export function FloatingWindow({
           className={styles.window}
           data-maximized={maximized}
           data-variant={variant}
+          data-appearance={appearance}
+          data-standalone={standalone}
           style={
             {
               '--window-x': `${bounds.x}px`,
@@ -141,7 +151,7 @@ export function FloatingWindow({
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => {
             e.preventDefault();
-            if (!hidden) onHide();
+            if (!hidden && !standalone) onHide();
           }}
         >
           <header className={styles.header}>
@@ -151,11 +161,14 @@ export function FloatingWindow({
                 className={styles.title}
                 aria-label={`拖动${title}窗口`}
                 onPointerDown={(e) => start(e, false)}
-                onDoubleClick={() => setMaximized(!maximized)}
+                onDoubleClick={() => {
+                  if (!standalone) setMaximized(!maximized);
+                }}
               >
-                {title}
+                {titleContent ?? title}
               </button>
             </Dialog.Title>
+            {headerAction}
             <button type="button" aria-label={`收起${actionName}窗口`} onClick={onHide}>
               <Minus size={18} />
             </button>

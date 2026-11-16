@@ -1,0 +1,13 @@
+.cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+}
+.cell .toggle {
+  padding-inline: 4px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-accent-text);
+  font-size: inherit;
+}

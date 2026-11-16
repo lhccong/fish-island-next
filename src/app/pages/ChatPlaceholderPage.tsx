@@ -133,6 +133,7 @@ export function ChatPlaceholderPage() {
                 ),
                 content: (
                   <ChatWorkspace
+                    miniChatHref="/chat/mini"
                     key={session.user.id}
                     membersOpen={membersOpen}
                     classicMembersOpen={!membersCollapsed}

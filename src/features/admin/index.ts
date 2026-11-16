@@ -1,4 +1,5 @@
 export { AdminAnalytics } from './AdminAnalytics';
+export { BroadcastPublisher } from './BroadcastPublisher';
 export { UserList } from './UserList';
 export { TitleList } from './TitleList';
 export { TagList } from './TagList';

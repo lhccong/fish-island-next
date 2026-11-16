@@ -11,6 +11,7 @@ export async function setupChatMenu(
   mode: string,
   role = 'user',
   prepare?: () => Promise<void>,
+  waitForHistory = true,
 ) {
   let socket!: WebSocketRoute;
   let connections = 0;
@@ -72,7 +73,8 @@ export async function setupChatMenu(
     '已连接 · HTTP 发送 / 实时接收',
     { timeout: 15_000 },
   );
-  await expect(page.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
+  if (waitForHistory)
+    await expect(page.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
   return {
     broadcast(message: Record<string, unknown>) {
       socket.send(JSON.stringify({ type: 'chat', data: { message } }));

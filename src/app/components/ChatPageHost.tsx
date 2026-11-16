@@ -8,8 +8,17 @@ const ChatPage = lazy(() =>
     default: module.ChatPlaceholderPage,
   })),
 );
+const ChatMiniPage = lazy(() =>
+  import('@/app/pages/ChatMiniPage').then((module) => ({ default: module.ChatMiniPage })),
+);
 
-export function ChatPageHost({ active }: { active: boolean }) {
+export function ChatPageHost({
+  active,
+  standalone = false,
+}: {
+  active: boolean;
+  standalone?: boolean;
+}) {
   const { mode, setMode } = useChatWindow();
   useEffect(() => {
     if (active && mode === 'restoring') setMode('inline');
@@ -18,9 +27,7 @@ export function ChatPageHost({ active }: { active: boolean }) {
   return (
     <div hidden={!active}>
       <Suspense fallback={active ? <PageLoading /> : null}>
-        <RequireAuth>
-          <ChatPage />
-        </RequireAuth>
+        <RequireAuth>{standalone ? <ChatMiniPage /> : <ChatPage />}</RequireAuth>
       </Suspense>
     </div>
   );

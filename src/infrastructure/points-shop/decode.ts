@@ -5,10 +5,15 @@ export function record(value: unknown): Record<string, unknown> {
     throw new Error('商城数据格式异常，请重试');
   return value as Record<string, unknown>;
 }
-function integer(value: unknown): number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0)
+function signedInteger(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value))
     throw new Error('商城积分数据异常，请重试');
   return value;
+}
+function integer(value: unknown): number {
+  const number = signedInteger(value);
+  if (number < 0) throw new Error('商城积分数据异常，请重试');
+  return number;
 }
 function id(value: unknown): string {
   if (
@@ -50,7 +55,7 @@ export function decodePointsRecord(value: unknown): PointsRecord {
     description: text(data.description) || text(data.sourceTypeText) || '积分变动',
     createdAt: text(data.createTime),
     change: integer(data.changePoints) * (data.changeType === 1 ? 1 : -1),
-    available: integer(data.afterPoints) - integer(data.afterUsedPoints),
+    available: integer(data.afterPoints) - signedInteger(data.afterUsedPoints),
   };
 }
 export function decodePage<T>(value: unknown, decode: (value: unknown) => T): ShopPage<T> {

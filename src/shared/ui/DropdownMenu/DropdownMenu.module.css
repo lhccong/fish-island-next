@@ -1,5 +1,5 @@
 .menu {
-  z-index: 30;
+  z-index: 90;
   min-width: 112px;
   max-width: calc(100vw - var(--space-4));
   max-height: var(--radix-dropdown-menu-content-available-height);

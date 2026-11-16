@@ -34,7 +34,10 @@ for (const skin of builtinSkins)
       const management = page
         .getByRole('navigation', { name: '管理导航' })
         .filter({ visible: true });
-      await expect(management.getByRole('link')).toHaveText(adminRoutes.map((r) => r[1]));
+      await expect(management.getByRole('link')).toHaveText([
+        '全体播报',
+        ...adminRoutes.map((r) => r[1]),
+      ]);
       await expect(page.getByRole('menu')).toHaveCount(0);
       await page.screenshot({ path: info.outputPath('admin-navigation.png') });
       for (const [path, label] of adminRoutes) {

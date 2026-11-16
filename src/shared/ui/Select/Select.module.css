@@ -26,6 +26,30 @@
   flex-shrink: 0;
   color: var(--color-muted);
 }
+.trigger[data-icon-only='true'] {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+  border-color: transparent;
+  background: transparent;
+  color: inherit;
+}
+.trigger[data-icon-only='true'] .icon {
+  color: inherit;
+}
+.trigger[data-icon-only='true']:hover:not(:disabled),
+.trigger[data-icon-only='true'][data-state='open'] {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border-color: transparent;
+}
+.hiddenValue {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
 .trigger:hover:not(:disabled),
 .trigger[data-state='open'] {
   border-color: var(--color-accent-text);

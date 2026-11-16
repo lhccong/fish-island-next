@@ -8,6 +8,27 @@
   place-items: center;
   height: 100%;
 }
+.modeSelect {
+  flex-shrink: 0;
+  width: 48px;
+  padding: 2px;
+}
+.headerActions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.openTab {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-control);
+  color: inherit;
+}
+.openTab:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
 .resume {
   position: fixed;
   z-index: 60;

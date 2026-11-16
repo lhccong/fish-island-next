@@ -1,0 +1,24 @@
+:root {
+  --color-excel-chrome: #217346;
+  --color-excel-on-chrome: #ffffff;
+  --color-excel-surface: #ffffff;
+  --color-excel-canvas: #ffffff;
+  --color-excel-header: #f3f3f3;
+  --color-excel-text: #111111;
+  --color-excel-muted: #606060;
+  --color-excel-border: #d4d4d4;
+  --color-excel-selection: #e2f0e8;
+  --color-excel-accent: #217346;
+}
+:root[data-color-mode='dark'] {
+  --color-excel-chrome: #174f34;
+  --color-excel-on-chrome: #f3faf5;
+  --color-excel-surface: #202225;
+  --color-excel-canvas: #191a1c;
+  --color-excel-header: #292c30;
+  --color-excel-text: #e8ece9;
+  --color-excel-muted: #b0bab4;
+  --color-excel-border: #454b47;
+  --color-excel-selection: #2a4033;
+  --color-excel-accent: #8bd6a9;
+}

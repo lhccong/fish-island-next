@@ -57,3 +57,22 @@
     color: var(--color-muted);
   }
 }
+:global([data-floating-excel='true']) .letters {
+  display: grid;
+  grid-template-columns: var(--chat-sheet-columns);
+}
+:global([data-floating-excel='true']) .letters > span {
+  padding: 2px 4px;
+  font-size: 11px;
+  line-height: 18px;
+}
+:global([data-floating-excel='true']) .columns {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+:global([data-floating-excel='true']) .content::before {
+  content: none;
+}

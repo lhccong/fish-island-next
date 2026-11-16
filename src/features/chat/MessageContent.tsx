@@ -4,13 +4,16 @@ import { MessageImage } from './MessageImage';
 import { MessageText } from './MessageText';
 import { RedPacketMessage } from './RedPacketMessage';
 import { LuckyBagMessage } from './LuckyBagMessage';
+import { CompactMessageImage } from './CompactMessageImage';
 
 export const MessageContent = memo(function MessageContent({
   parts,
   accountId,
+  compactImages = false,
 }: {
   parts: readonly MessageContentPart[];
   accountId: string;
+  compactImages?: boolean;
 }) {
   let offset = 0;
   return parts.map((part) => {
@@ -25,7 +28,11 @@ export const MessageContent = memo(function MessageContent({
     return part.kind === 'text' ? (
       <MessageText key={key} text={part.text} />
     ) : part.kind === 'image' ? (
-      <MessageImage key={key} url={part.url} />
+      compactImages ? (
+        <CompactMessageImage key={key} url={part.url} />
+      ) : (
+        <MessageImage key={key} url={part.url} />
+      )
     ) : part.kind === 'lucky-bag' ? (
       <LuckyBagMessage key={`${accountId}:${key}`} id={part.id} />
     ) : (

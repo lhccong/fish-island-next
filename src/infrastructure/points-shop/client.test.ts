@@ -43,6 +43,50 @@ describe('积分商城协议', () => {
     expect(decodePointsRecord({ ...value, changeType: 1 }).change).toBe(100);
     expect(() => decodePointsRecord({ ...value, changeType: 3 })).toThrow();
   });
+  it.each([
+    { used: -200, available: 1200 },
+    { used: 0, available: 1000 },
+    { used: 200, available: 800 },
+    { used: 1200, available: -200 },
+  ])('使用积分 $used 时按等级积分减使用积分得到 $available', ({ used, available }) => {
+    const value = {
+      id: '1',
+      changeType: 1,
+      changePoints: 10,
+      afterPoints: 1000,
+      afterUsedPoints: used,
+    };
+    expect(decodePointsRecord(value)).toMatchObject({ change: 10, available });
+    expect(decodePointsRecord({ ...value, changeType: 2 })).toMatchObject({
+      change: -10,
+      available,
+    });
+  });
+  it('允许负使用积分，仍拒绝非法快照、负变动数量和负等级积分', () => {
+    const value = {
+      id: '1',
+      changeType: 1,
+      changePoints: 10,
+      afterPoints: 1000,
+      afterUsedPoints: -200,
+    };
+    for (const used of [
+      undefined,
+      null,
+      '',
+      '-200',
+      true,
+      0.5,
+      NaN,
+      Infinity,
+      -Infinity,
+      Number.MAX_SAFE_INTEGER + 1,
+      Number.MIN_SAFE_INTEGER - 1,
+    ])
+      expect(() => decodePointsRecord({ ...value, afterUsedPoints: used })).toThrow('积分数据异常');
+    expect(() => decodePointsRecord({ ...value, changePoints: -10 })).toThrow('积分数据异常');
+    expect(() => decodePointsRecord({ ...value, afterPoints: -1 })).toThrow('积分数据异常');
+  });
   it('沿用 GET 分页和 JSON 兑换协议，确认 true 才成功', async () => {
     const fetchMock = vi
       .fn()

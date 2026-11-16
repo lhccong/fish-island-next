@@ -137,6 +137,29 @@ for (const viewport of [
           const entryBox = await entry.boundingBox();
           expect(entryBox!.width).toBeGreaterThanOrEqual(44);
           expect(entryBox!.height).toBeGreaterThanOrEqual(44);
+          if (skin.id === 'wps' && viewport.width > 760) {
+            const themeEntry = page.getByRole('button', { name: '切换主题', exact: true });
+            for (const width of [761, 1024, 1280, 1920]) {
+              await page.setViewportSize({ width, height: viewport.height });
+              const signBox = (await entry.boundingBox())!;
+              const themeBox = (await themeEntry.boundingBox())!;
+              expect(themeBox.x - (signBox.x + signBox.width)).toBeGreaterThanOrEqual(8);
+              expect(themeBox.width).toBe(44);
+              expect(themeBox.height).toBeGreaterThanOrEqual(44);
+              expect(
+                Math.abs(themeBox.y + themeBox.height / 2 - (signBox.y + signBox.height / 2)),
+              ).toBeLessThanOrEqual(1);
+              expect(themeBox.x + themeBox.width).toBeLessThanOrEqual(width - 12);
+              await entry.hover();
+              await themeEntry.click();
+              await expect(page.getByRole('dialog', { name: '主题模式' })).toBeVisible();
+              await page.keyboard.press('Escape');
+              await expect(themeEntry).toBeFocused();
+              if (width === 1920)
+                await page.screenshot({ path: info.outputPath(`wps-entry-${mode}.png`) });
+            }
+            await page.setViewportSize(viewport);
+          }
           await entry.focus();
           await page.screenshot({ path: info.outputPath('sign-in-entry.png') });
           if (viewport.width <= 760) await entry.tap();

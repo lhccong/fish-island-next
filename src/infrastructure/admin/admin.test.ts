@@ -4,6 +4,27 @@ import { equipment, user } from './decode';
 const signal = () => new AbortController().signal;
 const token = { name: 'test-session', value: 'synthetic-value' };
 afterEach(() => vi.unstubAllGlobals());
+test('broadcast publishing uses authenticated admin endpoint and requires server confirmation', async () => {
+  const fetchMock = vi.fn<typeof fetch>(
+    async () => new Response(JSON.stringify({ code: 0, data: true })),
+  );
+  vi.stubGlobal('fetch', fetchMock);
+  const client = createAdminClient(
+    'https://admin.test',
+    () => token,
+    () => true,
+    vi.fn(),
+  );
+  await client.publishBroadcast('合成播报', signal());
+  expect(fetchMock.mock.calls[0]?.[0]).toBe('https://admin.test/api/admin/broadcast/publish');
+  expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+    method: 'POST',
+    headers: { 'test-session': 'synthetic-value' },
+    body: JSON.stringify({ content: '合成播报' }),
+  });
+  fetchMock.mockImplementation(async () => new Response(JSON.stringify({ code: 0, data: false })));
+  await expect(client.publishBroadcast('合成播报', signal())).rejects.toThrow('服务器未确认');
+});
 test('blocks missing credentials and non-admin before network', async () => {
   const fetch = vi.fn();
   vi.stubGlobal('fetch', fetch);
@@ -13,6 +34,7 @@ test('blocks missing credentials and non-admin before network', async () => {
   ] as const) {
     const client = createAdminClient('https://admin.test', credential, allowed, vi.fn());
     await expect(client.list('user', 1, {}, signal())).rejects.toThrow('仅管理员');
+    await expect(client.publishBroadcast('合成播报', signal())).rejects.toThrow('仅管理员');
   }
   expect(fetch).not.toHaveBeenCalled();
 });

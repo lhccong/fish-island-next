@@ -9,6 +9,7 @@ import { NotificationSessionProvider } from '@/app/providers/NotificationSession
 import { SignInSessionProvider } from '@/app/providers/SignInSessionProvider';
 import { PageFooterProvider } from '@/shared/ui/PageFooter';
 import { SiteFooter } from '@/app/components/SiteFooter';
+import { BroadcastSession } from '@/app/components/BroadcastSession';
 
 export function App() {
   return (
@@ -17,6 +18,7 @@ export function App() {
       <AuthProvider controller={authController}>
         <ChatConnectionProvider>
           <SkinProvider>
+            <BroadcastSession />
             <NotificationSessionProvider>
               <SignInSessionProvider>
                 <PageFooterProvider footer={<SiteFooter />}>

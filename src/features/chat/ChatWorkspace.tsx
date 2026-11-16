@@ -20,6 +20,8 @@ export function ChatWorkspace({
   presentation = 'conversation',
   toolbarAction,
   decoration = 'none',
+  standalone = false,
+  miniChatHref,
 }: {
   membersOpen: boolean;
   classicMembersOpen: boolean;
@@ -30,27 +32,37 @@ export function ChatWorkspace({
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
   decoration?: 'none' | 'island' | 'classic';
+  standalone?: boolean;
+  miniChatHref?: string;
 }) {
   const { state, refresh } = useChatMembers();
-  const renderMessages = (activePresentation: ChatPresentation) => (
+  const renderMessages = (activePresentation: ChatPresentation, floating: boolean) => (
     <div
       key="messages"
       className={styles.messages}
-      data-decoration={decoration}
-      data-chat-decoration={decoration}
+      data-decoration={floating ? 'none' : decoration}
+      data-chat-decoration={floating ? 'none' : decoration}
     >
-      <MessageStream presentation={activePresentation} />
+      <MessageStream
+        presentation={activePresentation}
+        compactWorksheet={floating && activePresentation === 'worksheet'}
+      />
     </div>
   );
 
   return (
-    <ChatWindow groupName={groupName}>
-      {(floating, toggleFloating) => (
+    <ChatWindow
+      groupName={groupName}
+      standalone={standalone}
+      {...(miniChatHref ? { miniChatHref } : {})}
+    >
+      {(floating, toggleFloating, windowPresentation) => (
         <div
           className={styles.workspace}
           data-members-open={!floating && membersOpen}
-          data-presentation={floating ? 'conversation' : presentation}
+          data-presentation={floating ? windowPresentation : presentation}
           data-floating={floating}
+          data-floating-excel={floating && windowPresentation === 'worksheet'}
           data-decoration={floating ? 'none' : decoration}
           onKeyDown={(event) => {
             if (event.key === 'Escape' && !event.defaultPrevented && membersOpen) onCloseMembers();
@@ -58,23 +70,24 @@ export function ChatWorkspace({
         >
           <div className={styles.conversation}>
             {[
-              renderMessages(floating ? 'conversation' : presentation),
+              renderMessages(floating ? windowPresentation : presentation, floating),
               <ChatComposer
                 key="composer"
-                presentation={floating ? 'conversation' : presentation}
+                presentation={floating ? windowPresentation : presentation}
+                compactWorksheet={floating && windowPresentation === 'worksheet'}
                 toolsPresentation={decoration === 'classic' ? 'menu' : 'inline'}
                 toolbarAction={!floating && toolbarAction}
                 floating={floating}
                 onToggleFloating={toggleFloating}
               />,
             ]}
-            {!floating && presentation === 'worksheet' && (
+            {(floating ? windowPresentation : presentation) === 'worksheet' && (
               <div className={styles.sheetBar} aria-label="当前工作表">
                 <span className={styles.sheetTab}>
                   <Table2 size={15} aria-hidden="true" />
-                  <span title={groupName}>{groupName}</span>
+                  <span title={groupName}>{floating ? '消息记录' : groupName}</span>
                 </span>
-                <PageFooterOutlet />
+                {floating ? <span className={styles.sheetStatus}>就绪</span> : <PageFooterOutlet />}
               </div>
             )}
           </div>

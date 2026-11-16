@@ -14,7 +14,7 @@ for (const width of [1280, 375, 390]) {
     for (const skin of builtinSkins)
       for (const mode of ['light', 'dark']) {
         test(`${skin.id} ${mode} 商城兑换、流水与布局`, async ({ page }, info) => {
-          const frames = await frameFixture(page, skin.id, mode);
+          const frames = await frameFixture(page, skin.id, mode, -200);
           frames.catalog = 'ready';
           frames.exchangeFail = false;
           frames.wearFail = false;
@@ -24,6 +24,7 @@ for (const width of [1280, 375, 390]) {
           let fail = true;
           let moreFail = true;
           let syncFail = true;
+          let syncedUsedPoints = 300;
           let recordState = 'loading';
           let releaseRecords = () => {};
           const recordsGate = new Promise<void>((resolve) => {
@@ -78,7 +79,7 @@ for (const width of [1280, 375, 390]) {
                       userName: '头像框岛友',
                       userRole: 'user',
                       points: 1000,
-                      usedPoints: 300,
+                      usedPoints: syncedUsedPoints,
                     },
                   },
             });
@@ -107,7 +108,7 @@ for (const width of [1280, 375, 390]) {
                       changeType: 2,
                       changePoints: 100,
                       afterPoints: 1000,
-                      afterUsedPoints: 200,
+                      afterUsedPoints: -200,
                       description: '兑换月卡',
                       createTime: '2026-11-15T10:00:00+08:00',
                     },
@@ -116,7 +117,7 @@ for (const width of [1280, 375, 390]) {
                       changeType: 1,
                       changePoints: 10,
                       afterPoints: 1000,
-                      afterUsedPoints: 100,
+                      afterUsedPoints: -300,
                       description: '每日签到',
                       createTime: '2026-11-15T09:00:00+08:00',
                     },
@@ -127,6 +128,10 @@ for (const width of [1280, 375, 390]) {
           });
           await page.goto('/avatarFrames', { waitUntil: 'domcontentloaded' });
           const store = page.getByRole('region', { name: '店铺', exact: true });
+          await expect(
+            store.getByText('1,200', { exact: true }).filter({ visible: true }),
+          ).toBeVisible();
+          await expect(store.getByText('等级积分 1,000 · 使用积分 -200')).toBeVisible();
           const frameScroll = page.getByRole('region', { name: '头像框列表' });
           await expect(
             page.getByRole('heading', { name: '海风头像框 1', exact: true }),
@@ -140,6 +145,9 @@ for (const width of [1280, 375, 390]) {
             .click();
           await firstFrame.getByRole('button', { name: '使用', exact: true }).click();
           await expect(firstFrame.getByRole('button', { name: '使用中' })).toBeDisabled();
+          await expect(
+            store.getByText('1,100', { exact: true }).filter({ visible: true }),
+          ).toBeVisible();
           await store.getByRole('button', { name: '其他物品', exact: true }).click();
           await expect(store.getByText('正在加载道具…')).toBeVisible();
           catalog = 'error';
@@ -162,6 +170,9 @@ for (const width of [1280, 375, 390]) {
           await expect(store.getByText('兑换月卡', { exact: true })).toBeVisible();
           await expect(store.getByText('-100', { exact: true })).toBeVisible();
           await expect(store.getByText('+10', { exact: true })).toBeVisible();
+          await expect(store.getByText(/可用 1,200/)).toBeVisible();
+          await expect(store.getByText(/可用 1,300/)).toBeVisible();
+          await page.screenshot({ path: info.outputPath('shop-records.png') });
           await assertArea(
             page.getByRole('region', { name: '积分记录', exact: true }),
             width < 760,
@@ -264,7 +275,21 @@ for (const width of [1280, 375, 390]) {
           await page.screenshot({ path: info.outputPath('shop-bottom.png') });
           await store.getByRole('button', { name: '相关介绍', exact: true }).click();
           await expect(store.getByRole('link', { name: '前往支持' })).toBeVisible();
+          syncedUsedPoints = 1200;
+          await page.reload();
+          await expect(
+            store.getByText('-200', { exact: true }).filter({ visible: true }),
+          ).toBeVisible();
+          await expect(store.getByText('等级积分 1,000 · 使用积分 1,200')).toBeVisible();
+          await store.getByRole('button', { name: '其他物品', exact: true }).click();
+          await expect(store.getByRole('button', { name: '积分不足' }).first()).toBeDisabled();
           await page.goto('/discover');
+          await page.getByRole('button', { name: '用户菜单', exact: true }).click();
+          await page.getByRole('menuitem', { name: '头像框', exact: true }).click();
+          const framesDialog = page.getByRole('dialog', { name: '头像框', exact: true });
+          await expect(framesDialog.getByText('-200', { exact: true })).toBeVisible();
+          await page.keyboard.press('Escape');
+          await expect(framesDialog).toHaveCount(0);
           const navigation = page
             .getByRole('navigation', { name: '发现菜单' })
             .filter({ visible: true });

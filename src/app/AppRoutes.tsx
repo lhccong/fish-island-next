@@ -90,7 +90,10 @@ export function AppRoutes() {
   return (
     <GameWindowsProvider>
       <div className={styles.page} aria-hidden={isLogin ? true : undefined}>
-        <ChatPageHost active={displayLocation.pathname === '/chat'} />
+        <ChatPageHost
+          active={displayLocation.pathname === '/chat' || displayLocation.pathname === '/chat/mini'}
+          standalone={displayLocation.pathname === '/chat/mini'}
+        />
         <Suspense fallback={<PageLoading />}>
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
@@ -207,6 +210,7 @@ export function AppRoutes() {
               }
             />
             <Route path="/chat" element={null} />
+            <Route path="/chat/mini" element={null} />
             <Route
               path="/moments/fish-circle"
               element={

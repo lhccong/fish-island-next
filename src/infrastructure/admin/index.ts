@@ -75,6 +75,7 @@ export function createAdminClient(
       throw new Error('服务器未确认操作成功，请刷新核对后再试');
   }
   return {
+    publishBroadcast: (content, signal) => mutate('admin/broadcast/publish', signal, { content }),
     async list<K extends AdminCollection>(
       section: K,
       page: number,

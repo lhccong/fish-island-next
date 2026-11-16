@@ -41,7 +41,7 @@ export default function AvatarFramesDialog({
       mounted.current = false;
     };
   }, []);
-  const available = Math.max(0, (user.points ?? 0) - (user.usedPoints ?? 0));
+  const available = (user.points ?? 0) - (user.usedPoints ?? 0);
 
   async function act(frame: AvatarFrame, exchange: boolean) {
     if (locked.current || pending) return;
