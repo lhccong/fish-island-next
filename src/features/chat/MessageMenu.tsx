@@ -4,13 +4,14 @@ import {
   Pencil,
   AtSign,
   Copy,
-  MoreHorizontal,
   Quote,
   Repeat2,
   Undo2,
   ImagePlus,
   Ban,
+  Flag,
 } from 'lucide-react';
+import { useChatReport } from './report-context';
 import {
   hasRewardMessageContent,
   messageClipboardText,
@@ -20,9 +21,7 @@ import {
 import { useChatRealtime } from './realtime-context';
 import { useRemarks } from './remarks-context';
 import { ContextMenu } from '@/shared/ui/ContextMenu';
-import { DropdownMenu, type DropdownMenuItem } from '@/shared/ui/DropdownMenu';
-import { Button } from '@/shared/ui/Button';
-import styles from './MessageMenu.module.css';
+import { MessageActionBar, type MessageAction } from './MessageActionBar';
 
 interface Props {
   message: ReceivedMessage;
@@ -47,6 +46,7 @@ export function MessageMenu({
   const { controller, user, userId, draft, composerRef, emoticons, navigation, blacklist } =
     useChatRealtime();
   const remarks = useRemarks();
+  const report = useChatReport();
   const reward = hasRewardMessageContent(message.content);
   const focusDraft = useRef(false);
   const closeFocus = () => {
@@ -69,7 +69,17 @@ export function MessageMenu({
       draft.notify('复制失败，请选中消息文字后手动复制', 'error');
     }
   };
-  const items: DropdownMenuItem[] = [
+  const items: MessageAction[] = [
+    ...(!self
+      ? [
+          {
+            label: '举报',
+            shortcut: 'report' as const,
+            icon: <Flag size={16} aria-hidden="true" />,
+            onSelect: () => report({ id: message.id, senderId: message.senderId, returnFocusRef }),
+          },
+        ]
+      : []),
     ...(!self
       ? [
           {
@@ -133,6 +143,7 @@ export function MessageMenu({
       : []),
     {
       label: '引用',
+      shortcut: 'quote',
       icon: <Quote size={16} aria-hidden="true" />,
       onSelect: () => prepare(() => draft.quote(message.id, message.senderName)),
     },
@@ -146,6 +157,7 @@ export function MessageMenu({
       : [
           {
             label: '复读机',
+            shortcut: 'repeat' as const,
             icon: <Repeat2 size={16} aria-hidden="true" />,
             disabled: !user || message.content.length > 5000 || !message.content.trim(),
             onSelect: () => {
@@ -160,6 +172,7 @@ export function MessageMenu({
           {
             label:
               status === 'pending' ? '等待撤回确认…' : status === 'error' ? '重试撤回' : '撤回',
+            shortcut: 'revoke' as const,
             icon: <Undo2 size={16} aria-hidden="true" />,
             tone: 'danger' as const,
             disabled: message.revoked || !connected || status === 'pending',
@@ -182,16 +195,14 @@ export function MessageMenu({
     );
   if (message.revoked) return null;
   return (
-    <DropdownMenu
-      label="消息操作"
+    <MessageActionBar
       items={items}
       returnFocusRef={returnFocusRef}
       onCloseFocus={closeFocus}
-      trigger={
-        <Button variant="secondary" className={styles.more} aria-label="更多消息操作">
-          <MoreHorizontal size={18} aria-hidden="true" />
-        </Button>
-      }
+      onAction={(item) => {
+        item.onSelect();
+        focusDraft.current = false;
+      }}
     />
   );
 }

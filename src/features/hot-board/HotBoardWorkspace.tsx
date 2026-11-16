@@ -18,7 +18,7 @@ import styles from './ui/HotBoard.module.css';
 interface HotBoardWorkspaceProps {
   service: HotBoardPort;
   currentUser: Pick<AuthUser, 'name' | 'avatarUrl'> | null;
-  presentation?: 'cards' | 'table' | 'island';
+  presentation?: 'cards' | 'table' | 'island' | 'classic';
   renderLayout: (slots: {
     sidebar: ReactNode;
     header: ReactNode;

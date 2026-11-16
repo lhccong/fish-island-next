@@ -459,3 +459,21 @@
   right: 8px;
   top: 14px;
 }
+.card[data-variant='island'][data-island-style='classic'] {
+  --color-circle-author: var(--color-hot-link);
+  padding: 12px 0 8px;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.card[data-variant='island'][data-island-style='classic'] .islandTime {
+  position: static;
+  display: block;
+  margin: 0;
+}
+.card[data-variant='island'][data-island-style='classic'] .author > div {
+  padding-right: 0;
+}

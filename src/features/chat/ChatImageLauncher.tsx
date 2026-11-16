@@ -1,11 +1,12 @@
-import { useRef } from 'react';
+import { useRef, type RefObject } from 'react';
 import { useStore } from 'zustand';
 import { ImagePlus } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
 
-export function ChatImageLauncher() {
-  const input = useRef<HTMLInputElement>(null);
+export function ChatImageLauncher({ inputRef }: { inputRef?: RefObject<HTMLInputElement | null> }) {
+  const localInput = useRef<HTMLInputElement>(null);
+  const input = inputRef ?? localInput;
   const { imageUpload, user } = useChatRealtime();
   const status = useStore(imageUpload.store, (state) => state.status);
   return (

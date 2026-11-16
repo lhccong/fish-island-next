@@ -12,6 +12,7 @@ import { DraftQuote } from './DraftQuote';
 import { ComposerImage } from './ComposerImage';
 import { ChatEditor } from './ChatEditor';
 import { ChatImageLauncher } from './ChatImageLauncher';
+import { ChatToolsMenu } from './ChatToolsMenu';
 import styles from './ChatWorkspace.module.css';
 import type { ChatPresentation } from './chat-presentation';
 
@@ -20,15 +21,18 @@ export function ChatComposer({
   toolbarAction,
   floating = false,
   onToggleFloating,
+  toolsPresentation = 'inline',
 }: {
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
   floating?: boolean;
   onToggleFloating?: () => void;
+  toolsPresentation?: 'inline' | 'menu';
 }) {
   const [toolsOpen, setToolsOpen] = useState(false);
   const toolsId = useId();
   const toolsTrigger = useRef<HTMLButtonElement>(null);
+  const imageInput = useRef<HTMLInputElement>(null);
   const { draft, composerRef, controller, user, imageUpload } = useChatRealtime();
   const image = useStore(imageUpload.store, (state) => state);
   const text = useStore(draft.store, (state) => state.text);
@@ -77,18 +81,28 @@ export function ChatComposer({
       <div className={styles.inputRow}>
         <div className={styles.tools}>
           <EmoticonLauncher />
-          <ChatImageLauncher />
-          <Button
-            ref={toolsTrigger}
-            variant="secondary"
-            className={styles.moreTools}
-            aria-label="更多聊天工具"
-            aria-expanded={toolsOpen}
-            aria-controls={toolsId}
-            onClick={() => setToolsOpen((open) => !open)}
-          >
-            <Plus size={24} aria-hidden="true" />
-          </Button>
+          <ChatImageLauncher inputRef={imageInput} />
+          {toolsPresentation === 'menu' ? (
+            <ChatToolsMenu
+              className={styles.moreTools ?? ''}
+              floating={floating}
+              onToggleFloating={onToggleFloating}
+              onUploadImage={() => imageInput.current?.click()}
+              imageDisabled={!user || image.status !== 'empty'}
+            />
+          ) : (
+            <Button
+              ref={toolsTrigger}
+              variant="secondary"
+              className={styles.moreTools}
+              aria-label="更多聊天工具"
+              aria-expanded={toolsOpen}
+              aria-controls={toolsId}
+              onClick={() => setToolsOpen((open) => !open)}
+            >
+              <Plus size={24} aria-hidden="true" />
+            </Button>
+          )}
           <div id={toolsId} className={styles.extraTools}>
             <RedPacketLauncher key={user?.id ?? ''} />
             <LuckyBagLauncher key={`lucky:${user?.id ?? ''}`} />

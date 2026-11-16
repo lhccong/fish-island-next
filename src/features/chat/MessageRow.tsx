@@ -144,9 +144,6 @@ export const MessageRow = memo(function MessageRow({
               hour12: false,
             })}
           </time>
-          <span className={styles.messageActions}>
-            {!message.revoked && !local && <MessageMenu {...menuProps} presentation="button" />}
-          </span>
         </div>
         <div className={styles.bubbleLine} data-repeat={!!group}>
           {self && message.delivery === 'sending' && (
@@ -170,6 +167,11 @@ export const MessageRow = memo(function MessageRow({
             />
           )}
         </div>
+        {!message.revoked && !local && (
+          <div className={styles.messageActions}>
+            <MessageMenu {...menuProps} presentation="button" />
+          </div>
+        )}
         <div className={styles.rowFeedback}>
           {self && message.delivery === 'failed' && (
             <div className={styles.revoke}>

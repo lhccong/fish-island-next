@@ -15,11 +15,20 @@ export function HotBoardPage() {
     <HotBoardWorkspace
       service={hotBoardClient}
       currentUser={session.status === 'authenticated' ? session.user : null}
-      presentation={isTable ? 'table' : skinId === 'pixel-island' ? 'island' : 'cards'}
+      presentation={
+        skinId === 'moyu-island'
+          ? 'classic'
+          : isTable
+            ? 'table'
+            : skinId === 'pixel-island'
+              ? 'island'
+              : 'cards'
+      }
       renderLayout={(slots) => (
         <WorkspaceLayout
           slots={slots}
-          hideSidebar={isTable}
+          hideSidebar={isTable || skinId === 'moyu-island'}
+          hideDesktopHeader={skinId === 'moyu-island' && slots.contentKey === 'all'}
           mobileNavigation={slots.contentKey === 'all' || isTable ? 'tabs' : 'hidden'}
         />
       )}

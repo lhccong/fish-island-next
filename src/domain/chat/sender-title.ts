@@ -53,6 +53,13 @@ const levelNames = [
   '摸鱼天尊',
   '摸鱼祖师',
 ];
+// Legacy online-member badge artwork; absence of a level is not a default level.
+export function memberLevelEmoji(level: number | undefined): string | null {
+  if (level === undefined) return null;
+  return (
+    ['💦', '💦', '🐣', '⭐', '🎣', '🏖', '💫', '👑', '🏮', '🌈', '🌟', '✨', '🔱'][level] ?? '💦'
+  );
+}
 export function senderTitle(titleId: string | undefined, level: number | undefined): string {
   if (titleId && titleId !== '0')
     return Object.hasOwn(titleNames, titleId) ? titleNames[titleId]! : '称号未收录';

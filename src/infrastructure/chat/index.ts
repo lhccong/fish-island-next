@@ -1,4 +1,5 @@
 export { createChatClient } from './client';
+export { createChatReport } from './report';
 export { createChatImageUpload } from './image-upload';
 export { createLocalChatPreferences } from './preferences';
 export { createChatListPreferences } from './list-preferences';

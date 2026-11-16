@@ -2,9 +2,6 @@ import { projectRepetitions, type RepetitionView } from './repetition';
 import { createStore } from 'zustand/vanilla';
 import type { ChatConnectionState, ChatEvent, ReceivedMessage } from '@/domain/chat';
 
-export function compareMessages(a: ReceivedMessage, b: ReceivedMessage) {
-  return a.createdAt - b.createdAt || a.id.localeCompare(b.id, 'en');
-}
 interface MessageState extends RepetitionView {
   firstItemIndex: number;
   ids: readonly string[];
@@ -22,7 +19,7 @@ export function createMessageStore() {
     revokeState: {},
   }));
   const tombstones = new Set<string>();
-  let floor: ReceivedMessage | null = null;
+  const evictedIds = new Set<string>();
   return {
     store,
     updateDelivery(key: string, delivery: ReceivedMessage['delivery'], sendError?: string) {
@@ -36,7 +33,7 @@ export function createMessageStore() {
     },
     reset() {
       tombstones.clear();
-      floor = null;
+      evictedIds.clear();
       store.setState({
         ...projectRepetitions([], {}),
         firstItemIndex: 1000000,
@@ -46,7 +43,8 @@ export function createMessageStore() {
         revokeState: {},
       });
     },
-    apply(events: readonly ChatEvent[]) {
+    // historyAfter: undefined = live append; null = older page; key = latest-page boundary.
+    apply(events: readonly ChatEvent[], historyAfter?: string | null) {
       const before = store.getState();
       const messages = Object.assign(
         Object.create(null) as Record<string, ReceivedMessage>,
@@ -55,6 +53,7 @@ export function createMessageStore() {
       const revokeState = { ...before.revokeState };
       let changed = false;
       let added = false;
+      const incoming: string[] = [];
       for (const event of events) {
         if (event.type === 'revoke') {
           tombstones.add(event.id);
@@ -80,6 +79,7 @@ export function createMessageStore() {
               )
             : undefined;
           if (localKey) {
+            incoming.push(localKey);
             const existing = messages[localKey]!;
             // A canonical entity is broadcast only after persistence; either transport confirms it.
             messages[localKey] = {
@@ -92,11 +92,8 @@ export function createMessageStore() {
             changed = true;
             continue;
           }
-          if (
-            messages[message.id] ||
-            (floor && !message.delivery && compareMessages(message, floor) <= 0)
-          )
-            continue;
+          incoming.push(message.id);
+          if (messages[message.id] || evictedIds.has(message.id)) continue;
           messages[message.id] = tombstones.has(message.id)
             ? { ...message, content: '', revoked: true }
             : message;
@@ -106,15 +103,37 @@ export function createMessageStore() {
       if (!changed) return;
       let ids = before.ids;
       if (added) {
-        const ordered = Object.keys(messages).sort((a, b) =>
-          compareMessages(messages[a]!, messages[b]!),
-        );
+        const ordered = [...before.ids];
+        const known = new Set(ordered);
+        let position =
+          historyAfter === undefined
+            ? ordered.length
+            : historyAfter === null
+              ? 0
+              : Math.max(0, ordered.indexOf(historyAfter) + 1);
+        const pending: string[] = [];
+        for (const key of incoming) {
+          if (!messages[key]) continue;
+          if (known.has(key)) {
+            if (historyAfter !== undefined && ordered.includes(key)) {
+              const anchor = ordered.indexOf(key);
+              ordered.splice(anchor, 0, ...pending);
+              position = anchor + pending.length + 1;
+              pending.length = 0;
+            }
+          } else {
+            known.add(key);
+            pending.push(key);
+          }
+        }
+        ordered.splice(position, 0, ...pending);
         const removable = ordered.filter(
           (key) => !['sending', 'failed'].includes(messages[key]!.delivery ?? ''),
         );
         const evicted = removable.slice(0, Math.max(0, ordered.length - 1000));
         for (const key of evicted) {
-          floor = messages[key]!;
+          evictedIds.add(messages[key]!.id);
+          if (evictedIds.size > 10000) evictedIds.delete(evictedIds.values().next().value!);
           delete messages[key];
           delete revokeState[key];
         }

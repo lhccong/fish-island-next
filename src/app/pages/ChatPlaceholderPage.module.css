@@ -73,6 +73,17 @@
   flex-shrink: 0;
   gap: 4px;
 }
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .circleToggle {
+    display: none;
+  }
+}
 .onlineUsers {
   flex: 1;
   min-height: 0;
@@ -114,4 +125,26 @@
 .islandSidebar {
   height: 100%;
   min-height: 0;
+}
+.header[data-classic='true'] {
+  min-height: 44px;
+  padding: 0 8px;
+}
+.header[data-classic='true'] h1 {
+  display: flex;
+  align-items: center;
+  color: var(--color-accent-text);
+  font-size: 14px;
+  font-weight: 500;
+}
+@media (max-width: 760px) {
+  .header[data-classic='true'] {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+  .header[data-classic='true'] h1 {
+    font-size: 14px;
+  }
 }

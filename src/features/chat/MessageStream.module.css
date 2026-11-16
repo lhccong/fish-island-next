@@ -34,7 +34,7 @@
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  padding: 12px 28px 12px 24px;
+  padding: 4px 28px 4px 24px;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -125,9 +125,26 @@
 .identity {
   display: contents;
 }
-.messageActions,
 .rowFeedback {
   display: contents;
+}
+.messageActions {
+  max-width: 100%;
+  margin-top: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.messageBody:hover .messageActions,
+.messageBody:focus-within .messageActions,
+.messageActions:has([data-state='open']) {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (max-width: 760px), (hover: none), (pointer: coarse) {
+  .messageActions {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 .meta time {
   white-space: nowrap;
@@ -243,7 +260,7 @@
     height: 44px;
   }
   .row {
-    padding: 10px 24px 10px 16px;
+    padding: 6px 24px 6px 16px;
   }
   .bubble {
     max-width: 100%;
@@ -399,17 +416,21 @@
 .row[data-presentation='worksheet'] .messageActions {
   display: block;
   grid-column: 4;
-  grid-row: 1;
-  justify-self: end;
-  align-self: start;
-  margin: 4px 4px 0 0;
+  grid-row: 2;
+  justify-self: start;
+  margin: 4px;
   z-index: 1;
+}
+.row[data-presentation='worksheet']:hover .messageActions,
+.row[data-presentation='worksheet']:focus-within .messageActions {
+  opacity: 1;
+  pointer-events: auto;
 }
 .row[data-presentation='worksheet'] .bubbleLine {
   grid-column: 4;
   grid-row: 1;
   align-items: flex-start;
-  padding: 4px 48px 4px 4px;
+  padding: 4px;
   max-width: none;
 }
 .row[data-presentation='worksheet'] .bubble {
@@ -433,7 +454,7 @@
 .row[data-presentation='worksheet'] .rowFeedback {
   display: block;
   grid-column: 4;
-  grid-row: 2;
+  grid-row: 3;
   min-width: 0;
 }
 .row[data-presentation='worksheet'] .rowFeedback:empty {
@@ -468,10 +489,10 @@
   }
   .row[data-presentation='worksheet'] {
     grid-template-columns: 32px minmax(0, 1fr) 52px;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
   }
   .row[data-presentation='worksheet'] .rowNumber {
-    grid-row: 1 / 5;
+    grid-row: 1 / 6;
   }
   .row[data-presentation='worksheet'] .identity {
     grid-column: 2;
@@ -493,8 +514,9 @@
     grid-row: 1 / 3;
   }
   .row[data-presentation='worksheet'] .messageActions {
-    grid-column: 3;
-    grid-row: 1 / 3;
+    grid-column: 2 / 4;
+    grid-row: 4;
+    margin: 0 4px 4px;
   }
   .row[data-presentation='worksheet'] .bubbleLine {
     grid-column: 2 / 4;
@@ -506,6 +528,21 @@
   }
   .row[data-presentation='worksheet'] .rowFeedback {
     grid-column: 2 / 4;
-    grid-row: 4;
+    grid-row: 5;
+  }
+}
+:global([data-chat-decoration='classic'])
+  .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
+    [data-revoked='true']
+  ) {
+  border-radius: 14px;
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+:global([data-chat-decoration='classic']) .row {
+  padding-block: 4px;
+}
+@media (max-width: 760px) {
+  :global([data-chat-decoration='classic']) .row {
+    padding-block: 6px;
   }
 }

@@ -9,6 +9,7 @@ export function WechatShell({
   sidebarLabel = '热榜来源',
   navigationLayout = 'rail',
   hideSidebar = false,
+  centerContent = false,
   mobileNavigation = 'tabs',
   hideMobileHeader = false,
   hideDesktopHeader = false,
@@ -19,13 +20,14 @@ export function WechatShell({
 }: {
   slots: WorkspaceShellSlots;
   sidebarLabel?: string;
-  navigationLayout?: 'rail' | 'ribbon';
+  navigationLayout?: 'rail' | 'ribbon' | 'topbar';
   hideSidebar?: boolean;
+  centerContent?: boolean;
   mobileNavigation?: 'tabs' | 'hidden';
   hideMobileHeader?: boolean;
   hideDesktopHeader?: boolean;
   sidebarVariant?: 'default' | 'chat';
-  presentation?: 'default' | 'island';
+  presentation?: 'default' | 'island' | 'classic';
   showScene?: boolean;
   mainContentId?: string | null;
 }) {
@@ -34,6 +36,7 @@ export function WechatShell({
       className={styles.shell}
       data-navigation-layout={navigationLayout}
       data-sidebar-hidden={hideSidebar}
+      data-content-centered={centerContent}
       data-mobile-navigation={mobileNavigation}
       data-mobile-header-hidden={hideMobileHeader}
       data-desktop-header-hidden={hideDesktopHeader}
@@ -72,6 +75,11 @@ export function WechatShell({
         </main>
         {slots.footer && <footer className={styles.footer}>{slots.footer}</footer>}
       </div>
+      {presentation === 'classic' && (!hideSidebar || sidebarVariant === 'chat') && (
+        <div className={styles.classicFooter}>
+          <PageFooterOutlet />
+        </div>
+      )}
     </div>
   );
 }

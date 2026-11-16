@@ -10,7 +10,7 @@ interface AppearanceState {
 
 const storageKey = 'fish-island:skin';
 const modeStorageKey = 'fish-island:color-mode';
-const defaultSkinId: BuiltinSkinId = 'pixel-island';
+const defaultSkinId: BuiltinSkinId = 'moyu-island';
 
 function readColorMode(): ColorMode {
   try {

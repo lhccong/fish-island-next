@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { MessageCircle, MoreHorizontal, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Button } from '@/shared/ui/Button';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { chatService, chatPreferences, chatListPreferences } from '@/app/config/chat';
 import { useAuth } from '@/features/auth';
@@ -8,6 +9,7 @@ import { MyIslandProvider } from '@/features/my-island';
 import { IslandSidebarLauncher } from '@/app/components/IslandSidebarLauncher';
 import { IslandSidebar } from '@/app/components/IslandSidebar';
 import { IslandSidebarProvider } from '@/app/components/IslandSidebarProvider';
+import { ClassicCircleSidebar } from '@/app/components/ClassicCircleSidebar';
 import { islandPreferences } from '@/app/config/my-island';
 import {
   ChatWorkspace,
@@ -25,6 +27,7 @@ export function ChatPlaceholderPage() {
   const presentation = skinId === 'wps' ? 'worksheet' : 'conversation';
   const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
   const [membersOpen, setMembersOpen] = useState(false);
+  const [circleCollapsed, setCircleCollapsed] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const formulaTrigger = useRef<HTMLButtonElement>(null);
   const closeMembers = () => {
@@ -47,7 +50,9 @@ export function ChatPlaceholderPage() {
             <WorkspaceLayout
               sidebarLabel={skinId === 'pixel-island' ? '我的小岛' : '聊天会话'}
               sidebarVariant="chat"
-              hideSidebar={presentation === 'worksheet'}
+              hideSidebar={
+                presentation === 'worksheet' || (skinId === 'moyu-island' && circleCollapsed)
+              }
               hideDesktopHeader={presentation === 'worksheet'}
               slots={{
                 contentScroll: false,
@@ -56,12 +61,40 @@ export function ChatPlaceholderPage() {
                     <div className={styles.islandSidebar} hidden={skinId !== 'pixel-island'}>
                       <IslandSidebar active={skinId === 'pixel-island'} />
                     </div>
-                    {skinId !== 'pixel-island' && <ChatOnlineUsers groupName={groupName} />}
+                    {skinId === 'moyu-island' && <ClassicCircleSidebar />}
+                    {skinId !== 'pixel-island' && skinId !== 'moyu-island' && (
+                      <ChatOnlineUsers groupName={groupName} />
+                    )}
                   </>
                 ),
                 header: (
-                  <div className={styles.header}>
-                    <h1 title={groupName}>{groupName}</h1>
+                  <div className={styles.header} data-classic={skinId === 'moyu-island'}>
+                    <div className={styles.headerTitle}>
+                      {skinId === 'moyu-island' && (
+                        <Button
+                          variant="secondary"
+                          className={styles.circleToggle}
+                          aria-label={circleCollapsed ? '展开鱼小圈' : '收起鱼小圈'}
+                          aria-expanded={!circleCollapsed}
+                          aria-controls="classic-circle-sidebar"
+                          onClick={() => setCircleCollapsed((collapsed) => !collapsed)}
+                        >
+                          {circleCollapsed ? (
+                            <PanelLeftOpen size={16} aria-hidden="true" />
+                          ) : (
+                            <PanelLeftClose size={16} aria-hidden="true" />
+                          )}
+                          鱼小圈
+                        </Button>
+                      )}
+                      <h1 title={groupName} aria-label={groupName}>
+                        {skinId === 'moyu-island' ? (
+                          <MessageCircle size={18} aria-hidden="true" />
+                        ) : (
+                          groupName
+                        )}
+                      </h1>
+                    </div>
                     <div className={styles.headerActions}>
                       <IslandSidebarLauncher />
                       <div className={styles.mobileAppearance}>
@@ -93,7 +126,13 @@ export function ChatPlaceholderPage() {
                     groupName={groupName}
                     onRenameGroup={saveGroupName}
                     presentation={presentation}
-                    decoration={skinId === 'pixel-island' ? 'island' : 'none'}
+                    decoration={
+                      skinId === 'moyu-island'
+                        ? 'classic'
+                        : skinId === 'pixel-island'
+                          ? 'island'
+                          : 'none'
+                    }
                     toolbarAction={
                       presentation === 'worksheet' && (
                         <>

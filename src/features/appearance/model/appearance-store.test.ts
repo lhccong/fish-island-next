@@ -4,12 +4,12 @@ import { builtinSkins } from '@/skins/builtin';
 beforeEach(() => vi.resetModules());
 afterEach(() => vi.unstubAllGlobals());
 
-test.each([null, 'unknown'])('defaults to pixel island for saved skin %s', async (saved) => {
+test.each([null, 'unknown'])('defaults to moyu island for saved skin %s', async (saved) => {
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => (key.endsWith(':skin') ? saved : 'dark'),
   });
   const { useAppearanceStore: store } = await import('./appearance-store');
-  expect(store.getState()).toMatchObject({ skinId: 'pixel-island', colorMode: 'dark' });
+  expect(store.getState()).toMatchObject({ skinId: 'moyu-island', colorMode: 'dark' });
 });
 
 test.each(builtinSkins)('preserves the saved $id theme', async ({ id }) => {
@@ -49,7 +49,7 @@ test('storage failures leave both appearance controls usable', async () => {
     },
   });
   const { useAppearanceStore: store } = await import('./appearance-store');
-  expect(store.getState()).toMatchObject({ skinId: 'pixel-island', colorMode: 'light' });
+  expect(store.getState()).toMatchObject({ skinId: 'moyu-island', colorMode: 'light' });
   store.getState().setColorMode('dark');
   store.getState().setSkinId('feishu');
   expect(store.getState()).toMatchObject({ skinId: 'feishu', colorMode: 'dark' });

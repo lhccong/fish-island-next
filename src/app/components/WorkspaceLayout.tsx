@@ -54,15 +54,35 @@ export function WorkspaceLayout({
           : '返回发现';
   const mobileRoot = pathname === '/' || pathname === '/discover' || pathname === '/user/login';
   const shellId: ShellId =
-    skinId === 'wps' ? 'wps' : skinId === 'pixel-island' ? 'pixel-island' : 'wechat';
+    skinId === 'moyu-island'
+      ? 'moyu-island'
+      : skinId === 'wps'
+        ? 'wps'
+        : skinId === 'pixel-island'
+          ? 'pixel-island'
+          : 'wechat';
   const mobileNavigationMode = mobileNavigation ?? (mobileRoot ? 'tabs' : 'hidden');
   return (
     <WechatShell
       {...(sidebarLabel ? { sidebarLabel } : {})}
-      navigationLayout={shellId === 'wps' ? 'ribbon' : 'rail'}
-      presentation={shellId === 'pixel-island' ? 'island' : 'default'}
+      navigationLayout={
+        shellId === 'moyu-island' ? 'topbar' : shellId === 'wps' ? 'ribbon' : 'rail'
+      }
+      presentation={
+        shellId === 'moyu-island' ? 'classic' : shellId === 'pixel-island' ? 'island' : 'default'
+      }
       showScene={pathname === '/' || pathname === '/chat' || pathname === '/discover'}
-      hideSidebar={hideSidebar}
+      hideSidebar={
+        hideSidebar ||
+        (skinId === 'moyu-island' && !adminPage && pathname !== '/admin' && pathname !== '/chat')
+      }
+      centerContent={
+        skinId === 'moyu-island' &&
+        pathname !== '/' &&
+        pathname !== '/chat' &&
+        !adminPage &&
+        pathname !== '/admin'
+      }
       {...(sidebarVariant ? { sidebarVariant } : {})}
       hideMobileHeader={hideMobileHeader}
       hideDesktopHeader={hideDesktopHeader}

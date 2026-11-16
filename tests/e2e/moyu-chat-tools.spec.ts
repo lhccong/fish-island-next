@@ -1,0 +1,64 @@
+import { expect, test } from '@playwright/test';
+import { setupChatMenu } from './chat-menu-fixture';
+
+test.setTimeout(90_000);
+for (const mode of ['light', 'dark'])
+  test(`classic ${mode}: floating tools preserve layout, focus, draft and connection`, async ({
+    page,
+  }, info) => {
+    const fixture = await setupChatMenu(page, 'moyu-island', mode);
+    fixture.push('179453002', '合成菜单验证消息');
+    const editor = page.getByRole('textbox', { name: '消息草稿', exact: true });
+    await editor.fill('悬浮列表不丢失的草稿');
+    await expect(page.getByText(/欢迎来到摸鱼聊天室/)).toHaveCount(0);
+    const heading = page.locator('header h1').filter({ visible: true });
+    await expect(heading).toHaveText('');
+    await expect(heading.locator('svg')).toBeVisible();
+    const composer = page.getByRole('region', { name: '群聊输入区', exact: true });
+    const before = (await composer.boundingBox())!;
+    const stats = fixture.stats();
+    const plus = page.getByRole('button', { name: '更多聊天工具', exact: true });
+    await plus.click();
+    const menu = page.getByRole('menu', { name: '更多聊天工具', exact: true });
+    await expect(menu).toBeVisible();
+    expect((await composer.boundingBox())!.height).toBe(before.height);
+    expect((await composer.boundingBox())!.y).toBe(before.y);
+    const box = (await menu.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual((await plus.boundingBox())!.y + 1);
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    await page.screenshot({ path: info.outputPath(`tools-${mode}.png`), scale: 'css' });
+    await page.keyboard.press('Escape');
+    await expect(plus).toBeFocused();
+    await plus.press('ArrowDown');
+    await page.getByRole('menuitem', { name: '发红包', exact: true }).press('Enter');
+    await expect(page.getByRole('dialog', { name: '发送红包', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: '关闭发送红包', exact: true }).click();
+    await expect(plus).toBeFocused();
+    await plus.click();
+    await page.getByRole('menuitem', { name: '发福袋', exact: true }).click();
+    await expect(page.getByRole('dialog', { name: '发送福袋', exact: true })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(plus).toBeFocused();
+    await plus.click();
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('menuitem', { name: '上传图片', exact: true }).click();
+    await (await chooser).setFiles([]);
+    await expect(menu).toBeHidden();
+    await plus.click();
+    await editor.click();
+    await expect(menu).toBeHidden();
+    await expect(editor).toBeFocused();
+    await expect(editor).toHaveText('悬浮列表不丢失的草稿');
+    expect(fixture.stats().connections).toBe(stats.connections);
+    expect(fixture.stats().historyRequests).toBe(stats.historyRequests);
+    expect(await composer.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    await plus.click();
+    await page.getByRole('menuitem', { name: '小窗模式', exact: true }).click();
+    await expect(page).toHaveURL('/');
+    await page.getByRole('button', { name: '关闭聊天窗口', exact: true }).click();
+    await expect(page).toHaveURL('/chat');
+    await expect(plus).toBeFocused();
+    await expect(editor).toHaveText('悬浮列表不丢失的草稿');
+    expect(fixture.stats().connections).toBe(stats.connections);
+  });

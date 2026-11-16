@@ -13,6 +13,24 @@ const workspaceTokens = {
 
 export const builtinSkins: readonly SkinDefinition[] = [
   {
+    id: 'moyu-island',
+    name: '摸鱼岛',
+    tokens: {
+      '--color-accent': '#1677ff',
+      '--color-accent-soft': '#e6f4ff',
+      '--color-accent-text': '#0965ce',
+      '--color-selected-muted': '#e6f4ff',
+      '--color-rail': '#ffffff',
+      '--color-sidebar': '#ffffff',
+      '--color-message-outgoing': '#e6f4ff',
+      '--color-message-incoming': '#ffffff',
+      '--color-rail-active': '#f5f5f5',
+      '--color-hover': '#f5f7fa',
+      '--color-canvas': '#f5f5f5',
+      '--color-surface': '#ffffff',
+    },
+  },
+  {
     id: 'pixel-island',
     name: '摸鱼岛像素风',
     tokens: {

@@ -72,10 +72,13 @@ for (const skin of builtinSkins) {
         const link = footer.getByRole('link', { name: '粤ICP备2024313392号' });
         await expect(footer).toHaveCSS(
           'position',
-          page.viewportSize()!.width <= 760 ? 'fixed' : 'static',
+          page.viewportSize()!.width <= 760 && skin.id !== 'moyu-island' ? 'fixed' : 'static',
         );
         await expect(footer).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-        if (state === 'success' && page.viewportSize()!.width > 760) {
+        if (
+          state === 'success' &&
+          (page.viewportSize()!.width > 760 || skin.id === 'moyu-island')
+        ) {
           await expect(footer).not.toBeInViewport();
           const scroll = page.getByRole('region', { name: '主内容滚动区', exact: true });
           await scroll.focus();

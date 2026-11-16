@@ -73,7 +73,10 @@ it('preserves a visible historical anchor when older rows are prepended', () => 
   const model = createMessageStore();
   apply(model, message('4', { content: '锚点' }), message('5'));
   const before = model.store.getState().viewFirstItemIndex;
-  apply(model, message('1'), message('2'), message('3'));
+  model.apply(
+    ['1', '2', '3'].map((id) => ({ type: 'message', message: message(id) })),
+    null,
+  );
   const state = model.store.getState();
   expect(state.visibleIds).toEqual(['1', '4', '5']);
   expect(state.viewFirstItemIndex + state.visibleIds.indexOf('4')).toBe(before);

@@ -49,12 +49,22 @@ export function createChatRealtimeController(
       }
     }
   };
+  let historyAfter: string | null = null;
   const history = createHistoryController(
-    historyPort,
+    historyPort && {
+      loadHistory(input) {
+        flush();
+        historyAfter = input.cursor === null ? (model.store.getState().ids.at(-1) ?? null) : null;
+        return historyPort.loadHistory(input);
+      },
+    },
     () => model.store.getState().ids.length,
     (messages) => {
       flush();
-      model.apply(messages.map((message) => ({ type: 'message', message })));
+      model.apply(
+        [...messages].reverse().map((message) => ({ type: 'message', message })),
+        historyAfter,
+      );
     },
   );
   const stop = () => {

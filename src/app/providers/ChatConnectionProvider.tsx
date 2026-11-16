@@ -2,7 +2,12 @@ import { useLocation, useNavigate } from 'react-router';
 import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/features/auth';
 import { blacklist } from '@/app/config/account-tools';
-import { ChatRealtimeProvider, RemarksProvider, ChatWindowProvider } from '@/features/chat';
+import {
+  ChatRealtimeProvider,
+  RemarksProvider,
+  ChatWindowProvider,
+  ChatReportProvider,
+} from '@/features/chat';
 import { ChatUserCards } from '@/app/components/ChatUserCards';
 import {
   chatRealtime,
@@ -12,6 +17,7 @@ import {
   chatLuckyBags,
   chatEmoticons,
   chatImageUpload,
+  chatReport,
 } from '@/app/config/chat';
 
 export function ChatConnectionProvider({ children }: { children: ReactNode }) {
@@ -34,18 +40,20 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
       emoticonPort={chatEmoticons}
       imageUploadPort={chatImageUpload}
     >
-      <RemarksProvider key={userId} port={chatRemarks} userId={userId}>
-        <ChatUserCards user={session.status === 'authenticated' ? session.user : undefined}>
-          <ChatWindowProvider
-            key={userId}
-            suspended={location.pathname === '/user/login'}
-            onOpen={() => void navigate('/')}
-            onRestore={() => void navigate('/chat')}
-          >
-            {children}
-          </ChatWindowProvider>
-        </ChatUserCards>
-      </RemarksProvider>
+      <ChatReportProvider key={userId} port={chatReport}>
+        <RemarksProvider key={userId} port={chatRemarks} userId={userId}>
+          <ChatUserCards user={session.status === 'authenticated' ? session.user : undefined}>
+            <ChatWindowProvider
+              key={userId}
+              suspended={location.pathname === '/user/login'}
+              onOpen={() => void navigate('/')}
+              onRestore={() => void navigate('/chat')}
+            >
+              {children}
+            </ChatWindowProvider>
+          </ChatUserCards>
+        </RemarksProvider>
+      </ChatReportProvider>
     </ChatRealtimeProvider>
   );
 }

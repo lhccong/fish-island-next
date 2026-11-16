@@ -1,5 +1,11 @@
 # 外壳与皮肤协议
 
+经典聊天移除欢迎公告；加号使用统一 chat-tools 操作菜单，宽 208px、每行至少 44px，图标/文字/边框/悬停采用 accent-text/text/border/accent-soft 变量；面板在触发器上方按可用空间避让，超高可滚动，手机沿用全局隐藏滑轨规则。菜单不参与输入区布局，Dialog 返回稳定加号，见 ADR-085。
+
+摸鱼岛经典成员栏采用 28px 圆形头像、46px 行距和真实等级 emoji 徽标，标题栏只保留隐藏入口；签到为右上角蓝色圆形日历，使用 action/on-accent/action-hover 与现有状态提示，44px 命中区域内绘制 32px 圆形。其余主题保持原有签到与成员呈现，详见 ADR-085。
+
+ADR-085 新增 `moyu-island`（摸鱼岛），app 映射同名 classic 外壳：桌面白色顶栏、浅灰画布、橙色导航和热榜缎带、蓝色普通动作，聊天室居中分栏；手机沿用底部导航、单列热榜及独立输入。内置呈现 token 可覆盖 action/action-hover、hot-ribbon/fold/link 和经典导航色；只用于可信配置，不扩大导入白名单。暗夜仍使用 #191A1C 基底；外观切换保留业务状态。
+
 ADR-078 的伙伴工作台在全部主题共用既有 color-pixel-paper/paper-inset/ink/muted/border/wood 系列明暗 token；局部映射 surface/text/muted/border 与 pet-panel/frame，不改变全局主题或 action 普通按钮色。桌面三栏按容器宽度重排，手机单栏及 44px 图标入口，原始图片保持原貌。内嵌行囊和详细面板复用请求/操作实现，主题模式切换保留分页、选中物品与营地位置。
 
 伙伴页使用已有 home-island.png 作为独立装饰背景，居中贴底；明亮以 pet-battle-sky/canvas 的 78% 混合色为底、插画透明度 56%，暗夜保留 canvas 基础背景、插画透明度 32%。不影响面板与图片透明度，不拦截触摸或滚动。自动喂食的共享 Select 同时对触发器与 Portal 使用 pixel 呈现。
@@ -14,7 +20,7 @@ ADR-069 聊天用户卡片复用 surface/canvas/text/muted/border/action 语义�
 
 ## 1. 独立的外观维度
 
-新访客未保存主题时默认使用「摸鱼岛像素风」（`pixel-island`）；保存值无效或存储不可读时使用相同回退。已有有效主题选择优先恢复，明亮/暗夜模式仍独立恢复，默认明亮。
+新访客未保存主题时默认使用「摸鱼岛」（`moyu-island`）；保存值无效或存储不可读时使用相同回退。已有有效主题选择优先恢复，明亮/暗夜模式仍独立恢复，默认明亮。
 
 ADR-019 新增独立的 `colorMode`（明亮 light / 暗夜 dark），与 shellId、skinId 正交组合。主题注册表保留明亮默认值，`getSkinTokens` 为实际工作台和预览提供相同的模式组合。暗夜基础背景 `#191A1C`，局部配色通过模式语义变量覆盖；图片、封面和插画不反色。仅内置可信配置使用组合结果，第三方导入白名单保持不变。
 

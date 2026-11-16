@@ -2,6 +2,24 @@ import { describe, expect, it, vi } from 'vitest';
 import { createChatClient, decodeOnlineMembers } from './client';
 
 describe('online members adapter', () => {
+  it('preserves valid optional levels without inventing missing or malformed values', () => {
+    const members = decodeOnlineMembers([
+      { id: 'one', name: '合成', level: 7 },
+      { id: 'two', name: '合成', level: 0 },
+      { id: 'three', name: '合成', level: '7' },
+      { id: 'four', name: '合成', level: -1 },
+      { id: 'five', name: '合成', level: 1.5 },
+      { id: 'six', name: '合成' },
+    ]);
+    expect(members.map((member) => member.level)).toEqual([
+      7,
+      0,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
   it('maps and deduplicates stable IDs and rejects unsafe data', () => {
     expect(
       decodeOnlineMembers([

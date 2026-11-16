@@ -6,7 +6,7 @@ test.setTimeout(60000);
 
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
-    test(`${skin.id} ${mode}: compact composer and expandable tools`, async ({ page }, info) => {
+    test(`${skin.id} ${mode}: compact composer and tools`, async ({ page }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode);
       const mobile = page.viewportSize()!.width <= 760;
       if (mobile)
@@ -17,20 +17,28 @@ for (const skin of builtinSkins)
       const send = page.getByRole('button', { name: '发送', exact: true });
       await expect(send).toBeDisabled();
       const initialHeight = (await composer.boundingBox())!.height;
-      if (mobile) {
-        expect(initialHeight).toBeLessThanOrEqual(64);
+      if (mobile || skin.id === 'moyu-island') {
+        if (mobile) expect(initialHeight).toBeLessThanOrEqual(64);
         await expect(page.getByRole('button', { name: '发红包', exact: true })).toBeHidden();
-        await more.tap();
+        if (mobile) await more.tap();
+        else await more.click();
         await expect(more).toHaveAttribute('aria-expanded', 'true');
-        const packet = page.getByRole('button', { name: '发红包', exact: true });
-        await packet.tap();
+        const packet = page.getByRole(skin.id === 'moyu-island' ? 'menuitem' : 'button', {
+          name: '发红包',
+          exact: true,
+        });
+        if (mobile) await packet.tap();
+        else await packet.click();
         await expect(page.getByRole('dialog', { name: '发送红包', exact: true })).toBeVisible();
         await page.keyboard.press('Escape');
-        await expect(packet).toBeFocused();
-        await page.keyboard.press('Escape');
+        if (skin.id !== 'moyu-island') {
+          await expect(packet).toBeFocused();
+          await page.keyboard.press('Escape');
+        }
         await expect(more).toHaveAttribute('aria-expanded', 'false');
         await expect(more).toBeFocused();
-        await editor.tap();
+        if (mobile) await editor.tap();
+        else await editor.click();
       } else {
         await expect(more).toBeHidden();
         await expect(editor).toHaveCSS('height', skin.id === 'wps' ? '32px' : '86px');

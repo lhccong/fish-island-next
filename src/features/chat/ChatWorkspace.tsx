@@ -3,6 +3,7 @@ import { MessageStream } from './MessageStream';
 import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { ChatComposer } from './ChatComposer';
 import { OnlineMembers } from './OnlineMembers';
+import { ClassicMembers } from './ClassicMembers';
 import { useChatMembers } from './chat-members-context';
 import styles from './ChatWorkspace.module.css';
 import { Table2 } from 'lucide-react';
@@ -24,7 +25,7 @@ export function ChatWorkspace({
   onRenameGroup: (name: string) => void;
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
-  decoration?: 'none' | 'island';
+  decoration?: 'none' | 'island' | 'classic';
 }) {
   const { state, refresh } = useChatMembers();
   const renderMessages = (activePresentation: ChatPresentation) => (
@@ -46,6 +47,7 @@ export function ChatWorkspace({
           data-members-open={!floating && membersOpen}
           data-presentation={floating ? 'conversation' : presentation}
           data-floating={floating}
+          data-decoration={floating ? 'none' : decoration}
           onKeyDown={(event) => {
             if (event.key === 'Escape' && !event.defaultPrevented && membersOpen) onCloseMembers();
           }}
@@ -56,6 +58,7 @@ export function ChatWorkspace({
               <ChatComposer
                 key="composer"
                 presentation={floating ? 'conversation' : presentation}
+                toolsPresentation={decoration === 'classic' ? 'menu' : 'inline'}
                 toolbarAction={!floating && toolbarAction}
                 floating={floating}
                 onToggleFloating={toggleFloating}
@@ -71,6 +74,7 @@ export function ChatWorkspace({
               </div>
             )}
           </div>
+          {!floating && decoration === 'classic' && !membersOpen && <ClassicMembers />}
           {!floating && membersOpen && (
             <OnlineMembers
               state={state}

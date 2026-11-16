@@ -20,6 +20,7 @@ interface Props {
   onRefresh: () => void;
   onViewUser: (id: string, name: string) => void;
   variant?: 'feed' | 'detail' | 'island';
+  islandStyle?: 'pixel' | 'classic';
   onLikeChange?: (liked: boolean, count: number) => void;
   onCommentDelta?: (delta: number) => void;
   commentTarget?: CommentTarget | null;
@@ -31,6 +32,7 @@ export function MomentCard({
   onRefresh,
   onViewUser,
   variant = 'feed',
+  islandStyle = 'pixel',
   commentTarget = null,
   onLikeChange,
   onCommentDelta,
@@ -63,6 +65,7 @@ export function MomentCard({
       tabIndex={-1}
       data-pinned={moment.top}
       data-variant={variant}
+      data-island-style={variant === 'island' ? islandStyle : undefined}
       className={styles.card}
       aria-label={`${moment.userName}的动态`}
     >

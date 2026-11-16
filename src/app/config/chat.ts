@@ -1,4 +1,5 @@
 import {
+  createChatReport,
   createChatRemarks,
   createChatClient,
   createLocalChatPreferences,
@@ -21,6 +22,13 @@ import { landlordsChannel } from '@/app/config/landlords';
 import { undercoverChannel } from '@/app/config/undercover';
 
 const vault = createBrowserSessionVault(apiBaseUrl);
+export const chatReport = createChatReport(
+  apiBaseUrl,
+  () => vault.read(),
+  () => {
+    void authController.restore(true);
+  },
+);
 export const chatLuckyBags = createLuckyBagClient(
   apiBaseUrl,
   () => vault.read(),

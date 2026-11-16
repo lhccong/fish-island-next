@@ -7,6 +7,15 @@
 .detail {
   min-height: 100%;
 }
+.board[data-presentation='classic'] {
+  background: var(--color-canvas);
+  padding: 32px 40px 24px;
+}
+@media (max-width: 760px) {
+  .board[data-presentation='classic'] {
+    padding: 16px;
+  }
+}
 .board[data-presentation='island'],
 .detail[data-presentation='island'] {
   position: relative;

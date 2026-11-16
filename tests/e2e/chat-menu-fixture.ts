@@ -70,6 +70,7 @@ export async function setupChatMenu(
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page.getByRole('status', { name: '聊天室连接状态', exact: true })).toHaveText(
     '已连接 · HTTP 发送 / 实时接收',
+    { timeout: 15_000 },
   );
   await expect(page.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
   return {

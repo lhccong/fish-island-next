@@ -12,6 +12,37 @@ const message = (id: string): ReceivedMessage => ({
   revoked: false,
 });
 afterEach(() => vi.useRealTimers());
+it('places a non-overlapping latest page before messages received during the request', async () => {
+  vi.useFakeTimers();
+  let receive!: Parameters<Parameters<typeof createChatRealtimeController>[0]['connect']>[0];
+  let resolve!: (page: MessagePage) => void;
+  const client = createChatRealtimeController(
+    {
+      connect(onEvent) {
+        receive = onEvent;
+        return { close() {}, retry() {}, revoke: () => true };
+      },
+    },
+    {
+      loadHistory: () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    },
+  );
+  const stop = client.start();
+  receive({ type: 'message', message: message('1') });
+  const deactivate = client.history.activate();
+  const loading = client.history.loadMore();
+  receive({ type: 'message', message: { ...message('3'), createdAt: -1000 } });
+  resolve({ messages: [{ ...message('2'), createdAt: 9000 }], nextCursor: null });
+  await loading;
+  expect(client.store.getState().ids).toEqual(['1', '2', '3']);
+  deactivate();
+  stop();
+  expect(vi.getTimerCount()).toBe(0);
+});
+
 it('reloads the latest page on each return, including a full window and a previous failure', async () => {
   vi.useFakeTimers();
   const load = vi.fn<ChatHistoryPort['loadHistory']>();
@@ -83,7 +114,7 @@ it('merges delayed history with live messages and revoke tombstones without resu
   const load = client.history.loadMore();
   receive({ type: 'message', message: { ...message('2'), content: '实时优先' } });
   receive({ type: 'revoke', id: '1' });
-  resolve({ messages: [message('1'), message('2'), message('2')], nextCursor: null });
+  resolve({ messages: [message('2'), message('2'), message('1')], nextCursor: null });
   await load;
   expect(client.store.getState().ids).toEqual(['1', '2']);
   expect(client.store.getState().messages['1']).toMatchObject({ revoked: true, content: '' });

@@ -7,7 +7,13 @@ import { MomentCard } from './MomentCard';
 import { useIslandCircle } from './island-circle-context';
 import styles from './IslandCircleFeed.module.css';
 
-export function IslandCircleFeed({ active }: { active: boolean }) {
+export function IslandCircleFeed({
+  active,
+  presentation = 'pixel',
+}: {
+  active: boolean;
+  presentation?: 'pixel' | 'classic';
+}) {
   const { page, service, user, overrides, patch, publish, onViewUser } = useIslandCircle();
   return (
     <section className={styles.feed} aria-label="海岛鱼小圈">
@@ -45,6 +51,7 @@ export function IslandCircleFeed({ active }: { active: boolean }) {
                         user={user}
                         service={service}
                         variant="island"
+                        islandStyle={presentation}
                         onRefresh={page.refresh}
                         onViewUser={(id) => onViewUser(id)}
                         onLikeChange={(liked, count) => patch(moment.id, { liked, likes: count })}

@@ -17,7 +17,9 @@ interface Props {
   items: readonly DropdownMenuItem[];
   returnFocusRef?: RefObject<HTMLElement | null>;
   onCloseFocus?: () => void;
-  presentation?: 'default' | 'account';
+  presentation?: 'default' | 'account' | 'chat-tools';
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  align?: 'start' | 'center' | 'end';
 }
 
 export function DropdownMenu({
@@ -28,6 +30,8 @@ export function DropdownMenu({
   returnFocusRef,
   onCloseFocus,
   presentation = 'default',
+  side = 'bottom',
+  align = 'end',
 }: Props) {
   return (
     <Dropdown.Root modal={false}>
@@ -37,7 +41,8 @@ export function DropdownMenu({
           className={`${styles.menu} ${className}`}
           aria-label={label}
           data-presentation={presentation}
-          align="end"
+          side={side}
+          align={align}
           sideOffset={4}
           collisionPadding={8}
           sticky="always"

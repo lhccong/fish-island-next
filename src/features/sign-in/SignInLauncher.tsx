@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { CalendarCheck } from 'lucide-react';
+import { Calendar, CalendarCheck } from 'lucide-react';
 import type { SignInPort } from '@/domain/sign-in';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -15,10 +15,12 @@ export function SignInLauncher({
   port,
   navigationClassName,
   navigationLabel,
+  navigationPresentation = 'default',
 }: {
   port: SignInPort;
   navigationClassName?: string;
   navigationLabel?: string | undefined;
+  navigationPresentation?: 'default' | 'classic';
 }) {
   const [open, setOpen] = useState(false);
   const { todaySigned } = useSignInStatus();
@@ -35,6 +37,7 @@ export function SignInLauncher({
       trigger={
         <Button
           variant="secondary"
+          data-presentation={navigationPresentation}
           data-sign-in-entry={navigationClassName ? '' : undefined}
           className={`${styles.iconTrigger} ${navigationClassName ? `${navigationClassName} ${styles.navigationTrigger}` : ''}`}
           aria-label={
@@ -49,7 +52,11 @@ export function SignInLauncher({
           title={todaySigned === false ? '今日未签到' : todaySigned ? '今日已签到' : '每日签到'}
         >
           <span className={styles.launcherIcon}>
-            <CalendarCheck size={navigationClassName ? 23 : 16} aria-hidden="true" />
+            {navigationPresentation === 'classic' ? (
+              <Calendar size={18} aria-hidden="true" />
+            ) : (
+              <CalendarCheck size={navigationClassName ? 23 : 16} aria-hidden="true" />
+            )}
             {todaySigned === false && (
               <span className={styles.reminder} aria-hidden="true" data-sign-in-reminder />
             )}

@@ -4,6 +4,15 @@
   gap: var(--space-4);
   margin-bottom: var(--space-4);
 }
+:global([data-presentation='classic']) .toolbar {
+  justify-content: flex-end;
+}
+:global([data-presentation='classic']) .tabs {
+  flex: 0 1 auto;
+}
+:global([data-presentation='classic']) .pills {
+  background: transparent;
+}
 .tabs {
   flex: 1;
   min-width: 0;

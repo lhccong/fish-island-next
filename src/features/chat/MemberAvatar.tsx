@@ -9,7 +9,7 @@ export function MemberAvatar({
   showFrame = true,
 }: {
   member: OnlineMember;
-  size?: 'grid' | 'list' | 'compact';
+  size?: 'grid' | 'list' | 'compact' | 'classic';
   showFrame?: boolean;
 }) {
   const [failed, setFailed] = useState(false);

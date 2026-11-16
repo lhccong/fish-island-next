@@ -14,6 +14,13 @@ const darkAccents: Record<
     | '--color-message-outgoing'
   >
 > = {
+  'moyu-island': {
+    '--color-accent': '#2168bb',
+    '--color-accent-soft': '#20364c',
+    '--color-accent-text': '#8ec9ff',
+    '--color-selected-muted': '#e4f0ff',
+    '--color-message-outgoing': '#263e5b',
+  },
   'pixel-island': {
     '--color-accent': '#236f67',
     '--color-accent-soft': '#233e39',

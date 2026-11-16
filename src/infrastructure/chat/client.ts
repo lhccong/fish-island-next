@@ -31,6 +31,9 @@ export function decodeOnlineMembers(value: unknown): readonly OnlineMember[] {
       id: String(data.id),
       name: typeof data.name === 'string' && data.name.trim() ? data.name.trim() : '未命名岛友',
       avatar,
+      ...(typeof data.level === 'number' && Number.isSafeInteger(data.level) && data.level >= 0
+        ? { level: data.level }
+        : {}),
       ...(chatImageUrl(data.avatarFramerUrl)
         ? { avatarFrameUrl: chatImageUrl(data.avatarFramerUrl)! }
         : {}),

@@ -11,7 +11,7 @@ export function IslandSidebarProvider({ user, children }: { user: AuthUser; chil
   const [tab, setTab] = useState<'notebook' | 'circle'>('circle');
   const [visited, setVisited] = useState(
     () =>
-      useAppearanceStore.getState().skinId === 'pixel-island' &&
+      ['pixel-island', 'moyu-island'].includes(useAppearanceStore.getState().skinId) &&
       window.matchMedia('(min-width: 761px)').matches,
   );
   const [editing, setEditing] = useState(false);
@@ -19,7 +19,10 @@ export function IslandSidebarProvider({ user, children }: { user: AuthUser; chil
   useEffect(() => {
     const media = window.matchMedia('(min-width: 761px)');
     const activateVisibleSidebar = () => {
-      if (media.matches && useAppearanceStore.getState().skinId === 'pixel-island')
+      if (
+        media.matches &&
+        ['pixel-island', 'moyu-island'].includes(useAppearanceStore.getState().skinId)
+      )
         setVisited(true);
     };
     const unsubscribe = useAppearanceStore.subscribe(activateVisibleSidebar);

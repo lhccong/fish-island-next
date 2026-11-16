@@ -1,11 +1,13 @@
 // 客户端领域模型；后端 DTO 必须在 infrastructure 映射后进入此边界。
+export type { ChatReportPort, ChatReportReason } from './report';
 export type MessageId = string;
 export type { ChatListAppearance, ChatListPreferencesPort } from './list-preferences';
 export { defaultChatListAppearance, parseChatListAppearance } from './list-preferences';
 export type { UserRemarks, ChatRemarksPort } from './remarks';
 export { parseEmojiText } from './emoji';
 export type { ChatImageUploadPort } from './image-upload';
-export { senderTitle } from './sender-title';
+export { senderTitle, memberLevelEmoji } from './sender-title';
+export { sortMembersByLevel } from './member-order';
 export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';
 export type ConversationId = string;
 export {
@@ -68,6 +70,7 @@ export interface OnlineMember {
   name: string;
   avatar: string | null;
   avatarFrameUrl?: string | undefined;
+  level?: number | undefined;
 }
 
 export interface OnlineMembersPort {

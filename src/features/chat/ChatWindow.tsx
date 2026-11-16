@@ -27,8 +27,13 @@ export function ChatWindow({
   useLayoutEffect(() => {
     const destination = floating ? windowRef.current : inlineRef.current;
     destination?.append(host);
-    if (!floating && wasFloating.current)
-      host.querySelector<HTMLButtonElement>('button[aria-label="小窗模式"]')?.focus();
+    if (!floating && wasFloating.current) {
+      const inline = host.querySelector<HTMLButtonElement>('button[aria-label="小窗模式"]');
+      const trigger = inline?.getClientRects().length
+        ? inline
+        : host.querySelector<HTMLButtonElement>('button[aria-label="更多聊天工具"]');
+      trigger?.focus();
+    }
     wasFloating.current = floating;
   }, [floating, host]);
   useLayoutEffect(() => () => host.remove(), [host]);
