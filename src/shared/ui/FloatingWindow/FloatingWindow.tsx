@@ -17,7 +17,11 @@ export function FloatingWindow({
   onClose,
   children,
   returnFocusRef,
+  variant = 'default',
+  actionName = '游戏',
 }: {
+  variant?: 'default' | 'compact';
+  actionName?: string;
   title: string;
   hidden: boolean;
   onHide: () => void;
@@ -26,17 +30,29 @@ export function FloatingWindow({
   returnFocusRef?: RefObject<HTMLElement | null>;
 }) {
   const [maximized, setMaximized] = useState(false);
-  const [bounds, setBounds] = useState({ x: 80, y: 70, width: 960, height: 700 });
+  const [bounds, setBounds] = useState(() =>
+    variant === 'compact'
+      ? {
+          x: Math.max(0, innerWidth - 384),
+          y: Math.max(0, innerHeight - 544),
+          width: 360,
+          height: 520,
+        }
+      : { x: 80, y: 70, width: 960, height: 700 },
+  );
+  const minimumWidth = variant === 'compact' ? 320 : 600;
   const closeRef = useRef<HTMLButtonElement>(null);
   const initialFocus = useRef<HTMLElement | null>(null);
   const returnFocus = returnFocusRef ?? initialFocus;
   useEffect(() => {
-    returnFocus.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (!returnFocusRef)
+      initialFocus.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const element = returnFocus.current;
     return () => {
-      if (returnFocus.current?.isConnected) returnFocus.current.focus();
+      if (element?.isConnected) element.focus();
     };
-  }, [returnFocus]);
+  }, [returnFocus, returnFocusRef]);
   useEffect(() => {
     if (!hidden) closeRef.current?.focus();
     else if (returnFocus.current?.isConnected) returnFocus.current.focus();
@@ -64,7 +80,7 @@ export function FloatingWindow({
           ? {
               ...original,
               width: Math.min(
-                Math.max(600, original.width + e.clientX - x),
+                Math.max(minimumWidth, original.width + e.clientX - x),
                 innerWidth - original.x,
               ),
               height: Math.min(
@@ -108,6 +124,7 @@ export function FloatingWindow({
           hidden={hidden}
           className={styles.window}
           data-maximized={maximized}
+          data-variant={variant}
           style={
             {
               '--window-x': `${bounds.x}px`,
@@ -139,18 +156,23 @@ export function FloatingWindow({
                 {title}
               </button>
             </Dialog.Title>
-            <button type="button" aria-label="收起游戏窗口" onClick={onHide}>
+            <button type="button" aria-label={`收起${actionName}窗口`} onClick={onHide}>
               <Minus size={18} />
             </button>
             <button
               type="button"
               className={styles.maximize}
-              aria-label={maximized ? '还原游戏窗口' : '最大化游戏窗口'}
+              aria-label={maximized ? `还原${actionName}窗口` : `最大化${actionName}窗口`}
               onClick={() => setMaximized(!maximized)}
             >
               {maximized ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
             </button>
-            <button ref={closeRef} type="button" aria-label="关闭游戏窗口" onClick={onClose}>
+            <button
+              ref={closeRef}
+              type="button"
+              aria-label={`关闭${actionName}窗口`}
+              onClick={onClose}
+            >
               <X size={18} />
             </button>
           </header>
@@ -158,7 +180,7 @@ export function FloatingWindow({
           <button
             type="button"
             className={styles.resize}
-            aria-label="调整游戏窗口大小"
+            aria-label={`调整${actionName}窗口大小`}
             onPointerDown={(e) => start(e, true)}
             onKeyDown={(e) => {
               const delta = e.shiftKey ? 80 : 20;
@@ -169,7 +191,7 @@ export function FloatingWindow({
                   width: Math.min(
                     innerWidth - b.x,
                     Math.max(
-                      600,
+                      minimumWidth,
                       b.width +
                         (e.key === 'ArrowRight' ? delta : e.key === 'ArrowLeft' ? -delta : 0),
                     ),

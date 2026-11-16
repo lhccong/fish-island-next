@@ -51,3 +51,14 @@
     padding: 7px 8px;
   }
 }
+
+@container chat-conversation (max-width: 480px) {
+  .editor {
+    height: auto;
+    min-height: 40px;
+    max-height: min(120px, 24dvh);
+    padding: 7px 10px;
+    background: var(--color-surface);
+    font-size: 16px;
+  }
+}

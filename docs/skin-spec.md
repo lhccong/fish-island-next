@@ -179,3 +179,5 @@ ADR-079 抽奖转盘复用 pixel-paper/paper-inset/border/ink 与 life 稀有度
 ADR-080 的登录/邮箱注册弹窗在全部主题及外壳共用，使用 surface/message-surface/text/muted/border/action/accent-text/danger 语义变量。固定标题、关闭与注册操作反馈，独立 reserved 正文滚动；手机 44px 操作、16px 输入字号和安全区域。明暗与换肤不重挂载表单或新增请求。
 
 ADR-081 论坛按旧版左侧标签/搜索与帖子、右侧热门话题/公告的双栏组织，窄容器右栏下移、手机单栏和分类换行。复用 surface/canvas/text/muted/border/action/accent 语义变量与既有圆角，三点菜单及确认使用共享控件；图片保持原貌，Markdown 不保留旧帖内联配色。全部主题/明暗共用同一业务组件，外观切换保留草稿、分页和请求状态。
+
+ADR-084 聊天小窗沿用全部主题语义 token；桌面紧凑窗口、手机全屏和安全区域，按容器宽度重排输入工具。WPS 小窗使用普通会话呈现，返回恢复工作表；不改变主题、草稿或连接。

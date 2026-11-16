@@ -94,3 +94,17 @@
     display: none;
   }
 }
+
+.window[data-variant='compact'] .body {
+  padding-bottom: 24px;
+}
+.window[data-variant='compact'] .title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+@media (max-width: 760px) {
+  .window[data-variant='compact'] .body {
+    padding-bottom: 0;
+  }
+}

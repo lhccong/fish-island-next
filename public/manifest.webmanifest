@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "摸鱼岛",
+  "short_name": "摸鱼岛",
+  "description": "工作之余的轻松一站，热榜、鱼小圈、阅读与休闲游戏。",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#191A1C",
+  "theme_color": "#191A1C",
+  "icons": [
+    { "src": "/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

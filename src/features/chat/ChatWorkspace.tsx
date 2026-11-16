@@ -1,3 +1,4 @@
+import { ChatWindow } from './ChatWindow';
 import { MessageStream } from './MessageStream';
 import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { ChatComposer } from './ChatComposer';
@@ -26,49 +27,61 @@ export function ChatWorkspace({
   decoration?: 'none' | 'island';
 }) {
   const { state, refresh } = useChatMembers();
-  const messages = (
+  const renderMessages = (activePresentation: ChatPresentation) => (
     <div
       key="messages"
       className={styles.messages}
       data-decoration={decoration}
       data-chat-decoration={decoration}
     >
-      <MessageStream presentation={presentation} />
+      <MessageStream presentation={activePresentation} />
     </div>
   );
-  const composer = (
-    <ChatComposer key="composer" presentation={presentation} toolbarAction={toolbarAction} />
-  );
+
   return (
-    <div
-      className={styles.workspace}
-      data-members-open={membersOpen}
-      data-presentation={presentation}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' && !event.defaultPrevented && membersOpen) onCloseMembers();
-      }}
-    >
-      <div className={styles.conversation}>
-        {presentation === 'worksheet' ? [composer, messages] : [messages, composer]}
-        {presentation === 'worksheet' && (
-          <div className={styles.sheetBar} aria-label="当前工作表">
-            <span className={styles.sheetTab}>
-              <Table2 size={15} aria-hidden="true" />
-              <span title={groupName}>{groupName}</span>
-            </span>
-            <PageFooterOutlet />
+    <ChatWindow groupName={groupName}>
+      {(floating, toggleFloating) => (
+        <div
+          className={styles.workspace}
+          data-members-open={!floating && membersOpen}
+          data-presentation={floating ? 'conversation' : presentation}
+          data-floating={floating}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape' && !event.defaultPrevented && membersOpen) onCloseMembers();
+          }}
+        >
+          <div className={styles.conversation}>
+            {[
+              renderMessages(floating ? 'conversation' : presentation),
+              <ChatComposer
+                key="composer"
+                presentation={floating ? 'conversation' : presentation}
+                toolbarAction={!floating && toolbarAction}
+                floating={floating}
+                onToggleFloating={toggleFloating}
+              />,
+            ]}
+            {!floating && presentation === 'worksheet' && (
+              <div className={styles.sheetBar} aria-label="当前工作表">
+                <span className={styles.sheetTab}>
+                  <Table2 size={15} aria-hidden="true" />
+                  <span title={groupName}>{groupName}</span>
+                </span>
+                <PageFooterOutlet />
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      {membersOpen && (
-        <OnlineMembers
-          state={state}
-          onRefresh={refresh}
-          onClose={onCloseMembers}
-          groupName={groupName}
-          onRenameGroup={onRenameGroup}
-        />
+          {!floating && membersOpen && (
+            <OnlineMembers
+              state={state}
+              onRefresh={refresh}
+              onClose={onCloseMembers}
+              groupName={groupName}
+              onRenameGroup={onRenameGroup}
+            />
+          )}
+        </div>
       )}
-    </div>
+    </ChatWindow>
   );
 }

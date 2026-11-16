@@ -6,7 +6,7 @@ export function TabIdentityProvider() {
   useLayoutEffect(() => {
     const previousTitle = document.title;
     document.title = identity.name;
-    const links = ['icon', 'shortcut icon', 'apple-touch-icon'].map((rel) => {
+    const links = ['icon', 'shortcut icon'].map((rel) => {
       const existing = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
       const link = existing ?? document.createElement('link');
       const href = link.getAttribute('href');

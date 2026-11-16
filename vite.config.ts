@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 import { loadEnv, type ProxyOptions } from 'vite';
+import { pwa } from './scripts/pwa.ts';
 
 const emoticonProxy: Record<string, ProxyOptions> = {
   '/emoticon-search': {
@@ -40,7 +41,7 @@ export default defineConfig(({ mode }) => {
     : {};
   const proxy = { ...emoticonProxy, ...localProxy };
   return {
-    plugins: [react()],
+    plugins: [react(), pwa()],
     server: { proxy },
     preview: { proxy },
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },

@@ -1,7 +1,7 @@
 import { useStore } from 'zustand';
 import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { useId, useRef, useState, type ReactNode } from 'react';
-import { Folder, Plus, Scissors } from 'lucide-react';
+import { Folder, Plus, Scissors, PictureInPicture2, Maximize2 } from 'lucide-react';
 import { EmoticonLauncher } from './EmoticonLauncher';
 import { EmoticonFeedback } from './EmoticonFeedback';
 import { RedPacketLauncher } from './RedPacketLauncher';
@@ -18,9 +18,13 @@ import type { ChatPresentation } from './chat-presentation';
 export function ChatComposer({
   presentation = 'conversation',
   toolbarAction,
+  floating = false,
+  onToggleFloating,
 }: {
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
+  floating?: boolean;
+  onToggleFloating?: () => void;
 }) {
   const [toolsOpen, setToolsOpen] = useState(false);
   const toolsId = useId();
@@ -88,6 +92,22 @@ export function ChatComposer({
           <div id={toolsId} className={styles.extraTools}>
             <RedPacketLauncher key={user?.id ?? ''} />
             <LuckyBagLauncher key={`lucky:${user?.id ?? ''}`} />
+            {onToggleFloating && (
+              <Button
+                variant="secondary"
+                className={styles.iconButton}
+                aria-label={floating ? '返回完整聊天' : '小窗模式'}
+                title={floating ? '返回完整聊天' : '小窗模式'}
+                aria-pressed={floating}
+                onClick={onToggleFloating}
+              >
+                {floating ? (
+                  <Maximize2 size={20} aria-hidden="true" />
+                ) : (
+                  <PictureInPicture2 size={20} aria-hidden="true" />
+                )}
+              </Button>
+            )}
             <button type="button" disabled aria-label="文件（暂未接入）">
               <Folder size={20} />
             </button>

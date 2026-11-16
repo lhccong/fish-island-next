@@ -497,7 +497,8 @@
     order: 4;
     width: 100%;
     padding: 12px 4px 8px;
-    gap: 20px;
+    gap: 4px;
+    flex-wrap: wrap;
     border-top: 1px solid var(--color-border);
   }
   .composer[data-tools-open='true'] .extraTools {
@@ -525,5 +526,66 @@
   .empty {
     padding: 36px 20px;
     min-height: 220px;
+  }
+}
+
+.workspace[data-presentation='worksheet'] .composer {
+  order: -1;
+}
+@container chat-conversation (max-width: 480px) {
+  .composer {
+    padding: 4px 8px 8px;
+  }
+  .inputRow {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .editorSlot {
+    flex: 1;
+    align-self: center;
+  }
+  .editorSlot:focus-within {
+    border-radius: var(--radius-control);
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: -2px;
+  }
+  .tools {
+    display: contents;
+  }
+  .tools > button {
+    order: 1;
+    padding: 0;
+  }
+  .tools .moreTools {
+    display: grid;
+  }
+  .extraTools {
+    display: none;
+    order: 4;
+    width: 100%;
+    padding: 8px 4px;
+    gap: 4px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--color-border);
+  }
+  .composer[data-tools-open='true'] .extraTools {
+    display: flex;
+  }
+  .actions {
+    display: contents;
+  }
+  .actions > button {
+    order: 2;
+    flex-shrink: 0;
+  }
+  .composerFeedback {
+    order: 3;
+    width: 100%;
+  }
+  .shortcutHint,
+  .composerFooter {
+    display: none;
   }
 }

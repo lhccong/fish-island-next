@@ -34,7 +34,10 @@ for (const skin of builtinSkins)
             animations: 'disabled',
           });
       };
-      const sidebar = page.getByRole('complementary', { name: '聊天会话', exact: true });
+      const sidebar = page.getByRole('complementary', {
+        name: skin.id === 'pixel-island' ? '我的小岛' : '聊天会话',
+        exact: true,
+      });
       if (worksheet || mobile) await expect(sidebar).toBeHidden();
       else await expect(sidebar).toBeVisible();
       const columns = page.getByLabel('消息工作表列', { exact: true });
@@ -74,6 +77,8 @@ for (const skin of builtinSkins)
         } else await route.fulfill({ json: { code: 0, data: { records: [] } } });
       });
       await page.getByRole('link', { name: mobile ? '返回热榜' : '热榜', exact: true }).click();
+      await expect(page).toHaveURL('/');
+      await expect(page.getByRole('textbox', { name: '消息草稿', exact: true })).toHaveCount(0);
       await page.goBack();
       await expect(page.getByText('正在加载历史消息…', { exact: true })).toBeVisible();
       await noOverflow(page);

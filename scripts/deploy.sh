@@ -24,10 +24,13 @@ mkdir -p -- "$site_dir"
 # Keep previous hashed assets and server-managed files; do not delete the site directory.
 while IFS= read -r -d '' entry; do
   cp -a -- "$entry" "$site_dir/"
-done < <(find dist -mindepth 1 -maxdepth 1 ! -name index.html -print0)
-entry_tmp="$(mktemp "$site_dir/.index.html.XXXXXX")"
-trap 'rm -f -- "$entry_tmp"' EXIT
-cp -- dist/index.html "$entry_tmp"
-chmod 644 "$entry_tmp"
-mv -f -- "$entry_tmp" "$site_dir/index.html"
+done < <(find dist -mindepth 1 -maxdepth 1 ! -name index.html ! -name sw.js -print0)
+# Publish the worker last: its precache must see the matching HTML and assets.
+for publish_entry in index.html sw.js; do
+  entry_tmp="$(mktemp "$site_dir/.$publish_entry.XXXXXX")"
+  trap 'rm -f -- "$entry_tmp"' EXIT
+  cp -- "dist/$publish_entry" "$entry_tmp"
+  chmod 644 "$entry_tmp"
+  mv -f -- "$entry_tmp" "$site_dir/$publish_entry"
+done
 echo "Deployed to $site_dir"

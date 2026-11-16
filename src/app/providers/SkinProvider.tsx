@@ -15,7 +15,13 @@ export function SkinProvider({ children }: { children: ReactNode }) {
       ...getSkinPresentationTokens(skinId, colorMode),
     });
     entries.forEach(([name, value]) => root.style.setProperty(name, value));
+    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const previousThemeColor = themeColor?.content;
+    if (themeColor) {
+      themeColor.content = getComputedStyle(root).getPropertyValue('--color-canvas').trim();
+    }
     return () => {
+      if (themeColor && previousThemeColor !== undefined) themeColor.content = previousThemeColor;
       entries.forEach(([name]) => root.style.removeProperty(name));
       delete root.dataset.skin;
       delete root.dataset.colorMode;

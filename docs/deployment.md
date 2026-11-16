@@ -37,6 +37,29 @@ location / {
 
 若已有 `location /`，修改该块，不要重复添加。部署脚本只发布文件，不操作服务器服务配置。后端需允许站点域名的跨域请求；登录请求携带凭证时需配置明确的允许来源及凭证支持。
 
+PWA 需要 HTTPS。发布脚本先复制资源，再原子替换 index.html，最后替换 sw.js，以确保新 worker 能预缓存同版本资源。在 server 块配置以下精确规则，避免 CDN/浏览器长缓存入口及 worker，也避免缺失文件被 SPA 回退：
+
+```nginx
+location = /sw.js {
+    add_header Cache-Control "no-cache";
+    try_files $uri =404;
+}
+location = /index.html {
+    add_header Cache-Control "no-cache";
+    try_files $uri =404;
+}
+location = /manifest.webmanifest {
+    types { application/manifest+json webmanifest; }
+    add_header Cache-Control "no-cache";
+    try_files $uri =404;
+}
+location ^~ /pwa/ {
+    try_files $uri =404;
+}
+```
+
+若已有对应规则，请合并。安装和离线范围见 [ADR-083](./decisions/ADR-083-pwa.md)。
+
 聊天表情包搜索沿用 uTools 的百度图片接口，浏览器通过同源固定目标代理访问。在同一个站点 server 块添加以下配置并检查、重载 Nginx（开发和 preview 已配置 Vite 代理）：
 
 ```nginx

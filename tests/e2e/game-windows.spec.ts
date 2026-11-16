@@ -74,7 +74,9 @@ for (const skin of builtinSkins)
         await expect(win.getByText('暂时没有地块，请刷新同步农场。')).toBeVisible();
         farm.status = 'loading';
         await win.getByRole('button', { name: '刷新', exact: true }).click();
-        await expect(page.getByRole('status').filter({ hasText: '正在同步田地…' })).toBeVisible();
+        await expect(
+          page.locator('[data-loading-indicator]').filter({ hasText: '正在同步田地…' }),
+        ).toBeVisible();
         farm.status = 'ready';
         await expect(win.getByRole('button', { name: /^1号地/ })).toBeVisible();
         const before = farm.calls;

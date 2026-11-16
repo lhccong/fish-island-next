@@ -72,4 +72,12 @@ npm run test:e2e
 
 # Linux 部署
 
+## PWA
+
+生产构建支持通过浏览器安装到桌面/主屏幕；iPhone/iPad 使用 Safari 分享菜单中的“添加到主屏幕”。需要 HTTPS（localhost 可用于测试）。开发服务器不注册 Service Worker。
+
+首次联网成功缓存后，离线可以打开应用外壳；登录、聊天和其他服务端功能仍需网络，图片等公共素材不保证离线可用。只缓存发布静态资源，不缓存接口或用户内容。新版本在所有旧窗口关闭后启用，不自动刷新当前草稿。
+
+部署必须对 `/sw.js`、`/index.html` 设置 `Cache-Control: no-cache`，正确返回 manifest MIME，且不能将缺失 worker/manifest 重写为 HTML。详见 [PWA 决策与部署](./docs/decisions/ADR-083-pwa.md)。验证命令：`npx playwright test --config playwright.pwa.config.ts`。
+
 拉取、构建与 1Panel 站点发布命令见 [部署说明](docs/deployment.md)。

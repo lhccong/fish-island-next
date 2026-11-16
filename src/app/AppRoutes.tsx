@@ -1,6 +1,7 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, Suspense, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, type Location } from 'react-router';
+import { ChatPageHost } from '@/app/components/ChatPageHost';
 import { HotBoardPage } from '@/app/pages/HotBoardPage';
 import { RequireAuth } from '@/app/components/RequireAuth';
 import { RequireAdmin } from '@/app/components/RequireAdmin';
@@ -74,11 +75,6 @@ const InitializationPage = lazy(() =>
     default: module.InitializationPage,
   })),
 );
-const ChatPlaceholderPage = lazy(() =>
-  import('@/app/pages/ChatPlaceholderPage').then((module) => ({
-    default: module.ChatPlaceholderPage,
-  })),
-);
 
 export function AppRoutes() {
   const [readerEnabled, setReaderEnabled] = useState(false);
@@ -94,6 +90,7 @@ export function AppRoutes() {
   return (
     <GameWindowsProvider>
       <div className={styles.page} aria-hidden={isLogin ? true : undefined}>
+        <ChatPageHost active={displayLocation.pathname === '/chat'} />
         <Suspense fallback={<PageLoading />}>
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
@@ -209,14 +206,7 @@ export function AppRoutes() {
                 </RequireAuth>
               }
             />
-            <Route
-              path="/chat"
-              element={
-                <RequireAuth>
-                  <ChatPlaceholderPage />
-                </RequireAuth>
-              }
-            />
+            <Route path="/chat" element={null} />
             <Route
               path="/moments/fish-circle"
               element={
