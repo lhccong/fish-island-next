@@ -36,6 +36,7 @@ export function room(v: unknown): DrawRoom {
     return {
       id: id(p.userId),
       name: text(p.userName) || '岛友',
+      avatar: /^https?:\/\//i.test(text(p.userAvatar)) ? text(p.userAvatar) : null,
       score: number(p.score),
       correct: p.hasGuessedCorrectly === true,
     };

@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { UserAvatar } from '@/shared/ui/UserAvatar';
 import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 import type { DrawPort, DrawRealtimePort, DrawIdentity, DrawSettings } from '@/domain/draw';
@@ -201,9 +202,7 @@ export function DrawWorkspace({
                       data-drawing={p.id === room.drawerId && room.status === 'PLAYING'}
                     >
                       <span className={styles.playerIdentity}>
-                        <span className={styles.playerAvatar} aria-hidden="true">
-                          {Array.from(p.name)[0]}
-                        </span>
+                        <UserAvatar name={p.name} src={p.avatar} />
                         <span>
                           {p.name}
                           <small>

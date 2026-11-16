@@ -1,6 +1,7 @@
 export interface Player {
   id: string;
   name: string;
+  avatar?: string | null;
   ready: boolean;
   online: boolean;
   robot: boolean;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { TableState } from '@/domain/landlords';
 import { Button } from '@/shared/ui/Button';
+import { UserAvatar } from '@/shared/ui/UserAvatar';
 import { Cards } from './Cards';
 import { Hand } from './Hand';
 import styles from './Landlords.module.css';
@@ -64,9 +65,12 @@ export function Table({
             .map((p) => (
               <section key={p.id} className={styles.seat} data-current={p.id === table.currentId}>
                 <div className={styles.row}>
-                  <h3>
-                    {p.name}
-                    {p.id === userId ? '（我）' : ''}
+                  <h3 className={styles.playerIdentity}>
+                    <UserAvatar name={p.name} src={p.avatar} />
+                    <span>
+                      {p.name}
+                      {p.id === userId ? '（我）' : ''}
+                    </span>
                   </h3>
                   <strong>
                     {p.id === table.landlordId
@@ -126,6 +130,12 @@ export function Table({
             </p>
           ))}
         </section>
+      )}
+      {me && (
+        <div className={styles.myIdentity}>
+          <UserAvatar name={me.name} src={me.avatar} />
+          <strong>{me.name}（我）</strong>
+        </div>
       )}
       <Hand
         cards={table.hand}

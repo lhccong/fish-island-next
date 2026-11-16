@@ -7,6 +7,7 @@ export async function prepareChatImage(file: File, signal: AbortSignal): Promise
     throw new Error('仅支持 PNG、JPEG、WebP、GIF 图片');
   if (!file.size || file.size > 10 * MiB) throw new Error('图片需在 10MB 以内且不能为空');
   signal.throwIfAborted();
+  if (file.size <= 5 * MiB) return file;
   if (await isAnimatedImage(file)) {
     signal.throwIfAborted();
     return file;
@@ -34,12 +35,10 @@ export async function prepareChatImage(file: File, signal: AbortSignal): Promise
         signal.throwIfAborted();
         if (!blob) throw new Error('图片压缩失败，请重试');
         if (blob.size <= targetBytes) {
-          if (scale === 1 && blob.size >= file.size && file.size <= targetBytes) return file;
           return new File([blob], `pasted-image.${blob.type === 'image/webp' ? 'webp' : 'png'}`, {
             type: blob.type,
           });
         }
-        if (scale === 1 && file.size <= targetBytes) return file;
       }
       const longest = Math.max(canvas.width, canvas.height);
       if (longest <= 320) break;

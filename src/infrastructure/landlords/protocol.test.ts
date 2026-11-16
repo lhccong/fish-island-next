@@ -11,7 +11,14 @@ describe('斗地主旧协议', () => {
           roomId: 'room',
           phase: 'playing',
           handCards: [{ id: '♠A' }],
-          players: [{ userId: '9007199254740999', userName: '合成玩家', isReady: true }],
+          players: [
+            {
+              userId: '9007199254740999',
+              userName: '合成玩家',
+              avatar: 'https://example.test/avatar.png',
+              isReady: true,
+            },
+          ],
         },
       }),
     );
@@ -19,6 +26,7 @@ describe('斗地主旧协议', () => {
     if (e?.type !== 'state') throw new Error('missing state');
     let state = mergeTable(emptyTable(), e, '9007199254740999');
     expect(state.players[0]?.id).toBe('9007199254740999');
+    expect(state.players[0]?.avatar).toBe('https://example.test/avatar.png');
     const publicState = decodeLandlords({
       type: 'gamePlayCards',
       data: { roomId: 'room', phase: 'playing', handCards: null },

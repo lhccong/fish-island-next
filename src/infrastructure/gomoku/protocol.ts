@@ -32,12 +32,15 @@ export function decodeGomokuEvent(raw: unknown): GomokuEvent | null {
     const opponentId = id(data.playerId);
     if (!/^\d{1,20}$/.test(opponentId)) return null;
     const info = object(data.playerInfo);
+    const name = info?.userName ?? info?.name;
+    const avatar = info?.userAvatar ?? info?.avatar;
     return {
       type: 'joined',
       roomId,
       color: data.yourColor,
       opponentId,
-      opponentName: typeof info?.name === 'string' ? info.name.slice(0, 100) : '岛友',
+      opponentName: typeof name === 'string' && name.trim() ? name.slice(0, 100) : '岛友',
+      opponentAvatar: typeof avatar === 'string' && /^https?:\/\//i.test(avatar) ? avatar : null,
     };
   }
   if (frame.type === 'moveChess' && (data?.player === 'black' || data?.player === 'white')) {

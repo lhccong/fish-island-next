@@ -1,7 +1,9 @@
-import { coordinate, opposite } from '@/domain/gomoku';
+import { coordinate } from '@/domain/gomoku';
+import type { ComponentProps } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { GomokuBoard } from './GomokuBoard';
+import { GomokuPlayers } from './GomokuPlayers';
 import { RoomToolbar } from './RoomToolbar';
 import type { GameState, GomokuController } from './controller';
 import styles from './Gomoku.module.css';
@@ -12,12 +14,16 @@ export function GomokuRoom({
   onInvite,
   inviteBusy,
   inviteFeedback,
+  user,
+  profiles,
 }: {
   state: GameState;
   controller: GomokuController;
   onInvite: () => void;
   inviteBusy: boolean;
   inviteFeedback: string;
+  user: ComponentProps<typeof GomokuPlayers>['user'];
+  profiles: ComponentProps<typeof GomokuPlayers>['profiles'];
 }) {
   const canMove = s.phase === 'playing' && s.turn === s.color && !s.thinking;
   const result =
@@ -44,20 +50,7 @@ export function GomokuRoom({
         inviteFeedback={inviteFeedback}
       />
       <section className={styles.playArea} aria-label="当前对局">
-        <div className={styles.players}>
-          <div data-active={s.turn === s.color && s.phase === 'playing'}>
-            <span className={styles.stone} data-color={s.color} />
-            <span>你 · {s.color === 'black' ? '黑棋' : '白棋'}</span>
-          </div>
-          <span className={styles.versus}>VS</span>
-          <div data-active={s.turn !== s.color && s.phase === 'playing'}>
-            <span className={styles.stone} data-color={opposite(s.color)} />
-            <span>
-              {s.mode === 'single' ? '电脑' : s.opponentName} ·{' '}
-              {s.color === 'black' ? '白棋' : '黑棋'}
-            </span>
-          </div>
-        </div>
+        <GomokuPlayers state={s} user={user} profiles={profiles} />
         <div className={styles.turn} role="status">
           {result}
           <small>

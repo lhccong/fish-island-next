@@ -1,6 +1,7 @@
 export interface DrawPlayer {
   id: string;
   name: string;
+  avatar?: string | null;
   score: number;
   correct: boolean;
 }

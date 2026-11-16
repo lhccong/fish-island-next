@@ -12,7 +12,14 @@ describe('绘画旧协议边界', () => {
       creatorId: '1',
       status: 'PLAYING',
       currentDrawerId: '2',
-      participants: [{ userId: '2', userName: '合成画家', score: 10 }],
+      participants: [
+        {
+          userId: '2',
+          userName: '合成画家',
+          userAvatar: 'https://example.test/avatar.png',
+          score: 10,
+        },
+      ],
       currentRound: 2,
       totalRounds: 6,
     };
@@ -21,9 +28,15 @@ describe('绘画旧协议边界', () => {
       creatorId: '1',
       round: 2,
       rounds: 6,
-      players: [{ id: '2', score: 10 }],
+      players: [
+        { id: '2', name: '合成画家', avatar: 'https://example.test/avatar.png', score: 10 },
+      ],
     });
     expect(() => room({ ...source, status: 'NEW' })).toThrow();
+    expect(
+      room({ ...source, participants: [{ userId: '2', userAvatar: 'data:image/svg+xml,abc' }] })
+        .players[0]?.avatar,
+    ).toBeNull();
     expect(() =>
       room({ ...source, participants: [...source.participants, ...source.participants] }),
     ).toThrow();

@@ -16,6 +16,7 @@ function player(v: unknown): Player {
   return {
     id: id(p.userId),
     name: text(p.userName) || '岛友',
+    avatar: /^https?:\/\//i.test(text(p.avatar)) ? text(p.avatar) : null,
     ready: Boolean(p.isReady ?? p.ready),
     online: (p.isOnline ?? p.online) !== false,
     robot: Boolean(p.isRobotControlled ?? p.robotControlled),

@@ -3,6 +3,36 @@ import { decodeGomokuEvent, encodeGomokuCommand } from './protocol';
 import { createGomokuRelay } from './index';
 
 const frame = (type: string, data: unknown) => JSON.stringify({ type, data });
+it('preserves optional player snapshots and rejects unsafe avatars while accepting ID-only joins', () => {
+  for (const info of [
+    { userName: '合成棋友', userAvatar: 'https://example.test/avatar.png' },
+    { name: '合成棋友', avatar: 'https://example.test/avatar.png' },
+  ]) {
+    expect(
+      decodeGomokuEvent(
+        frame('joinSuccess', {
+          roomId: 'room-1',
+          yourColor: 'black',
+          playerId: '202',
+          playerInfo: info,
+        }),
+      ),
+    ).toMatchObject({
+      opponentName: '合成棋友',
+      opponentAvatar: 'https://example.test/avatar.png',
+    });
+  }
+  expect(
+    decodeGomokuEvent(
+      frame('joinSuccess', {
+        roomId: 'room-1',
+        yourColor: 'white',
+        playerId: '202',
+        playerInfo: { userName: '', userAvatar: 'javascript:alert(1)' },
+      }),
+    ),
+  ).toMatchObject({ opponentName: '岛友', opponentAvatar: null });
+});
 it('decodes both create formats and validates joins, game type and remote coordinates', () => {
   for (const data of ['12345', { roomId: '12345', gameType: 'normal' }])
     expect(decodeGomokuEvent(frame('createChessRoom', data))).toEqual({

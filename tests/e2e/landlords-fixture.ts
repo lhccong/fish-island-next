@@ -193,6 +193,7 @@ export async function landlordsFixture(page: Page) {
   });
   return {
     state,
+    players,
     emit,
     releaseRooms: () => {
       holdRooms = false;

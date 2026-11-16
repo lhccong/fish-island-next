@@ -205,6 +205,17 @@
 .players li > span:last-child {
   color: var(--color-muted);
 }
+.playerIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
+}
+.playerIdentity > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .history li {
   padding: 12px 0;
   border-bottom: 1px solid var(--color-border);

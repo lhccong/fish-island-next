@@ -3,6 +3,7 @@ import type { UndercoverRoom } from '@/domain/undercover';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Select } from '@/shared/ui/Select';
+import { UserAvatar } from '@/shared/ui/UserAvatar';
 import type { RoomController } from './room-controller';
 import styles from './Undercover.module.css';
 export function RoomPlayers({
@@ -27,10 +28,13 @@ export function RoomPlayers({
       <ul className={styles.players}>
         {room.players.map((p, index) => (
           <li key={p.id}>
-            <span>
-              {index + 1}. {p.name}
-              {p.id === userId && '（你）'}
-              {p.id === room.creatorId && ' · 房主'}
+            <span className={styles.playerIdentity}>
+              <UserAvatar name={p.name} src={p.avatar} />
+              <span>
+                {index + 1}. {p.name}
+                {p.id === userId && '（你）'}
+                {p.id === room.creatorId && ' · 房主'}
+              </span>
             </span>
             <span>
               {p.eliminated ? '已出局' : room.status === 'PLAYING' ? `${p.votes} 票` : '已就位'}

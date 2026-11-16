@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { test, expect, type Page, type Route } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
@@ -26,7 +27,13 @@ async function pasteImage(page: Page, count = 1) {
     element.dispatchEvent(
       new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }),
     );
-    return original.size;
+    const digest = await crypto.subtle.digest('SHA-256', await original.arrayBuffer());
+    return {
+      size: original.size,
+      hash: Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join(
+        '',
+      ),
+    };
   }, count);
 }
 
@@ -58,14 +65,17 @@ for (const skin of builtinSkins)
       await pasteImage(page, 2);
       await expect(composer).toContainText('一次只能粘贴一张图片');
       expect(uploads).toBe(0);
-      const originalSize = await pasteImage(page);
+      const original = await pasteImage(page);
       await expect(attachment).toContainText('图片上传中');
       await expect(send).toBeDisabled();
       await expect.poll(() => uploads).toBe(1);
       expect(held.request().headers()['content-type']).toContain('multipart/form-data');
-      expect(originalSize).toBeLessThan(1024 * 1024);
-      expect(held.request().postDataBuffer()!.byteLength).toBeLessThan(originalSize);
-      expect(held.request().postData()).toContain('filename="pasted-image.webp"');
+      expect(original.size).toBeLessThan(5 * 1024 * 1024);
+      const multipart = held.request().postDataBuffer()!;
+      const start = multipart.indexOf('\r\n\r\n') + 4;
+      const uploaded = multipart.subarray(start, start + original.size);
+      expect(createHash('sha256').update(uploaded).digest('hex')).toBe(original.hash);
+      expect(held.request().postData()).toContain('filename="synthetic-0.png"');
       await draft.fill('上传时可继续编辑');
       await page.screenshot({ path: info.outputPath('uploading.png') });
       await held.fulfill({ json: { code: 50000 } });
@@ -148,7 +158,7 @@ test('large static image compression preserves transparency and bounds', async (
     };
     const canvas = document.createElement('canvas');
     canvas.width = 2200;
-    canvas.height = 600;
+    canvas.height = 1000;
     const context = canvas.getContext('2d')!;
     const pixels = context.createImageData(canvas.width, canvas.height);
     let seed = 19;
@@ -183,7 +193,8 @@ test('large static image compression preserves transparency and bounds', async (
     bitmap.close();
     return result;
   });
-  expect(result.original).toBeGreaterThan(1024 * 1024);
+  expect(result.original).toBeGreaterThan(5 * 1024 * 1024);
+  expect(result.original).toBeLessThanOrEqual(10 * 1024 * 1024);
   expect(result.size).toBeLessThanOrEqual(256 * 1024);
   expect(result.type).toBe('image/webp');
   expect(Math.max(result.width, result.height)).toBeLessThanOrEqual(2000);

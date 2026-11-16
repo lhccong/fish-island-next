@@ -20,6 +20,30 @@
 .workspace p {
   overflow-wrap: anywhere;
 }
+.playerIdentity,
+.myIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: 13px;
+}
+.playerIdentity > span:last-child,
+.myIdentity strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+.myIdentity {
+  padding: var(--space-4);
+}
+.roomPlayers {
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding: 0;
+}
 .row,
 .workspaceHeader,
 .phaseHeader {

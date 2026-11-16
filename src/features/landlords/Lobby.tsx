@@ -3,6 +3,7 @@ import type { Room } from '@/domain/landlords';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
+import { UserAvatar } from '@/shared/ui/UserAvatar';
 import styles from './Landlords.module.css';
 export function Lobby({
   rooms,
@@ -72,7 +73,18 @@ export function Lobby({
                   {r.count} / {r.max} 人
                 </span>
               </div>
-              <p>{r.players.map((p) => p.name).join('、') || '等待牌友加入'}</p>
+              {r.players.length ? (
+                <ul className={styles.roomPlayers}>
+                  {r.players.map((p) => (
+                    <li key={p.id} className={styles.playerIdentity}>
+                      <UserAvatar name={p.name} src={p.avatar} />
+                      <span>{p.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>等待牌友加入</p>
+              )}
               <Button
                 variant="secondary"
                 disabled={disabled}

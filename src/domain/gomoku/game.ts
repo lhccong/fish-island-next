@@ -52,7 +52,14 @@ export function winningLine(board: Board, point: Point, player: Stone): readonly
 }
 export type GomokuEvent =
   | { type: 'created'; roomId: string }
-  | { type: 'joined'; roomId: string; color: Stone; opponentId: string; opponentName: string }
+  | {
+      type: 'joined';
+      roomId: string;
+      color: Stone;
+      opponentId: string;
+      opponentName: string;
+      opponentAvatar?: string | null;
+    }
   | { type: 'move'; roomId: string; move: Move }
   | { type: 'error'; message: string };
 export type GomokuCommand =

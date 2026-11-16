@@ -4,6 +4,7 @@ import { gomokuController, gomokuSocial } from '@/app/config/gomoku';
 import { chatRealtime } from '@/app/config/chat';
 import { GomokuWorkspace } from '@/features/gomoku';
 import { useAuth } from '@/features/auth';
+import { accountTools } from '@/app/config/account-tools';
 
 export function GomokuGame() {
   const { session } = useAuth();
@@ -18,6 +19,8 @@ export function GomokuGame() {
     <GomokuWorkspace
       key={session.user.id}
       controller={gomokuController}
+      user={session.user}
+      profiles={accountTools}
       social={gomokuSocial}
       initialRoom={room}
       onRoomHandled={handled}

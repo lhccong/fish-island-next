@@ -258,22 +258,6 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.playerAvatar {
-  display: grid;
-  place-items: center;
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-control);
-  background: var(--color-canvas);
-  color: var(--color-muted);
-  font-size: 14px;
-  font-weight: 500;
-}
-.players li[data-drawing='true'] .playerAvatar {
-  color: var(--color-accent-text);
-  background: var(--color-accent-soft);
-}
 .players strong {
   white-space: nowrap;
   font-size: 12px;

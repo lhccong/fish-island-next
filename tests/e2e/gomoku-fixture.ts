@@ -11,6 +11,7 @@ export async function setupGomoku(
   mode: string,
   width: number,
   userId = '101',
+  avatar: string | null = null,
 ) {
   await page.setViewportSize({ width, height: 900 });
   await page.addInitScript(
@@ -39,6 +40,7 @@ export async function setupGomoku(
   const user = {
     id: userId,
     userName: `合成棋手${userId}`,
+    userAvatar: avatar,
     userRole: 'user',
     saTokenInfo: { tokenName: 'synthetic-session', tokenValue: 'synthetic-value' },
   };

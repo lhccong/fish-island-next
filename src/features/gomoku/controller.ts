@@ -22,6 +22,7 @@ export interface GameState {
   roomId: string;
   opponentId: string;
   opponentName: string;
+  opponentAvatar: string | null;
   color: Stone;
   turn: Stone;
   board: Board;
@@ -39,6 +40,7 @@ const initial = (connection: ConnectionStatus): GameState => ({
   roomId: '',
   opponentId: '',
   opponentName: '岛友',
+  opponentAvatar: null,
   color: 'black',
   turn: 'black',
   board: emptyBoard(),
@@ -137,6 +139,7 @@ export function createGomokuController(port: GomokuPort) {
         color: event.color,
         opponentId: event.opponentId,
         opponentName: event.opponentName,
+        opponentAvatar: event.opponentAvatar ?? null,
         board: emptyBoard(),
         moves: [],
         line: [],

@@ -2,6 +2,8 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import type { GomokuSocialPort } from '@/domain/gomoku';
+import type { AuthUser } from '@/domain/auth';
+import type { UserCardPort } from '@/domain/account-tools';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
 import { GomokuLobby } from './GomokuLobby';
@@ -24,12 +26,16 @@ export function GomokuWorkspace({
   initialRoom = '',
   onRoomHandled,
   onReconnect,
+  user,
+  profiles,
 }: {
   controller: GomokuController;
   social: GomokuSocialPort;
   initialRoom?: string;
   onRoomHandled?: () => void;
   onReconnect: () => void;
+  user: Pick<AuthUser, 'name' | 'avatarUrl'>;
+  profiles: Pick<UserCardPort, 'userCard'>;
 }) {
   const s = useStore(controller.store);
   const [inviteState, setInviteState] = useState('');
@@ -150,6 +156,8 @@ export function GomokuWorkspace({
           <GomokuRoom
             key={`${s.mode}:${s.roomId}`}
             state={s}
+            user={user}
+            profiles={profiles}
             controller={controller}
             onInvite={() => void invite()}
             inviteBusy={inviteBusy}
