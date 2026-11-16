@@ -1,28 +1,21 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Megaphone, X } from 'lucide-react';
 import type { Broadcast } from '@/domain/broadcast';
 import { Button } from '@/shared/ui/Button';
+import { useBroadcastPlayback } from './use-broadcast-playback';
 import styles from './Broadcast.module.css';
 
 export function BroadcastRibbon({ event, onDismiss }: { event: Broadcast; onDismiss: () => void }) {
-  const lane = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  useLayoutEffect(() => {
-    const measure = () => setWidth(lane.current?.clientWidth ?? 0);
-    const observer = new ResizeObserver(measure);
-    if (lane.current) observer.observe(lane.current);
-    measure();
-    return () => observer.disconnect();
-  }, []);
-  const style = {
-    '--broadcast-start': `${width}px`,
-  } as CSSProperties;
+  const { laneRef, textRef, timing } = useBroadcastPlayback(event.content, onDismiss);
   return (
     <aside className={styles.position} aria-label="全体播报">
-      <div className={styles.ribbon} style={style}>
-        <Megaphone size={18} aria-hidden="true" className={styles.icon} />
-        <div className={styles.lane} ref={lane}>
-          <span className={styles.text} aria-hidden="true">
+      <div
+        className={styles.ribbon}
+        data-duration-ms={timing?.duration}
+        data-distance={timing?.distance}
+      >
+        <Megaphone size={16} aria-hidden="true" className={styles.icon} />
+        <div className={styles.lane} ref={laneRef}>
+          <span className={styles.text} ref={textRef} aria-hidden="true" data-broadcast-content>
             {event.content}
           </span>
         </div>

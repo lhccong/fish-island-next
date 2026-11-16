@@ -1,7 +1,7 @@
 .position {
   position: fixed;
   z-index: 140;
-  inset: max(12px, env(safe-area-inset-top)) 0 auto;
+  inset: max(8px, env(safe-area-inset-top)) 0 auto;
   padding: 0 max(12px, env(safe-area-inset-left)) 0 max(12px, env(safe-area-inset-right));
   pointer-events: none;
   display: flex;
@@ -11,23 +11,27 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: min(760px, 100%);
+  gap: 10px;
+  width: min(640px, 100%);
   min-width: 0;
-  min-height: 46px;
-  padding: 10px 44px 10px 16px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  background: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-panel);
+  min-height: 44px;
+  padding: 9px 44px 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--color-warning) 26%, var(--color-border));
+  border-radius: var(--radius-control);
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--color-warning) 14%, var(--color-surface)),
+    color-mix(in srgb, var(--color-warning) 6%, var(--color-surface))
+  );
+  color: color-mix(in srgb, var(--color-warning) 30%, var(--color-text));
   pointer-events: auto;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.6;
+  animation: arrive 180ms ease-out both;
 }
 .icon {
   flex: none;
-  color: var(--color-accent-text);
+  color: var(--color-warning);
 }
 .lane {
   flex: 1;
@@ -38,7 +42,6 @@
   display: block;
   width: max-content;
   white-space: nowrap;
-  animation: drift 3s linear forwards;
 }
 .ribbon .close {
   position: absolute;
@@ -49,9 +52,10 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--color-muted);
+  color: color-mix(in srgb, var(--color-warning) 30%, var(--color-text));
 }
-.ribbon .close:hover {
+.ribbon .close:hover:not(:disabled) {
+  background: transparent;
   color: var(--color-text);
 }
 .accessible {
@@ -64,21 +68,26 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
-@keyframes drift {
+@keyframes arrive {
   from {
-    transform: translateX(var(--broadcast-start));
+    opacity: 0;
+    transform: translateY(-4px);
   }
   to {
-    transform: translateX(-100%);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 @media (max-width: 760px) {
   .ribbon {
     gap: 8px;
-    padding-left: 12px;
+    font-size: 14px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .ribbon {
+    animation: none;
+  }
   .text {
     width: auto;
     white-space: normal;

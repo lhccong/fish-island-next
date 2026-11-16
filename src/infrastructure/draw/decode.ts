@@ -12,9 +12,10 @@ export function id(v: unknown): string {
 }
 export function number(v: unknown, fallback = 0) {
   if (v == null) return fallback;
-  if (typeof v !== 'number' || !Number.isSafeInteger(v) || v < 0)
+  const value = typeof v === 'string' && /^\d+$/.test(v) ? Number(v) : v;
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0)
     throw new Error('绘画服务数值异常');
-  return v;
+  return value;
 }
 export function list<T>(v: unknown, decode: (v: unknown) => T): T[] {
   if (v == null) return [];
@@ -56,7 +57,8 @@ export function room(v: unknown): DrawRoom {
     hint: text(d.wordHint),
     round: number(d.currentRound),
     rounds: number(d.totalRounds, 6),
-    endTime: number(d.roundEndTime),
+    // 旧服务返回 Unix 秒（Long 经 JSON 序列化为字符串），领域时间统一为毫秒。
+    endTime: number(number(d.roundEndTime) * 1000),
     image: image(d.drawData),
     creatorOnly: d.creatorOnlyMode === true,
   };

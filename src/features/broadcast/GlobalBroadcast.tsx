@@ -9,11 +9,6 @@ export function GlobalBroadcast({ port }: { port: BroadcastPort }) {
   const events = useSyncExternalStore(queue.subscribe, queue.getSnapshot);
   useEffect(() => port.subscribe(queue.enqueue), [port, queue]);
   const current = events[0];
-  useEffect(() => {
-    if (!current) return;
-    const timer = setTimeout(() => queue.dismiss(current.id), 3000);
-    return () => clearTimeout(timer);
-  }, [current, queue]);
   return current
     ? createPortal(
         <BroadcastRibbon

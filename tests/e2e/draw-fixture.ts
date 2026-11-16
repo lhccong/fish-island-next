@@ -30,7 +30,7 @@ export async function drawFixture(page: Page) {
       currentWord: '',
       wordHint: '水果',
       drawData: '',
-      roundEndTime: 0,
+      roundEndTime: '0',
       creatorOnlyMode: false,
       participants: [
         { userId: '123', userName: '合成画家', score: 0, hasGuessedCorrectly: false },
@@ -72,7 +72,7 @@ export async function drawFixture(page: Page) {
       state.room.status = 'PLAYING';
       state.room.currentWord = '苹果';
       state.room.currentRound = 1;
-      state.room.roundEndTime = Date.now() + 60000;
+      state.room.roundEndTime = String(Math.floor(Date.now() / 1000) + 60);
     }
     if (path === 'game/next-round') {
       state.room.currentRound++;

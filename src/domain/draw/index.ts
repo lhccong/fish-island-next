@@ -19,6 +19,7 @@ export interface DrawRoom {
   hint: string;
   round: number;
   rounds: number;
+  /** 回合结束的 Unix 毫秒时间戳；未开始为 0。 */
   endTime: number;
   image: string;
   creatorOnly: boolean;

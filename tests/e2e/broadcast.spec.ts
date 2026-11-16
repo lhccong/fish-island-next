@@ -98,7 +98,7 @@ for (const skin of builtinSkins)
       expect(before!.x + before!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
       const close = banner.getByRole('button', { name: '关闭播报' });
       const closeBounds = (await close.boundingBox())!;
-      expect(closeBounds.height).toBeGreaterThanOrEqual(44);
+      await expect(close).toHaveCSS('height', '44px');
       expect(Math.abs(closeBounds.y - before!.y)).toBeLessThanOrEqual(2);
       expect(
         Math.abs(closeBounds.x + closeBounds.width - before!.x - before!.width),
@@ -106,14 +106,7 @@ for (const skin of builtinSkins)
       await expect(close.locator('svg')).toHaveAttribute('width', '14');
       await close.focus();
       const moving = banner.locator('[aria-hidden="true"]').filter({ hasText: '合成全体播报' });
-      await expect(moving).toHaveCSS('animation-duration', '3s');
-      // 固定在动画中点检查实际布局，随后通过手动关闭及计时验证生命周期。
-      await moving.evaluate((el) => {
-        for (const a of el.getAnimations()) {
-          a.pause();
-          a.currentTime = 1500;
-        }
-      });
+      await expect(moving).toHaveCSS('white-space', 'nowrap');
       await page.screenshot({ path: info.outputPath('broadcast.png') });
       if (isMobile) await close.tap();
       else await close.click();
@@ -140,6 +133,12 @@ for (const skin of builtinSkins)
       await page.clock.fastForward(999);
       await expect(banner.getByRole('status')).toContainText('第二条合成播报');
       await page.clock.fastForward(1);
+      await expect(banner.getByRole('status')).toContainText('第二条合成播报');
+      const longDuration = Number(
+        await banner.locator(':scope > div').getAttribute('data-duration-ms'),
+      );
+      expect(longDuration).toBeGreaterThan(3000);
+      await page.clock.fastForward(longDuration - 3000);
       await expect(banner).toHaveCount(0);
       // 客户端导航到其他菜单，验证全局订阅与连接不依赖管理页面。
       await page.evaluate(() => {
@@ -169,12 +168,17 @@ for (const skin of builtinSkins)
       await expect(banner.locator('span[aria-hidden="true"]')).toHaveCSS('animation-name', 'none');
       expect((await banner.boundingBox())!.height).toBeLessThan(page.viewportSize()!.height);
       await page.screenshot({ path: info.outputPath('reduced-motion.png') });
-      await page.clock.fastForward(2999);
+      const readingDuration = Number(
+        await banner.locator(':scope > div').getAttribute('data-duration-ms'),
+      );
+      expect(readingDuration).toBeGreaterThan(3000);
+      await page.clock.fastForward(readingDuration - 1);
       await expect(banner.getByRole('status')).toContainText('减少动态效果');
       await page.clock.fastForward(1);
       await expect(banner).toHaveCount(0);
       expect(connections).toBe(connectionsBeforeSwitch);
       await page.clock.resume();
+      await page.goto('about:blank');
     });
   }
 
@@ -192,4 +196,5 @@ test('ordinary users cannot open publisher but receive global broadcasts', async
   const banner = page.getByRole('complementary', { name: '全体播报' });
   await expect(banner.getByRole('status')).toHaveText('全体播报：普通用户接收合成播报');
   await banner.getByRole('button', { name: '关闭播报' }).click();
+  await page.goto('about:blank');
 });

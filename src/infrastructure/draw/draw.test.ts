@@ -1,11 +1,59 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createDrawClient } from './client';
 import { createDrawChannel } from './channel';
-import { room, image } from './decode';
+import { room, image, number } from './decode';
 const signal = () => new AbortController().signal;
 const token = { name: 'synthetic-session', value: 'synthetic-token' };
 afterEach(() => vi.unstubAllGlobals());
 describe('绘画旧协议边界', () => {
+  it.each([0, 6, '0', '6', '1794825600'])('兼容非负安全整数及十进制字符串 %s', (value) => {
+    expect(number(value)).toBe(Number(value));
+  });
+  it.each([
+    '',
+    ' ',
+    '1.5',
+    '1e3',
+    '0x10',
+    '-1',
+    true,
+    {},
+    -1,
+    1.5,
+    NaN,
+    Infinity,
+    '9007199254740992',
+  ])('拒绝非法数值 %s，避免宽松转换掩盖服务异常', (value) => {
+    expect(() => number(value)).toThrow('绘画服务数值异常');
+  });
+  it.each([1794825600, '1794825600'])(
+    '列表和房间详情将服务端秒时间 %s 归一为毫秒',
+    async (endTime) => {
+      const source = {
+        roomId: 'r1',
+        creatorId: '1',
+        status: 'PLAYING',
+        roundEndTime: endTime,
+      };
+      const fetcher = vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data: [source] })))
+        .mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data: source })));
+      vi.stubGlobal('fetch', fetcher);
+      const client = createDrawClient('', () => token, vi.fn());
+      expect(await client.rooms(signal())).toMatchObject([{ id: 'r1', endTime: 1794825600000 }]);
+      expect(await client.room('r1', signal())).toMatchObject({ id: 'r1', endTime: 1794825600000 });
+    },
+  );
+  it('等待房间保留零时间，毫秒转换不能溢出安全整数', () => {
+    const source = { roomId: 'r1', creatorId: '1', status: 'WAITING' };
+    for (const roundEndTime of [undefined, null, 0, '0']) {
+      expect(room({ ...source, roundEndTime }).endTime).toBe(0);
+    }
+    expect(() => room({ ...source, roundEndTime: Number.MAX_SAFE_INTEGER })).toThrow(
+      '绘画服务数值异常',
+    );
+  });
   it('房间解析保留轮换与权限所需身份，拒绝异常数据与非 PNG', () => {
     const source = {
       roomId: 'r1',

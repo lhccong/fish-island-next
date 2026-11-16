@@ -38,6 +38,10 @@ for (const skin of builtinSkins)
         await page.getByRole('button', { name: '重试同步', exact: true }).click();
         fixture.releaseFirstLoad();
         await expect(page.getByRole('heading', { name: '还没有房间' })).toBeVisible();
+        fixture.state.empty = false;
+        await page.getByRole('button', { name: '刷新房间', exact: true }).click();
+        await expect(page.getByRole('button', { name: '查看房间', exact: true })).toBeVisible();
+        await assertDrawLayout(page, width);
         await page.getByRole('button', { name: '创建房间', exact: true }).click();
         const dialog = page.getByRole('dialog', { name: '创建你画我猜房间' });
         await selectValue(page, '词库', '成语');
@@ -56,6 +60,13 @@ for (const skin of builtinSkins)
         await expect(page).toHaveURL(/\/game\/draw\/synthetic-draw$/);
         await page.getByRole('button', { name: '开始游戏', exact: true }).click();
         await expect(page.getByText('你的题目：苹果', { exact: true })).toBeVisible();
+        const clock = page.getByLabel('回合剩余时间', { exact: true });
+        await expect(clock).toHaveText(/^(?:[1-5]?\d|60) 秒$/);
+        const seconds = Number((await clock.innerText()).replace(' 秒', ''));
+        expect(seconds).toBeGreaterThan(50);
+        await expect
+          .poll(async () => Number((await clock.innerText()).replace(' 秒', '')))
+          .toBeLessThan(seconds);
         await selectValue(page, '画笔颜色', '海蓝');
         fixture.state.saveFail = true;
         await drawStroke(page, width < 760);

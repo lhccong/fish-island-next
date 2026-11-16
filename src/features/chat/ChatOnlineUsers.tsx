@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { sortMembersByLevel } from '@/domain/chat';
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import { useRemarks } from './remarks-context';
@@ -33,7 +34,7 @@ export function ChatOnlineUsers({
   const loading = state.status === 'idle' || state.status === 'loading';
   const users =
     state.status === 'success'
-      ? buildConversationEntries(state.members).filter((entry) =>
+      ? buildConversationEntries(sortMembersByLevel(state.members)).filter((entry) =>
           `${entry.name} ${entry.kind === 'member' && Object.hasOwn(remarks, entry.id) ? remarks[entry.id] : ''}`
             .toLocaleLowerCase()
             .includes(query.trim().toLocaleLowerCase()),
