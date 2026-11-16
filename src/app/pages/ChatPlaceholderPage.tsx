@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { MessageCircle, MoreHorizontal, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { MessageCircle, MoreHorizontal, PanelLeftOpen } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { chatService, chatPreferences, chatListPreferences } from '@/app/config/chat';
@@ -28,6 +28,8 @@ export function ChatPlaceholderPage() {
   const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
   const [membersOpen, setMembersOpen] = useState(false);
   const [circleCollapsed, setCircleCollapsed] = useState(false);
+  const circleExpand = useRef<HTMLButtonElement>(null);
+  const circleCollapse = useRef<HTMLButtonElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const formulaTrigger = useRef<HTMLButtonElement>(null);
   const closeMembers = () => {
@@ -61,7 +63,15 @@ export function ChatPlaceholderPage() {
                     <div className={styles.islandSidebar} hidden={skinId !== 'pixel-island'}>
                       <IslandSidebar active={skinId === 'pixel-island'} />
                     </div>
-                    {skinId === 'moyu-island' && <ClassicCircleSidebar />}
+                    {skinId === 'moyu-island' && (
+                      <ClassicCircleSidebar
+                        collapseRef={circleCollapse}
+                        onCollapse={() => {
+                          setCircleCollapsed(true);
+                          requestAnimationFrame(() => circleExpand.current?.focus());
+                        }}
+                      />
+                    )}
                     {skinId !== 'pixel-island' && skinId !== 'moyu-island' && (
                       <ChatOnlineUsers groupName={groupName} />
                     )}
@@ -70,21 +80,21 @@ export function ChatPlaceholderPage() {
                 header: (
                   <div className={styles.header} data-classic={skinId === 'moyu-island'}>
                     <div className={styles.headerTitle}>
-                      {skinId === 'moyu-island' && (
+                      {skinId === 'moyu-island' && circleCollapsed && (
                         <Button
+                          ref={circleExpand}
                           variant="secondary"
                           className={styles.circleToggle}
-                          aria-label={circleCollapsed ? '展开鱼小圈' : '收起鱼小圈'}
-                          aria-expanded={!circleCollapsed}
+                          aria-label="展开鱼小圈"
+                          title="展开鱼小圈"
+                          aria-expanded={false}
                           aria-controls="classic-circle-sidebar"
-                          onClick={() => setCircleCollapsed((collapsed) => !collapsed)}
+                          onClick={() => {
+                            setCircleCollapsed(false);
+                            requestAnimationFrame(() => circleCollapse.current?.focus());
+                          }}
                         >
-                          {circleCollapsed ? (
-                            <PanelLeftOpen size={16} aria-hidden="true" />
-                          ) : (
-                            <PanelLeftClose size={16} aria-hidden="true" />
-                          )}
-                          鱼小圈
+                          <PanelLeftOpen size={16} aria-hidden="true" />
                         </Button>
                       )}
                       <h1 title={groupName} aria-label={groupName}>

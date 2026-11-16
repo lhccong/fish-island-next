@@ -40,7 +40,8 @@ for (const skin of builtinSkins)
         });
       });
       const mobile = page.viewportSize()!.width <= 760;
-      const toggle = () => page.getByRole('button', { name: /^(收起|展开)鱼小圈$/ });
+      const toggle = () =>
+        page.getByRole('button', { name: /^(收起|展开)鱼小圈$/ }).filter({ visible: true });
       const bounds = async () => {
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
           true,
@@ -62,12 +63,18 @@ for (const skin of builtinSkins)
         page.getByText('正在加载动态…', { exact: true }).filter({ visible: true }),
       ).toBeVisible();
       if (!mobile) {
+        await expect(
+          page.locator('#classic-circle-sidebar').getByRole('button', { name: '收起鱼小圈' }),
+        ).toBeVisible();
+        await expect(toggle()).toHaveText('');
         await toggle().focus();
         await page.keyboard.press('Enter');
         await expect(toggle()).toHaveAttribute('aria-expanded', 'false');
+        await expect(toggle()).toBeFocused();
         await expect(page.locator('#classic-circle-sidebar')).toBeHidden();
         await page.keyboard.press('Space');
         await expect(toggle()).toHaveAttribute('aria-expanded', 'true');
+        await expect(toggle()).toBeFocused();
       }
       state = 'empty';
       release!();

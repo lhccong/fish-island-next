@@ -3,3 +3,16 @@
   min-height: 0;
   padding-top: 8px;
 }
+.collapse {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-muted);
+}
+.collapse:hover:not(:disabled) {
+  background: var(--color-hover);
+  border-color: transparent;
+  color: var(--color-text);
+}

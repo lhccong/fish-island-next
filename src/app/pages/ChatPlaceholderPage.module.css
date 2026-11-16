@@ -79,6 +79,13 @@
   gap: 8px;
   min-width: 0;
 }
+.circleToggle {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+}
 @media (max-width: 760px) {
   .circleToggle {
     display: none;
