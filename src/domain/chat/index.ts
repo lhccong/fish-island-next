@@ -5,6 +5,8 @@ export type { ChatListAppearance, ChatListPreferencesPort } from './list-prefere
 export { defaultChatListAppearance, parseChatListAppearance } from './list-preferences';
 export type { UserRemarks, ChatRemarksPort } from './remarks';
 export { parseEmojiText } from './emoji';
+export { parseInvitationText } from './game-invitation';
+export type { InvitationGame } from './game-invitation';
 export type { ChatImageUploadPort } from './image-upload';
 export { senderTitle, memberLevelEmoji } from './sender-title';
 export { sortMembersByLevel } from './member-order';

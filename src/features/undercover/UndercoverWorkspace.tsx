@@ -11,14 +11,16 @@ export function UndercoverWorkspace({
   realtime,
   user,
   onLogin,
+  initialRoom = null,
 }: {
   service: UndercoverPort;
   realtime: UndercoverRealtimePort;
   user: AuthUser | null;
   onLogin: () => void;
+  initialRoom?: string | null;
 }) {
-  const [tab, setTab] = useState<'local' | 'online'>('local');
-  const [visited, setVisited] = useState(false);
+  const [tab, setTab] = useState<'local' | 'online'>(initialRoom ? 'online' : 'local');
+  const [visited, setVisited] = useState(!!initialRoom);
   return (
     <div className={styles.workspace}>
       <header className={styles.intro}>
@@ -55,7 +57,13 @@ export function UndercoverWorkspace({
       <section hidden={tab !== 'online'} aria-label="联机房间">
         {visited &&
           (user ? (
-            <OnlineLobby key={user.id} service={service} realtime={realtime} user={user} />
+            <OnlineLobby
+              key={user.id}
+              service={service}
+              realtime={realtime}
+              user={user}
+              initialRoom={initialRoom}
+            />
           ) : (
             <div className={styles.panel}>
               <h3>和岛友在线过招</h3>

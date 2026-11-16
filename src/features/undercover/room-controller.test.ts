@@ -17,7 +17,7 @@ const room: UndercoverRoom = {
   result: '',
   votes: [],
 };
-function setup() {
+function setup(initialRoom: string | null = null) {
   const service: UndercoverPort = {
     rooms: vi.fn(async () => [room]),
     room: vi.fn(async () => room),
@@ -37,9 +37,19 @@ function setup() {
     },
     send: () => true,
   };
-  const controller = createRoomController(service, realtime, '123');
+  const controller = createRoomController(service, realtime, '123', initialRoom);
   return { service, controller, emit: (event: UndercoverEvent) => listener?.(event) };
 }
+it('opens an invited room ahead of membership recovery without joining or duplicate loads', async () => {
+  const { controller, service } = setup('invited-room');
+  vi.mocked(service.room).mockResolvedValue({ ...room, id: 'invited-room', creatorId: '456' });
+  const stop = controller.start();
+  await vi.waitFor(() => expect(controller.store.getState().status).toBe('ready'));
+  expect(service.room).toHaveBeenCalledExactlyOnceWith('invited-room', expect.any(AbortSignal));
+  expect(controller.store.getState().activeId).toBe('invited-room');
+  expect(service.action).not.toHaveBeenCalled();
+  stop();
+});
 it('restores membership, preserves loaded content on failure and requires manual retry', async () => {
   const { service, controller } = setup();
   const stop = controller.start();

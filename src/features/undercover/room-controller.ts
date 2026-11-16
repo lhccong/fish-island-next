@@ -21,10 +21,11 @@ export function createRoomController(
   service: UndercoverPort,
   realtime: UndercoverRealtimePort,
   userId: string,
+  initialRoom: string | null = null,
 ) {
   const store = createStore<RoomState>(() => ({
     rooms: [],
-    activeId: null,
+    activeId: initialRoom,
     room: null,
     status: 'loading',
     error: '',

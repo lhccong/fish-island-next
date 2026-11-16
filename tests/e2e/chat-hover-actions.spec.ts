@@ -49,7 +49,13 @@ for (const skin of builtinSkins)
         expect((await row.boundingBox())!.height).toBe(before!.height);
       }
       if (mobile) await expect(toolbar).toBeHidden();
-      for (const name of mobile ? [] : ['复读', '引用', '举报', '撤回']) {
+      else
+        expect(
+          await toolbar
+            .getByRole('button')
+            .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label'))),
+        ).toEqual(['撤回', '引用', '举报', '复读', '更多消息操作']);
+      for (const name of mobile ? [] : ['撤回', '引用', '举报', '复读']) {
         const button = toolbar.getByRole('button', { name, exact: true });
         await expect(button).toBeVisible();
         expect((await button.boundingBox())!.height).toBe(mobile ? 44 : 26);

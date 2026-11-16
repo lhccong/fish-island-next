@@ -8,15 +8,15 @@ export type MessageAction = DropdownMenuItem & {
   shortcut?: 'repeat' | 'quote' | 'report' | 'revoke';
 };
 const shortcuts = [
-  { id: 'repeat', name: '复读', icon: Repeat2, reason: '红包和福袋不能复读' },
-  { id: 'quote', name: '引用', icon: Quote, reason: '' },
-  { id: 'report', name: '举报', icon: Flag, reason: '不能举报自己的消息' },
   {
     id: 'revoke',
     name: '撤回',
     icon: Undo2,
     reason: '仅本人或管理员可撤回；红包和福袋仅管理员可撤回',
   },
+  { id: 'quote', name: '引用', icon: Quote, reason: '' },
+  { id: 'report', name: '举报', icon: Flag, reason: '不能举报自己的消息' },
+  { id: 'repeat', name: '复读', icon: Repeat2, reason: '红包和福袋不能复读' },
 ] as const;
 export function MessageActionBar({
   items,

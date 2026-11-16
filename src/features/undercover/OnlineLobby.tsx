@@ -13,12 +13,16 @@ export function OnlineLobby({
   service,
   realtime,
   user,
+  initialRoom = null,
 }: {
   service: UndercoverPort;
   realtime: UndercoverRealtimePort;
   user: AuthUser;
+  initialRoom?: string | null;
 }) {
-  const [controller] = useState(() => createRoomController(service, realtime, user.id));
+  const [controller] = useState(() =>
+    createRoomController(service, realtime, user.id, initialRoom),
+  );
   const state = useStore(controller.store);
   const [create, setCreate] = useState(false);
   const [joinId, setJoinId] = useState('');
