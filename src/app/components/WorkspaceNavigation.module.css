@@ -30,9 +30,16 @@
     text-decoration: none;
   }
   .classicBrand img {
+    flex-shrink: 0;
     width: 30px;
     height: 30px;
     border-radius: 6px;
+  }
+  .classicBrand > span {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .navigation[data-shell='moyu-island'] .items,
   .navigation[data-shell='moyu-island'] .classicLinks {

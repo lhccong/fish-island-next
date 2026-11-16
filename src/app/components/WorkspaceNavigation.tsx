@@ -9,7 +9,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Link, NavLink, useLocation } from 'react-router';
-import { ThemePicker } from '@/features/appearance';
+import { ThemePicker, useTabIdentityStore } from '@/features/appearance';
 import type { ShellId } from '@/shells/contracts';
 import { WpsChrome } from './WpsChrome';
 import { WpsOfficeTools } from './WpsOfficeTools';
@@ -22,12 +22,13 @@ import { WorkspaceSignIn } from './WorkspaceSignIn';
 
 export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId }) {
   const location = useLocation();
+  const siteName = useTabIdentityStore((state) => state.identity.name);
   return (
     <div className={styles.navigation} data-shell={shellId}>
       {shellId === 'moyu-island' && (
-        <Link to="/" className={styles.classicBrand}>
+        <Link to="/" className={styles.classicBrand} title={siteName}>
           <img src="/skins/moyu-island/logo.png" alt="" />
-          摸鱼岛
+          <span>{siteName}</span>
         </Link>
       )}
       {shellId === 'wps' && <WpsChrome />}

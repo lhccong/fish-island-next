@@ -2,7 +2,7 @@ import type { AuthUser } from '@/domain/auth';
 import type { LuckyBagPort } from '@/domain/chat';
 import { createLuckyBagController } from './lucky-bag-controller';
 import { createLuckyBagCreation } from './lucky-bag-creation';
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createMessageNavigation } from './message-navigation';
 import { createChatDraft } from './chat-draft';
 import type { ChatEmoticonPort, ChatImageUploadPort } from '@/domain/chat';
@@ -16,6 +16,7 @@ import { ChatRealtimeContext } from './realtime-context';
 import { useAvatarPreference } from './use-avatar-preference';
 import { useImagePreference } from './use-image-preference';
 import type { BlacklistPort } from '@/domain/account-tools';
+import { createImageGeometry } from './image-geometry';
 
 export function ChatRealtimeProvider({
   controller,
@@ -64,6 +65,13 @@ export function ChatRealtimeProvider({
     };
   }, [luckyBags, luckyBagCreation, controller]);
   const imagePreference = useImagePreference(preferences);
+  const [geometryScope, setGeometryScope] = useState(() => ({
+    userId,
+    controller,
+    cache: createImageGeometry(),
+  }));
+  if (geometryScope.userId !== userId || geometryScope.controller !== controller)
+    setGeometryScope({ userId, controller, cache: createImageGeometry() });
   const draft = useMemo(() => createChatDraft(userId), [userId]);
   const imageUpload = useMemo(
     () => createImageUploadController(imageUploadPort, userId),
@@ -109,6 +117,7 @@ export function ChatRealtimeProvider({
         userId,
         avatarPreference,
         imagePreference,
+        imageGeometry: geometryScope.cache,
         draft,
         imageUpload,
         composerRef,

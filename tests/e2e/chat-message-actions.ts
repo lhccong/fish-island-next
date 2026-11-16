@@ -13,9 +13,17 @@ export async function openMessageActions(
   const bubble = row.getByRole('group');
   await expect(bubble).toBeVisible();
   await bubble.scrollIntoViewIfNeeded();
-  if (page.viewportSize()!.width <= 760)
-    await row.getByRole('button', { name: '更多消息操作', exact: true }).tap();
-  else await bubble.click({ button: 'right' });
+  if (page.viewportSize()!.width <= 760) {
+    const touch = await page.context().newCDPSession(page);
+    const box = (await bubble.boundingBox())!;
+    await touch.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x: box.x + box.width / 2, y: box.y + Math.min(20, box.height / 2) }],
+    });
+    await expect(page.getByRole('menu')).toBeVisible();
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+    await touch.detach();
+  } else await bubble.click({ button: 'right' });
   const menu = page.getByRole('menu');
   await expect(menu).toBeVisible();
   return menu;

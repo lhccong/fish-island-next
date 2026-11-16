@@ -545,4 +545,8 @@
   :global([data-chat-decoration='classic']) .row {
     padding-block: 6px;
   }
+  .row .messageActions,
+  .row[data-presentation='worksheet'] .messageActions {
+    display: none;
+  }
 }

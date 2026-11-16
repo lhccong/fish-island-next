@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { EyeOff, UsersRound } from 'lucide-react';
 import { memberLevelEmoji, sortMembersByLevel } from '@/domain/chat';
 import { Button } from '@/shared/ui/Button';
@@ -9,9 +8,8 @@ import { MemberAvatar } from './MemberAvatar';
 import { RemarkName } from './RemarkName';
 import styles from './ClassicMembers.module.css';
 
-export function ClassicMembers() {
+export function ClassicMembers({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   const { state, refresh } = useChatMembers();
-  const [open, setOpen] = useState(true);
   return (
     <aside className={styles.members} data-open={open} aria-label="经典在线成员">
       <header>
@@ -19,7 +17,8 @@ export function ClassicMembers() {
         <Button
           variant="secondary"
           aria-label={open ? '隐藏在线成员' : '展开在线成员'}
-          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          onClick={onToggle}
         >
           {open ? (
             <EyeOff size={14} aria-hidden="true" />

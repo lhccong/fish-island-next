@@ -117,19 +117,36 @@ export function MessageStream({
     let previousTop = viewport.scrollTop;
     let previousHeight = viewport.scrollHeight;
     let previousClientHeight = viewport.clientHeight;
+    let touching = false;
+    const startTouch = () => {
+      touching = true;
+      setFollow(false);
+    };
+    const endTouch = () => {
+      touching = false;
+      if (viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1) setFollow(true);
+    };
     const trackPosition = () => {
       const top = viewport.scrollTop;
       const height = viewport.scrollHeight;
       const clientHeight = viewport.clientHeight;
       const resized = height !== previousHeight || clientHeight !== previousClientHeight;
-      if (height - top - clientHeight <= 64) setFollow(true);
-      else if (top < previousTop && (!resized || top === 0)) setFollow(false);
+      if (top < previousTop && (!resized || top === 0)) setFollow(false);
+      else if (!touching && height - top - clientHeight <= 64) setFollow(true);
       previousTop = top;
       previousHeight = height;
       previousClientHeight = clientHeight;
     };
     viewport.addEventListener('scroll', trackPosition);
-    return () => viewport.removeEventListener('scroll', trackPosition);
+    viewport.addEventListener('touchstart', startTouch, { passive: true });
+    viewport.addEventListener('touchend', endTouch, { passive: true });
+    viewport.addEventListener('touchcancel', endTouch, { passive: true });
+    return () => {
+      viewport.removeEventListener('scroll', trackPosition);
+      viewport.removeEventListener('touchstart', startTouch);
+      viewport.removeEventListener('touchend', endTouch);
+      viewport.removeEventListener('touchcancel', endTouch);
+    };
   }, [viewport, setFollow]);
   return (
     <section className={styles.stream} aria-label="群聊实时消息" data-presentation={presentation}>
@@ -154,6 +171,8 @@ export function MessageStream({
                 context={rowContext}
                 computeItemKey={key}
                 itemContent={row}
+                // Compensate variable-height rows before paint instead of one frame later.
+                skipAnimationFrameInResizeObserver
                 atBottomThreshold={64}
                 atBottomStateChange={updateBottom}
                 // Let Virtuoso coordinate measurement and scrolling; external resize writes

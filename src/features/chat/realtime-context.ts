@@ -13,6 +13,7 @@ import type { useAvatarPreference } from './use-avatar-preference';
 import type { useImagePreference } from './use-image-preference';
 
 import type { MessageNavigation } from './message-navigation';
+import type { ImageGeometry } from './image-geometry';
 
 export const ChatRealtimeContext = createContext<{
   controller: ChatRealtimeController;
@@ -24,6 +25,7 @@ export const ChatRealtimeContext = createContext<{
   user?: AuthUser | undefined;
   avatarPreference: ReturnType<typeof useAvatarPreference>;
   imagePreference: ReturnType<typeof useImagePreference>;
+  imageGeometry: ImageGeometry;
   draft: ChatDraft;
   imageUpload: ImageUploadController;
   emoticons: EmoticonController;

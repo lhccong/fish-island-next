@@ -1,6 +1,7 @@
 import { expect, test, type Route } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
+import { openMessageActions } from './chat-message-actions';
 
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
@@ -36,7 +37,7 @@ for (const skin of builtinSkins)
               Number.parseFloat(getComputedStyle(element).paddingTop),
           )) -
           ((await bubble.boundingBox())!.y + (await bubble.boundingBox())!.height);
-        expect(gap).toBeGreaterThanOrEqual(mobile ? 44 : 26);
+        expect(gap).toBeGreaterThanOrEqual(mobile ? 0 : 26);
         expect(gap).toBeLessThanOrEqual(mobile ? 58 : 36);
       }
       if (!mobile) {
@@ -47,7 +48,8 @@ for (const skin of builtinSkins)
         await expect(toolbar.locator('..')).toHaveCSS('opacity', '1');
         expect((await row.boundingBox())!.height).toBe(before!.height);
       }
-      for (const name of ['复读', '引用', '举报', '撤回']) {
+      if (mobile) await expect(toolbar).toBeHidden();
+      for (const name of mobile ? [] : ['复读', '引用', '举报', '撤回']) {
         const button = toolbar.getByRole('button', { name, exact: true });
         await expect(button).toBeVisible();
         expect((await button.boundingBox())!.height).toBe(mobile ? 44 : 26);
@@ -56,7 +58,13 @@ for (const skin of builtinSkins)
         await expect(button.locator('svg')).toHaveAttribute('width', '14');
       }
       await page.screenshot({ path: info.outputPath('compact-actions.png') });
-      await toolbar.getByRole('button', { name: '引用', exact: true }).click();
+      const action = async (name: string) => {
+        if (mobile) {
+          const menu = await openMessageActions(page, '1');
+          await menu.getByRole('menuitem', { name, exact: true }).tap();
+        } else await toolbar.getByRole('button', { name, exact: true }).click();
+      };
+      await action('引用');
       await expect(page.getByRole('region', { name: '引用消息', exact: true })).toContainText(
         '测试气泡操作',
       );
@@ -64,11 +72,12 @@ for (const skin of builtinSkins)
       await expect(draft).toBeFocused();
       await page.getByRole('button', { name: '取消引用', exact: true }).click();
       if (!mobile) await bubble.hover();
-      await toolbar.getByRole('button', { name: '更多消息操作' }).click();
+      if (mobile) await openMessageActions(page, '1');
+      else await toolbar.getByRole('button', { name: '更多消息操作' }).click();
       await expect(page.getByRole('menu')).toBeVisible();
       await page.keyboard.press('Escape');
       await expect(bubble).toBeFocused();
-      await toolbar.getByRole('button', { name: '举报', exact: true }).click();
+      await action('举报');
       const dialog = page.getByRole('dialog', { name: '举报消息', exact: true });
       await expect(dialog.getByRole('status')).toContainText('加载举报原因');
       await expect.poll(() => !!reasons).toBe(true);
@@ -110,8 +119,13 @@ for (const skin of builtinSkins)
       await expect(bubble).toBeFocused();
       await expect(page.getByText('举报已提交，我们会尽快处理', { exact: true })).toBeVisible();
       await expect(draft).toHaveText('保留草稿');
-      await toolbar.getByRole('button', { name: '撤回', exact: true }).click();
-      await expect(toolbar.getByRole('button', { name: '撤回', exact: true })).toBeDisabled();
+      await action('撤回');
+      if (mobile) {
+        const menu = await openMessageActions(page, '1');
+        await expect(menu.getByRole('menuitem', { name: '等待撤回确认…' })).toBeDisabled();
+        await page.keyboard.press('Escape');
+      } else
+        await expect(toolbar.getByRole('button', { name: '撤回', exact: true })).toBeDisabled();
       fixture.revoke('1');
       await expect(bubble).toHaveText('消息已撤回');
       await expect(toolbar).toHaveCount(0);

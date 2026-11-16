@@ -60,6 +60,8 @@ for (const skin of builtinSkins)
       await dialog.getByRole('button', { name: '保存', exact: true }).click();
       await expect(dialog.getByRole('status')).toHaveText('已保存到此浏览器');
       await expect(page).toHaveTitle('项目文档');
+      const brand = page.locator('a[title="项目文档"]');
+      if (skin.id === 'moyu-island') await expect(brand).toHaveText('项目文档');
       await expect(page.locator('head link[rel="icon"]')).toHaveAttribute(
         'href',
         /^data:image\/png;base64,/,
@@ -67,6 +69,7 @@ for (const skin of builtinSkins)
       await page.screenshot({ path: info.outputPath(`${skin.id}-${mode}-saved.png`) });
       await page.reload();
       await expect(page).toHaveTitle('项目文档');
+      if (skin.id === 'moyu-island') await expect(brand).toHaveText('项目文档');
       dialog = await openSettings(page);
       await expect(dialog.getByRole('textbox', { name: '网站名称', exact: true })).toHaveValue(
         '项目文档',
@@ -94,6 +97,8 @@ for (const skin of builtinSkins)
       await dialog.getByRole('button', { name: '恢复默认', exact: true }).click();
       await dialog.getByRole('button', { name: '保存', exact: true }).click();
       await expect(page).toHaveTitle('摸鱼岛');
+      if (skin.id === 'moyu-island')
+        await expect(page.locator('a[title="摸鱼岛"]')).toHaveText('摸鱼岛');
       await expect(page.locator('head link[rel="icon"]')).toHaveAttribute(
         'href',
         '/favicon.ico?v=moyudao',
@@ -163,6 +168,27 @@ for (const skin of builtinSkins)
       await page.screenshot({ path: info.outputPath(`${skin.id}-${mode}-scroll.png`) });
       await dialog.getByRole('button', { name: '关闭网站设置', exact: true }).click();
       await expect(page.getByRole('button', { name: '切换主题', exact: true })).toBeFocused();
+      if (skin.id === 'moyu-island') {
+        background = 'success';
+        await page.reload();
+        dialog = await openSettings(page);
+        const longName = '网站名称'.repeat(15);
+        await dialog.getByRole('textbox', { name: '网站名称', exact: true }).fill(longName);
+        await dialog.getByRole('button', { name: '保存', exact: true }).click();
+        await expect(page).toHaveTitle(longName);
+        await dialog.getByRole('button', { name: '关闭网站设置', exact: true }).click();
+        const longBrand = page.locator('a').filter({ hasText: longName });
+        await expect(longBrand).toHaveAttribute('title', longName);
+        if (page.viewportSize()!.width > 760) {
+          await expect(longBrand).toBeVisible();
+          expect((await longBrand.boundingBox())!.width).toBeLessThanOrEqual(198);
+          await expect(longBrand.locator('span')).toHaveCSS('text-overflow', 'ellipsis');
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+          true,
+        );
+        await page.screenshot({ path: info.outputPath('long-site-name.png') });
+      }
     });
   }
 

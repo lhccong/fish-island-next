@@ -12,6 +12,8 @@ import type { ReactNode } from 'react';
 
 export function ChatWorkspace({
   membersOpen,
+  classicMembersOpen,
+  onToggleClassicMembers,
   onCloseMembers,
   groupName,
   onRenameGroup,
@@ -20,6 +22,8 @@ export function ChatWorkspace({
   decoration = 'none',
 }: {
   membersOpen: boolean;
+  classicMembersOpen: boolean;
+  onToggleClassicMembers: () => void;
   onCloseMembers: () => void;
   groupName: string;
   onRenameGroup: (name: string) => void;
@@ -74,7 +78,9 @@ export function ChatWorkspace({
               </div>
             )}
           </div>
-          {!floating && decoration === 'classic' && !membersOpen && <ClassicMembers />}
+          {!floating && decoration === 'classic' && !membersOpen && (
+            <ClassicMembers open={classicMembersOpen} onToggle={onToggleClassicMembers} />
+          )}
           {!floating && membersOpen && (
             <OnlineMembers
               state={state}

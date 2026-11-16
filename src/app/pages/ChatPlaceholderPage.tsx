@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { chatService, chatPreferences, chatListPreferences } from '@/app/config/chat';
 import { useAuth } from '@/features/auth';
-import { ThemePicker, useAppearanceStore } from '@/features/appearance';
+import { ThemePicker, useAppearanceStore, useChatPanelStore } from '@/features/appearance';
 import { MyIslandProvider } from '@/features/my-island';
 import { IslandSidebarLauncher } from '@/app/components/IslandSidebarLauncher';
 import { IslandSidebar } from '@/app/components/IslandSidebar';
@@ -27,7 +27,10 @@ export function ChatPlaceholderPage() {
   const presentation = skinId === 'wps' ? 'worksheet' : 'conversation';
   const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
   const [membersOpen, setMembersOpen] = useState(false);
-  const [circleCollapsed, setCircleCollapsed] = useState(false);
+  const circleCollapsed = useChatPanelStore((state) => state.circleCollapsed);
+  const setCircleCollapsed = useChatPanelStore((state) => state.setCircleCollapsed);
+  const membersCollapsed = useChatPanelStore((state) => state.membersCollapsed);
+  const setMembersCollapsed = useChatPanelStore((state) => state.setMembersCollapsed);
   const circleExpand = useRef<HTMLButtonElement>(null);
   const circleCollapse = useRef<HTMLButtonElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -132,6 +135,8 @@ export function ChatPlaceholderPage() {
                   <ChatWorkspace
                     key={session.user.id}
                     membersOpen={membersOpen}
+                    classicMembersOpen={!membersCollapsed}
+                    onToggleClassicMembers={() => setMembersCollapsed(!membersCollapsed)}
                     onCloseMembers={closeMembers}
                     groupName={groupName}
                     onRenameGroup={saveGroupName}

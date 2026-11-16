@@ -53,8 +53,9 @@ function DeferredMessageImage({ url }: { url: string }) {
 }
 
 function LoadedMessageImage({ url, onCollapse }: { url: string; onCollapse?: () => void }) {
+  const { imageGeometry } = useChatRealtime();
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [ratio, setRatio] = useState<number | null>(null);
+  const [ratio, setRatio] = useState(() => imageGeometry.read(url));
   const [attempt, setAttempt] = useState(0);
   const [preview, setPreview] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -99,7 +100,8 @@ function LoadedMessageImage({ url, onCollapse }: { url: string; onCollapse?: () 
               referrerPolicy="no-referrer"
               onLoad={(event) => {
                 const { naturalWidth, naturalHeight } = event.currentTarget;
-                if (naturalWidth > 0 && naturalHeight > 0) setRatio(naturalWidth / naturalHeight);
+                imageGeometry.remember(url, naturalWidth, naturalHeight);
+                setRatio(imageGeometry.read(url));
                 setState('ready');
               }}
               onError={() => setState('error')}
