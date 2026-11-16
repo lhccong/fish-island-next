@@ -3,6 +3,20 @@ import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 
 test.setTimeout(60000);
+test('floating chat keeps only the active main content landmark', async ({ page }) => {
+  await setupChatMenu(page, 'pixel-island', 'light');
+  if (page.viewportSize()!.width <= 760)
+    await page.getByRole('button', { name: '更多聊天工具' }).click();
+  await page.getByRole('button', { name: '小窗模式', exact: true }).click();
+  await expect(page).toHaveURL('/');
+  await expect(page.locator('#main-content')).toHaveCount(1);
+  await expect(page.locator('#main-content')).toBeVisible();
+  await page.getByRole('button', { name: '关闭聊天窗口', exact: true }).click();
+  await expect(page).toHaveURL('/chat');
+  await expect(page.locator('#main-content')).toHaveCount(1);
+  await expect(page.locator('#main-content')).toBeVisible();
+});
+
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
     test(`${skin.id} ${mode}: floating chat preserves editor, messages and connection`, async ({
@@ -55,10 +69,15 @@ for (const skin of builtinSkins)
       }
       fixture.push('1794530000001', '小窗接收的合成消息');
       await expect(surface.getByText('小窗接收的合成消息', { exact: true })).toBeVisible();
+      if (!mobile) {
+        await page.getByRole('link', { name: '鱼小圈', exact: true }).click();
+        await expect(page).toHaveURL('/moments/fish-circle');
+        await expect(close).toBeVisible();
+      }
       await surface.getByRole('button', { name: '收起聊天窗口' }).click();
       await expect(close).toBeHidden();
-      await page.getByRole('link', { name: mobile ? '发现' : '鱼小圈', exact: true }).click();
-      await expect(page).toHaveURL(mobile ? '/discover' : '/moments/fish-circle');
+      await page.getByRole('link', { name: mobile ? '发现' : '热榜', exact: true }).click();
+      await expect(page).toHaveURL(mobile ? '/discover' : '/');
       await page.getByRole('button', { name: '恢复聊天小窗' }).click();
       await expect(editor).toHaveText('切换小窗时保留的草稿');
       await page.route('**/api/chat/message/send', (route) => route.fulfill({ status: 503 }));

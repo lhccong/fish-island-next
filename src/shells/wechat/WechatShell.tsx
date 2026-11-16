@@ -15,6 +15,7 @@ export function WechatShell({
   sidebarVariant = 'default',
   presentation = 'default',
   showScene = false,
+  mainContentId = 'main-content',
 }: {
   slots: WorkspaceShellSlots;
   sidebarLabel?: string;
@@ -26,6 +27,7 @@ export function WechatShell({
   sidebarVariant?: 'default' | 'chat';
   presentation?: 'default' | 'island';
   showScene?: boolean;
+  mainContentId?: string | null;
 }) {
   return (
     <div
@@ -52,7 +54,7 @@ export function WechatShell({
         {slots.status}
         <main
           className={styles.content}
-          id="main-content"
+          id={mainContentId ?? undefined}
           data-island-backdrop={presentation === 'island' && showScene}
         >
           {slots.contentScroll === false ? (

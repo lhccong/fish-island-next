@@ -66,6 +66,7 @@ export function WorkspaceLayout({
       {...(sidebarVariant ? { sidebarVariant } : {})}
       hideMobileHeader={hideMobileHeader}
       hideDesktopHeader={hideDesktopHeader}
+      mainContentId={sidebarVariant === 'chat' && pathname !== '/chat' ? null : 'main-content'}
       mobileNavigation={mobileNavigationMode}
       slots={{
         ...slots,

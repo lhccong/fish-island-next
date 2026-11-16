@@ -406,6 +406,9 @@
     display: none;
   }
   .toolbarAction {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     grid-column: 4;
     grid-row: 1;
   }
@@ -587,5 +590,30 @@
   .shortcutHint,
   .composerFooter {
     display: none;
+  }
+}
+
+@media (min-width: 761px) {
+  @container chat-conversation (max-width: 900px) {
+    .composer[data-presentation='worksheet'] .inputRow {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+    .composer[data-presentation='worksheet'] .tools {
+      display: flex;
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .composer[data-presentation='worksheet'] .editorSlot {
+      grid-column: 1;
+    }
+    .composer[data-presentation='worksheet'] .actions > button {
+      grid-column: 2;
+    }
+    .composer[data-presentation='worksheet'] .toolbarAction {
+      grid-column: 3;
+    }
+    .composer[data-presentation='worksheet'] .composerFeedback {
+      grid-row: 3;
+    }
   }
 }
