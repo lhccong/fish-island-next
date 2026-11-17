@@ -1,6 +1,7 @@
 import type { PetPort, BattleTarget } from '@/domain/pet';
 import type { SessionToken } from '@/domain/auth';
 import { createPetActivities } from './activities';
+import { createTreasureClient } from './treasure';
 import {
   record,
   number,
@@ -72,6 +73,7 @@ export function createPetClient(
       : `pet/battle/${preview ? 'info' : 'start'}?${query({ opponentUserId: target.id })}`;
   }
   return {
+    ...createTreasureClient(request),
     ...createPetActivities(request),
     async other(userId, signal) {
       const data = await request(`pet/other?${query({ otherUserId: userId })}`, signal);

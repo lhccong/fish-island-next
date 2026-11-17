@@ -65,6 +65,13 @@ export const chatRedPackets = createRedPacketClient(
     void authController.restore(true);
   },
 );
+export const chatService = createChatClient(
+  apiBaseUrl,
+  () => vault.read(),
+  () => {
+    void authController.restore(true);
+  },
+);
 export const chatRealtime = createChatRealtimeController(
   createChatRealtime(
     apiBaseUrl,
@@ -102,13 +109,7 @@ export const chatRealtime = createChatRealtimeController(
       void authController.restore(true);
     },
   ),
+  chatService,
 );
 export const chatPreferences = createLocalChatPreferences();
 export const chatListPreferences = createChatListPreferences();
-export const chatService = createChatClient(
-  apiBaseUrl,
-  () => vault.read(),
-  () => {
-    void authController.restore(true);
-  },
-);

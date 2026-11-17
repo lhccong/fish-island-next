@@ -1,3 +1,7 @@
+import type { TreasurePort } from './treasure';
+export { treasureSites } from './treasure';
+export type { TreasureSiteId, TreasureState, TreasurePort } from './treasure';
+
 export interface PetItem {
   code: string;
   id: string;
@@ -116,7 +120,7 @@ export interface ForgeDetail {
   max: boolean;
   entries: { number: number; name: string; value: number; locked: boolean; grade: number | null }[];
 }
-export interface PetPort {
+export interface PetPort extends TreasurePort {
   other(userId: string, signal: AbortSignal): Promise<Companion | null>;
   bossRanks(bossId: string, signal: AbortSignal): Promise<BossRank[]>;
   batchDecompose(signal: AbortSignal): Promise<number>;

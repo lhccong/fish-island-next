@@ -37,9 +37,30 @@ for (const skin of builtinSkins)
       await page.screenshot({ path: info.outputPath('sending.png') });
       const withNextDraft = await composer.boundingBox();
       await held!.fulfill({ json: { code: 50001, message: '合成失败，请重试' } });
-      await expect(page.getByRole('button', { name: '重试发送' })).toBeVisible();
+      const retry = page.getByRole('button', { name: '重试发送', exact: true });
+      await expect(retry).toBeVisible();
+      await expect(retry).toHaveText('');
+      await expect(retry).toHaveAccessibleDescription('合成失败，请重试');
+      const failed = page.locator('[data-delivery="failed"]');
+      const bubble = failed.getByRole('group', { name: '本人合成的消息' });
+      const retryBox = (await retry.boundingBox())!;
+      const bubbleBox = (await bubble.boundingBox())!;
+      expect(retryBox.width).toBeGreaterThanOrEqual(44);
+      expect(retryBox.height).toBeGreaterThanOrEqual(44);
+      expect(retryBox.x + retryBox.width).toBeLessThanOrEqual(bubbleBox.x);
+      expect(
+        Math.abs(retryBox.y + retryBox.height / 2 - bubbleBox.y - bubbleBox.height / 2),
+      ).toBeLessThan(1);
+      expect(await failed.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+      await expect(failed.getByText('合成失败，请重试', { exact: true })).toHaveCount(0);
+      await page.keyboard.press('Tab');
+      await retry.focus();
+      await expect(retry).toBeFocused();
+      await expect(retry).toHaveCSS('outline-style', 'solid');
+      await page.screenshot({ path: info.outputPath('failed-icon.png') });
       await expect(draft).toHaveText('发送时保留下一条草稿');
-      await page.getByRole('button', { name: '重试发送' }).click();
+      if (page.viewportSize()!.width <= 760) await retry.tap();
+      else await retry.press('Enter');
       await expect.poll(() => commands.length).toBe(2);
       expect(commands[0]).toEqual(commands[1]);
       await expect(page.getByLabel('消息发送中')).toBeVisible();

@@ -156,5 +156,15 @@ export function useCampMovement(enabled: boolean) {
     engine.current.target = campPosition(x, y);
     startLoop.current();
   }
-  return { scene, ...view, moveTo };
+  function placeAt(x: number, y: number) {
+    const motion = engine.current;
+    cancelAnimationFrame(motion.frame);
+    motion.frame = 0;
+    motion.time = 0;
+    motion.keys.clear();
+    motion.target = null;
+    motion.position = campPosition(x, y);
+    setView({ position: { ...motion.position }, facing: motion.facing, moving: false });
+  }
+  return { scene, ...view, moveTo, placeAt };
 }

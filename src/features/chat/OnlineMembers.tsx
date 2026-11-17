@@ -9,22 +9,19 @@ import { Button } from '@/shared/ui/Button';
 import { MemberAvatar } from './MemberAvatar';
 import { GroupNameEditor } from './GroupNameEditor';
 import { ChatDisplaySettings } from './ChatDisplaySettings';
-import { useOnlineMembers } from './use-online-members';
+import { useChatMembers } from './chat-members-context';
 import styles from './ChatWorkspace.module.css';
 
 export function OnlineMembers({
-  state,
-  onRefresh,
   onClose,
   groupName,
   onRenameGroup,
 }: {
-  state: ReturnType<typeof useOnlineMembers>['state'];
-  onRefresh: () => void;
   onClose: () => void;
   groupName: string;
   onRenameGroup: (name: string) => void;
 }) {
+  const { state, refresh: onRefresh } = useChatMembers();
   const [query, setQuery] = useState('');
   const { controller } = useRemarks();
   const remarks = useStore(controller.store, (state) => state.remarks);

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { MessageCircle, MoreHorizontal, PanelLeftOpen } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
-import { chatService, chatPreferences, chatListPreferences } from '@/app/config/chat';
+import { chatRealtime, chatPreferences, chatListPreferences } from '@/app/config/chat';
 import { useAuth } from '@/features/auth';
 import { ThemePicker, useAppearanceStore, useChatPanelStore } from '@/features/appearance';
 import { MyIslandProvider } from '@/features/my-island';
@@ -51,7 +51,7 @@ export function ChatPlaceholderPage() {
     >
       <IslandSidebarProvider user={session.user}>
         <ChatListProvider key={session.user.id} preferences={chatListPreferences}>
-          <ChatMembersProvider service={chatService}>
+          <ChatMembersProvider controller={chatRealtime.members}>
             <WorkspaceLayout
               sidebarLabel={skinId === 'pixel-island' ? '我的小岛' : '聊天会话'}
               sidebarVariant="chat"

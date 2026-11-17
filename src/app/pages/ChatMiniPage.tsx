@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { chatPreferences, chatService } from '@/app/config/chat';
+import { chatPreferences, chatRealtime } from '@/app/config/chat';
 import {
   ChatMembersProvider,
   ChatWindowProvider,
@@ -18,7 +18,7 @@ export function ChatMiniPage() {
         onOpen={() => undefined}
         onRestore={() => void navigate('/chat')}
       >
-        <ChatMembersProvider service={chatService}>
+        <ChatMembersProvider controller={chatRealtime.members}>
           <ChatWorkspace
             standalone
             groupName={groupName}

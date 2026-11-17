@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { CircleAlert } from 'lucide-react';
 import { useMessageLocationPulse } from './use-message-location-pulse';
 import { MessageQuote } from './MessageQuote';
 import { RemarkName } from './RemarkName';
@@ -148,6 +149,18 @@ export const MessageRow = memo(function MessageRow({
           </time>
         </div>
         <div className={styles.bubbleLine} data-repeat={!!group}>
+          {self && message.delivery === 'failed' && (
+            <Button
+              variant="secondary"
+              className={styles.retry}
+              aria-label="重试发送"
+              aria-description={message.sendError || '发送失败，点击重试'}
+              title={`${message.sendError || '发送失败'}，点击重试`}
+              onClick={() => controller.sender.retry(id)}
+            >
+              <CircleAlert size={20} aria-hidden="true" />
+            </Button>
+          )}
           {self && message.delivery === 'sending' && (
             <span role="status" aria-label="消息发送中" className={styles.sending}>
               <LoadingIndicator compact>发送中…</LoadingIndicator>
@@ -175,14 +188,6 @@ export const MessageRow = memo(function MessageRow({
           </div>
         )}
         <div className={styles.rowFeedback}>
-          {self && message.delivery === 'failed' && (
-            <div className={styles.revoke}>
-              <span role="status">{message.sendError || '发送失败'}</span>
-              <Button variant="secondary" onClick={() => controller.sender.retry(id)}>
-                重试发送
-              </Button>
-            </div>
-          )}
           {!message.revoked && revoke && (
             <div className={styles.revoke}>
               {revoke === 'pending' ? (

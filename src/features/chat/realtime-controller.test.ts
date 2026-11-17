@@ -1,8 +1,26 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import type { ChatEvent, ChatRealtimePort } from '@/domain/chat';
+import type { ChatEvent, ChatRealtimeEvent, ChatRealtimePort } from '@/domain/chat';
 import { createChatRealtimeController } from './realtime-controller';
 
 afterEach(() => vi.useRealTimers());
+it('routes members separately without updating message subscribers and clears them on logout', () => {
+  let receive!: (event: ChatRealtimeEvent) => void;
+  const controller = createChatRealtimeController({
+    connect(onEvent) {
+      receive = onEvent;
+      return { close() {}, retry() {}, revoke: () => false };
+    },
+  });
+  const stop = controller.start();
+  const messages = vi.fn();
+  controller.store.subscribe(messages);
+  receive({ type: 'members-snapshot', members: [{ id: 'a', name: '合成', avatar: null }] });
+  receive({ type: 'member-offline', id: 'a' });
+  expect(controller.members.store.getState().state).toMatchObject({ members: [] });
+  expect(messages).not.toHaveBeenCalled();
+  stop();
+  expect(controller.members.store.getState().state).toEqual({ status: 'idle' });
+});
 it.each(['redpacket', 'luckybag'])(
   'only admins can revoke %s messages, including their own',
   (tag) => {

@@ -4,18 +4,22 @@ import type {
   ChatRealtimePort,
   ChatHistoryPort,
   ReceivedMessage,
+  OnlineMembersPort,
 } from '@/domain/chat';
 import { hasRewardMessageContent } from '@/domain/chat';
 import { createSendController } from './send-controller';
 import type { ChatSendPort } from '@/domain/chat';
 import { createMessageStore } from './message-store';
 import { createHistoryController } from './history-controller';
+import { createMembersController } from './members-controller';
 
 export function createChatRealtimeController(
   port: ChatRealtimePort,
   historyPort?: ChatHistoryPort,
   sendPort?: ChatSendPort,
+  membersPort?: OnlineMembersPort,
 ) {
+  const members = createMembersController(membersPort);
   const model = createMessageStore();
   const sender = createSendController(sendPort, model);
   const incoming = new Set<(message: ReceivedMessage) => void>();
@@ -68,6 +72,7 @@ export function createChatRealtimeController(
     },
   );
   const stop = () => {
+    members.reset();
     sender.reset();
     history.reset();
     connection?.close();
@@ -80,6 +85,7 @@ export function createChatRealtimeController(
     model.reset();
   };
   return {
+    members,
     sender,
     subscribeIncoming(listener: (message: ReceivedMessage) => void) {
       incoming.add(listener);
@@ -93,6 +99,10 @@ export function createChatRealtimeController(
       if (connection) return stop;
       connection = port.connect(
         (event) => {
+          if (event.type !== 'message' && event.type !== 'revoke') {
+            members.receive(event);
+            return;
+          }
           queue.push(event);
           if (queue.length >= 200) flush();
           else timer ??= setTimeout(flush, 16);

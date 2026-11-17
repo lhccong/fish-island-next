@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { createActivityFixture } from './pet-activities-fixture';
+import { createTreasureFixture } from './pet-treasure-fixture';
 import {
   createPetChallengeState,
   isPetChallengePath,
@@ -10,6 +11,7 @@ const portrait = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130">
 export async function setupPet(page: Page, skin: string, mode: string) {
   await page.routeWebSocket(/\/ws\//, (socket) => socket.onMessage(() => {}));
   const activity = createActivityFixture();
+  const treasure = createTreasureFixture();
   const template = {
     id: '40',
     name: '苔纹护腕',
@@ -46,6 +48,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     equippedItems: {} as Record<string, typeof item>,
   };
   const state = {
+    treasure: treasure.state,
     activity: activity.state,
     ...createPetChallengeState(),
     pet,
@@ -89,6 +92,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
     const path = url.pathname.replace(/^\/api\//, '');
     const signalHeaders = route.request().headers();
     state.requests.push(path);
+    if (path.startsWith('pet/treasure/')) return treasure.handle(route, path);
     let data: unknown = true;
     if (path.startsWith('user/')) {
       data = {

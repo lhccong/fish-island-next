@@ -1,10 +1,11 @@
 import { createContext, useContext } from 'react';
-import type { useOnlineMembers } from './use-online-members';
+import { useOnlineMembers } from './use-online-members';
+import type { MembersController } from './members-controller';
 
-export const ChatMembersContext = createContext<ReturnType<typeof useOnlineMembers> | null>(null);
+export const ChatMembersContext = createContext<MembersController | null>(null);
 
 export function useChatMembers() {
   const context = useContext(ChatMembersContext);
   if (!context) throw new Error('在线用户列表需要 ChatMembersProvider');
-  return context;
+  return useOnlineMembers(context);
 }

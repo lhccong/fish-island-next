@@ -1,15 +1,14 @@
-import type { ReactNode } from 'react';
-import type { OnlineMembersPort } from '@/domain/chat';
-import { useOnlineMembers } from './use-online-members';
+import { useEffect, type ReactNode } from 'react';
+import type { MembersController } from './members-controller';
 import { ChatMembersContext } from './chat-members-context';
 
 export function ChatMembersProvider({
-  service,
+  controller,
   children,
 }: {
-  service: OnlineMembersPort;
+  controller: MembersController;
   children: ReactNode;
 }) {
-  const members = useOnlineMembers(service, true);
-  return <ChatMembersContext.Provider value={members}>{children}</ChatMembersContext.Provider>;
+  useEffect(() => controller.load(), [controller]);
+  return <ChatMembersContext.Provider value={controller}>{children}</ChatMembersContext.Provider>;
 }

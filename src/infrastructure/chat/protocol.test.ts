@@ -1,6 +1,32 @@
 import { expect, it } from 'vitest';
 import { decodeChatEvent, decodeReceivedMessage } from './protocol';
 
+it('validates presence frames, preserves member metadata and rejects malformed payloads', () => {
+  const frame = (type: string, data: unknown) => JSON.stringify({ type, data });
+  expect(
+    decodeChatEvent(
+      frame('userOnline', [
+        { id: 1, name: '合成成员', level: 7, avatar: 'https://images.test/a.png' },
+      ]),
+    ),
+  ).toEqual({
+    type: 'members-online',
+    members: [{ id: '1', name: '合成成员', level: 7, avatar: 'https://images.test/a.png' }],
+  });
+  expect(decodeChatEvent(frame('userOffline', '1'))).toEqual({ type: 'member-offline', id: '1' });
+  expect(decodeChatEvent(frame('userOffline', 1))).toEqual({ type: 'member-offline', id: '1' });
+  for (const data of [
+    null,
+    {},
+    [null],
+    [{ name: 'missing ID' }],
+    [{ id: Number.MAX_SAFE_INTEGER + 1 }],
+  ])
+    expect(decodeChatEvent(frame('userOnline', data))).toBeNull();
+  for (const data of [null, {}, [], '', Number.MAX_SAFE_INTEGER + 1])
+    expect(decodeChatEvent(frame('userOffline', data))).toBeNull();
+});
+
 it('normalizes legacy millisecond strings alongside ISO and numeric timestamps', () => {
   const message = { id: 'robot', sender: { id: '-1' }, content: '合成机器人消息' };
   for (const timestamp of [1794441600000, '1794441600000', '2026-11-12T00:00:00Z']) {

@@ -42,6 +42,10 @@ export interface ReceivedMessage {
 }
 export type ChatEvent =
   { type: 'message'; message: ReceivedMessage } | { type: 'revoke'; id: string };
+export type OnlineMembersEvent =
+  | { type: 'members-snapshot' | 'members-online'; members: readonly OnlineMember[] }
+  | { type: 'member-offline'; id: string };
+export type ChatRealtimeEvent = ChatEvent | OnlineMembersEvent;
 export type ChatConnectionState =
   'connecting' | 'connected' | 'reconnecting' | 'offline' | 'unauthorized' | 'closed';
 export interface ChatConnection {
@@ -51,7 +55,7 @@ export interface ChatConnection {
 }
 export interface ChatRealtimePort {
   connect(
-    onEvent: (event: ChatEvent) => void,
+    onEvent: (event: ChatRealtimeEvent) => void,
     onState: (state: ChatConnectionState) => void,
   ): ChatConnection;
 }

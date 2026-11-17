@@ -73,6 +73,7 @@ export function createChatRealtime(
           url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
           url.searchParams.set('token', token.value);
           const current = new WebSocket(url);
+          let awaitingMembersSnapshot = true;
           socket = current;
           deadline = setTimeout(() => {
             disposeSocket();
@@ -93,7 +94,10 @@ export function createChatRealtime(
           current.onmessage = (event) => {
             extension?.receive(event.data);
             const decoded = decodeChatEvent(event.data);
-            if (decoded) onEvent(decoded);
+            if (decoded?.type === 'members-online' && awaitingMembersSnapshot) {
+              awaitingMembersSnapshot = false;
+              onEvent({ ...decoded, type: 'members-snapshot' });
+            } else if (decoded) onEvent(decoded);
           };
           current.onerror = () => {
             disposeSocket();

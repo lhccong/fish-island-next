@@ -163,6 +163,38 @@ function reconnectFixture() {
   vi.advanceTimersByTime(1);
   return { target, network, connection, state, expired };
 }
+it('treats the first valid online frame on each connection as a full snapshot', () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('navigator', { onLine: true });
+  vi.stubGlobal('WebSocket', Socket);
+  const receive = vi.fn();
+  const connection = createChatRealtime(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic-value' }),
+    vi.fn(),
+  ).connect(receive, vi.fn());
+  vi.advanceTimersByTime(1);
+  const first = Socket.instances[0]!;
+  first.open();
+  first.onmessage?.({ data: '{"type":"userOnline","data":null}' });
+  expect(receive).not.toHaveBeenCalled();
+  first.onmessage?.({ data: '{"type":"userOnline","data":[]}' });
+  expect(receive).toHaveBeenLastCalledWith({ type: 'members-snapshot', members: [] });
+  first.onmessage?.({ data: '{"type":"userOnline","data":[{"id":"a"}]}' });
+  expect(receive).toHaveBeenLastCalledWith({
+    type: 'members-online',
+    members: [{ id: 'a', name: '未命名岛友', avatar: null }],
+  });
+  first.onclose?.({ code: 1006 });
+  vi.advanceTimersByTime(1001);
+  const second = Socket.instances[1]!;
+  second.open();
+  second.onmessage?.({ data: '{"type":"userOnline","data":[]}' });
+  expect(receive).toHaveBeenLastCalledWith({ type: 'members-snapshot', members: [] });
+  connection.close();
+  expect(vi.getTimerCount()).toBe(0);
+});
 it('retries immediately on return while reusing open and connecting sockets', () => {
   const fixture = reconnectFixture();
   fixture.connection.retry();

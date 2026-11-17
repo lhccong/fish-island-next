@@ -14,7 +14,7 @@ import {
 import type { PetPort } from '@/domain/pet';
 import { usePetOperation, usePetResource } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
-import { CampScene } from './CampScene';
+import { CampAdventure } from './CampAdventure';
 import { CompanionSummary } from './CompanionSummary';
 import { CareActions } from './CareActions';
 import { PetWelcome } from './PetWelcome';
@@ -154,7 +154,7 @@ export function PetWorkspace({
             />
           </section>
           <div className={styles.adventure}>
-            <CampScene pet={pet} />
+            <CampAdventure pet={pet} service={service} onSettled={onLotterySettled} />
             <ChallengeEntrances
               disabled={!pet}
               onSelect={(mode) => {

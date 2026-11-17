@@ -292,6 +292,27 @@
   flex-shrink: 0;
   color: var(--color-muted);
 }
+.retry.retry {
+  flex: 0 0 44px;
+  align-self: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+.retry.retry:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+.retry svg {
+  flex-shrink: 0;
+  fill: var(--color-danger);
+  stroke: var(--color-on-accent);
+}
+.retry svg circle {
+  stroke: var(--color-danger);
+}
 .sending svg {
   animation: send-spin 1s linear infinite;
 }
@@ -432,6 +453,9 @@
   align-items: flex-start;
   padding: 4px;
   max-width: none;
+}
+.row[data-presentation='worksheet'][data-delivery='failed'] .bubbleLine {
+  align-items: center;
 }
 .row[data-presentation='worksheet'] .bubble {
   flex: 1;

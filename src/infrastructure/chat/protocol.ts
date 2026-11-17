@@ -1,4 +1,5 @@
-import { chatImageUrl, type ChatEvent, type ReceivedMessage } from '@/domain/chat';
+import { chatImageUrl, type ChatRealtimeEvent, type ReceivedMessage } from '@/domain/chat';
+import { decodeOnlineMembers } from './client';
 
 function object(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -18,13 +19,24 @@ function id(value: unknown): string | null {
 }
 
 // Ignore unrelated game/system frames. Never fabricate identifiers or timestamps.
-export function decodeChatEvent(raw: unknown): ChatEvent | null {
+export function decodeChatEvent(raw: unknown): ChatRealtimeEvent | null {
   if (typeof raw !== 'string' || raw.length > 262144) return null;
   let frame: Record<string, unknown> | null;
   try {
     frame = object(JSON.parse(raw));
   } catch {
     return null;
+  }
+  if (frame?.type === 'userOnline') {
+    try {
+      return { type: 'members-online', members: decodeOnlineMembers(frame.data) };
+    } catch {
+      return null;
+    }
+  }
+  if (frame?.type === 'userOffline') {
+    const memberId = id(frame.data);
+    return memberId ? { type: 'member-offline', id: memberId } : null;
   }
   if (frame?.type === 'userMessageRevoke') {
     const messageId = id(frame.data);
