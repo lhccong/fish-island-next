@@ -5,6 +5,7 @@ export default defineConfig({
   ...base,
   expect: { timeout: 15000 },
   testMatch: [
+    'chat-blacklist.spec.ts',
     'chat-menu.spec.ts',
     'chat-history.spec.ts',
     'chat-media.spec.ts',

@@ -17,7 +17,7 @@ export default function ChatImagePreview({
     const state = controller.store.getState();
     const urls = state.ids.flatMap((id) => {
       const message = state.messages[id];
-      return message && !message.revoked
+      return message && !message.revoked && !state.blockedSenders.has(message.senderId)
         ? parseMessageContent(message.content).flatMap((part) =>
             part.kind === 'image' ? [part.url] : [],
           )

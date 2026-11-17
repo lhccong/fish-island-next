@@ -26,7 +26,15 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const userId = session.status === 'authenticated' ? session.user.id : '';
   useEffect(() => {
-    if (userId) return chatRealtime.start();
+    const syncBlacklist = () =>
+      chatRealtime.setBlockedSenders(blacklist.read(userId).map((user) => user.id));
+    syncBlacklist();
+    const unsubscribe = blacklist.subscribe(syncBlacklist);
+    const stop = userId ? chatRealtime.start() : undefined;
+    return () => {
+      unsubscribe();
+      stop?.();
+    };
   }, [userId]);
   return (
     <ChatRealtimeProvider

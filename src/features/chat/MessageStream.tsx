@@ -78,7 +78,12 @@ export function MessageStream({
   useEffect(
     () =>
       controller.subscribeIncoming((message) => {
-        if (!atBottomRef.current && !message.delivery) setNewMessageCount((count) => count + 1);
+        if (
+          !atBottomRef.current &&
+          !message.delivery &&
+          !controller.store.getState().blockedSenders.has(message.senderId)
+        )
+          setNewMessageCount((count) => count + 1);
       }),
     [controller],
   );

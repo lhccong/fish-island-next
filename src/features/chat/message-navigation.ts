@@ -50,6 +50,14 @@ export function createMessageNavigation(chat: ChatRealtimeController) {
       const state = chat.store.getState();
       const key = state.ids.find((key) => state.messages[key]?.id === id);
       if (key) {
+        if (state.blockedSenders.has(state.messages[key]!.senderId)) {
+          store.setState({
+            target: null,
+            pending: null,
+            feedback: '该消息来自黑名单用户，无法定位',
+          });
+          return;
+        }
         const visible = state.visibleIds.includes(key)
           ? key
           : Object.keys(state.repetitions).find((group) => state.repetitions[group]?.includes(key));
@@ -114,7 +122,10 @@ export function createMessageNavigation(chat: ChatRealtimeController) {
     cancel,
     start(userId: string, name: string) {
       const unsubscribe = chat.subscribeIncoming((message) => {
-        if (mentionsUser(message, userId, name))
+        if (
+          !chat.store.getState().blockedSenders.has(message.senderId) &&
+          mentionsUser(message, userId, name)
+        )
           store.setState((state) => ({
             mentions: state.mentions.includes(message.id)
               ? state.mentions
@@ -126,7 +137,7 @@ export function createMessageNavigation(chat: ChatRealtimeController) {
         if (!current.length) return;
         const valid = new Set(
           Object.values(state.messages)
-            .filter((message) => !message.revoked)
+            .filter((message) => !message.revoked && !state.blockedSenders.has(message.senderId))
             .map((message) => message.id),
         );
         const mentions = current.filter((id) => valid.has(id));

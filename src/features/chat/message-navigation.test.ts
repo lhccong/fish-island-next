@@ -96,6 +96,23 @@ describe('message navigation', () => {
       false,
     );
   });
+  it('clears blocked mentions, ignores new ones and refuses to locate blocked messages', async () => {
+    vi.useFakeTimers();
+    const f = setup();
+    f.receive({ type: 'message', message: message('1', '@本人 请查看') });
+    await vi.advanceTimersByTimeAsync(20);
+    expect(f.nav.store.getState().mentions).toEqual(['1']);
+    f.chat.setBlockedSenders(['other']);
+    expect(f.nav.store.getState().mentions).toEqual([]);
+    f.receive({ type: 'message', message: message('2', '@本人 新消息') });
+    await vi.advanceTimersByTimeAsync(20);
+    expect(f.nav.store.getState().mentions).toEqual([]);
+    await f.nav.locate('1');
+    expect(f.nav.store.getState()).toMatchObject({ target: null, pending: null });
+    expect(f.nav.store.getState().feedback).toContain('黑名单');
+    expect(f.loadHistory).not.toHaveBeenCalled();
+    f.dispose();
+  });
   it('deduplicates incoming alerts and clears revoked alerts without treating history as new', async () => {
     vi.useFakeTimers();
     const f = setup();

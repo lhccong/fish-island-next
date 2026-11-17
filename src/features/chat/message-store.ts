@@ -3,15 +3,28 @@ import { createStore } from 'zustand/vanilla';
 import type { ChatConnectionState, ChatEvent, ReceivedMessage } from '@/domain/chat';
 
 interface MessageState extends RepetitionView {
+  blockedSenders: ReadonlySet<string>;
   firstItemIndex: number;
   ids: readonly string[];
   messages: Readonly<Record<string, ReceivedMessage>>;
   connection: ChatConnectionState;
   revokeState: Readonly<Record<string, 'pending' | 'error'>>;
 }
+function projectMessages(
+  ids: readonly string[],
+  messages: MessageState['messages'],
+  state: MessageState,
+) {
+  return projectRepetitions(
+    ids.filter((id) => !state.blockedSenders.has(messages[id]!.senderId)),
+    messages,
+    state,
+  );
+}
 export function createMessageStore() {
   const store = createStore<MessageState>(() => ({
     ...projectRepetitions([], {}),
+    blockedSenders: new Set(),
     firstItemIndex: 1000000,
     ids: [],
     messages: Object.create(null),
@@ -22,6 +35,19 @@ export function createMessageStore() {
   const evictedIds = new Set<string>();
   return {
     store,
+    setBlockedSenders(ids: readonly string[]) {
+      const state = store.getState();
+      const blockedSenders = new Set(ids);
+      if (
+        blockedSenders.size === state.blockedSenders.size &&
+        [...blockedSenders].every((id) => state.blockedSenders.has(id))
+      )
+        return;
+      store.setState({
+        blockedSenders,
+        ...projectMessages(state.ids, state.messages, { ...state, blockedSenders }),
+      });
+    },
     updateDelivery(key: string, delivery: ReceivedMessage['delivery'], sendError?: string) {
       const state = store.getState();
       if (!state.messages[key]) return;
@@ -29,13 +55,14 @@ export function createMessageStore() {
         ...state.messages,
         [key]: { ...state.messages[key], delivery, sendError },
       };
-      store.setState({ messages, ...projectRepetitions(state.ids, messages, state) });
+      store.setState({ messages, ...projectMessages(state.ids, messages, state) });
     },
     reset() {
       tombstones.clear();
       evictedIds.clear();
       store.setState({
         ...projectRepetitions([], {}),
+        blockedSenders: new Set(),
         firstItemIndex: 1000000,
         ids: [],
         messages: Object.create(null),
@@ -150,7 +177,7 @@ export function createMessageStore() {
         messages,
         revokeState,
         firstItemIndex,
-        ...projectRepetitions(ids, messages, before),
+        ...projectMessages(ids, messages, before),
       });
     },
   };

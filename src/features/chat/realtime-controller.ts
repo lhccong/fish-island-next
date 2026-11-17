@@ -95,6 +95,7 @@ export function createChatRealtimeController(
     },
     history,
     store: model.store,
+    setBlockedSenders: model.setBlockedSenders,
     start() {
       if (connection) return stop;
       connection = port.connect(

@@ -2,7 +2,7 @@
 
 ADR-095 将在线成员接入账号唯一 WebSocket：infrastructure 校验上线/下线帧并区分每条连接首次全量名单，chat 独立成员控制器合并 HTTP 快照和实时增量；所有成员呈现与 @ 候选共用状态，重连校准、登出清理，不进入消息 store，见 ADR-095。
 
-ADR-094 为伙伴营地增加挖宝：既有 pet 分层扩展服务端状态、开始及幂等结算端口；独立控制器管理五秒演出，服务端持久化每日五次、一小时冷却及 1–10 积分奖励，见 ADR-094。
+ADR-094 为伙伴营地增加挖宝：既有 pet 分层扩展服务端状态、开始及幂等结算端口；独立控制器管理五秒演出，服务端持久化每日五次、一小时冷却及 1–10 积分奖励，结算统一调用 UserPointsService.updateUsedPoints 的带来源重载，见 ADR-094。
 
 ADR-093 新增全体播报：管理页经 admin 端口发布，独立 broadcast 领域/适配/呈现模块复用账号唯一 WebSocket，由 app 注入全局宿主；播报展示不绑定发布者身份，不进入聊天消息或草稿状态，见 ADR-093。
 
@@ -31,6 +31,8 @@ ADR-085 后续调整由 app 注入 centerContent：摸鱼岛普通菜单页隐�
 状态：已采用。版本：1.0。日期：2026-11-11。
 
 本文件是后续实现、代码评审和架构调整的依据。新增功能必须先确定所属模块和依赖方向，再编写代码。变更基线需同步 ADR、实现与验证，禁止用“临时实现”长期绕过边界。
+
+ADR-065 补充黑名单消息完全隐藏：app 在账号连接生命周期内同步本机黑名单，chat 消息 store 在复读投影前过滤发送者，不生成虚拟行或屏蔽占位；原始实体、分页游标和草稿保留，消息提醒、定位及图片浏览遵守同一屏蔽状态。
 
 ## 1. 目标与当前范围
 
@@ -338,7 +340,7 @@ ADR-057 在 appearance 内新增独立标签页名称与图标本地偏好，app
 
 ADR-062 迁移联机五子棋 /game/piece：独立 domain/gomoku、infrastructure/gomoku、features/gomoku 分层；app 将游戏扩展注入现有账号 WebSocket，不新增连接。棋局规则、单机 AI 与联机状态隔离，断线停棋，邀请复用公共聊天，详见 ADR-062。
 
-ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；聊天精确订阅屏蔽偏好。详见 ADR-065。
+ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；app 按账号同步屏蔽偏好，聊天统一投影可见消息。详见 ADR-065。
 
 ADR-066 迁移你画我猜：domain/draw、infrastructure/draw、features/draw 分层；app 复用账号连接，整幅画布串行保存，独立游戏路由与窗口共享实现，见 ADR-066。
 

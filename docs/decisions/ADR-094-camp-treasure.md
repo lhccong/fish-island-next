@@ -30,3 +30,11 @@
 后端既有 JsonConfig 将 long/Long 序列化为十进制字符串，包含 serverNow、resetAt、nextAvailableAt 及 active.readyAt。原适配器只接受 number，模拟接口也只返回 number，导致真实正常响应被判定为“挖宝状态异常”。在 infrastructure/pet 中将规范的非负十进制时间戳字符串严格转换为安全整数，同时保留 number 兼容；拒绝空串、空白、指数、负值、非整数及精度溢出，计数与奖励仍按 int 的 number 协议校验。领域及 UI 继续只接收 number，不改变后端全局序列化、额度、奖励或业务生命周期。
 
 后端回归测试使用实际 JsonConfig 序列化 VO；前端单元测试覆盖初始、挖掘中及已结算状态的数字串时间戳，浏览器夹具默认采用真实序列化形态，重新验证原有主题与视口矩阵。
+
+## 2026-11-17：复用统一积分服务
+
+按用户要求，挖宝结算改为调用 UserPointsService.updateUsedPoints(userId, -reward, PET_TREASURE.getValue(), digId, "营地挖宝奖励")，积分和流水均由既有五参数重载处理，删除 PetTreasureMapper 中独立的余额更新和流水插入 SQL。负数减少 usedPoints，从而增加可用积分，累计积分和等级不变。
+
+保留原有账号积分外层锁、TransactionTemplate 事务及完成标记条件更新。统一方法的账号锁可重入；只有本次成功写入完成标记时才发奖和安排既有播报，重复领取不再次调用积分方法。五参数重载补查 updateById 和 addPointsRecord 的 boolean 返回值，失败抛出 BusinessException，交由挖宝现有外层事务一并回滚完成标记、余额和流水。两参数重载、全局锁及事务所有权不变。
+
+独立 SQL 虽可在同一事务中结算，但重复了统一积分入口的职责，按本次要求移除。不新增接口、数据表、依赖或前端呈现变更。验证覆盖统一方法的奖励符号、来源及流水、写入失败抛错，以及挖宝的幂等、回滚重试和播报顺序；执行前端 npm run check，不以模拟浏览器接口替代后端验证。
