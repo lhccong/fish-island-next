@@ -85,11 +85,39 @@ for (const width of [1280, 375, 390]) {
             await expect(list.locator('[aria-current="true"]')).toContainText('鱼岛群聊');
             await expect(list.getByRole('listitem').nth(2)).toContainText('服务号');
             await expect(list.getByRole('listitem').nth(5)).toContainText('项目协作群');
+            const times = list.locator('li time');
+            const originalTimes = await times.allTextContents();
+            expect(new Set(originalTimes.slice(0, 8)).size).toBeGreaterThanOrEqual(3);
+            await expect(times.first()).toHaveAttribute(
+              'title',
+              /本地工作伪装时间.*非真实消息时间/,
+            );
+            await list.getByRole('button', { name: '刷新聊天列表' }).click();
+            await expect(times).toHaveText(originalTimes);
+            const refreshedRequests = requests;
             const search = list.getByRole('searchbox', { name: '搜索聊天' });
             await search.fill('合成成员高等级');
             await expect(names).toHaveText(expectedNames.slice(0, 2));
+            await expect(times).toHaveText(originalTimes.slice(0, 2));
             await search.fill('');
             await expect(names).toHaveText(expectedNames);
+            await expect(times).toHaveText(originalTimes);
+            expect(requests).toBe(readyRequests + 1);
+            for (const row of await list.getByRole('listitem').all()) {
+              expect(
+                await row.evaluate((element) => element.scrollWidth <= element.clientWidth),
+              ).toBe(true);
+              const time = await row.locator('time').boundingBox();
+              const nameEnd = await row
+                .locator('span[title]')
+                .first()
+                .evaluate(
+                  (element) =>
+                    element.getBoundingClientRect().right -
+                    parseFloat(getComputedStyle(element).paddingInlineEnd),
+                );
+              if (time) expect(nameEnd).toBeLessThanOrEqual(time.x);
+            }
             const scroll = list.getByRole('region', { name: '聊天列表滚动区' });
             await scroll.hover();
             const track = scroll.locator('..').locator(':scope > [data-orientation="vertical"]');
@@ -111,14 +139,70 @@ for (const width of [1280, 375, 390]) {
               if (mobile) await trigger.tap();
               else await trigger.click();
               await expect(names).toHaveText(expectedNames);
+              await expect(times).toHaveText(originalTimes);
               await page.keyboard.press('Escape');
             }
             await expect(draft).toHaveText('合成排序验证草稿');
-            expect(requests).toBe(readyRequests);
+            expect(requests).toBe(refreshedRequests);
           } finally {
             release();
           }
         });
       }
+  });
+}
+
+for (const width of [1280, 375, 390]) {
+  test.describe(`时间外观切换 ${width}px`, () => {
+    test.use({ viewport: { width, height: 900 }, hasTouch: width <= 760 });
+    test('切换全部主题及明暗模式保留时间、草稿和请求', async ({ page }) => {
+      test.setTimeout(90000);
+      await frameFixture(page, 'wechat', 'light');
+      let requests = 0;
+      await page.route('**/api/chat/online/user', (route) => {
+        requests++;
+        return route.fulfill({ json: { code: 0, data: members } });
+      });
+      await page.goto('/chat');
+      const draft = page.getByRole('textbox', { name: '消息草稿', exact: true });
+      await draft.fill('合成时间外观草稿');
+      let originalTimes: string[] | undefined;
+      for (const skin of builtinSkins)
+        for (const mode of ['light', 'dark']) {
+          await page
+            .getByRole('button', { name: '切换主题', exact: true })
+            .filter({ visible: true })
+            .click();
+          const picker = page.getByRole('dialog', { name: '主题模式', exact: true });
+          await picker.getByRole('button', { name: skin.name, exact: true }).click();
+          await picker
+            .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
+            .click();
+          await picker.getByRole('button', { name: '关闭主题弹窗', exact: true }).click();
+          const mobile = width <= 760;
+          const hasList = mobile || !['moyu-island', 'pixel-island'].includes(skin.id);
+          if (hasList) {
+            const dialog = mobile || skin.id === 'wps';
+            if (dialog)
+              await page.getByRole('button', { name: '查看聊天列表', exact: true }).click();
+            const host = dialog
+              ? page.getByRole('dialog', { name: '聊天列表', exact: true })
+              : page.getByRole('complementary', { name: '聊天会话', exact: true });
+            const times = host.locator('li time');
+            await expect(times).toHaveCount(members.length + 5);
+            originalTimes ??= await times.allTextContents();
+            await expect(times).toHaveText(originalTimes);
+            expect(
+              await host.evaluate((element) => element.scrollWidth <= element.clientWidth),
+            ).toBe(true);
+            if (dialog) await page.keyboard.press('Escape');
+          }
+          await expect(draft).toHaveText('合成时间外观草稿');
+          expect(requests).toBe(1);
+          expect(
+            await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          ).toBe(true);
+        }
+    });
   });
 }

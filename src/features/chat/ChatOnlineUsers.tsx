@@ -10,6 +10,7 @@ import { Button } from '@/shared/ui/Button';
 import { useChatMembers } from './chat-members-context';
 import { MemberAvatar } from './MemberAvatar';
 import { getWorkPreview } from './work-preview';
+import { withWorkTimes } from './work-time';
 import { buildConversationEntries } from './camouflage-conversations';
 import { CoverAvatar } from './CoverAvatar';
 import styles from './ChatOnlineUsers.module.css';
@@ -24,7 +25,7 @@ export function ChatOnlineUsers({
   groupName: string;
   presentation?: 'sidebar' | 'dialog';
 }) {
-  const { state, refresh } = useChatMembers();
+  const { state, refresh, referenceAt } = useChatMembers();
   const { appearance, readError } = useChatListAppearance();
   const [query, setQuery] = useState('');
   const { controller } = useRemarks();
@@ -34,7 +35,10 @@ export function ChatOnlineUsers({
   const loading = state.status === 'idle' || state.status === 'loading';
   const users =
     state.status === 'success'
-      ? buildConversationEntries(sortMembersByLevel(state.members)).filter((entry) =>
+      ? withWorkTimes(
+          buildConversationEntries(sortMembersByLevel(state.members)),
+          referenceAt,
+        ).filter((entry) =>
           `${entry.name} ${entry.kind === 'member' && Object.hasOwn(remarks, entry.id) ? remarks[entry.id] : ''}`
             .toLocaleLowerCase()
             .includes(query.trim().toLocaleLowerCase()),
@@ -163,8 +167,8 @@ export function ChatOnlineUsers({
                             {preview}
                           </span>
                         </div>
-                        <time className={styles.time} title="列表更新时间">
-                          {time}
+                        <time className={styles.time} title="本地工作伪装时间（非真实消息时间）">
+                          {entry.time}
                         </time>
                       </li>
                     );
