@@ -4,7 +4,6 @@ import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { ChatComposer } from './ChatComposer';
 import { OnlineMembers } from './OnlineMembers';
 import { ClassicMembers } from './ClassicMembers';
-import { useChatMembers } from './chat-members-context';
 import styles from './ChatWorkspace.module.css';
 import { Table2 } from 'lucide-react';
 import type { ChatPresentation } from './chat-presentation';
@@ -35,7 +34,6 @@ export function ChatWorkspace({
   standalone?: boolean;
   miniChatHref?: string;
 }) {
-  const { state, refresh } = useChatMembers();
   const renderMessages = (activePresentation: ChatPresentation, floating: boolean) => (
     <div
       key="messages"
@@ -96,8 +94,6 @@ export function ChatWorkspace({
           )}
           {!floating && membersOpen && (
             <OnlineMembers
-              state={state}
-              onRefresh={refresh}
               onClose={onCloseMembers}
               groupName={groupName}
               onRenameGroup={onRenameGroup}
