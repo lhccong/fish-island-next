@@ -14,6 +14,7 @@ export function WechatShell({
   hideMobileHeader = false,
   hideDesktopHeader = false,
   sidebarVariant = 'default',
+  sidebarPosition = 'left',
   presentation = 'default',
   showScene = false,
   mainContentId = 'main-content',
@@ -27,6 +28,7 @@ export function WechatShell({
   hideMobileHeader?: boolean;
   hideDesktopHeader?: boolean;
   sidebarVariant?: 'default' | 'chat';
+  sidebarPosition?: 'left' | 'right';
   presentation?: 'default' | 'island' | 'classic';
   showScene?: boolean;
   mainContentId?: string | null;
@@ -41,6 +43,7 @@ export function WechatShell({
       data-mobile-header-hidden={hideMobileHeader}
       data-desktop-header-hidden={hideDesktopHeader}
       data-sidebar-variant={sidebarVariant}
+      data-sidebar-position={sidebarPosition}
       data-presentation={presentation}
     >
       <aside className={styles.rail} aria-label="应用导航">

@@ -3,7 +3,7 @@ import { parseMessageContent, type ReceivedMessage } from '@/domain/chat';
 import type { ChatRealtimeController } from './realtime-controller';
 
 export function mentionsUser(message: ReceivedMessage, userId: string, name: string) {
-  if (!name.trim() || message.revoked || message.senderId === userId) return false;
+  if (!name.trim() || message.poke || message.revoked || message.senderId === userId) return false;
   const token = `@${name.trim().replace(/\s+/g, ' ')}`;
   return parseMessageContent(message.content).some((part) => {
     if (part.kind !== 'text') return false;

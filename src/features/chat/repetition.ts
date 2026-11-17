@@ -6,6 +6,7 @@ function eligible(message: ReceivedMessage) {
   if (cached !== undefined) return cached;
   const result =
     !message.revoked &&
+    !message.poke &&
     !message.quote &&
     !!message.content.trim() &&
     !['sending', 'failed'].includes(message.delivery ?? '') &&

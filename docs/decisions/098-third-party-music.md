@@ -1,0 +1,33 @@
+# ADR-098：可移除的个人音乐模块
+
+状态：采用。日期：2026-11-17。
+
+## 原因与范围
+
+用户要求参考 fishmusic 接入服务端配置的音乐接口，个人独立点歌与播放，代码集中在第三方目录，能够整体移除。上游使用 Meting `/api?server=...&type=search|url&id=...`，要求服务端 Bearer Token。仅实现网易云、QQ 音乐搜索、个人有界待播队列、播放/暂停、下一首、进度与音量；不实现全员同步、歌词、音效或平台账号绑定。
+
+后续明确增加音乐消息和悬浮球：复用既有 HTTP 发送、历史、实时和撤回，正文使用版本化 `[music]` URI 编码 JSON 标记，仅含来源、编号、歌名、歌手，不带播放链接或凭证。domain/chat 纯解析和预览；chat 的音乐卡片通过独立只读播放回调调用 app 注入的播放器，无音频或进度订阅。第三方模块移除时保留可读歌曲信息和未启用反馈。悬浮球只订阅低频播放状态，提供暂停/继续、打开面板和停止并关闭；位置可触屏/鼠标拖动，键盘可达，避让已有工作时间球及手机导航、安全区域。无自动旋转、逐帧更新或聊天请求。
+
+消息与悬浮球按用户要求统一为光盘呈现：shared/ui/MediaDisc 仅提供静态反光盘面、同心纹路、中心孔和状态图标插槽，不持有业务状态。盘面使用既有语义 token，不新增品牌配色；不播放持续旋转动画。消息保留歌名、歌手、来源与整块可点击区域，移除内层矩形面板；纯音乐消息的外层气泡也透明，带引用和撤回时保留原有反馈呈现。
+
+悬浮球位于聊天/游戏浮窗层（60）之上、共享模态弹窗层（80）之下，使用 70；独立聊天页仍能点按、拖动和停止音乐，不穿透其他模态任务。
+
+## 决策与依赖
+
+- 新增 `src/third-party/music` 纵向模块，是现有按层目录的明确局部例外。内部 `domain.ts` 纯类型，`client.ts` 仅处理 HTTP、校验，`*-controller.ts` 管理请求/队列/播放，UI 仅通过模型操作。模块不导入 chat、auth feature、app、shells 或其 store。对外仅 `index.ts`，app 注入端口；ESLint 限制越界引用。
+- chat 只新增可选 `toolsSlot`，不知道音乐业务。app 的 MusicSession 注入账号命名空间；首次点入口才异步加载 Runtime，关闭弹窗继续播放，跨路由保留，登出/切号取消请求并释放音频、监听器、状态。不持久化搜索词和队列。
+- 全模块只创建一个 HTMLAudioElement，使用浏览器媒体管线；不使用 WebAudio、频谱、轮询、逐帧动画、全局进度 store。timeupdate 仅通知进度组件，聊天列表和草稿不订阅。搜索手动提交、每页 20、最多 100；共享 InfiniteScroll 续载，单请求在途、稳定 ID 去重、空/重复页停止，错误显式重试。队列最多 50，不预取整首音频；当前播放地址按需获取，不缓存过期签名链接。
+- 后端包 `com.cong.fishisland.thirdparty.music` 独立提供已登录代理；`fishisland.third-party.music.api-url` 和 `token` 仅放在 dev/pre/prod 环境配置，不放主配置。提交的环境文件仅保留 `${MUSIC_API_URL:}`、`${MUSIC_API_TOKEN:}`，Java 默认值也为空；真实地址和密钥通过服务端环境变量或不提交 Git 的外部环境 yml 注入。避免主配置及 Java 默认值泄露部署地址；未配置任一项均明确报错，不请求上游。固定操作/来源、参数长度/页数、上游连接与读取超时、响应大小上限、有界短时搜索缓存；不透传调用者 URL、Cookie 或上游错误正文。音频直连公开 HTTPS CDN，无服务器转码或下载。未配置、上游拒绝及无音源明确反馈，浏览器自动播放拒绝提示主动播放。
+- 复用 Button、Dialog、Select、Slider、ScrollArea reserved、InfiniteScroll、LoadingIndicator 与语义 token。弹窗固定页头、搜索、滚动正文与播放区；手机单列和安全区域，全部注册主题及明暗共用，不因切换重挂载或请求。
+
+## 替代方案
+
+直接浏览器请求会暴露上游 Token；复制 fishmusic 房间、Socket 与大播放器会扩大依赖和更新范围；拆散到全局多层目录会增加卸载成本，均不采用。未引入依赖。
+
+## 移除方式
+
+在 ChatConnectionProvider 中解除 MusicSession 包装，删除 ChatMiniPage/ChatPlaceholderPage 的 ChatMusicTool 注入与 import，再删除 app 的 MusicSession、第三方模块目录、对应测试/config；聊天可选插槽可保留或删除。后端删除 thirdparty/music 包与对应 yml 配置。无数据库迁移、聊天消息格式或 WebSocket 扩展需回滚。
+
+## 验证
+
+`npm run check`；协议、竞态取消、重复分页、队列上限和音频释放单元测试；全部主题 × 明暗 × 桌面/375/390 的入口、搜索 loading/empty/error/success、真实滚动、播放/暂停/结束/失败、Esc/焦点返回、无横向溢出；换肤保留草稿和音频，不新增聊天请求/连接。生产构建检查异步块；聊天突发期间测量输入延迟和长任务。真实上游联调需要部署者配置 Token，模拟媒体验证不代替真实音源验收，结果另记验证报告。

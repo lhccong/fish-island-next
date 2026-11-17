@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
-import { parseEmojiText, parseInvitationText } from '@/domain/chat';
+import { parseEmojiText, parseInvitationText, parseMusicMessage } from '@/domain/chat';
+import { MusicMessage } from './MusicMessage';
 import { GameInvitation } from './GameInvitation';
 import styles from './MessageText.module.css';
 
 export function MessageText({ text }: { text: string }) {
   const parts = useMemo(() => parseInvitationText(text), [text]);
+  const song = useMemo(() => parseMusicMessage(text), [text]);
+  if (song) return <MusicMessage song={song} />;
   return parts.map((part, sectionIndex) => {
     if (part.kind === 'invitation')
       return <GameInvitation key={sectionIndex} game={part.game} roomId={part.roomId} />;

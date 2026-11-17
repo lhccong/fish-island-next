@@ -2,13 +2,18 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { farmService } from '@/app/config/farm';
+import { petService } from '@/app/config/pet';
 import { stockService } from '@/app/config/stock';
 import { useAuth } from '@/features/auth';
 import { Button } from '@/shared/ui/Button';
 import type { GameId } from './game-windows-context';
+import { useGameWindows } from './game-windows-context';
 
 const FarmWorkspace = lazy(() =>
   import('@/features/farm').then((m) => ({ default: m.FarmWorkspace })),
+);
+const PetWorkspace = lazy(() =>
+  import('@/features/pet').then((m) => ({ default: m.PetWorkspace })),
 );
 const LifeGame = lazy(() => import('@/features/life').then((m) => ({ default: m.LifeGame })));
 const StockWorkspace = lazy(() =>
@@ -24,7 +29,8 @@ const UndercoverGame = lazy(() =>
 );
 
 export function GameWindowContent({ game }: { game: GameId }) {
-  const { session, restore } = useAuth();
+  const { session, restore, refreshUser } = useAuth();
+  const open = useGameWindows();
   const navigate = useNavigate();
   const location = useLocation();
   const [detailCode, setDetailCode] = useState<string | null>(null);
@@ -53,8 +59,20 @@ export function GameWindowContent({ game }: { game: GameId }) {
   if (game === 'gomoku') return <GomokuGame />;
   if (game === 'landlords') return <LandlordsGame />;
   if (game === 'farm')
+    return <FarmWorkspace key={session.user.id} service={farmService} onPet={() => open('pet')} />;
+  if (game === 'pet')
     return (
-      <FarmWorkspace key={session.user.id} service={farmService} onPet={() => navigate('/pet')} />
+      <PetWorkspace
+        key={session.user.id}
+        service={petService}
+        userId={session.user.id}
+        points={
+          session.user.points === undefined
+            ? undefined
+            : session.user.points - (session.user.usedPoints ?? 0)
+        }
+        onLotterySettled={refreshUser}
+      />
     );
   return (
     <StockWorkspace

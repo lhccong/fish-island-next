@@ -1,0 +1,36 @@
+.notice {
+  margin: 8px 12px;
+  padding: 4px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.content {
+  display: inline-block;
+  max-width: 100%;
+  padding-inline: 8px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-text) 5%, var(--color-canvas));
+}
+
+.action {
+  margin-inline-start: 8px;
+}
+
+.content > [role='status'],
+.content > [role='alert'] {
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+@media (max-width: 760px) {
+  .notice {
+    margin-inline: 8px;
+    padding-block: 12px;
+    font-size: 13px;
+    line-height: 22px;
+  }
+}

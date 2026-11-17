@@ -108,6 +108,7 @@ export function createAuthClient(baseUrl: string): AuthPort {
         userAvatar: values.avatarUrl,
         momentsBgUrl: values.coverUrl,
         userProfile: values.profile,
+        pokeSuffix: values.pokeSuffix,
       });
       if (result !== true) throw new AuthError('rejected', '服务器未确认资料保存成功');
     },

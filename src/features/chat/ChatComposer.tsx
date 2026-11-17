@@ -20,6 +20,7 @@ import { WorksheetAddress } from './WorksheetAddress';
 export function ChatComposer({
   presentation = 'conversation',
   toolbarAction,
+  toolsSlot,
   floating = false,
   onToggleFloating,
   toolsPresentation = 'inline',
@@ -27,6 +28,7 @@ export function ChatComposer({
 }: {
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
+  toolsSlot?: ReactNode;
   floating?: boolean;
   onToggleFloating?: () => void;
   toolsPresentation?: 'inline' | 'menu';
@@ -83,6 +85,7 @@ export function ChatComposer({
       <ComposerImage />
       <div className={styles.inputRow}>
         <div className={styles.tools}>
+          {toolsSlot}
           {compactWorksheet ? (
             <>
               <ChatToolsMenu
@@ -99,14 +102,12 @@ export function ChatComposer({
               <span className={styles.ribbonLabel} aria-hidden="true">
                 插入
               </span>
-              <div hidden>
-                <ChatImageLauncher inputRef={imageInput} />
-              </div>
+              <ChatImageLauncher inputRef={imageInput} showTrigger={false} />
             </>
           ) : (
             <>
               <EmoticonLauncher />
-              <ChatImageLauncher inputRef={imageInput} />
+              <ChatImageLauncher inputRef={imageInput} showTrigger={toolsPresentation !== 'menu'} />
               {toolsPresentation === 'menu' ? (
                 <ChatToolsMenu
                   className={styles.moreTools ?? ''}

@@ -51,6 +51,7 @@ export function decodeUser(value: unknown): AuthUser {
       typeof user.usedPoints === 'number' && Number.isFinite(user.usedPoints) ? user.usedPoints : 0,
     role: typeof user.userRole === 'string' ? user.userRole : 'user',
     profile: typeof user.userProfile === 'string' ? user.userProfile : '',
+    pokeSuffix: typeof user.pokeSuffix === 'string' ? user.pokeSuffix.slice(0, 30) : '',
     coverUrl: safeImageUrl(user.momentsBgUrl),
     email: typeof user.email === 'string' ? user.email : '',
     titleId:
@@ -59,6 +60,14 @@ export function decodeUser(value: unknown): AuthUser {
         : '0',
     vip: user.vip === true,
     createdAt: typeof user.createTime === 'string' ? user.createTime : '',
+    nextRenameAt:
+      user.nextRenameTime === null
+        ? null
+        : typeof user.nextRenameTime === 'string' &&
+            /T.*(?:Z|[+-]\d{2}:\d{2})$/.test(user.nextRenameTime) &&
+            Number.isFinite(Date.parse(user.nextRenameTime))
+          ? new Date(user.nextRenameTime).toISOString()
+          : undefined,
   };
 }
 

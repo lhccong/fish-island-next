@@ -40,7 +40,7 @@ function setup() {
     };
   });
   const controller = createActiveLuckyBags(port, 'synthetic');
-  const push = (content: string, senderId = 'other') =>
+  const push = (content: string, senderId = 'other', poke?: ReceivedMessage['poke']) =>
     incoming?.({
       id: 'synthetic-message',
       senderId,
@@ -48,6 +48,7 @@ function setup() {
       content,
       createdAt: Date.now(),
       revoked: false,
+      ...(poke ? { poke } : {}),
     });
   return { port, chat, controller, push };
 }
@@ -116,6 +117,11 @@ it('keeps the previous badge on failure and only refreshes on relevant incoming 
   expect(f.controller.store.getState().count).toBe(1);
   f.push('普通消息');
   f.push('讨论福袋');
+  f.push('[luckybag]new[/luckybag]', 'other', {
+    targetId: 'self',
+    targetName: '本人',
+    suffix: '[luckybag]new[/luckybag]',
+  });
   await vi.advanceTimersByTimeAsync(200);
   expect(f.port.active).toHaveBeenCalledOnce();
   vi.mocked(f.port.active).mockRejectedValueOnce(new Error('读取失败'));

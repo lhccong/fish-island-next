@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { chatPreferences, chatRealtime } from '@/app/config/chat';
+import { ChatMusicTool } from '@/app/components/MusicSession';
 import {
   ChatMembersProvider,
   ChatWindowProvider,
@@ -20,6 +21,7 @@ export function ChatMiniPage() {
       >
         <ChatMembersProvider controller={chatRealtime.members}>
           <ChatWorkspace
+            toolsSlot={<ChatMusicTool />}
             standalone
             groupName={groupName}
             onRenameGroup={saveGroupName}

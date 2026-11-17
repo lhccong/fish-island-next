@@ -22,6 +22,22 @@
   color: var(--color-text);
   border-color: var(--color-border);
 }
+.button.inline {
+  position: relative;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-accent-text);
+  font: inherit;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+.inline:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -42,5 +58,14 @@
     min-height: 44px;
     padding: 10px var(--space-3);
     font-size: 14px;
+  }
+  .inline::before {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    translate: -50% -50%;
+    content: '';
   }
 }

@@ -18,6 +18,7 @@ export function ChatWorkspace({
   onRenameGroup,
   presentation = 'conversation',
   toolbarAction,
+  toolsSlot,
   decoration = 'none',
   standalone = false,
   miniChatHref,
@@ -30,6 +31,7 @@ export function ChatWorkspace({
   onRenameGroup: (name: string) => void;
   presentation?: ChatPresentation;
   toolbarAction?: ReactNode;
+  toolsSlot?: ReactNode;
   decoration?: 'none' | 'island' | 'classic';
   standalone?: boolean;
   miniChatHref?: string;
@@ -75,6 +77,7 @@ export function ChatWorkspace({
                 compactWorksheet={floating && windowPresentation === 'worksheet'}
                 toolsPresentation={decoration === 'classic' ? 'menu' : 'inline'}
                 toolbarAction={!floating && toolbarAction}
+                toolsSlot={toolsSlot}
                 floating={floating}
                 onToggleFloating={toggleFloating}
               />,

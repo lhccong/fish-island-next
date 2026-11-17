@@ -8,6 +8,7 @@ import { EmailBinding } from './EmailBinding';
 import { ProfileTitles } from './ProfileTitles';
 import { ProfileMilestones } from './ProfileMilestones';
 import { useAuth } from './use-auth';
+import { formatNextRenameTime } from './profile-date';
 import styles from './ui/Profile.module.css';
 
 interface ProfileEditorProps {
@@ -20,6 +21,7 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
   const { updateProfile, pending } = useAuth();
   const [name, setName] = useState(user.name);
   const [profile, setProfile] = useState(user.profile ?? '');
+  const [pokeSuffix, setPokeSuffix] = useState(user.pokeSuffix ?? '');
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '');
   const [coverUrl, setCoverUrl] = useState(user.coverUrl ?? '');
   const [uploading, setUploading] = useState(false);
@@ -39,6 +41,10 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
           setError('个人简介不能超过 100 个字符。');
           return;
         }
+        if (pokeSuffix.length > 30) {
+          setError('被戳后缀不能超过 30 个字符。');
+          return;
+        }
         if (
           [avatarUrl, coverUrl].some((url) => {
             if (!url) return false;
@@ -54,7 +60,7 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
         }
         setError('');
         try {
-          if (await updateProfile({ name, profile, avatarUrl, coverUrl })) onSaved();
+          if (await updateProfile({ name, profile, avatarUrl, coverUrl, pokeSuffix })) onSaved();
         } catch (reason) {
           setError(reason instanceof Error ? reason.message : '保存失败，请重试');
         }
@@ -90,6 +96,8 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
               </div>
               <span id="profile-name-hint" className={styles.ruleHint}>
                 首次免费，之后每月限改一次，消耗 100 积分。
+                <br />
+                下次可修改时间：{formatNextRenameTime(user.nextRenameAt)}
               </span>
             </label>
             <EmailBinding boundEmail={user.email ?? ''} disabled={busy} />
@@ -124,6 +132,22 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
             <span className={styles.counter}>{profile.length}/100</span>
           </label>
           <ProfileMilestones user={user} />
+          <label className={styles.label}>
+            被戳后缀
+            <input
+              aria-label="被戳后缀"
+              value={pokeSuffix}
+              maxLength={30}
+              placeholder="最多30个字符，留空不追加文字"
+              disabled={busy}
+              onChange={(event) => setPokeSuffix(event.target.value)}
+              aria-describedby="poke-preview"
+            />
+            <span className={styles.counter}>{pokeSuffix.length}/30</span>
+            <span id="poke-preview" className={styles.ruleHint}>
+              岛友拍了拍「{name || '我'}」{pokeSuffix}
+            </span>
+          </label>
         </div>
       </ScrollArea>
       {uploading && <LoadingIndicator compact>正在上传图片…</LoadingIndicator>}
@@ -141,7 +165,11 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
         >
           取消
         </Button>
-        <Button type="submit" disabled={busy}>
+        <Button
+          type="submit"
+          disabled={busy}
+          aria-label={pending === 'profile' ? '保存中…' : '保存修改'}
+        >
           {pending === 'profile' ? (
             <LoadingIndicator compact>{'保存中…'}</LoadingIndicator>
           ) : (

@@ -1,4 +1,5 @@
 export { ChatWorkspace } from './ChatWorkspace';
+export { ChatMusicProvider } from './ChatMusicProvider';
 export { ChatReportProvider } from './ChatReportProvider';
 export { ChatListProvider } from './ChatListProvider';
 export { useLocalGroupName } from './use-local-group-name';

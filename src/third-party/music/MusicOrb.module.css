@@ -1,0 +1,66 @@
+.area {
+  position: fixed;
+  z-index: 70;
+  inset: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    calc(92px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  pointer-events: none;
+}
+.area[hidden] {
+  display: none;
+}
+.anchor {
+  position: absolute;
+  left: calc((100% - 64px) * var(--music-x));
+  top: calc((100% - 64px) * var(--music-y));
+  pointer-events: auto;
+}
+.orb {
+  display: flex;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-text);
+  box-shadow: none;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+.orb:active {
+  cursor: grabbing;
+}
+.panel {
+  width: min(320px, calc(100vw - 24px));
+}
+.body {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+.song {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.song strong {
+  font-weight: 500;
+  font-size: 14px;
+}
+.song span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-danger);
+  overflow-wrap: anywhere;
+}

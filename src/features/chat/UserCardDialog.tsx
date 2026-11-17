@@ -36,7 +36,7 @@ export function UserCardDialog({
   const remark = useRemark(target.id);
   const remarks = useRemarks();
   const remarkRef = useRef<HTMLButtonElement>(null);
-  const { blacklist, composerRef } = useChatRealtime();
+  const { blacklist, composerRef, controller, draft } = useChatRealtime();
   const blocked = useSyncExternalStore(blacklist.subscribe, () =>
     blacklist.read(user.id).some((v) => v.id === target.id),
   );
@@ -261,6 +261,17 @@ export function UserCardDialog({
         {feedback.message && <p role={feedback.error ? 'alert' : 'status'}>{feedback.message}</p>}
         {confirmBlock && <p>仅在此浏览器屏蔽该岛友的聊天消息，确认加入黑名单？</p>}
         <div className={styles.actions}>
+          {card && (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (controller.sender.poke(target.id, name, user)) onClose();
+                else draft.notify('戳一戳未提交，请处理待发送消息后重试', 'error');
+              }}
+            >
+              戳一戳
+            </Button>
+          )}
           {!self &&
             card &&
             (confirmBlock ? (

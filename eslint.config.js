@@ -7,7 +7,13 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const internalImports = {
-  group: ['@/features/*/*', '!@/features/fish-circle/notifications', '@/shells/*/*', '@/skins/*/*'],
+  group: [
+    '@/features/*/*',
+    '!@/features/fish-circle/notifications',
+    '@/shells/*/*',
+    '@/skins/*/*',
+    '@/third-party/*/*',
+  ],
   message: '跨模块仅允许从模块 index.ts 公开入口导入。',
 };
 function restrict(files, groups) {
@@ -81,7 +87,11 @@ export default defineConfig([
   ),
   restrict(
     ['src/features/**/*.{ts,tsx}'],
-    [['@/app/**', '@/shells/**', '@/infrastructure/**', '@/features/*']],
+    [['@/app/**', '@/shells/**', '@/infrastructure/**', '@/features/*', '@/third-party/**']],
+  ),
+  restrict(
+    ['src/third-party/**/*.{ts,tsx}'],
+    [['@/app/**', '@/features/**', '@/shells/**', '@/infrastructure/**', '@/third-party/**']],
   ),
   restrict(['src/shells/**/*.{ts,tsx}'], [['@/app/**', '@/features/**', '@/infrastructure/**']]),
   restrict(

@@ -10,10 +10,12 @@ import { SignInSessionProvider } from '@/app/providers/SignInSessionProvider';
 import { PageFooterProvider } from '@/shared/ui/PageFooter';
 import { SiteFooter } from '@/app/components/SiteFooter';
 import { BroadcastSession } from '@/app/components/BroadcastSession';
+import { MobileViewport } from '@/app/components/MobileViewport';
 
 export function App() {
   return (
     <BrowserRouter>
+      <MobileViewport />
       <TabIdentityProvider />
       <AuthProvider controller={authController}>
         <ChatConnectionProvider>

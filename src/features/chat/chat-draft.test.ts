@@ -6,6 +6,7 @@ it('prepares quote, mention and repetition without discarding existing input or 
   draft.setText('已有输入');
   draft.quote('123', '岛友');
   expect(draft.store.getState().quote).toEqual({ id: '123', senderName: '岛友' });
+  expect(draft.store.getState().feedback).toBeNull();
   draft.mention(' 合成\n岛友 ');
   expect(draft.store.getState().text).toBe('已有输入 @合成 岛友 ');
   draft.repeat('合成原文');

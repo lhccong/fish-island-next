@@ -18,10 +18,14 @@ export function GameWindowsProvider({ children }: { children: ReactNode }) {
   const origins = useRef(new Map<GameId, HTMLElement>());
   const returnFocus = useRef<HTMLElement | null>(null);
   const location = useLocation();
-  const open = (id: GameId) => {
-    if (document.activeElement instanceof HTMLElement) {
-      origins.current.set(id, document.activeElement);
-      returnFocus.current = document.activeElement;
+  const open = (id: GameId, origin = document.activeElement) => {
+    const focusOrigin =
+      active && origin instanceof HTMLElement && origin.closest('[role="dialog"]')
+        ? (origins.current.get(active) ?? origin)
+        : origin;
+    if (focusOrigin instanceof HTMLElement) {
+      origins.current.set(id, focusOrigin);
+      returnFocus.current = focusOrigin;
     }
     setOpened((items) => (items.includes(id) ? items : [...items, id]));
     setActive(id);

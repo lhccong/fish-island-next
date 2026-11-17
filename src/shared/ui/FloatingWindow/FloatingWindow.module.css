@@ -138,10 +138,13 @@
 }
 @media (max-width: 760px) {
   .window,
-  .window[data-maximized='true'] {
+  .window[data-maximized='true'],
+  .window[data-standalone='true'] {
     inset: 0;
+    top: var(--visual-viewport-top, 0px);
+    bottom: auto;
     width: 100%;
-    height: 100dvh;
+    height: var(--visual-viewport-height, 100dvh);
     border-radius: 0;
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
   }

@@ -49,5 +49,44 @@ test('unavailable storage retains current session choices', async () => {
   const { useChatPanelStore: store } = await import('./chat-panel-store');
   store.getState().setCircleCollapsed(true);
   store.getState().setMembersCollapsed(true);
-  expect(store.getState()).toMatchObject({ circleCollapsed: true, membersCollapsed: true });
+  store.getState().setCirclePosition('right');
+  expect(store.getState()).toMatchObject({
+    circleCollapsed: true,
+    membersCollapsed: true,
+    circlePosition: 'right',
+  });
+});
+
+test.each([undefined, null, 'top', true, 1])(
+  'old or invalid circle positions default to left: %s',
+  async (circlePosition) => {
+    vi.stubGlobal('localStorage', {
+      getItem: () => JSON.stringify({ circleCollapsed: true, circlePosition }),
+    });
+    const { useChatPanelStore: store } = await import('./chat-panel-store');
+    expect(store.getState()).toMatchObject({ circleCollapsed: true, circlePosition: 'left' });
+  },
+);
+
+test('circle position survives reload and independent collapse changes', async () => {
+  let saved = '{"circleCollapsed":true,"membersCollapsed":false}';
+  vi.stubGlobal('localStorage', {
+    getItem: () => saved,
+    setItem: (_key: string, value: string) => (saved = value),
+  });
+  let { useChatPanelStore: store } = await import('./chat-panel-store');
+  store.getState().setCirclePosition('right');
+  store.getState().setCircleCollapsed(false);
+  store.getState().setMembersCollapsed(true);
+  vi.resetModules();
+  ({ useChatPanelStore: store } = await import('./chat-panel-store'));
+  expect(store.getState()).toMatchObject({
+    circleCollapsed: false,
+    membersCollapsed: true,
+    circlePosition: 'right',
+  });
+  store.getState().setCirclePosition('left');
+  vi.resetModules();
+  ({ useChatPanelStore: store } = await import('./chat-panel-store'));
+  expect(store.getState().circlePosition).toBe('left');
 });

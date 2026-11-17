@@ -15,6 +15,7 @@ export function WorkspaceLayout({
   hideSidebar = false,
   mobileNavigation,
   sidebarVariant,
+  sidebarPosition = 'left',
   hideMobileHeader = false,
   hideDesktopHeader = false,
   mobileHeader = 'full',
@@ -25,6 +26,7 @@ export function WorkspaceLayout({
   hideSidebar?: boolean;
   mobileNavigation?: 'tabs' | 'hidden';
   sidebarVariant?: 'default' | 'chat';
+  sidebarPosition?: 'left' | 'right';
   hideMobileHeader?: boolean;
   hideDesktopHeader?: boolean;
   mobileHeader?: 'full' | 'back-only';
@@ -84,6 +86,7 @@ export function WorkspaceLayout({
         pathname !== '/admin'
       }
       {...(sidebarVariant ? { sidebarVariant } : {})}
+      sidebarPosition={sidebarPosition}
       hideMobileHeader={hideMobileHeader}
       hideDesktopHeader={hideDesktopHeader}
       mainContentId={sidebarVariant === 'chat' && pathname !== '/chat' ? null : 'main-content'}

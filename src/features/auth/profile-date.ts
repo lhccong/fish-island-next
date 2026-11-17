@@ -23,3 +23,20 @@ export function profileDate(value: Date): string {
 export function profileDays(value: Date, now = Date.now()): number {
   return Math.floor((now - value.getTime()) / 86400000);
 }
+
+export function formatNextRenameTime(value: string | null | undefined, now = Date.now()): string {
+  if (value === null) return '现在可修改';
+  const date = value ? parseProfileDate(value) : null;
+  if (!date) return '暂无法获取';
+  if (date.getTime() <= now) return '现在可修改';
+  const time = new Intl.DateTimeFormat('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone: 'Asia/Shanghai',
+  }).format(date);
+  const day = profileDate(date)
+    .replace(/[年月]/g, '-')
+    .replace('日', '');
+  return `${day} ${time}（北京时间）`;
+}

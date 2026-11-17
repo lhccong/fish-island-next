@@ -61,6 +61,7 @@
 .uploadRow > input,
 .emailActions > input {
   box-sizing: border-box;
+  scroll-margin-block: 8px;
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -129,6 +130,7 @@
 }
 .ruleHint,
 .hint {
+  overflow-wrap: anywhere;
   margin: 0;
   color: var(--color-muted);
   font-size: 12px;

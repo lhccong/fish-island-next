@@ -23,8 +23,7 @@ export function createChatDraft(ownerId: string) {
       store.setState({ text, feedback: null });
     },
     quote(id: string, senderName: string) {
-      store.setState({ quote: { id, senderName } });
-      notify('已引用消息');
+      store.setState({ quote: { id, senderName }, feedback: null });
     },
     clearQuote() {
       store.setState({ quote: null, feedback: null });

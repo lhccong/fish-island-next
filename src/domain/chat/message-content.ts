@@ -1,3 +1,5 @@
+import { parseMusicMessage } from './music-message';
+
 export type MessageContentPart =
   | { kind: 'text'; text: string }
   | { kind: 'image'; url: string }
@@ -11,6 +13,8 @@ export function hasRewardMessageContent(content: string): boolean {
 }
 
 export function messageClipboardText(content: string): string {
+  const music = parseMusicMessage(content);
+  if (music) return `[音乐] ${music.name} — ${music.artist}`;
   return parseMessageContent(content)
     .map((part, index, parts) =>
       part.kind === 'image'
@@ -24,6 +28,8 @@ export function messageClipboardText(content: string): string {
     .join('');
 }
 export function messagePreview(content: string): string {
+  const music = parseMusicMessage(content);
+  if (music) return `[音乐] ${music.name} — ${music.artist}`.slice(0, 120);
   const text = parseMessageContent(content)
     .map((part) =>
       part.kind === 'image'

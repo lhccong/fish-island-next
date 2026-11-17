@@ -7,11 +7,14 @@ export interface AuthUser {
   usedPoints?: number;
   role: string;
   profile?: string;
+  pokeSuffix?: string;
   coverUrl?: string;
   email?: string;
   titleId?: string;
   vip?: boolean;
   createdAt?: string;
+  /** null means available now; undefined means the server did not provide a valid status. */
+  nextRenameAt?: string | null | undefined;
 }
 export interface ProfileTitle {
   id: string;
@@ -31,6 +34,7 @@ export interface Membership {
   expired: boolean;
 }
 export interface ProfileUpdate {
+  pokeSuffix?: string;
   name: string;
   avatarUrl: string;
   coverUrl: string;

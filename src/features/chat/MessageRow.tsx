@@ -2,12 +2,13 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { CircleAlert } from 'lucide-react';
 import { useMessageLocationPulse } from './use-message-location-pulse';
 import { MessageQuote } from './MessageQuote';
+import { PokeMessage } from './PokeMessage';
 import { RemarkName } from './RemarkName';
 import { SenderTitle } from './SenderTitle';
 import { RepeatButton } from './RepeatButton';
 import { RepetitionParticipants } from './RepetitionParticipants';
 import { Button } from '@/shared/ui/Button';
-import { parseMessageContent } from '@/domain/chat';
+import { parseMessageContent, parseMusicMessage } from '@/domain/chat';
 import { memo, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
 import { useChatRealtime } from './realtime-context';
@@ -42,9 +43,25 @@ export const MessageRow = memo(function MessageRow({
   const connected = useStore(controller.store, (state) => state.connection === 'connected');
   const bubbleRef = useRef<HTMLDivElement>(null);
   useMessageLocationPulse(bubbleRef, navigation, id, locationRevision);
-  const parts = useMemo(() => parseMessageContent(message?.content ?? ''), [message?.content]);
+  const parts = useMemo(
+    () => (message?.poke ? [] : parseMessageContent(message?.content ?? '')),
+    [message?.content, message?.poke],
+  );
+  const musicOnly = useMemo(
+    () => Boolean(parseMusicMessage(message?.content ?? '')),
+    [message?.content],
+  );
   if (!message) return null;
   const self = message.senderId === userId;
+  if (message.poke)
+    return (
+      <PokeMessage
+        message={message}
+        status={revoke}
+        connected={connected}
+        locationRevision={locationRevision}
+      />
+    );
   const menuProps = {
     message,
     self,
@@ -59,6 +76,7 @@ export const MessageRow = memo(function MessageRow({
       ref={bubbleRef}
       className={styles.bubble}
       data-revoked={message.revoked}
+      data-music-only={!message.revoked && !message.quote && musicOnly}
       data-red-packet-content={
         !message.revoked &&
         parts.some((part) => part.kind === 'red-packet' || part.kind === 'lucky-bag')

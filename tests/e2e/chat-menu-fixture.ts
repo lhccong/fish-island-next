@@ -65,7 +65,7 @@ export async function setupChatMenu(
     }),
   );
   await prepare?.();
-  await page.goto('/chat');
+  await page.goto('/chat', { waitUntil: 'domcontentloaded' });
   await page.getByRole('textbox', { name: '账号或邮箱', exact: true }).fill('synthetic-account');
   await page.getByLabel('密码', { exact: true }).fill('synthetic-password');
   await page.getByRole('button', { name: '登录', exact: true }).click();
@@ -98,6 +98,7 @@ export async function setupChatMenu(
       socket.send(JSON.stringify({ type: 'userMessageRevoke', data: id }));
     },
     stats: () => ({ connections, historyRequests, commands }),
+    dispose: () => socket.close({ code: 1000, reason: 'synthetic test cleanup' }),
     clipboardText: () => page.evaluate(() => (window as FixtureWindow).chatMenuClipboard.text),
     failClipboard: (fail: boolean) =>
       page.evaluate((fail) => {

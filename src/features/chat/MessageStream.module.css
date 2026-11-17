@@ -167,8 +167,8 @@
 }
 :global([data-chat-decoration='island'])
   .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
-    [data-revoked='true']
-  ) {
+    [data-music-only='true']
+  ):not([data-revoked='true']) {
   --color-muted: var(--color-pixel-muted);
   --color-border: var(--color-pixel-border);
   color: var(--color-pixel-ink);
@@ -188,8 +188,8 @@
 :global([data-chat-decoration='island'])
   .row[data-self='true']
   .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
-    [data-revoked='true']
-  ) {
+    [data-music-only='true']
+  ):not([data-revoked='true']) {
   border-color: var(--color-accent-text);
   background-color: var(--color-pixel-paper-inset);
 }
@@ -197,6 +197,12 @@
 .row .bubble[data-image-only='true'] {
   padding: 0;
   background: transparent;
+}
+.row .bubble[data-music-only='true'] {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .row[data-self='true'] .bubble[data-image-only='true'] {
   --chat-image-position: right center;

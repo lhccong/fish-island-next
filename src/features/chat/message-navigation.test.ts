@@ -38,6 +38,18 @@ function setup() {
   };
 }
 describe('message navigation', () => {
+  it('does not treat a poke suffix as an actual mention', () => {
+    expect(
+      mentionsUser(
+        {
+          ...message('1', '@本人'),
+          poke: { targetId: 'self', targetName: '本人', suffix: '@本人' },
+        },
+        'self',
+        '本人',
+      ),
+    ).toBe(false);
+  });
   afterEach(() => vi.useRealTimers());
 
   it('dismisses successful feedback while preserving other mentions and the scroll target', async () => {

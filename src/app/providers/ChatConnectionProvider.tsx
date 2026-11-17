@@ -9,6 +9,7 @@ import {
   ChatReportProvider,
 } from '@/features/chat';
 import { ChatUserCards } from '@/app/components/ChatUserCards';
+import { MusicSession } from '@/app/components/MusicSession';
 import {
   chatRealtime,
   chatRemarks,
@@ -57,7 +58,7 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
               onOpen={() => void navigate('/')}
               onRestore={() => void navigate('/chat')}
             >
-              {children}
+              <MusicSession>{children}</MusicSession>
             </ChatWindowProvider>
           </ChatUserCards>
         </RemarksProvider>

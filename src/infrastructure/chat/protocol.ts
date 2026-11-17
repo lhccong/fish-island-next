@@ -70,9 +70,28 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
   )
     return null;
   const quoted = object(message.quotedMessage);
+  const poke = object(message.poke);
+  if (
+    message.poke != null &&
+    (!id(poke?.targetId) ||
+      typeof poke?.targetName !== 'string' ||
+      poke.targetName.length > 200 ||
+      typeof poke.suffix !== 'string' ||
+      poke.suffix.length > 30)
+  )
+    return null;
   const quotedSender = object(quoted?.sender);
   const quoteId = id(quoted?.id);
   return {
+    ...(poke
+      ? {
+          poke: {
+            targetId: id(poke.targetId)!,
+            targetName: poke.targetName as string,
+            suffix: poke.suffix as string,
+          },
+        }
+      : {}),
     ...(id(message.clientMessageId) ? { clientMessageId: id(message.clientMessageId)! } : {}),
     ...(quoteId && typeof quoted?.content === 'string'
       ? {

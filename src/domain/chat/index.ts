@@ -1,4 +1,6 @@
 // 客户端领域模型；后端 DTO 必须在 infrastructure 映射后进入此边界。
+export { encodeMusicMessage, parseMusicMessage } from './music-message';
+export type { ChatMusicSong } from './music-message';
 export type { ChatReportPort, ChatReportReason } from './report';
 export type MessageId = string;
 export type { ChatListAppearance, ChatListPreferencesPort } from './list-preferences';
@@ -25,6 +27,7 @@ export type { RedPacketCreateInput, RedPacketFormValues } from './red-packet';
 export { RedPacketCreateError, validateRedPacketForm } from './red-packet';
 
 export interface ReceivedMessage {
+  poke?: { targetId: string; targetName: string; suffix: string };
   id: string;
   senderId: string;
   senderName: string;
@@ -109,6 +112,7 @@ export interface ChatHistoryPort {
 }
 
 export interface SendMessageInput {
+  pokeTargetId?: string;
   content: string;
   quotedMessageId?: string | undefined;
   clientMessageId: string;

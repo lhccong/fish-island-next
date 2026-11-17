@@ -11,6 +11,16 @@ const user = {
 };
 afterEach(() => vi.unstubAllGlobals());
 
+it('decodes authoritative rename availability without guessing from profile updates', () => {
+  expect(decodeUser({ ...user, nextRenameTime: '2027-01-01T00:00:00+08:00' }).nextRenameAt).toBe(
+    '2026-12-31T16:00:00.000Z',
+  );
+  expect(decodeUser({ ...user, nextRenameTime: null }).nextRenameAt).toBeNull();
+  for (const value of [undefined, '', 'invalid', '2027-01-01 00:00:00', 123]) {
+    expect(decodeUser({ ...user, nextRenameTime: value }).nextRenameAt).toBeUndefined();
+  }
+});
+
 it('uses legacy title, email and membership contracts and decodes their states', async () => {
   const request = vi.fn().mockImplementation((url: string) =>
     Promise.resolve(

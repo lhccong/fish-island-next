@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { ArrowDown } from 'lucide-react';
@@ -12,6 +12,14 @@ import { HistoryBoundary } from './HistoryBoundary';
 import styles from './MessageStream.module.css';
 import { WorksheetHeader } from './WorksheetHeader';
 import type { ChatPresentation } from './chat-presentation';
+import { useMessageLocation } from './use-message-location';
+import { useMessageViewport } from './use-message-viewport';
+import {
+  captureReadingAnchor,
+  readingAnchorOffset,
+  scrollToLatest,
+  type MessageReadingAnchor,
+} from './message-scroll-position';
 
 const key = (_index: number, id: string) => id;
 const listComponents = { Header: HistoryBoundary };
@@ -43,8 +51,6 @@ export function MessageStream({
 }) {
   const { controller, navigation, avatarPreference: avatars } = useChatRealtime();
   const ids = useStore(controller.store, (state) => state.visibleIds);
-  const target = useStore(navigation.store, (state) => state.target);
-  const revision = useStore(navigation.store, (state) => state.revision);
   const firstItemIndex = useStore(controller.store, (state) => state.viewFirstItemIndex);
   const initialized = useStore(controller.history.store, (state) => state.initialized);
   const rowContext = useMemo(
@@ -88,76 +94,144 @@ export function MessageStream({
     [controller],
   );
   const list = useRef<VirtuosoHandle>(null);
-  const [following, setFollow] = useState(true);
-  useEffect(() => {
-    if (!target || !viewport) return;
-    const state = controller.store.getState();
-    const index = state.visibleIds.indexOf(target);
-    if (index < 0) return;
-    const frame = requestAnimationFrame(() => {
-      setFollow(false);
-      list.current?.scrollToIndex({
-        index,
-        align: 'center',
-        behavior: 'auto',
-      });
+  const followingRef = useRef(true);
+  const readingAnchor = useRef<MessageReadingAnchor | null>(null);
+  const lastReadingAnchor = useRef<MessageReadingAnchor | null>(null);
+  const shiftingWindow = useRef(false);
+  const previousWindowIndex = useRef(firstItemIndex);
+  const followFrame = useRef<number | undefined>(undefined);
+  const setFollow = useCallback((value: boolean) => {
+    readingAnchor.current = null;
+    if (value) lastReadingAnchor.current = null;
+    followingRef.current = value;
+  }, []);
+  const scrollingChanged = useCallback((scrolling: boolean) => {
+    if (!scrolling) shiftingWindow.current = false;
+  }, []);
+  const followMeasuredHeight = useCallback(() => {
+    if ((!followingRef.current && !readingAnchor.current) || followFrame.current !== undefined)
+      return;
+    followFrame.current = requestAnimationFrame(() => {
+      followFrame.current = undefined;
+      if (followingRef.current && viewport) {
+        const state = controller.store.getState();
+        const tail = state.visibleIds.at(-1);
+        scrollToLatest(viewport, list.current, tail ? state.messages[tail]?.id : undefined);
+      } else if (!followingRef.current && viewport && readingAnchor.current) {
+        const offset = readingAnchorOffset(viewport, readingAnchor.current);
+        if (Math.abs(offset) > 1) list.current?.scrollBy({ top: offset, behavior: 'auto' });
+      }
     });
-    return () => cancelAnimationFrame(frame);
-  }, [target, revision, controller, viewport, setFollow]);
+  }, [viewport, controller]);
+  useLayoutEffect(() => {
+    if (previousWindowIndex.current !== firstItemIndex) shiftingWindow.current = true;
+    previousWindowIndex.current = firstItemIndex;
+    followMeasuredHeight();
+  }, [ids, firstItemIndex, followMeasuredHeight]);
+  useMessageViewport(viewport, followMeasuredHeight, followFrame);
+  useMessageLocation(viewport, list, setFollow);
   useEffect(() => {
-    let frame: number | undefined;
     const unsubscribe = controller.store.subscribe((state, previous) => {
+      if (state.firstItemIndex > previous.firstItemIndex && !followingRef.current && viewport)
+        readingAnchor.current ??= lastReadingAnchor.current ?? captureReadingAnchor(viewport);
       if (
         state.ids.some((id) => !previous.messages[id] && state.messages[id]?.delivery === 'sending')
       ) {
         setFollow(true);
-        if (frame !== undefined) cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() =>
-          list.current?.scrollToIndex({ index: 'LAST', align: 'end' }),
-        );
+        followMeasuredHeight();
       }
     });
-    return () => {
-      unsubscribe();
-      if (frame !== undefined) cancelAnimationFrame(frame);
-    };
-  }, [controller, setFollow]);
+    return unsubscribe;
+  }, [controller, setFollow, followMeasuredHeight, viewport]);
   useLayoutEffect(() => {
     if (!viewport) return;
     let previousTop = viewport.scrollTop;
     let previousHeight = viewport.scrollHeight;
     let previousClientHeight = viewport.clientHeight;
+    let previousFirstItemIndex = controller.store.getState().viewFirstItemIndex;
     let touching = false;
+    let touchTop = 0;
+    let followedBeforeTouch = false;
     const startTouch = () => {
       touching = true;
+      touchTop = viewport.scrollTop;
+      followedBeforeTouch = followingRef.current;
       setFollow(false);
     };
     const endTouch = () => {
       touching = false;
-      if (viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1) setFollow(true);
+      if (
+        viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1 ||
+        (followedBeforeTouch && Math.abs(viewport.scrollTop - touchTop) <= 1)
+      )
+        setFollow(true);
+    };
+    const wheel = (event: WheelEvent) => {
+      if (event.deltaY < 0) setFollow(false);
+      else if (event.deltaY > 0) readingAnchor.current = null;
+    };
+    const keyDown = (event: KeyboardEvent) => {
+      if (['ArrowUp', 'PageUp', 'Home'].includes(event.key)) setFollow(false);
+      else if (['ArrowDown', 'PageDown', 'End'].includes(event.key)) readingAnchor.current = null;
+    };
+    const pointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('button[aria-expanded]:not([aria-haspopup])')
+      ) {
+        readingAnchor.current = null;
+        shiftingWindow.current = true;
+      }
+      if (event.target instanceof Element && event.target.closest('[data-orientation="vertical"]'))
+        setFollow(false);
     };
     const trackPosition = () => {
       const top = viewport.scrollTop;
       const height = viewport.scrollHeight;
       const clientHeight = viewport.clientHeight;
       const resized = height !== previousHeight || clientHeight !== previousClientHeight;
-      if (top < previousTop && (!resized || top === 0)) setFollow(false);
-      else if (!touching && height - top - clientHeight <= 64) setFollow(true);
+      const currentFirstItemIndex = controller.store.getState().viewFirstItemIndex;
+      const windowMoved = currentFirstItemIndex !== previousFirstItemIndex;
+      if (top < previousTop && top === 0 && !resized && !windowMoved && !shiftingWindow.current)
+        setFollow(false);
+      else if (
+        !touching &&
+        !resized &&
+        !shiftingWindow.current &&
+        !readingAnchor.current &&
+        top > previousTop &&
+        height - top - clientHeight <= 64
+      )
+        setFollow(true);
       previousTop = top;
       previousHeight = height;
       previousClientHeight = clientHeight;
+      previousFirstItemIndex = currentFirstItemIndex;
+      if (!followingRef.current && !shiftingWindow.current && !windowMoved)
+        lastReadingAnchor.current = captureReadingAnchor(viewport);
+      if (
+        (followingRef.current || readingAnchor.current) &&
+        (resized || windowMoved || shiftingWindow.current)
+      )
+        followMeasuredHeight();
     };
     viewport.addEventListener('scroll', trackPosition);
+    viewport.parentElement?.addEventListener('wheel', wheel, { passive: true });
+    viewport.addEventListener('keydown', keyDown);
+    viewport.parentElement?.addEventListener('pointerdown', pointerDown);
     viewport.addEventListener('touchstart', startTouch, { passive: true });
     viewport.addEventListener('touchend', endTouch, { passive: true });
     viewport.addEventListener('touchcancel', endTouch, { passive: true });
     return () => {
       viewport.removeEventListener('scroll', trackPosition);
+      viewport.parentElement?.removeEventListener('wheel', wheel);
+      viewport.removeEventListener('keydown', keyDown);
+      viewport.parentElement?.removeEventListener('pointerdown', pointerDown);
       viewport.removeEventListener('touchstart', startTouch);
       viewport.removeEventListener('touchend', endTouch);
       viewport.removeEventListener('touchcancel', endTouch);
     };
-  }, [viewport, setFollow]);
+  }, [viewport, setFollow, controller, followMeasuredHeight]);
   return (
     <section className={styles.stream} aria-label="群聊实时消息" data-presentation={presentation}>
       <ConnectionStatus />
@@ -188,11 +262,12 @@ export function MessageStream({
                 // Dense worksheet rows use Virtuoso's frame scheduling to batch cell resizing.
                 // Conversation/image rows retain synchronous anchor compensation (ADR-089).
                 skipAnimationFrameInResizeObserver={!compactWorksheet}
-                atBottomThreshold={64}
+                atBottomThreshold={1}
                 atBottomStateChange={updateBottom}
-                // Let Virtuoso coordinate measurement and scrolling; external resize writes
-                // race its anchor compensation when the bounded message window advances.
-                followOutput={following ? 'auto' : false}
+                isScrolling={scrollingChanged}
+                // Follow late row measurements through Virtuoso, preserving its anchor ownership.
+                totalListHeightChanged={followMeasuredHeight}
+                followOutput={false}
               />
             )
           )}
@@ -206,7 +281,7 @@ export function MessageStream({
               title={newMessageCount > 0 ? `${newMessageCount} 条新消息，点击查看` : '查看最新消息'}
               onClick={() => {
                 setFollow(true);
-                list.current?.scrollToIndex({ index: 'LAST', align: 'end', behavior: 'auto' });
+                followMeasuredHeight();
               }}
             >
               <ArrowDown size={18} aria-hidden="true" />

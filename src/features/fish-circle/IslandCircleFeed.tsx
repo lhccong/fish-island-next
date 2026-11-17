@@ -1,4 +1,4 @@
-import { UsersRound, Pencil } from 'lucide-react';
+import { UsersRound, Pencil, RefreshCw } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -19,13 +19,23 @@ export function IslandCircleFeed({
 }) {
   const { page, service, user, overrides, patch, publish, onViewUser } = useIslandCircle();
   return (
-    <section className={styles.feed} aria-label="海岛鱼小圈">
+    <section className={styles.feed} aria-label="海岛鱼小圈" data-presentation={presentation}>
       <div className={styles.heading}>
         <div className={styles.headingTitle}>
           <h3>
             <UsersRound size={18} aria-hidden="true" />
             鱼小圈
           </h3>
+          <Button
+            variant="secondary"
+            className={styles.refresh}
+            aria-label="刷新动态"
+            title="刷新动态"
+            disabled={page.result.status === 'loading'}
+            onClick={page.refresh}
+          >
+            <RefreshCw size={16} aria-hidden="true" />
+          </Button>
           {headingAction}
         </div>
         <Button variant="secondary" onClick={(event) => publish(event.currentTarget)}>

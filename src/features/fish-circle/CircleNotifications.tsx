@@ -1,9 +1,8 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { useCallback, useRef, useState, type CSSProperties } from 'react';
-import { Bell, CheckCheck, RefreshCw, Trash2, MoreHorizontal } from 'lucide-react';
+import { Bell, Check, CheckCheck, RefreshCw, Settings2, Trash2 } from 'lucide-react';
 import type { CircleReminder, FishCirclePort } from '@/domain/fish-circle';
-import { DropdownMenu } from '@/shared/ui/DropdownMenu';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
@@ -96,73 +95,62 @@ export function CircleNotifications({ service, onViewDetail }: Props) {
         showCloseAction={false}
         dismissLabel="关闭消息通知"
       >
-        <div className={styles.more}>
-          <DropdownMenu
-            label="通知操作"
-            className={styles.menu || ''}
-            trigger={
-              <button
-                type="button"
-                aria-label="更多通知操作"
-                className={styles.iconButton}
-                title="更多通知操作"
-                disabled={pending || result.status === 'loading'}
-              >
-                <MoreHorizontal size={19} aria-hidden="true" />
-              </button>
-            }
-            items={[
-              {
-                label: '刷新消息通知',
-                icon: <RefreshCw size={16} aria-hidden="true" />,
-                disabled: pending || result.status === 'loading',
-                onSelect: () => {
-                  setNotice('');
+        <div className={styles.toolbar} role="group" aria-label="通知操作">
+          <Button
+            variant="secondary"
+            className={styles.iconButton}
+            aria-label="刷新消息通知"
+            title="刷新消息通知"
+            disabled={pending || result.status === 'loading'}
+            onClick={() => {
+              setNotice('');
+              refresh();
+              notifications.refresh();
+            }}
+          >
+            <RefreshCw size={18} aria-hidden="true" />
+          </Button>
+          <Button
+            variant="secondary"
+            className={styles.iconButton}
+            aria-label="全部已读"
+            title="全部已读"
+            disabled={pending || notifications.count === 0}
+            onClick={() => {
+              setNotice('');
+              void run((signal) => service.allReminderAction('read', signal)).then((done) => {
+                if (done) {
+                  setReadIds((current) => [
+                    ...new Set([...current, ...unread.map((item) => item.id)]),
+                  ]);
+                  setNotice('全部消息已标为已读');
                   refresh();
                   notifications.refresh();
-                },
-              },
-              {
-                label: '全部已读',
-                icon: <CheckCheck size={16} aria-hidden="true" />,
-                disabled: pending || notifications.count === 0,
-                onSelect: () => {
-                  setNotice('');
-                  void run((signal) => service.allReminderAction('read', signal)).then((done) => {
-                    if (done) {
-                      setReadIds((current) => [
-                        ...new Set([...current, ...unread.map((item) => item.id)]),
-                      ]);
-                      setNotice('全部消息已标为已读');
-                      refresh();
-                      notifications.refresh();
-                    }
-                  });
-                },
-              },
-              {
-                label: '全部删除',
-                icon: <Trash2 size={16} aria-hidden="true" />,
-                tone: 'danger',
-                disabled: pending || (result.status === 'ready' && result.data.total === 0),
-                onSelect: () => {
-                  setNotice('');
-                  setDeleting(false);
-                  setDeleteAll(true);
-                },
-              },
-              {
-                label: deleting ? '取消删除' : '管理',
-                icon: <Trash2 size={16} aria-hidden="true" />,
-                disabled: pending || !items.length,
-                onSelect: () => {
-                  setDeleting(!deleting);
-                  setDeleteAll(false);
-                  setIds([]);
-                },
-              },
-            ]}
-          />
+                }
+              });
+            }}
+          >
+            <CheckCheck size={18} aria-hidden="true" />
+          </Button>
+          <Button
+            variant="secondary"
+            className={styles.iconButton}
+            aria-label={deleting ? '完成' : '管理'}
+            title={deleting ? '完成' : '管理'}
+            aria-pressed={deleting}
+            disabled={pending || !items.length}
+            onClick={() => {
+              setDeleting(!deleting);
+              setDeleteAll(false);
+              setIds([]);
+            }}
+          >
+            {deleting ? (
+              <Check size={18} aria-hidden="true" />
+            ) : (
+              <Settings2 size={18} aria-hidden="true" />
+            )}
+          </Button>
         </div>
         {error && <p role="alert">{error}</p>}
         {notifications.error && <p role="alert">未读数暂不可用，刷新消息通知可重试。</p>}
@@ -176,6 +164,20 @@ export function CircleNotifications({ service, onViewDetail }: Props) {
                 : `删除所选 ${ids.length} 条通知？`}
             </span>
             <div className={styles.confirmActions}>
+              {deleting && (
+                <Button
+                  variant="secondary"
+                  className={styles.deleteAction}
+                  disabled={pending || !items.length}
+                  onClick={() => {
+                    setNotice('');
+                    setDeleteAll(true);
+                  }}
+                >
+                  <Trash2 size={16} aria-hidden="true" />
+                  全部删除
+                </Button>
+              )}
               <Button
                 variant="secondary"
                 disabled={pending}
@@ -188,6 +190,8 @@ export function CircleNotifications({ service, onViewDetail }: Props) {
                 取消
               </Button>
               <Button
+                className={styles.deleteAction}
+                variant="secondary"
                 disabled={pending || (!deleteAll && !ids.length)}
                 onClick={() => {
                   setNotice('');

@@ -153,6 +153,26 @@ it('keeps confirmed changes if readback fails, and does not misreport a saved pr
   expect(controller.store.getState().notice).toContain('资料已保存');
 });
 
+it('refreshes rename availability after save and clears stale availability when readback fails', async () => {
+  const { controller, service } = setup();
+  vi.mocked(service.current).mockResolvedValueOnce({ ...user, nextRenameAt: null });
+  await controller.restore();
+  vi.mocked(service.current).mockRejectedValueOnce(new AuthError('network', '读取失败'));
+  await controller.updateProfile(profileUpdate);
+  expect(controller.store.getState().session).toMatchObject({
+    user: { ...profileUpdate, nextRenameAt: undefined },
+  });
+  vi.mocked(service.current).mockResolvedValueOnce({
+    ...user,
+    ...profileUpdate,
+    nextRenameAt: '2026-12-01T00:00:00+08:00',
+  });
+  await controller.updateProfile(profileUpdate);
+  expect(controller.store.getState().session).toMatchObject({
+    user: { nextRenameAt: '2026-12-01T00:00:00+08:00' },
+  });
+});
+
 it('discards an upload response after logout', async () => {
   const { controller, service } = setup();
   await controller.restore();

@@ -4,8 +4,13 @@ const storageKey = 'fish-island:chat-panels:v1';
 interface ChatPanelPreferences {
   circleCollapsed: boolean;
   membersCollapsed: boolean;
+  circlePosition: 'left' | 'right';
 }
-const defaults: ChatPanelPreferences = { circleCollapsed: false, membersCollapsed: false };
+const defaults: ChatPanelPreferences = {
+  circleCollapsed: false,
+  membersCollapsed: false,
+  circlePosition: 'left',
+};
 
 function readPreferences(): ChatPanelPreferences {
   try {
@@ -16,6 +21,7 @@ function readPreferences(): ChatPanelPreferences {
       circleCollapsed: typeof saved.circleCollapsed === 'boolean' ? saved.circleCollapsed : false,
       membersCollapsed:
         typeof saved.membersCollapsed === 'boolean' ? saved.membersCollapsed : false,
+      circlePosition: saved.circlePosition === 'right' ? 'right' : 'left',
     };
   } catch {
     return defaults;
@@ -25,6 +31,7 @@ function readPreferences(): ChatPanelPreferences {
 interface ChatPanelState extends ChatPanelPreferences {
   setCircleCollapsed: (collapsed: boolean) => void;
   setMembersCollapsed: (collapsed: boolean) => void;
+  setCirclePosition: (position: 'left' | 'right') => void;
 }
 
 export const useChatPanelStore = create<ChatPanelState>((set, get) => {
@@ -32,6 +39,7 @@ export const useChatPanelStore = create<ChatPanelState>((set, get) => {
     const preferences = {
       circleCollapsed: get().circleCollapsed,
       membersCollapsed: get().membersCollapsed,
+      circlePosition: get().circlePosition,
       ...patch,
     };
     set(preferences);
@@ -45,5 +53,6 @@ export const useChatPanelStore = create<ChatPanelState>((set, get) => {
     ...readPreferences(),
     setCircleCollapsed: (circleCollapsed) => save({ circleCollapsed }),
     setMembersCollapsed: (membersCollapsed) => save({ membersCollapsed }),
+    setCirclePosition: (circlePosition) => save({ circlePosition }),
   };
 });

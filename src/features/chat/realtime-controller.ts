@@ -122,7 +122,8 @@ export function createChatRealtimeController(
         !message ||
         message.revoked ||
         (role !== 'admin' &&
-          (message.senderId !== userId || hasRewardMessageContent(message.content))) ||
+          (message.senderId !== userId ||
+            (!message.poke && hasRewardMessageContent(message.content)))) ||
         pending.has(id)
       )
         return;

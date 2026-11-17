@@ -185,9 +185,13 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   }
 
   function updateProfile(values: ProfileUpdate) {
+    const session = store.getState().session;
     return mutateProfile((token, signal) => service.updateProfile(values, token, signal), {
       ...values,
       avatarUrl: values.avatarUrl || null,
+      ...(session.status === 'authenticated' && session.user.name !== values.name
+        ? { nextRenameAt: undefined }
+        : {}),
     });
   }
 

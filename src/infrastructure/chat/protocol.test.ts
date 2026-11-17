@@ -1,6 +1,24 @@
 import { expect, it } from 'vitest';
 import { decodeChatEvent, decodeReceivedMessage } from './protocol';
 
+it('validates structured poke snapshots without parsing suffix markup', () => {
+  const message = {
+    id: '1',
+    sender: { id: '123' },
+    content: 'fallback',
+    timestamp: 123456,
+    poke: { targetId: '456', targetName: '合成岛友', suffix: '[img]不是图片[/img]' },
+  };
+  expect(decodeReceivedMessage(message)?.poke).toEqual(message.poke);
+  for (const poke of [
+    {},
+    { ...message.poke, targetId: '__proto__' },
+    { ...message.poke, suffix: 'x'.repeat(31) },
+    { ...message.poke, targetName: null },
+  ])
+    expect(decodeReceivedMessage({ ...message, poke })).toBeNull();
+});
+
 it('validates presence frames, preserves member metadata and rejects malformed payloads', () => {
   const frame = (type: string, data: unknown) => JSON.stringify({ type, data });
   expect(

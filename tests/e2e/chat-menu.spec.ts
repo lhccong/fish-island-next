@@ -41,6 +41,7 @@ for (const skin of builtinSkins)
       let menu = page.getByRole('menu');
       await expect(menu).toBeVisible();
       expect(await menu.getByRole('menuitem').allTextContents()).toEqual([
+        '戳一戳',
         '设置备注',
         '复制',
         '引用',
@@ -70,6 +71,7 @@ for (const skin of builtinSkins)
       await expect(page.getByText('已复制消息文字或图片链接', { exact: true })).toBeVisible();
       menu = await openMessageActions(page, '2');
       expect(await menu.getByRole('menuitem').allTextContents()).toEqual([
+        '戳一戳',
         '举报',
         '加入黑名单',
         '设置备注',

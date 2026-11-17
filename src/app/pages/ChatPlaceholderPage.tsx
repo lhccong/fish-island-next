@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
-import { MessageCircle, MoreHorizontal, PanelLeftOpen } from 'lucide-react';
+import { MessageCircle, MoreHorizontal, PanelLeftOpen, PanelRightOpen } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { chatRealtime, chatPreferences, chatListPreferences } from '@/app/config/chat';
 import { useAuth } from '@/features/auth';
 import { ThemePicker, useAppearanceStore, useChatPanelStore } from '@/features/appearance';
 import { MyIslandProvider } from '@/features/my-island';
-import { IslandSidebarLauncher } from '@/app/components/IslandSidebarLauncher';
+import { ChatGameShortcuts } from '@/app/components/ChatGameShortcuts';
 import { IslandSidebar } from '@/app/components/IslandSidebar';
 import { IslandSidebarProvider } from '@/app/components/IslandSidebarProvider';
 import { ClassicCircleSidebar } from '@/app/components/ClassicCircleSidebar';
@@ -20,6 +20,8 @@ import {
   MobileOnlineUsers,
 } from '@/features/chat';
 import styles from './ChatPlaceholderPage.module.css';
+import { ChatMusicTool } from '@/app/components/MusicSession';
+import { CirclePositionPicker } from '@/app/components/CirclePositionPicker';
 
 export function ChatPlaceholderPage() {
   const { session } = useAuth();
@@ -28,6 +30,7 @@ export function ChatPlaceholderPage() {
   const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
   const [membersOpen, setMembersOpen] = useState(false);
   const circleCollapsed = useChatPanelStore((state) => state.circleCollapsed);
+  const circlePosition = useChatPanelStore((state) => state.circlePosition);
   const setCircleCollapsed = useChatPanelStore((state) => state.setCircleCollapsed);
   const membersCollapsed = useChatPanelStore((state) => state.membersCollapsed);
   const setMembersCollapsed = useChatPanelStore((state) => state.setMembersCollapsed);
@@ -55,6 +58,7 @@ export function ChatPlaceholderPage() {
             <WorkspaceLayout
               sidebarLabel={skinId === 'pixel-island' ? '我的小岛' : '聊天会话'}
               sidebarVariant="chat"
+              sidebarPosition={skinId === 'moyu-island' ? circlePosition : 'left'}
               hideSidebar={
                 presentation === 'worksheet' || (skinId === 'moyu-island' && circleCollapsed)
               }
@@ -97,7 +101,11 @@ export function ChatPlaceholderPage() {
                             requestAnimationFrame(() => circleCollapse.current?.focus());
                           }}
                         >
-                          <PanelLeftOpen size={16} aria-hidden="true" />
+                          {circlePosition === 'right' ? (
+                            <PanelRightOpen size={16} aria-hidden="true" />
+                          ) : (
+                            <PanelLeftOpen size={16} aria-hidden="true" />
+                          )}
                         </Button>
                       )}
                       <h1 title={groupName} aria-label={groupName}>
@@ -109,7 +117,12 @@ export function ChatPlaceholderPage() {
                       </h1>
                     </div>
                     <div className={styles.headerActions}>
-                      <IslandSidebarLauncher />
+                      {skinId === 'moyu-island' && (
+                        <div className={styles.mobileAppearance}>
+                          <CirclePositionPicker mobile />
+                        </div>
+                      )}
+                      <ChatGameShortcuts />
                       <div className={styles.mobileAppearance}>
                         <ThemePicker />
                       </div>
@@ -133,6 +146,7 @@ export function ChatPlaceholderPage() {
                 ),
                 content: (
                   <ChatWorkspace
+                    toolsSlot={<ChatMusicTool />}
                     miniChatHref="/chat/mini"
                     key={session.user.id}
                     membersOpen={membersOpen}
@@ -152,8 +166,8 @@ export function ChatPlaceholderPage() {
                     toolbarAction={
                       presentation === 'worksheet' && (
                         <>
-                          <div className={styles.formulaIsland}>
-                            <IslandSidebarLauncher />
+                          <div className={styles.formulaShortcuts}>
+                            <ChatGameShortcuts />
                           </div>
                           <MobileOnlineUsers groupName={groupName} alwaysVisible />
                           <button

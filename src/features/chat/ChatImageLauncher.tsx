@@ -4,22 +4,30 @@ import { ImagePlus } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
 
-export function ChatImageLauncher({ inputRef }: { inputRef?: RefObject<HTMLInputElement | null> }) {
+export function ChatImageLauncher({
+  inputRef,
+  showTrigger = true,
+}: {
+  inputRef?: RefObject<HTMLInputElement | null>;
+  showTrigger?: boolean;
+}) {
   const localInput = useRef<HTMLInputElement>(null);
   const input = inputRef ?? localInput;
   const { imageUpload, user } = useChatRealtime();
   const status = useStore(imageUpload.store, (state) => state.status);
   return (
     <>
-      <Button
-        variant="secondary"
-        aria-label="上传图片"
-        title={status === 'empty' ? '上传图片' : '请先发送或移除当前图片'}
-        disabled={!user || status !== 'empty'}
-        onClick={() => input.current?.click()}
-      >
-        <ImagePlus size={22} aria-hidden="true" />
-      </Button>
+      {showTrigger && (
+        <Button
+          variant="secondary"
+          aria-label="上传图片"
+          title={status === 'empty' ? '上传图片' : '请先发送或移除当前图片'}
+          disabled={!user || status !== 'empty'}
+          onClick={() => input.current?.click()}
+        >
+          <ImagePlus size={22} aria-hidden="true" />
+        </Button>
+      )}
       <input
         ref={input}
         type="file"

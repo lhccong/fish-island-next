@@ -1,0 +1,39 @@
+.message {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  width: min(290px, 100%);
+  max-width: 100%;
+  height: auto;
+  min-height: 84px;
+  padding: 4px;
+  border: 0;
+  box-shadow: none;
+  text-align: left;
+  white-space: normal;
+  color: var(--color-text);
+  background: transparent;
+}
+.message:hover:not(:disabled) {
+  background: transparent;
+}
+.message:hover [data-media-disc] {
+  border-color: var(--color-accent-text);
+}
+.info {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+.info strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+.info span,
+.info small {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+}

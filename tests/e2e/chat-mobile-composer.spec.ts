@@ -14,6 +14,9 @@ for (const skin of builtinSkins)
       const composer = page.getByRole('region', { name: '群聊输入区', exact: true });
       const editor = page.getByRole('textbox', { name: '消息草稿', exact: true });
       const more = page.getByRole('button', { name: '更多聊天工具' });
+      const imageInMenu = skin.id === 'moyu-island';
+      if (imageInMenu)
+        await expect(page.getByRole('button', { name: '上传图片', exact: true })).toHaveCount(0);
       const send = page.getByRole('button', { name: '发送', exact: true });
       await expect(send).toBeDisabled();
       const initialHeight = (await composer.boundingBox())!.height;
@@ -65,10 +68,26 @@ for (const skin of builtinSkins)
         await expect(editor).toBeInViewport();
       }
       await editor.fill('发送失败保留可重试消息');
-      const upload = page.getByRole('button', { name: '上传图片', exact: true });
+      const upload = page.getByRole(imageInMenu ? 'menuitem' : 'button', {
+        name: '上传图片',
+        exact: true,
+      });
+      const showUpload = async () => {
+        if (imageInMenu) {
+          if (mobile) await more.tap();
+          else await more.click();
+        }
+      };
+      await showUpload();
       await expect(upload).toBeVisible();
       expect((await upload.boundingBox())!.width).toBeGreaterThanOrEqual(44);
+      if (imageInMenu) {
+        await page.screenshot({ path: info.outputPath('upload-menu.png') });
+        await page.keyboard.press('Escape');
+        await expect(more).toBeFocused();
+      }
       const choose = async () => {
+        await showUpload();
         const chooser = page.waitForEvent('filechooser');
         if (mobile) await upload.tap();
         else await upload.click();
@@ -105,7 +124,9 @@ for (const skin of builtinSkins)
       const attachment = page.getByRole('region', { name: '待发送图片', exact: true });
       await expect(attachment).toContainText('图片上传中');
       await expect(send).toBeDisabled();
+      await showUpload();
       await expect(upload).toBeDisabled();
+      if (imageInMenu) await page.keyboard.press('Escape');
       await expect.poll(() => uploads).toBe(1);
       release();
       await expect(attachment).toContainText('图片上传失败');
@@ -120,7 +141,9 @@ for (const skin of builtinSkins)
       await expect(page.getByRole('button', { name: '重试发送', exact: true })).toBeVisible();
       await expect(editor).toHaveText('');
       await expect(attachment).toHaveCount(0);
+      await showUpload();
       await expect(upload).toBeEnabled();
+      if (imageInMenu) await page.keyboard.press('Escape');
       expect((await composer.boundingBox())!.height).toBe(initialHeight);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,

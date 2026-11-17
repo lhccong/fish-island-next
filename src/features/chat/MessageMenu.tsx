@@ -10,6 +10,7 @@ import {
   ImagePlus,
   Ban,
   Flag,
+  Hand,
 } from 'lucide-react';
 import { useChatReport } from './report-context';
 import {
@@ -70,6 +71,15 @@ export function MessageMenu({
     }
   };
   const items: MessageAction[] = [
+    {
+      label: '戳一戳',
+      icon: <Hand size={16} aria-hidden="true" />,
+      disabled: !user,
+      onSelect: () => {
+        if (user && !controller.sender.poke(message.senderId, message.senderName, user))
+          draft.notify('戳一戳未提交，请处理待发送消息后重试', 'error');
+      },
+    },
     ...(!self
       ? [
           {

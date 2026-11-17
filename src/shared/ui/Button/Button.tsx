@@ -2,7 +2,7 @@ import type { ComponentPropsWithRef } from 'react';
 import styles from './Button.module.css';
 
 interface ButtonProps extends ComponentPropsWithRef<'button'> {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'inline';
 }
 
 export function Button({

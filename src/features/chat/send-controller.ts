@@ -50,6 +50,7 @@ export function createSendController(
     content: string,
     quotedMessageId: string | undefined,
     user: AuthUser,
+    poke?: { targetId: string; targetName: string; suffix: string },
   ): string | null => {
     if (!port || !user.id || !content.trim() || content.length > 5000) return null;
     for (const key of inputs.keys()) {
@@ -59,7 +60,12 @@ export function createSendController(
     if (inputs.size >= 50) return null;
     const clientMessageId = crypto.randomUUID();
     const key = `local:${clientMessageId}`;
-    const input = { content, quotedMessageId, clientMessageId };
+    const input = {
+      content: poke ? '' : content,
+      quotedMessageId,
+      clientMessageId,
+      ...(poke ? { pokeTargetId: poke.targetId } : {}),
+    };
     inputs.set(key, input);
     const original = Object.values(model.store.getState().messages).find(
       (m) => m.id === quotedMessageId,
@@ -75,6 +81,7 @@ export function createSendController(
           senderAvatar: user.avatarUrl,
           ...(user.avatarFrameUrl ? { senderAvatarFrame: user.avatarFrameUrl } : {}),
           content,
+          ...(poke ? { poke } : {}),
           createdAt: Date.now(),
           revoked: false,
           delivery: 'sending',
@@ -95,6 +102,17 @@ export function createSendController(
   };
   return {
     enqueue,
+    poke(targetId: string, targetName: string, user: AuthUser) {
+      if (
+        [...inputs.keys()].some(
+          (key) =>
+            inputs.get(key)?.pokeTargetId &&
+            model.store.getState().messages[key]?.delivery === 'sending',
+        )
+      )
+        return false;
+      return enqueue('戳一戳', undefined, user, { targetId, targetName, suffix: '' }) !== null;
+    },
     repeat(content: string, user: AuthUser) {
       if (hasRewardMessageContent(content)) return false;
       if (

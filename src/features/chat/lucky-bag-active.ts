@@ -92,6 +92,7 @@ export function createActiveLuckyBags(port: LuckyBagPort, accountId: string) {
       if (!accountId || unsubscribe) return;
       void load();
       unsubscribe = chat.subscribeIncoming((message) => {
+        if (message.poke) return;
         if (
           parseMessageContent(message.content).some((part) => part.kind === 'lucky-bag') ||
           (message.senderId === '-1' && message.content.includes('福袋'))
