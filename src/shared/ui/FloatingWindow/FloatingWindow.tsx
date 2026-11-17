@@ -56,8 +56,9 @@ export function FloatingWindow({
     if (!returnFocusRef)
       initialFocus.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const element = returnFocus.current;
+    const focusTarget = returnFocus;
     return () => {
+      const element = focusTarget.current;
       if (element?.isConnected) element.focus();
     };
   }, [returnFocus, returnFocusRef]);

@@ -18,13 +18,19 @@ async function checkScroll(page: Page, region: Locator, width: number) {
   expect(layout.gap).toBeGreaterThanOrEqual(width <= 760 ? 20 : 24);
   if (width <= 760) expect(layout.track).toBe('hidden');
   await region.focus();
-  await region.press('End');
-  await expect.poll(() => region.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await region.press('Control+End');
+  await expect
+    .poll(() =>
+      region.evaluate((element) =>
+        Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop),
+      ),
+    )
+    .toBeLessThanOrEqual(1);
   if (width > 760) {
     await region.hover();
     await expect(region.locator('..').locator('[data-orientation="vertical"]')).toBeVisible();
   }
-  await region.press('Home');
+  await region.press('Control+Home');
   await expect.poll(() => region.evaluate((element) => element.scrollTop)).toBe(0);
   if (width <= 760) {
     const bounds = (await region.boundingBox())!;

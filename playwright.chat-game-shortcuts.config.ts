@@ -4,7 +4,7 @@ import base from './playwright.config';
 const node = `"${process.execPath}"`;
 const buildDir =
   process.env.PLAYWRIGHT_SHORTCUTS_ISOLATED === '1'
-    ? 'node_modules/.cache/chat-game-shortcuts-validation'
+    ? 'node_modules/.cache/chat-game-shortcuts-validation-final'
     : 'dist';
 
 export default defineConfig({
