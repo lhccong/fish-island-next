@@ -148,9 +148,30 @@ for (const skin of builtinSkins)
       expect(requests).toHaveLength(1);
 
       failLike = false;
+      await page.evaluate(() => {
+        const animate = Element.prototype.animate;
+        Element.prototype.animate = function (...args) {
+          if (this.closest('[aria-label="点赞评论"]')) {
+            const data = document.documentElement.dataset;
+            data.commentLikeAnimations = String(Number(data.commentLikeAnimations ?? 0) + 1);
+          }
+          return animate.apply(this, args);
+        };
+      });
       await activate(button('101'));
       await expect(button('101')).toHaveAttribute('aria-pressed', 'true');
       await expect(button('101')).toHaveText('1');
+      await expect(page.locator('html')).toHaveAttribute('data-comment-like-animations', '2');
+      expect(
+        await button('101').evaluate((element) => {
+          const probe = document.createElement('span');
+          probe.style.color = 'var(--color-danger)';
+          element.append(probe);
+          const red = getComputedStyle(probe).color;
+          probe.remove();
+          return getComputedStyle(element).color === red;
+        }),
+      ).toBe(true);
       await expect(button('101')).toHaveAccessibleDescription('1 个赞');
       await expect.poll(order).toEqual(['100', '101', '102']);
       await checkBounds();
@@ -161,11 +182,14 @@ for (const skin of builtinSkins)
       await activate(button('101'));
       await expect(button('101')).toHaveAttribute('aria-pressed', 'false');
       await expect(button('101')).toHaveText('0');
+      await expect(page.locator('html')).toHaveAttribute('data-comment-like-animations', '2');
       await expect.poll(order).toEqual(['100', '102', '101']);
       await activate(item('100').getByRole('button', { name: '查看 2 条回复' }));
       await expect.poll(order).toEqual(['100', '202', '201', '102', '101']);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
       await activate(button('201'));
       await expect(button('201')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('html')).toHaveAttribute('data-comment-like-animations', '2');
       await expect.poll(order).toEqual(['100', '201', '202', '102', '101']);
       await expect(editor).toHaveValue('点赞后保留评论草稿');
       expect(listRequests).toBe(initialListRequests);

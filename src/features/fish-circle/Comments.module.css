@@ -123,10 +123,35 @@
 .actions .like:hover:not(:disabled) {
   border-color: transparent;
   background: transparent;
-  color: var(--color-accent-text);
+  color: var(--color-danger);
 }
 .actions .like[aria-pressed='true'] {
-  color: var(--color-accent-text);
+  color: var(--color-danger);
+}
+.likeIcon {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+.likeSparks {
+  position: absolute;
+  inset: calc(50% - 1.5px);
+  border-radius: 50%;
+  box-shadow:
+    -8px -3px currentColor,
+    -4px -8px currentColor,
+    5px -8px currentColor,
+    8px -2px currentColor,
+    -7px 6px currentColor,
+    7px 6px currentColor;
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .likeSparks {
+    display: none;
+  }
 }
 .actionMeta {
   display: flex;
