@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
+import { scrollChatUp } from './chat-scroll-actions';
 
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark'])
@@ -55,20 +56,7 @@ for (const skin of builtinSkins)
         await bottom();
 
         // Reading history must stop following, including within the old 64px threshold.
-        await viewport.focus();
-        await page.keyboard.press('ArrowUp');
-        await expect
-          .poll(() =>
-            viewport.evaluate(async (el) => {
-              const positions: number[] = [];
-              for (let frame = 0; frame < 12; frame++) {
-                await new Promise(requestAnimationFrame);
-                positions.push(el.scrollTop);
-              }
-              return Math.max(...positions) - Math.min(...positions);
-            }),
-          )
-          .toBeLessThanOrEqual(1);
+        await scrollChatUp(page, viewport);
         const readingTop = await viewport.evaluate((el) => el.scrollTop);
         fixture.push('35', '回看时保留当前位置');
         await page.waitForTimeout(200);

@@ -1,5 +1,7 @@
 # 组件与设计规范
 
+工作时间节假日提示复用 HoverPreview 的 compact 尺寸和显式 anchorRef，定位实际悬浮按钮；桌面悬停/聚焦显示、Esc/离开/拖动关闭，浮层可移入阅读。手机在原工作时间 Dialog 正文展示同一摘要，不依赖 hover。沿用语义变量，不增加请求或计时器，详见 ADR-065。
+
 本规范为强制要求。架构入口：[architecture.md](./architecture.md)。
 
 ## 1. 组件职责

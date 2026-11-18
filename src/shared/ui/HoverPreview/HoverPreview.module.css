@@ -16,3 +16,7 @@
   color: var(--color-text);
   box-shadow: var(--shadow-panel);
 }
+.compact {
+  justify-content: center;
+  pointer-events: auto;
+}

@@ -14,6 +14,7 @@ import { WorksheetHeader } from './WorksheetHeader';
 import type { ChatPresentation } from './chat-presentation';
 import { useMessageLocation } from './use-message-location';
 import { useMessageViewport } from './use-message-viewport';
+import { useMessageScrollIntent } from './use-message-scroll-intent';
 import {
   captureReadingAnchor,
   readingAnchorOffset,
@@ -74,18 +75,19 @@ export function MessageStream({
   }, [controller, navigation]);
   const [viewport, setViewport] = useState<HTMLDivElement | null>(null);
   const [atBottom, setAtBottom] = useState(true);
-  const atBottomRef = useRef(true);
+  const followingRef = useRef(true);
   const [newMessageCount, setNewMessageCount] = useState(0);
-  const updateBottom = (bottom: boolean) => {
-    atBottomRef.current = bottom;
+  const updateBottom = useCallback(() => {
+    if (!viewport) return;
+    const bottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1;
     setAtBottom(bottom);
-    if (bottom) setNewMessageCount(0);
-  };
+    if (bottom && followingRef.current) setNewMessageCount(0);
+  }, [viewport]);
   useEffect(
     () =>
       controller.subscribeIncoming((message) => {
         if (
-          !atBottomRef.current &&
+          !followingRef.current &&
           !message.delivery &&
           !controller.store.getState().blockedSenders.has(message.senderId)
         )
@@ -94,23 +96,39 @@ export function MessageStream({
     [controller],
   );
   const list = useRef<VirtuosoHandle>(null);
-  const followingRef = useRef(true);
+  const downwardIntent = useRef(false);
   const readingAnchor = useRef<MessageReadingAnchor | null>(null);
   const lastReadingAnchor = useRef<MessageReadingAnchor | null>(null);
   const shiftingWindow = useRef(false);
   const previousWindowIndex = useRef(firstItemIndex);
   const followFrame = useRef<number | undefined>(undefined);
-  const setFollow = useCallback((value: boolean) => {
-    readingAnchor.current = null;
-    if (value) lastReadingAnchor.current = null;
-    followingRef.current = value;
-  }, []);
-  const scrollingChanged = useCallback((scrolling: boolean) => {
-    if (!scrolling) shiftingWindow.current = false;
-  }, []);
+  const setFollow = useCallback(
+    (value: boolean) => {
+      readingAnchor.current = null;
+      if (value) lastReadingAnchor.current = null;
+      else downwardIntent.current = false;
+      followingRef.current = value;
+      if (
+        value &&
+        viewport &&
+        viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1
+      )
+        setNewMessageCount(0);
+    },
+    [viewport],
+  );
+  const scrollingChanged = useCallback(
+    (scrolling: boolean) => {
+      if (!scrolling) {
+        shiftingWindow.current = false;
+        if (!followingRef.current && viewport)
+          lastReadingAnchor.current = captureReadingAnchor(viewport);
+      }
+    },
+    [viewport],
+  );
   const followMeasuredHeight = useCallback(() => {
-    if ((!followingRef.current && !readingAnchor.current) || followFrame.current !== undefined)
-      return;
+    if (followFrame.current !== undefined) return;
     followFrame.current = requestAnimationFrame(() => {
       followFrame.current = undefined;
       if (followingRef.current && viewport) {
@@ -121,8 +139,12 @@ export function MessageStream({
         const offset = readingAnchorOffset(viewport, readingAnchor.current);
         if (Math.abs(offset) > 1) list.current?.scrollBy({ top: offset, behavior: 'auto' });
       }
+      updateBottom();
     });
-  }, [viewport, controller]);
+  }, [viewport, controller, updateBottom]);
+  const followRenderedItems = useCallback(() => {
+    if (followingRef.current) followMeasuredHeight();
+  }, [followMeasuredHeight]);
   useLayoutEffect(() => {
     if (previousWindowIndex.current !== firstItemIndex) shiftingWindow.current = true;
     previousWindowIndex.current = firstItemIndex;
@@ -143,95 +165,19 @@ export function MessageStream({
     });
     return unsubscribe;
   }, [controller, setFollow, followMeasuredHeight, viewport]);
-  useLayoutEffect(() => {
-    if (!viewport) return;
-    let previousTop = viewport.scrollTop;
-    let previousHeight = viewport.scrollHeight;
-    let previousClientHeight = viewport.clientHeight;
-    let previousFirstItemIndex = controller.store.getState().viewFirstItemIndex;
-    let touching = false;
-    let touchTop = 0;
-    let followedBeforeTouch = false;
-    const startTouch = () => {
-      touching = true;
-      touchTop = viewport.scrollTop;
-      followedBeforeTouch = followingRef.current;
-      setFollow(false);
-    };
-    const endTouch = () => {
-      touching = false;
-      if (
-        viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= 1 ||
-        (followedBeforeTouch && Math.abs(viewport.scrollTop - touchTop) <= 1)
-      )
-        setFollow(true);
-    };
-    const wheel = (event: WheelEvent) => {
-      if (event.deltaY < 0) setFollow(false);
-      else if (event.deltaY > 0) readingAnchor.current = null;
-    };
-    const keyDown = (event: KeyboardEvent) => {
-      if (['ArrowUp', 'PageUp', 'Home'].includes(event.key)) setFollow(false);
-      else if (['ArrowDown', 'PageDown', 'End'].includes(event.key)) readingAnchor.current = null;
-    };
-    const pointerDown = (event: PointerEvent) => {
-      if (
-        event.target instanceof Element &&
-        event.target.closest('button[aria-expanded]:not([aria-haspopup])')
-      ) {
-        readingAnchor.current = null;
-        shiftingWindow.current = true;
-      }
-      if (event.target instanceof Element && event.target.closest('[data-orientation="vertical"]'))
-        setFollow(false);
-    };
-    const trackPosition = () => {
-      const top = viewport.scrollTop;
-      const height = viewport.scrollHeight;
-      const clientHeight = viewport.clientHeight;
-      const resized = height !== previousHeight || clientHeight !== previousClientHeight;
-      const currentFirstItemIndex = controller.store.getState().viewFirstItemIndex;
-      const windowMoved = currentFirstItemIndex !== previousFirstItemIndex;
-      if (top < previousTop && top === 0 && !resized && !windowMoved && !shiftingWindow.current)
-        setFollow(false);
-      else if (
-        !touching &&
-        !resized &&
-        !shiftingWindow.current &&
-        !readingAnchor.current &&
-        top > previousTop &&
-        height - top - clientHeight <= 64
-      )
-        setFollow(true);
-      previousTop = top;
-      previousHeight = height;
-      previousClientHeight = clientHeight;
-      previousFirstItemIndex = currentFirstItemIndex;
-      if (!followingRef.current && !shiftingWindow.current && !windowMoved)
-        lastReadingAnchor.current = captureReadingAnchor(viewport);
-      if (
-        (followingRef.current || readingAnchor.current) &&
-        (resized || windowMoved || shiftingWindow.current)
-      )
-        followMeasuredHeight();
-    };
-    viewport.addEventListener('scroll', trackPosition);
-    viewport.parentElement?.addEventListener('wheel', wheel, { passive: true });
-    viewport.addEventListener('keydown', keyDown);
-    viewport.parentElement?.addEventListener('pointerdown', pointerDown);
-    viewport.addEventListener('touchstart', startTouch, { passive: true });
-    viewport.addEventListener('touchend', endTouch, { passive: true });
-    viewport.addEventListener('touchcancel', endTouch, { passive: true });
-    return () => {
-      viewport.removeEventListener('scroll', trackPosition);
-      viewport.parentElement?.removeEventListener('wheel', wheel);
-      viewport.removeEventListener('keydown', keyDown);
-      viewport.parentElement?.removeEventListener('pointerdown', pointerDown);
-      viewport.removeEventListener('touchstart', startTouch);
-      viewport.removeEventListener('touchend', endTouch);
-      viewport.removeEventListener('touchcancel', endTouch);
-    };
-  }, [viewport, setFollow, controller, followMeasuredHeight]);
+  useMessageScrollIntent(
+    viewport,
+    {
+      following: followingRef,
+      downward: downwardIntent,
+      changing: shiftingWindow,
+      reading: readingAnchor,
+      lastReading: lastReadingAnchor,
+    },
+    setFollow,
+    followMeasuredHeight,
+    updateBottom,
+  );
   return (
     <section className={styles.stream} aria-label="群聊实时消息" data-presentation={presentation}>
       <ConnectionStatus />
@@ -263,16 +209,17 @@ export function MessageStream({
                 // Conversation/image rows retain synchronous anchor compensation (ADR-089).
                 skipAnimationFrameInResizeObserver={!compactWorksheet}
                 atBottomThreshold={1}
-                atBottomStateChange={updateBottom}
+                atBottomStateChange={followMeasuredHeight}
                 isScrolling={scrollingChanged}
                 // Follow late row measurements through Virtuoso, preserving its anchor ownership.
                 totalListHeightChanged={followMeasuredHeight}
+                itemsRendered={followRenderedItems}
                 followOutput={false}
               />
             )
           )}
         </ScrollArea>
-        {!atBottom && ids.length > 0 && (
+        {(!atBottom || newMessageCount > 0) && ids.length > 0 && (
           <div className={styles.latest}>
             <Button
               variant="secondary"

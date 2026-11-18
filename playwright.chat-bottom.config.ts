@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   outputDir: process.env.FISH_CHAT_BOTTOM_OUTPUT ?? join(tmpdir(), 'fish-chat-bottom-20261117'),
   projects: base.projects!.filter((project) => project.name !== 'mobile-chromium'),
-  use: { ...base.use, baseURL: url },
+  use: { ...base.use, baseURL: url, serviceWorkers: 'block', trace: 'off' },
   webServer: {
     command: `node node_modules/vite/bin/vite.js ${preview ? 'preview ' : ''}--host 127.0.0.1 --port ${port} --strictPort`,
     url,

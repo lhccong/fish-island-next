@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { openMessageActions } from './chat-message-actions';
+import { scrollChatUp } from './chat-scroll-actions';
 
 test.setTimeout(90000);
 
@@ -73,7 +74,10 @@ for (const skin of builtinSkins)
             });
           },
           false,
-        );
+        ).then((fixture) => {
+          dispose = fixture.dispose;
+          return fixture;
+        });
         await expect(page.getByText('正在加载历史消息…', { exact: true })).toBeVisible({
           timeout: 30000,
         });
@@ -110,7 +114,6 @@ for (const skin of builtinSkins)
         await page.screenshot({ path: info.outputPath('excel-error.png') });
         await retry.click();
         const fixture = await setup;
-        dispose = fixture.dispose;
         await expect(page.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
         await expect(page.getByRole('button', { name: '发送', exact: true })).toBeEnabled();
         await page.screenshot({ path: info.outputPath('excel-empty.png') });
@@ -176,17 +179,7 @@ for (const skin of builtinSkins)
         await expect(page.locator('[data-message-id="30"]')).toBeInViewport();
         await scroll.hover();
         const mobile = page.viewportSize()!.width <= 760;
-        if (mobile) {
-          const box = (await scroll.boundingBox())!;
-          const touch = await page.context().newCDPSession(page);
-          await touch.send('Input.synthesizeScrollGesture', {
-            x: box.x + box.width / 2,
-            y: box.y + box.height / 2,
-            yDistance: 1800,
-            gestureSourceType: 'touch',
-          });
-          await touch.detach();
-        } else await page.mouse.wheel(0, -500);
+        await scrollChatUp(page, scroll);
         await scroll.evaluate((el) => {
           el.scrollTop = 0;
         });

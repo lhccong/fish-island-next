@@ -3,11 +3,17 @@ import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './Tools.module.css';
-import { isWorkDay, timeMinute as minute, validSchedule } from '@/domain/account-tools';
+import {
+  getHolidayCountdown,
+  isWorkDay,
+  timeMinute as minute,
+  validSchedule,
+} from '@/domain/account-tools';
 import { Select } from '@/shared/ui/Select';
 import { readSchedule, scheduleKey } from './work-schedule';
 import { WorkTimeOrb } from './WorkTimeOrb';
 import workStyles from './WorkTime.module.css';
+import { HolidaySummary } from './HolidaySummary';
 export function WorkTime({ visible }: { visible: boolean }) {
   const [saved, setSaved] = useState(readSchedule);
   const [draft, setDraft] = useState(saved);
@@ -29,6 +35,7 @@ export function WorkTime({ visible }: { visible: boolean }) {
   const countdown = `${Math.floor(remaining / 3600)}时${Math.floor((remaining % 3600) / 60)}分${remaining % 60}秒`;
   const label = current < start ? '上班' : current < lunch ? '午饭' : '下班';
   const working = isWorkDay(now, saved);
+  const holiday = getHolidayCountdown(now);
   const progress = working ? Math.min(1, Math.max(0, (current - start) / (end - start))) : 0;
   const status = !working ? '今天休息' : remaining ? `距${label}` : '已下班';
   const clock = remaining
@@ -40,6 +47,7 @@ export function WorkTime({ visible }: { visible: boolean }) {
   return (
     <>
       <WorkTimeOrb
+        holiday={holiday}
         label={status}
         time={!working ? '好好放松' : clock}
         progress={progress}
@@ -116,6 +124,9 @@ export function WorkTime({ visible }: { visible: boolean }) {
                   </p>
                 )}
               </section>
+              <div className={workStyles.holiday}>
+                <HolidaySummary holiday={holiday} />
+              </div>
               <div className={styles.timeFields}>
                 {(
                   [

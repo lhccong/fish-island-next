@@ -10,6 +10,8 @@ export interface DeveloperApp {
 }
 export { defaultSchedule, timeMinute, validSchedule, isWorkDay } from './work-time';
 export type { WorkSchedule } from './work-time';
+export { getHolidayCountdown } from './holiday';
+export type { HolidayCountdown } from './holiday';
 export type AppInput = Pick<
   DeveloperApp,
   'appName' | 'appDesc' | 'appWebsite' | 'redirectUri' | 'status'

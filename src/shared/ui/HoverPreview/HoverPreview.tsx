@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './HoverPreview.module.css';
 
@@ -7,11 +7,17 @@ export function HoverPreview({
   content,
   children,
   disabled = false,
+  size = 'default',
+  anchorRef,
+  onOpenChange,
 }: {
   label: string;
   content: ReactNode;
   children: (descriptionId: string | undefined) => ReactNode;
   disabled?: boolean;
+  size?: 'default' | 'compact';
+  anchorRef?: RefObject<HTMLElement | null>;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const id = useId();
   const anchor = useRef<HTMLSpanElement>(null);
@@ -33,10 +39,10 @@ export function HoverPreview({
     if (!window.matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)').matches)
       return;
     timer.current = setTimeout(() => {
-      const box = anchor.current?.getBoundingClientRect();
+      const box = (anchorRef?.current ?? anchor.current)?.getBoundingClientRect();
       if (!box) return;
-      const width = Math.min(280, innerWidth - 24);
-      const height = Math.min(300, innerHeight - 24);
+      const width = Math.min(size === 'compact' ? 248 : 280, innerWidth - 24);
+      const height = Math.min(size === 'compact' ? 144 : 300, innerHeight - 24);
       const preferred =
         innerWidth - box.right >= width + 20 ? box.right + 12 : box.left - width - 12;
       setPosition({
@@ -51,6 +57,9 @@ export function HoverPreview({
     clear();
     timer.current = setTimeout(() => setPosition(null), 120);
   };
+  useEffect(() => {
+    onOpenChange?.(Boolean(position) && !disabled);
+  }, [position, disabled, onOpenChange]);
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(() => {
     if (!position || disabled) return;
@@ -99,7 +108,7 @@ export function HoverPreview({
             id={id}
             role="tooltip"
             aria-label={label}
-            className={styles.preview}
+            className={`${styles.preview} ${size === 'compact' ? styles.compact : ''}`}
             style={position}
             onMouseEnter={clear}
             onMouseLeave={leave}
