@@ -1,5 +1,6 @@
 import { createStore } from 'zustand/vanilla';
-import { songKey, type MusicPort, type Song } from './domain';
+import { songKey, type MusicPort, type MusicSource, type Song } from './domain';
+import { createMusicRecommendations } from './recommendation-controller';
 
 export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
   const store = createStore(() => ({
@@ -9,11 +10,22 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
     error: '',
     notice: '',
     volume: 0.7,
+    recommendationSource: null as MusicSource | null,
+    recommendationStatus: 'idle' as 'idle' | 'loading' | 'error',
+    recommendationError: '',
   }));
   const progress = createStore(() => ({ position: 0, duration: 0 }));
   let request: AbortController | undefined;
   let disposed = false;
   let generation = 0;
+  let recommendationGeneration = 0;
+  const recommendations = createMusicRecommendations(port);
+  let recommendationPool: Song[] = [];
+  function cancelRecommendations() {
+    recommendationGeneration++;
+    recommendations.cancel();
+    store.setState({ recommendationStatus: 'idle', recommendationError: '' });
+  }
   audio.preload = 'none';
   audio.volume = 0.7;
   const update = () =>
@@ -43,6 +55,10 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
     }
   }
   async function play(song: Song) {
+    cancelRecommendations();
+    recommendationPool = recommendationPool.filter(
+      (candidate) => songKey(candidate) !== songKey(song),
+    );
     request?.abort();
     const current = new AbortController();
     request = current;
@@ -68,10 +84,16 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
     }
   }
   function next() {
+    const state = store.getState();
+    if (!state.queue.length && state.recommendationStatus === 'loading') return;
     const [song, ...queue] = store.getState().queue;
     store.setState({ queue });
     if (song) void play(song);
-    else {
+    else if (state.recommendationSource) {
+      const candidate = recommendationPool.shift();
+      if (candidate) void play(candidate);
+      else void loadRecommendations(state.recommendationSource);
+    } else {
       request?.abort();
       request = undefined;
       generation++;
@@ -82,6 +104,23 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
       progress.setState({ position: 0, duration: 0 });
     }
   }
+  async function loadRecommendations(source: MusicSource) {
+    const version = ++recommendationGeneration;
+    store.setState({ recommendationStatus: 'loading', recommendationError: '' });
+    try {
+      const batch = await recommendations.load(source, store.getState().current);
+      if (!batch || disposed || version !== recommendationGeneration) return;
+      recommendationPool = batch;
+      const song = recommendationPool.shift()!;
+      void play(song);
+    } catch (error) {
+      if (!disposed && version === recommendationGeneration)
+        store.setState({
+          recommendationStatus: 'error',
+          recommendationError: error instanceof Error ? error.message : '推荐歌曲获取失败，请重试',
+        });
+    }
+  }
   const listeners = {
     timeupdate: update,
     durationchange: update,
@@ -89,7 +128,10 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
     playing,
     waiting,
     error: failed,
-    ended: next,
+    ended: () => {
+      store.setState({ status: 'paused' });
+      next();
+    },
   };
   Object.entries(listeners).forEach(([event, listener]) => audio.addEventListener(event, listener));
   return {
@@ -118,6 +160,28 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
       store.setState({ queue: store.getState().queue.filter((song) => songKey(song) !== key) });
     },
     next,
+    toggleRecommendations(source: MusicSource) {
+      if (store.getState().recommendationSource) {
+        cancelRecommendations();
+        recommendationPool = [];
+        store.setState({ recommendationSource: null });
+        return;
+      }
+      store.setState({ recommendationSource: source });
+      if (!store.getState().current) next();
+    },
+    retryRecommendations() {
+      const { recommendationSource, recommendationStatus } = store.getState();
+      if (recommendationSource && recommendationStatus === 'error')
+        void loadRecommendations(recommendationSource);
+    },
+    changeRecommendationSource(source: MusicSource) {
+      if (!store.getState().recommendationSource) return;
+      cancelRecommendations();
+      recommendationPool = [];
+      store.setState({ recommendationSource: source });
+      if (!store.getState().current) next();
+    },
     playNow(song: Song) {
       const state = store.getState();
       if (state.current && songKey(state.current) === songKey(song)) {
@@ -129,7 +193,9 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
       void play(song);
     },
     stop() {
-      store.setState({ queue: [] });
+      cancelRecommendations();
+      recommendationPool = [];
+      store.setState({ queue: [], recommendationSource: null });
       next();
     },
     toggle() {
@@ -151,6 +217,7 @@ export function createMusicPlayer(port: MusicPort, audio: HTMLAudioElement) {
     },
     dispose() {
       disposed = true;
+      recommendations.cancel();
       generation++;
       request?.abort();
       Object.entries(listeners).forEach(([event, listener]) =>

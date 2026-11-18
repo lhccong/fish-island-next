@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: min(560px, calc(100% - 24px));
-  height: min(720px, calc(100dvh - 48px));
+  width: min(600px, calc(100% - 24px));
+  height: min(660px, calc(100dvh - 48px));
   overflow: hidden;
   padding: 20px;
   color: var(--color-text);
@@ -13,17 +13,18 @@
   margin: 0;
   padding-right: 44px;
   font-size: 18px;
+  line-height: 28px;
 }
 .search {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr) auto;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
   gap: 8px;
   align-items: center;
 }
 .search input {
   width: 100%;
   min-width: 0;
-  height: 36px;
+  height: 32px;
   padding: 0 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control);
@@ -37,6 +38,9 @@
   align-items: center;
   gap: 8px;
 }
+.recommendations {
+  margin-left: auto;
+}
 .tabs button[aria-pressed='true'] {
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
@@ -49,20 +53,35 @@
 .list {
   padding: 4px 4px 8px;
 }
+.list:has(> .empty:only-child) {
+  display: grid;
+  height: 100%;
+  align-content: center;
+}
 .song {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--color-border);
 }
-.song > div,
+.songInfo,
 .now {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
+.songActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+.songActions .remove {
+  min-width: 44px;
+  min-height: 44px;
 }
 .song strong,
 .now strong {
@@ -76,6 +95,13 @@
   color: var(--color-muted);
   overflow-wrap: anywhere;
 }
+.now strong,
+.now span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
 .song button {
   flex-shrink: 0;
 }
@@ -86,19 +112,26 @@
   text-align: center;
   color: var(--color-muted);
   line-height: 1.7;
+  margin: 0;
+  padding: 16px;
+  font-size: 14px;
 }
 .playback {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  padding-top: 12px;
+  flex: none;
+  gap: 12px;
+  padding: 16px 12px 4px;
   border-top: 1px solid var(--color-border);
+  background: var(--color-canvas);
+  border-radius: var(--radius-control);
 }
-.playback > :nth-child(n + 3) {
-  grid-column: 1 / -1;
+.playerHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.share {
-  align-self: center;
+.playerHeader > button {
+  flex: none;
 }
 .volume {
   width: 112px;
@@ -117,23 +150,31 @@
 .notice {
   color: var(--color-muted);
 }
+.recommendationError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.recommendationError button {
+  flex: none;
+}
 @media (max-width: 760px) {
   .scroll {
     --scroll-area-reserved-gutter: 20px;
   }
   .dialog {
     width: calc(100% - 16px);
-    height: min(760px, calc(var(--visual-viewport-height, 100dvh) - 16px));
+    height: min(720px, calc(var(--visual-viewport-height, 100dvh) - 16px));
     max-height: calc(var(--visual-viewport-height, 100dvh) - 16px);
     top: calc(var(--visual-viewport-top, 0px) + var(--visual-viewport-height, 100dvh) / 2);
     padding: 16px 12px max(16px, env(safe-area-inset-bottom));
     gap: 10px;
   }
   .search {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 120px minmax(0, 1fr) auto;
   }
   .search > :first-child {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
   .search input {
     height: 44px;
@@ -142,13 +183,31 @@
   .controls {
     flex-wrap: wrap;
   }
+  .song {
+    gap: 8px;
+  }
+  .songActions {
+    gap: 8px;
+  }
+  .playback {
+    padding: 12px 8px 4px;
+    gap: 8px;
+  }
+  .playerHeader {
+    align-items: flex-start;
+  }
   .volume {
-    width: 100px;
+    flex-basis: 100%;
+    width: auto;
+    margin: 0;
+  }
+  .recommendationError {
+    flex-wrap: wrap;
   }
 }
 @container (max-height: 560px) {
   .search {
-    grid-template-columns: 100px minmax(0, 1fr) auto;
+    grid-template-columns: 120px minmax(0, 1fr) auto;
   }
   .search > :first-child {
     grid-column: auto;
@@ -158,9 +217,17 @@
   }
   .playback {
     gap: 4px;
+    padding-top: 8px;
   }
-  .now span,
-  .volume {
+  .now span {
     display: none;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: auto auto minmax(64px, 1fr);
+  }
+  .volume {
+    width: auto;
+    margin-left: 4px;
   }
 }

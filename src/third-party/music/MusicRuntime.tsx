@@ -24,6 +24,18 @@ export function MusicRuntime({
   onShare: (song: Song) => void;
 }) {
   const [player, setPlayer] = useState<ReturnType<typeof createMusicPlayer> | null>(null);
+  const [shareFeedback, setShareFeedback] = useState('');
+  const share = useCallback(
+    (song: Song) => {
+      try {
+        onShare(song);
+        setShareFeedback('已提交到聊天室，请在消息中查看发送结果');
+      } catch (error) {
+        setShareFeedback(error instanceof Error ? error.message : '提交失败，请重试');
+      }
+    },
+    [onShare],
+  );
   const attachAudio = useCallback(
     (audio: HTMLAudioElement | null) => {
       if (!audio) return;
@@ -63,8 +75,8 @@ export function MusicRuntime({
       >
         {player ? (
           <>
-            <MusicSearch port={port} player={player} open={open} />
-            <MusicPlayback player={player} onShare={onShare} />
+            <MusicSearch port={port} player={player} open={open} onShare={share} />
+            <MusicPlayback player={player} onShare={share} shareFeedback={shareFeedback} />
           </>
         ) : (
           <LoadingIndicator>正在准备播放器…</LoadingIndicator>

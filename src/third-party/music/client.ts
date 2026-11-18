@@ -1,4 +1,4 @@
-import type { MusicPort, Song } from './domain';
+import type { MusicPort, MusicSource, Song } from './domain';
 
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -58,31 +58,42 @@ export function createMusicClient(
       );
     return payload.data;
   }
+  function songs(data: unknown, source: MusicSource): Song[] {
+    if (!Array.isArray(data) || data.length > 20) throw new Error('音乐数据异常，请重试');
+    return data.map((raw): Song => {
+      const row = object(raw);
+      if (
+        typeof row.id !== 'string' ||
+        !row.id ||
+        typeof row.name !== 'string' ||
+        !row.name ||
+        typeof row.artist !== 'string'
+      )
+        throw new Error('音乐数据异常，请重试');
+      return {
+        id: row.id,
+        name: row.name.slice(0, 200),
+        artist: row.artist.slice(0, 200),
+        source,
+      };
+    });
+  }
   return {
     async search(source, keyword, page, signal) {
-      const data = await request(
-        'search',
-        new URLSearchParams({ source, keyword, page: String(page) }),
-        signal,
+      return songs(
+        await request(
+          'search',
+          new URLSearchParams({ source, keyword, page: String(page) }),
+          signal,
+        ),
+        source,
       );
-      if (!Array.isArray(data) || data.length > 20) throw new Error('音乐搜索数据异常，请重试');
-      return data.map((raw): Song => {
-        const row = object(raw);
-        if (
-          typeof row.id !== 'string' ||
-          !row.id ||
-          typeof row.name !== 'string' ||
-          !row.name ||
-          typeof row.artist !== 'string'
-        )
-          throw new Error('音乐搜索数据异常，请重试');
-        return {
-          id: row.id,
-          name: row.name.slice(0, 200),
-          artist: row.artist.slice(0, 200),
-          source,
-        };
-      });
+    },
+    async recommend(source, signal) {
+      return songs(
+        await request('recommendations', new URLSearchParams({ source }), signal),
+        source,
+      );
     },
     async resolve(song, signal) {
       return playableUrl(

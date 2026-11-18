@@ -39,7 +39,7 @@ function setup(
   resolve = vi.fn<MusicPort['resolve']>().mockResolvedValue('https://cdn.example.test/song.mp3'),
 ) {
   const audio = new FakeAudio();
-  const port: MusicPort = { search: vi.fn(), resolve };
+  const port: MusicPort = { search: vi.fn(), recommend: vi.fn(), resolve };
   return { audio, port, player: createMusicPlayer(port, audio as unknown as HTMLAudioElement) };
 }
 describe('independent music player', () => {
@@ -108,13 +108,94 @@ describe('independent music player', () => {
     expect(player.store.getState().status).toBe('playing');
     player.dispose();
   });
+  it('starts recommended music without a keyword, prioritizes manual songs and refills only on demand', async () => {
+    const { player, port, audio } = setup();
+    const recommend = vi
+      .mocked(port.recommend)
+      .mockResolvedValue([song('1'), song('1'), song('2')]);
+    player.toggleRecommendations('netease');
+    player.next();
+    await settle();
+    expect(recommend).toHaveBeenCalledTimes(1);
+    expect(recommend.mock.calls[0]?.[0]).toBe('netease');
+    expect(port.search).not.toHaveBeenCalled();
+    expect(player.store.getState().status).toBe('playing');
+    const first = player.store.getState().current;
+    player.add(song('manual'));
+    audio.dispatchEvent(new Event('ended'));
+    await settle();
+    expect(player.store.getState().current?.id).toBe('manual');
+    player.next();
+    await settle();
+    expect(first?.id).toBe('1');
+    expect(player.store.getState().current?.id).toBe('2');
+    expect(recommend).toHaveBeenCalledTimes(1);
+    player.next();
+    await settle();
+    expect(recommend).toHaveBeenCalledTimes(2);
+    player.toggleRecommendations('netease');
+    expect(player.store.getState().current).not.toBeNull();
+    expect(player.store.getState().recommendationSource).toBeNull();
+    player.stop();
+    expect(player.store.getState().current).toBeNull();
+    player.dispose();
+  });
+  it('exposes empty recommended batches and retries explicitly without looping on errors', async () => {
+    const { player, port } = setup();
+    const recommend = vi
+      .mocked(port.recommend)
+      .mockResolvedValueOnce([])
+      .mockResolvedValue([song('1')]);
+    player.toggleRecommendations('netease');
+    await settle();
+    expect(player.store.getState().recommendationStatus).toBe('error');
+    expect(recommend).toHaveBeenCalledTimes(1);
+    player.retryRecommendations();
+    await settle();
+    expect(player.store.getState().status).toBe('playing');
+    expect(recommend).toHaveBeenCalledTimes(2);
+    player.next();
+    await settle();
+    expect(player.store.getState().recommendationStatus).toBe('error');
+    expect(recommend).toHaveBeenCalledTimes(3);
+    player.dispose();
+  });
+  it('cancels recommended requests on source change, manual playback, disabling and disposal', async () => {
+    const { player, port } = setup();
+    const responses: Array<(songs: Song[]) => void> = [];
+    const recommend = vi
+      .mocked(port.recommend)
+      .mockImplementation(() => new Promise((done) => responses.push(done)));
+    player.toggleRecommendations('netease');
+    player.changeRecommendationSource('tencent');
+    expect(recommend.mock.calls[1]?.[0]).toBe('tencent');
+    expect(recommend.mock.calls[0]?.[1].aborted).toBe(true);
+    player.add(song('manual'));
+    expect(recommend.mock.calls[1]?.[1].aborted).toBe(true);
+    responses.forEach((respond) => respond([song('late')]));
+    await settle();
+    expect(player.store.getState().current?.id).toBe('manual');
+    player.next();
+    player.toggleRecommendations('netease');
+    expect(recommend.mock.calls[2]?.[1].aborted).toBe(true);
+    responses[2]!([song('late')]);
+    await settle();
+    expect(player.store.getState().current?.id).toBe('manual');
+    player.stop();
+    player.toggleRecommendations('netease');
+    player.dispose();
+    expect(recommend.mock.calls[3]?.[1].aborted).toBe(true);
+    responses[3]!([song('late')]);
+    await settle();
+    expect(player.store.getState().current).toBeNull();
+  });
 });
 describe('music search requests', () => {
   it('allows one page in flight, deduplicates repeated pages and stops', async () => {
     const search = vi
       .fn<MusicPort['search']>()
       .mockResolvedValue(Array.from({ length: 20 }, (_, n) => song(String(n))));
-    const controller = createMusicSearch({ search, resolve: vi.fn() });
+    const controller = createMusicSearch({ search, recommend: vi.fn(), resolve: vi.fn() });
     controller.search('netease', '合成');
     void controller.load();
     await settle();
@@ -138,7 +219,7 @@ describe('music search requests', () => {
       )
       .mockRejectedValueOnce(new Error('配置错误'))
       .mockResolvedValue([song('new')]);
-    const controller = createMusicSearch({ search, resolve: vi.fn() });
+    const controller = createMusicSearch({ search, recommend: vi.fn(), resolve: vi.fn() });
     controller.search('netease', '旧');
     controller.search('tencent', '新');
     await settle();
@@ -157,6 +238,25 @@ describe('music search requests', () => {
   });
 });
 describe('music transport', () => {
+  it('requests recommendations independently of search and the local queue', async () => {
+    const fetcher = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(JSON.stringify({ code: 0, data: [song('fresh')] })));
+    try {
+      const client = createMusicClient(
+        'https://island.example.test',
+        () => ({ name: 'synthetic-session', value: 'synthetic-value' }),
+        vi.fn(),
+      );
+      const songs = await client.recommend('tencent', new AbortController().signal);
+      expect(String(fetcher.mock.calls[0]?.[0])).toBe(
+        'https://island.example.test/api/third-party/music/recommendations?source=tencent',
+      );
+      expect(songs).toEqual([{ ...song('fresh'), source: 'tencent' }]);
+    } finally {
+      fetcher.mockRestore();
+    }
+  });
   it('only calls the island backend with the island session', async () => {
     const fetcher = vi
       .spyOn(globalThis, 'fetch')

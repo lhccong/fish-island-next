@@ -23,6 +23,7 @@ musicViewports(() => {
     await dialog.getByRole('slider', { name: '音量', exact: true }).press('ArrowLeft');
     const audio = await page.locator('audio').elementHandle();
     const volume = await audio!.evaluate((el: HTMLAudioElement) => el.volume);
+    await dialog.getByRole('button', { name: '今日推荐', exact: true }).click();
     await page.keyboard.press('Escape');
     const counts = fixture.counts();
     await page.getByRole('button', { name: '切换主题', exact: true }).click();
@@ -35,11 +36,16 @@ musicViewports(() => {
           true,
         );
         expect(fixture.counts()).toEqual(counts);
+        expect(fixture.recommendationRequests()).toBe(0);
         expect(fixture.stats()).toMatchObject({ connections: 1, historyRequests: 1 });
       }
     }
     await picker.getByRole('button', { name: '关闭主题弹窗', exact: true }).click();
     await fixture.open();
+    await expect(dialog.getByRole('button', { name: '今日推荐', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
     await expect(dialog.getByRole('button', { name: '待播 1', exact: true })).toBeVisible();
     await expect(dialog.getByRole('slider', { name: '音量', exact: true })).toHaveValue(
       String(volume),

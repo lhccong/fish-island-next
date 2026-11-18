@@ -12,7 +12,7 @@ import { parseMessageContent, parseMusicMessage } from '@/domain/chat';
 import { memo, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
 import { useChatRealtime } from './realtime-context';
-import { MemberAvatar } from './MemberAvatar';
+import { MessageAvatar } from './MessageAvatar';
 import { MessageContent } from './MessageContent';
 import { MessageMenu } from './MessageMenu';
 import styles from './MessageStream.module.css';
@@ -33,7 +33,7 @@ export const MessageRow = memo(function MessageRow({
   rowNumber: number | undefined;
   compactWorksheet?: boolean;
 }) {
-  const { controller, userId, user, draft, composerRef, navigation } = useChatRealtime();
+  const { controller, userId, user, navigation } = useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
     state.target === id ? state.revision : 0,
   );
@@ -117,29 +117,7 @@ export const MessageRow = memo(function MessageRow({
           {rowNumber}
         </span>
       )}
-      {showAvatars && (
-        <button
-          type="button"
-          className={styles.senderAvatar}
-          data-message-avatar="true"
-          aria-label={`@${message.senderName}`}
-          onClick={() => {
-            draft.mention(message.senderName);
-            composerRef.current?.focus({ preventScroll: true });
-          }}
-        >
-          <MemberAvatar
-            showFrame={showAvatarFrames}
-            key={`${message.senderId}:${message.senderAvatar ?? ''}`}
-            member={{
-              id: message.senderId,
-              name: message.senderName,
-              avatar: message.senderAvatar ?? null,
-              avatarFrameUrl: message.senderAvatarFrame,
-            }}
-          />
-        </button>
-      )}
+      {showAvatars && <MessageAvatar message={message} showFrame={showAvatarFrames} />}
       <div className={styles.messageBody}>
         <div className={styles.meta}>
           <div className={styles.identity}>

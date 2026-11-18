@@ -1,11 +1,11 @@
 import { useStore } from 'zustand';
-import { Pause, Play, SkipForward, Send } from 'lucide-react';
-import { useState } from 'react';
+import { Pause, Play, SkipForward } from 'lucide-react';
 import type { Song } from './domain';
 import { Button } from '@/shared/ui/Button';
 import { Slider } from '@/shared/ui/Slider';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import type { MusicPlayer } from './player-controller';
+import { MusicShareButton } from './MusicShareButton';
 import styles from './Music.module.css';
 
 function time(value: number) {
@@ -28,35 +28,32 @@ function MusicProgress({ player }: { player: MusicPlayer }) {
 export function MusicPlayback({
   player,
   onShare,
+  shareFeedback,
 }: {
   player: MusicPlayer;
   onShare: (song: Song) => void;
+  shareFeedback: string;
 }) {
-  const [shareFeedback, setShareFeedback] = useState('');
-  const { current, queue, status, error, notice, volume } = useStore(player.store);
+  const {
+    current,
+    queue,
+    status,
+    error,
+    notice,
+    volume,
+    recommendationSource,
+    recommendationStatus,
+    recommendationError,
+  } = useStore(player.store);
   return (
     <section className={styles.playback} aria-label="音乐播放控制">
-      <div className={styles.now}>
-        <strong>{current?.name ?? '还没有播放歌曲'}</strong>
-        <span>{current?.artist ?? '点歌后开始播放'}</span>
+      <div className={styles.playerHeader}>
+        <div className={styles.now}>
+          <strong title={current?.name}>{current?.name ?? '还没有播放歌曲'}</strong>
+          <span title={current?.artist}>{current?.artist ?? '点歌或听今日推荐'}</span>
+        </div>
+        <MusicShareButton song={current} onShare={onShare} current />
       </div>
-      <Button
-        variant="secondary"
-        className={styles.share ?? ''}
-        disabled={!current}
-        onClick={() => {
-          if (!current) return;
-          try {
-            onShare(current);
-            setShareFeedback('已提交到聊天，发送结果请在消息中查看');
-          } catch (error) {
-            setShareFeedback(error instanceof Error ? error.message : '提交失败，请重试');
-          }
-        }}
-      >
-        <Send size={16} aria-hidden="true" />
-        发送到聊天
-      </Button>
       <MusicProgress player={player} />
       <div className={styles.controls}>
         <Button
@@ -71,7 +68,11 @@ export function MusicPlayback({
           )}
           {status === 'playing' ? '暂停' : '播放'}
         </Button>
-        <Button variant="secondary" disabled={!queue.length} onClick={player.next}>
+        <Button
+          variant="secondary"
+          disabled={!queue.length && (!recommendationSource || recommendationStatus === 'loading')}
+          onClick={player.next}
+        >
           <SkipForward size={16} aria-hidden="true" />
           下一首
         </Button>
@@ -89,6 +90,19 @@ export function MusicPlayback({
           />
         </div>
       </div>
+      {recommendationStatus === 'loading' && (
+        <LoadingIndicator compact>正在寻找推荐歌曲…</LoadingIndicator>
+      )}
+      {recommendationError && (
+        <div className={styles.recommendationError}>
+          <p role="alert" className={styles.error}>
+            {recommendationError}
+          </p>
+          <Button variant="secondary" onClick={player.retryRecommendations}>
+            重试今日推荐
+          </Button>
+        </div>
+      )}
       {status === 'loading' && <LoadingIndicator compact>正在加载歌曲…</LoadingIndicator>}
       {error && (
         <p role="alert" className={styles.error}>

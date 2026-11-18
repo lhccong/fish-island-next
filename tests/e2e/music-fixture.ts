@@ -40,15 +40,19 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
   let phase: 'loading' | 'empty' | 'error' | 'success' = 'success';
   let release: (() => void) | undefined;
   let searchRequests = 0;
+  let recommendationRequests = 0;
   let resolveRequests = 0;
   let resolutionHeld = false;
   let releaseResolution: (() => void) | undefined;
   let sentMessages = 0;
+  let sendFailure = false;
   const audio = silentAudio();
   const fixture = await setupChatMenu(page, skin, mode, 'user', async () => {
     await page.route('**/api/chat/message/send', (route) => {
       const input = route.request().postDataJSON() as { content: string; clientMessageId: string };
       sentMessages++;
+      if (sendFailure)
+        return route.fulfill({ json: { code: 50001, message: '合成发送失败，请重试' } });
       return route.fulfill({
         json: {
           code: 0,
@@ -76,7 +80,8 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
           json: { code: 0, data: `https://music.example.test/${url.searchParams.get('id')}.wav` },
         });
       }
-      searchRequests++;
+      if (url.pathname.endsWith('/recommendations')) recommendationRequests++;
+      else searchRequests++;
       if (phase === 'loading')
         await new Promise<void>((done) => {
           release = done;
@@ -85,7 +90,7 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
         return route.fulfill({
           json: { code: 50001, message: '音乐服务尚未配置，请在后端 yml 填写密钥' },
         });
-      const pageNumber = Number(url.searchParams.get('page'));
+      const pageNumber = Number(url.searchParams.get('page') ?? 1);
       const data =
         phase === 'empty'
           ? []
@@ -123,7 +128,11 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
       if (value !== 'loading') release?.();
     },
     counts: () => ({ searchRequests, resolveRequests }),
+    recommendationRequests: () => recommendationRequests,
     sends: () => sentMessages,
+    failSending(value: boolean) {
+      sendFailure = value;
+    },
     holdResolution(value: boolean) {
       resolutionHeld = value;
       if (!value) releaseResolution?.();

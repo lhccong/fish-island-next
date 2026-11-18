@@ -18,7 +18,15 @@ export function MusicOrb({
   hidden: boolean;
   onOpen: (trigger: HTMLElement | null) => void;
 }) {
-  const { current, status, queue, error } = useStore(player.store);
+  const {
+    current,
+    status,
+    queue,
+    error,
+    recommendationSource,
+    recommendationStatus,
+    recommendationError,
+  } = useStore(player.store);
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const { area, style, ...events } = useMusicOrb();
@@ -64,7 +72,13 @@ export function MusicOrb({
                 )}
                 {status === 'playing' ? '暂停' : '播放'}
               </Button>
-              <Button variant="secondary" disabled={!queue.length} onClick={player.next}>
+              <Button
+                variant="secondary"
+                disabled={
+                  !queue.length && (!recommendationSource || recommendationStatus === 'loading')
+                }
+                onClick={player.next}
+              >
                 <SkipForward size={16} aria-hidden="true" />
                 下一首
               </Button>
@@ -90,6 +104,19 @@ export function MusicOrb({
               </Button>
             </div>
             {status === 'loading' && <LoadingIndicator compact>正在加载歌曲…</LoadingIndicator>}
+            {recommendationStatus === 'loading' && (
+              <LoadingIndicator compact>正在寻找推荐歌曲…</LoadingIndicator>
+            )}
+            {recommendationError && (
+              <>
+                <p className={styles.error} role="alert">
+                  {recommendationError}
+                </p>
+                <Button variant="secondary" onClick={player.retryRecommendations}>
+                  重试今日推荐
+                </Button>
+              </>
+            )}
             {error && (
               <p className={styles.error} role="alert">
                 {error}

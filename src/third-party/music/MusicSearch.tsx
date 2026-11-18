@@ -1,24 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useStore } from 'zustand';
-import { ListMusic, Search, X } from 'lucide-react';
+import { ListMusic, Search, Sparkles, X } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { Select } from '@/shared/ui/Select';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { songKey, type MusicPort, type MusicSource } from './domain';
+import { songKey, type MusicPort, type MusicSource, type Song } from './domain';
 import { createMusicSearch } from './search-controller';
 import type { MusicPlayer } from './player-controller';
+import { MusicShareButton } from './MusicShareButton';
 import styles from './Music.module.css';
 
 export function MusicSearch({
   port,
   player,
   open,
+  onShare,
 }: {
   port: MusicPort;
   player: MusicPlayer;
   open: boolean;
+  onShare: (song: Song) => void;
 }) {
   const [controller] = useState(() => createMusicSearch(port));
   const state = useStore(controller.store);
@@ -26,6 +29,7 @@ export function MusicSearch({
   const [source, setSource] = useState<MusicSource>('netease');
   const [tab, setTab] = useState<'search' | 'queue'>('search');
   const queue = useStore(player.store, (state) => state.queue);
+  const recommendationSource = useStore(player.store, (state) => state.recommendationSource);
   useEffect(() => {
     controller.activate();
     return () => controller.dispose();
@@ -48,6 +52,7 @@ export function MusicSearch({
           value={source}
           onValueChange={(value) => {
             setSource(value as MusicSource);
+            player.changeRecommendationSource(value as MusicSource);
             controller.search(value as MusicSource, keyword);
           }}
           options={[
@@ -79,9 +84,19 @@ export function MusicSearch({
           <ListMusic size={16} aria-hidden="true" />
           待播 {queue.length}
         </Button>
+        <Button
+          variant="secondary"
+          className={styles.recommendations ?? ''}
+          aria-pressed={!!recommendationSource}
+          onClick={() => player.toggleRecommendations(source)}
+        >
+          <Sparkles size={16} aria-hidden="true" />
+          今日推荐
+        </Button>
       </div>
       <ScrollArea
         gutter="reserved"
+        fillContent
         label={tab === 'search' ? '音乐搜索结果' : '待播队列'}
         className={styles.scroll ?? ''}
       >
@@ -90,17 +105,21 @@ export function MusicSearch({
             {!queue.length && <p className={styles.empty}>暂无待播歌曲，搜索后点歌加入</p>}
             {queue.map((song) => (
               <div className={styles.song} key={songKey(song)}>
-                <div>
+                <div className={styles.songInfo}>
                   <strong>{song.name}</strong>
                   <span>{song.artist}</span>
                 </div>
-                <Button
-                  variant="secondary"
-                  aria-label={`移除 ${song.name}`}
-                  onClick={() => player.remove(songKey(song))}
-                >
-                  <X size={16} aria-hidden="true" />
-                </Button>
+                <div className={styles.songActions}>
+                  <MusicShareButton song={song} onShare={onShare} />
+                  <Button
+                    variant="secondary"
+                    className={styles.remove ?? ''}
+                    aria-label={`移除 ${song.name}`}
+                    onClick={() => player.remove(songKey(song))}
+                  >
+                    <X size={16} aria-hidden="true" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -109,24 +128,27 @@ export function MusicSearch({
         ) : (
           <div className={styles.list}>
             {state.status === 'idle' && (
-              <p className={styles.empty}>搜索喜欢的歌曲，点歌后在本机播放</p>
+              <p className={styles.empty}>搜索喜欢的歌曲，或直接听今日推荐</p>
             )}
             {state.status === 'ready' && !state.items.length && (
               <p className={styles.empty}>没有找到歌曲，试试其他关键词或来源</p>
             )}
             {state.items.map((song) => (
               <div className={styles.song} key={songKey(song)}>
-                <div>
+                <div className={styles.songInfo}>
                   <strong>{song.name}</strong>
                   <span>{song.artist}</span>
                 </div>
-                <Button
-                  variant="secondary"
-                  aria-label={`点歌 ${song.name}`}
-                  onClick={() => player.add(song)}
-                >
-                  点歌
-                </Button>
+                <div className={styles.songActions}>
+                  <MusicShareButton song={song} onShare={onShare} />
+                  <Button
+                    variant="secondary"
+                    aria-label={`点歌 ${song.name}`}
+                    onClick={() => player.add(song)}
+                  >
+                    点歌
+                  </Button>
+                </div>
               </div>
             ))}
             {state.status !== 'idle' && (state.items.length > 0 || state.error) && (

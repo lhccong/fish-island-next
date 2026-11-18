@@ -16,7 +16,7 @@ musicViewports(() => {
         await draft.fill('音乐操作保留聊天草稿');
         const dialog = await fixture.open();
         const field = dialog.getByRole('textbox', { name: '搜索歌曲或歌手' });
-        await expect(dialog.getByText('搜索喜欢的歌曲，点歌后在本机播放')).toBeVisible();
+        await expect(dialog.getByText('搜索喜欢的歌曲，或直接听今日推荐')).toBeVisible();
         fixture.phase('loading');
         await field.fill('合成空结果');
         await dialog.getByRole('button', { name: '搜索', exact: true }).click();
@@ -32,12 +32,22 @@ musicViewports(() => {
         await expect(
           results.getByRole('button', { name: '点歌 合成歌曲1', exact: true }),
         ).toBeVisible();
+        await results.getByRole('button', { name: '分享 合成歌曲1', exact: true }).click();
+        await expect.poll(() => fixture.sends()).toBe(1);
+        expect(fixture.counts().resolveRequests).toBe(0);
         await dialog.getByRole('combobox', { name: '音乐来源' }).click();
         await page.keyboard.press('Escape');
         await expect(dialog.getByRole('combobox', { name: '音乐来源' })).toBeFocused();
         await dialog.getByRole('combobox', { name: '音乐来源' }).click();
         await page.getByRole('option', { name: 'QQ 音乐', exact: true }).click();
         await expect(dialog.getByRole('combobox', { name: '音乐来源' })).toHaveText('QQ 音乐');
+        const sourceLabel = await dialog
+          .getByRole('combobox', { name: '音乐来源' })
+          .evaluate((element) => {
+            const label = element.querySelector('span')!;
+            return { text: label.scrollWidth, available: label.clientWidth };
+          });
+        expect(sourceLabel.text).toBeLessThanOrEqual(sourceLabel.available);
         await expect(
           results.getByRole('button', { name: '点歌 合成歌曲1', exact: true }),
         ).toBeVisible();
@@ -49,6 +59,17 @@ musicViewports(() => {
           )
           .toBeGreaterThan(0);
         await results.getByRole('button', { name: '点歌 合成歌曲2', exact: true }).click();
+        await dialog.getByRole('button', { name: '待播 1', exact: true }).click();
+        await expect(
+          dialog.getByRole('button', { name: '分享 合成歌曲2', exact: true }),
+        ).toBeEnabled();
+        const remove = dialog.getByRole('button', { name: '移除 合成歌曲2', exact: true });
+        const removeBox = (await remove.boundingBox())!;
+        expect(removeBox.width).toBeGreaterThanOrEqual(44);
+        expect(removeBox.height).toBeGreaterThanOrEqual(44);
+        await remove.focus();
+        await expect(remove).toBeFocused();
+        await dialog.getByRole('button', { name: '搜索结果', exact: true }).click();
         await dialog.getByRole('button', { name: '暂停音乐' }).click();
         await expect(dialog.getByRole('button', { name: '播放音乐' })).toBeVisible();
         await dialog.getByRole('button', { name: '播放音乐' }).click();
@@ -117,7 +138,7 @@ musicViewports(() => {
         await dialog.getByRole('button', { name: '待播 0', exact: true }).click();
         await expect(dialog.getByText('暂无待播歌曲，搜索后点歌加入')).toBeVisible();
         await dialog.getByRole('button', { name: '发送到聊天', exact: true }).click();
-        await expect.poll(() => fixture.sends()).toBe(1);
+        await expect.poll(() => fixture.sends()).toBe(2);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
           true,
         );
@@ -128,7 +149,7 @@ musicViewports(() => {
         await expect(draft).toHaveText('音乐操作保留聊天草稿');
         const musicMessage = page.getByRole('button', { name: '播放音乐 合成歌曲2', exact: true });
         await expect(musicMessage).toBeVisible();
-        await expect(page.locator('[data-delivery="sent"]')).toHaveCount(1);
+        await expect(page.locator('[data-delivery="sent"]')).toHaveCount(2);
         await expect(page.getByRole('button', { name: '重试发送', exact: true })).toHaveCount(0);
         const orb = page.getByRole('button', { name: '音乐悬浮球', exact: true });
         await orb.click();
