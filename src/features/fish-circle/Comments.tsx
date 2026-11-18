@@ -2,7 +2,7 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Comment, FishCirclePort } from '@/domain/fish-circle';
 import { usePage } from './use-page';
 import { useOperation } from './use-operation';
@@ -11,6 +11,7 @@ import { CommentLikeButton } from './CommentLikeButton';
 import { MediaGrid } from './MediaGrid';
 import { CircleAvatar } from './CircleAvatar';
 import { formatMomentTime } from './format-time';
+import { applyCommentLikes } from './comment-ranking';
 import type { CommentTarget } from './comment-target';
 import { useCommentTarget } from './use-comment-target';
 import styles from './Comments.module.css';
@@ -40,12 +41,29 @@ export function Comments({
     (p: number, signal: AbortSignal) => service.comments(momentId, p, signal),
     [service, momentId],
   );
-  const { result, refresh, loadMore, loadingMore, error: pageError, hasMore } = usePage(load);
+  const {
+    result,
+    refresh: reload,
+    loadMore,
+    loadingMore,
+    error: pageError,
+    hasMore,
+  } = usePage(load);
+  const [likes, setLikes] = useState<ReadonlyMap<string, boolean>>(new Map());
+  const comments = useMemo(
+    () => (result.status === 'ready' ? applyCommentLikes(result.data.items, likes) : []),
+    [result, likes],
+  );
+  function refresh() {
+    setLikes(new Map());
+    reload();
+  }
   const [expanded, setExpanded] = useState(!!target);
+  const visibleComments = expanded ? comments : comments.slice(0, 3);
   const [replyOverrides, setReplyOverrides] = useState<ReadonlyMap<string, boolean>>(new Map());
   const [reply, setReply] = useState<Comment | null>(null);
   const operation = useOperation();
-  const [likingId, setLikingId] = useState<string | null>(null);
+  const like = useOperation();
   const [notice, setNotice] = useState('');
   const container = useRef<HTMLElement>(null);
   const replyElement = useRef<HTMLElement | null>(null);
@@ -66,7 +84,7 @@ export function Comments({
   const anchor = useCommentTarget({
     container,
     target,
-    items: result.status === 'ready' ? result.data.items : [],
+    items: comments,
     ready: result.status === 'ready',
     hasMore,
     loadingMore,
@@ -77,15 +95,8 @@ export function Comments({
     return 1 + c.children.reduce((n, child) => n + commentCount(child), 0);
   }
   async function setLiked(id: string, liked: boolean) {
-    if (operation.pending) return;
-    setNotice('');
-    setLikingId(id);
-    const ok = await operation.run((signal) => service.setCommentLiked(id, liked, signal));
-    setLikingId(null);
-    if (ok) {
-      setNotice(liked ? '已点赞评论' : '已取消评论点赞');
-      refresh();
-    }
+    const ok = await like.run((signal) => service.setCommentLiked(id, liked, signal));
+    if (ok) setLikes((previous) => new Map(previous).set(id, liked));
   }
   function renderComment(c: Comment, ancestors: string[] = []) {
     const highlighted = anchor.match?.status === 'found' && anchor.match.id === c.id;
@@ -110,65 +121,66 @@ export function Comments({
           <p className={styles.text}>{c.content}</p>
           <MediaGrid media={c.media} />
           <div className={styles.actions}>
-            <time>{formatMomentTime(c.createdAt)}</time>
+            <div className={styles.actionMeta}>
+              <time>{formatMomentTime(c.createdAt)}</time>
+              <button
+                type="button"
+                aria-label={`回复 ${c.userName}`}
+                disabled={operation.pending}
+                onClick={(event) => {
+                  replyElement.current = event.currentTarget.closest('li');
+                  onStartReply();
+                  setReply(c);
+                  setReplyOverrides((old) => {
+                    const next = new Map(old);
+                    for (const id of [...ancestors, c.id]) next.set(id, true);
+                    return next;
+                  });
+                }}
+              >
+                回复
+              </button>
+              {(c.userId === userId || admin) && (
+                <button
+                  type="button"
+                  disabled={operation.pending}
+                  onClick={() => {
+                    void operation
+                      .run((signal) => service.commentAction('delete', c.id, false, signal))
+                      .then((ok) => {
+                        if (ok) {
+                          setNotice('评论已删除');
+                          onCountChange(-commentCount(c));
+                          refresh();
+                        }
+                      });
+                  }}
+                >
+                  删除评论
+                </button>
+              )}
+              {canManage && ancestors.length === 0 && (
+                <button
+                  type="button"
+                  disabled={operation.pending}
+                  onClick={() => {
+                    void operation
+                      .run((signal) => service.commentAction('top', c.id, !c.top, signal))
+                      .then((ok) => {
+                        if (ok) refresh();
+                      });
+                  }}
+                >
+                  {c.top ? '取消评论置顶' : '置顶评论'}
+                </button>
+              )}
+            </div>
             {c.reaction && (
               <CommentLikeButton
                 reaction={c.reaction}
-                pending={likingId === c.id}
-                disabled={operation.pending}
+                disabled={like.pending}
                 onToggle={(liked) => void setLiked(c.id, liked)}
               />
-            )}
-            <button
-              type="button"
-              aria-label={`回复 ${c.userName}`}
-              disabled={operation.pending}
-              onClick={(event) => {
-                replyElement.current = event.currentTarget.closest('li');
-                onStartReply();
-                setReply(c);
-                setReplyOverrides((old) => {
-                  const next = new Map(old);
-                  for (const id of [...ancestors, c.id]) next.set(id, true);
-                  return next;
-                });
-              }}
-            >
-              回复
-            </button>
-            {(c.userId === userId || admin) && (
-              <button
-                type="button"
-                disabled={operation.pending}
-                onClick={() => {
-                  void operation
-                    .run((signal) => service.commentAction('delete', c.id, false, signal))
-                    .then((ok) => {
-                      if (ok) {
-                        setNotice('评论已删除');
-                        onCountChange(-commentCount(c));
-                        refresh();
-                      }
-                    });
-                }}
-              >
-                删除评论
-              </button>
-            )}
-            {canManage && ancestors.length === 0 && (
-              <button
-                type="button"
-                disabled={operation.pending}
-                onClick={() => {
-                  void operation
-                    .run((signal) => service.commentAction('top', c.id, !c.top, signal))
-                    .then((ok) => {
-                      if (ok) refresh();
-                    });
-                }}
-              >
-                {c.top ? '取消评论置顶' : '置顶评论'}
-              </button>
             )}
           </div>
         </div>
@@ -249,9 +261,7 @@ export function Comments({
             <>
               {result.data.items.length ? (
                 <ul className={styles.commentList}>
-                  {(expanded ? result.data.items : result.data.items.slice(0, 3)).map((c) =>
-                    renderComment(c),
-                  )}
+                  {visibleComments.map((c) => renderComment(c))}
                 </ul>
               ) : (
                 <p>暂无评论，来聊两句吧</p>
@@ -279,6 +289,8 @@ export function Comments({
         </div>
       </ScrollArea>
       {operation.error && <p role="alert">{operation.error}</p>}
+      {like.pending && <LoadingIndicator compact>处理中…</LoadingIndicator>}
+      {like.error && <p role="alert">{like.error}</p>}
       {notice && <p role="status">{notice}</p>}
     </section>
   );

@@ -120,6 +120,8 @@ export function reminder(value: unknown): CircleReminder {
   const sender = r.senderUser == null ? {} : record(r.senderUser);
   const raw = text(r.sourceContent);
   const imageMatch = /\[img\]([^[]+)\[\/img\]|\[img:([^\]]+)\]/.exec(raw);
+  const isCommentLike = r.sourceType === 7 && r.action === 'like';
+  const relatedMoment = text(r.url);
   if (r.state !== 0 && r.state !== 1) throw new CircleError('通知已读状态异常');
   return {
     id: id(r.id),
@@ -128,9 +130,16 @@ export function reminder(value: unknown): CircleReminder {
     avatar: safeUrl(sender.userAvatar),
     content: raw.replace(/\[img\][^[]+\[\/img\]|\[img:[^\]]+\]/g, '').trim(),
     image: safeUrl(imageMatch?.[1] || imageMatch?.[2]),
-    action: text(r.action),
+    action: isCommentLike ? 'comment-like' : text(r.action),
     createdAt: text(r.createTime),
     read: r.state === 1,
-    momentId: r.sourceType === 4 && r.sourceId != null ? id(r.sourceId) : '',
+    momentId: isCommentLike
+      ? /^[1-9]\d*$/.test(relatedMoment)
+        ? relatedMoment
+        : ''
+      : r.sourceType === 4 && r.sourceId != null
+        ? id(r.sourceId)
+        : '',
+    ...(isCommentLike && r.sourceId != null ? { commentId: id(r.sourceId) } : {}),
   };
 }

@@ -25,6 +25,7 @@ for (const skin of builtinSkins)
       let releaseLike: (() => void) | undefined;
       const liked = new Set<string>();
       const requests: Array<{ commentId: string; liked: boolean }> = [];
+      let listRequests = 0;
       const row = (id: string, likes = 0) => ({
         id,
         userId: '456',
@@ -37,6 +38,7 @@ for (const skin of builtinSkins)
         rows.sort((a, b) => b.likeNum - a.likeNum || Number(b.id) - Number(a.id));
 
       await page.route('**/api/moments/comment/list', async (route) => {
+        listRequests++;
         if (phase.value === 'error') {
           await new Promise<void>((resolve) => (releaseList = resolve));
           return route.fulfill({ status: 503 });
@@ -108,9 +110,20 @@ for (const skin of builtinSkins)
       const editor = comments.getByRole('textbox', { name: '评论内容' });
       await editor.fill('点赞后保留评论草稿');
       await expect.poll(order).toEqual(['100', '102', '101']);
+      const initialListRequests = listRequests;
       const box = (await button('101').boundingBox())!;
       expect(box.width).toBeGreaterThanOrEqual(44);
       expect(box.height).toBe(mobile ? 44 : 32);
+      const actions = button('101').locator('..');
+      const actionsBox = (await actions.boundingBox())!;
+      expect(box.x + box.width).toBeCloseTo(actionsBox.x + actionsBox.width, 0);
+      await expect(actions.getByRole('button').last()).toHaveAccessibleName('点赞评论');
+      await expect(button('101')).toHaveText('0');
+      await expect(button('101')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+      const otherActions = actions.getByRole('button', { name: /回复 |删除评论|置顶评论/ });
+      const actionPositions = await otherActions.evaluateAll((buttons) =>
+        buttons.map((control) => control.getBoundingClientRect().x),
+      );
       if (mobile) await button('101').tap();
       else {
         await button('101').hover();
@@ -119,6 +132,13 @@ for (const skin of builtinSkins)
         await button('101').press('Space');
       }
       await expect(button('101')).toBeDisabled();
+      await expect(button('101')).toHaveText('0');
+      for (const control of await otherActions.all()) await expect(control).toBeEnabled();
+      expect(
+        await otherActions.evaluateAll((buttons) =>
+          buttons.map((control) => control.getBoundingClientRect().x),
+        ),
+      ).toEqual(actionPositions);
       await expect(comments.getByText('处理中…')).toBeVisible();
       await checkBounds();
       await expect.poll(() => Boolean(releaseLike)).toBe(true);
@@ -131,6 +151,7 @@ for (const skin of builtinSkins)
       await activate(button('101'));
       await expect(button('101')).toHaveAttribute('aria-pressed', 'true');
       await expect(button('101')).toHaveText('1');
+      await expect(button('101')).toHaveAccessibleDescription('1 个赞');
       await expect.poll(order).toEqual(['100', '101', '102']);
       await checkBounds();
       if (skin.id === 'moyu-island') {
@@ -139,6 +160,7 @@ for (const skin of builtinSkins)
       }
       await activate(button('101'));
       await expect(button('101')).toHaveAttribute('aria-pressed', 'false');
+      await expect(button('101')).toHaveText('0');
       await expect.poll(order).toEqual(['100', '102', '101']);
       await activate(item('100').getByRole('button', { name: '查看 2 条回复' }));
       await expect.poll(order).toEqual(['100', '202', '201', '102', '101']);
@@ -146,6 +168,7 @@ for (const skin of builtinSkins)
       await expect(button('201')).toHaveAttribute('aria-pressed', 'true');
       await expect.poll(order).toEqual(['100', '201', '202', '102', '101']);
       await expect(editor).toHaveValue('点赞后保留评论草稿');
+      expect(listRequests).toBe(initialListRequests);
       expect(requests).toEqual([
         { commentId: '101', liked: true },
         { commentId: '101', liked: true },
@@ -164,12 +187,13 @@ for (const skin of builtinSkins)
                   records: [
                     {
                       id: '800',
-                      senderId: '456',
-                      senderUser: { userName: '合成岛友 101' },
-                      action: 'comment',
-                      sourceContent: '合成评论 101',
-                      sourceType: 4,
-                      sourceId: post.id,
+                      senderId: '789',
+                      senderUser: { userName: '合成点赞岛友' },
+                      action: 'like',
+                      sourceContent: '合成评论 201',
+                      sourceType: 7,
+                      sourceId: '201',
+                      url: post.id,
                       state: 1,
                     },
                   ],
@@ -182,20 +206,21 @@ for (const skin of builtinSkins)
         route.fulfill({ json: { code: 0, data: { ...post, commentNum: 3 } } }),
       );
       await activate(page.getByRole('button', { name: '消息通知', exact: true }));
-      await activate(
-        page
-          .getByRole('dialog', { name: '全部互动消息' })
-          .getByRole('button')
-          .filter({ hasText: '合成评论 101' }),
-      );
+      const notification = page
+        .getByRole('dialog', { name: '全部互动消息' })
+        .getByRole('button')
+        .filter({ hasText: '合成评论 201' });
+      await expect(notification).toContainText('合成点赞岛友');
+      await expect(notification).toContainText('赞了你的评论');
+      await activate(notification);
       const detail = page.getByRole('region', { name: '动态详情', exact: true });
       await expect(detail.locator('[data-comment-target="true"]')).toHaveAttribute(
         'data-comment-id',
-        '101',
+        '201',
       );
       await activate(button('101'));
       await expect(button('101')).toHaveAttribute('aria-pressed', 'true');
-      await expect.poll(order).toEqual(['100', '101', '102']);
+      await expect.poll(order).toEqual(['100', '201', '202', '101', '102']);
       await checkBounds();
     });
 

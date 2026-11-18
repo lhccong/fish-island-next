@@ -2,7 +2,7 @@ import type { CircleReminder, Comment } from '@/domain/fish-circle';
 
 export type CommentTarget = Pick<
   CircleReminder,
-  'senderId' | 'senderName' | 'content' | 'image' | 'createdAt'
+  'senderId' | 'senderName' | 'content' | 'image' | 'createdAt' | 'commentId'
 >;
 export type CommentMatch =
   { status: 'found'; id: string; ancestors: string[] } | { status: 'missing' | 'ambiguous' };
@@ -14,13 +14,13 @@ export function findCommentTarget(comments: Comment[], target: CommentTarget): C
       const authorMatches = target.senderId
         ? comment.userId === target.senderId
         : comment.userName === target.senderName;
-      if (
-        authorMatches &&
-        comment.content.trim() === target.content.trim() &&
-        (!target.image || comment.media.some((media) => media.url === target.image)) &&
-        (target.content.trim() || target.image)
-      )
-        matches.push({ comment, ancestors });
+      const isMatch = target.commentId
+        ? comment.id === target.commentId
+        : authorMatches &&
+          comment.content.trim() === target.content.trim() &&
+          (!target.image || comment.media.some((media) => media.url === target.image)) &&
+          (target.content.trim() || target.image);
+      if (isMatch) matches.push({ comment, ancestors });
       visit(comment.children, [...ancestors, comment.id]);
     }
   }

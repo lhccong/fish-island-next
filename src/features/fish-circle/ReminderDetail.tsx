@@ -61,7 +61,9 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
                 key={moment.id}
                 moment={moment}
                 variant="detail"
-                commentTarget={reminder.action === 'comment' ? reminder : null}
+                commentTarget={
+                  reminder.commentId || reminder.action === 'comment' ? reminder : null
+                }
                 user={user}
                 service={service}
                 onRefresh={refresh}

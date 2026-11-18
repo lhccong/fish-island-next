@@ -53,18 +53,20 @@ export function NotificationRow({
             <time>{formatMomentTime(item.createdAt)}</time>
           </span>
           <span className={styles.action}>
-            {item.action === 'like' ? (
+            {item.action === 'like' || item.action === 'comment-like' ? (
               <Heart size={14} aria-hidden="true" />
             ) : (
               <MessageCircle size={14} aria-hidden="true" />
             )}
-            {item.action === 'like'
-              ? '赞了你的动态'
-              : item.action === 'comment'
-                ? '评论了你的动态'
-                : item.action === 'mention'
-                  ? '提到了你'
-                  : '发来一条通知'}
+            {item.action === 'comment-like'
+              ? '赞了你的评论'
+              : item.action === 'like'
+                ? '赞了你的动态'
+                : item.action === 'comment'
+                  ? '评论了你的动态'
+                  : item.action === 'mention'
+                    ? '提到了你'
+                    : '发来一条通知'}
           </span>
           {item.action !== 'like' && item.content && (
             <span className={styles.preview}>{item.content}</span>

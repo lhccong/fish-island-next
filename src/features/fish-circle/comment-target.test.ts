@@ -24,6 +24,14 @@ const comment = (id: string, patch: Partial<Comment> = {}): Comment => ({
   ...patch,
 });
 describe('notification comment matching', () => {
+  it('uses the exact reply ID even when the notification sender and preview differ', () => {
+    expect(
+      findCommentTarget(
+        [comment('1'), comment('2', { children: [comment('3', { userId: 'recipient' })] })],
+        { ...target, commentId: '3', content: '预览', senderId: 'liker' },
+      ),
+    ).toEqual({ status: 'found', id: '3', ancestors: ['2'] });
+  });
   it('matches sender identity and expands the entire nested path', () => {
     const tree = [
       comment('1', {
