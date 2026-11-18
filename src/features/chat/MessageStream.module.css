@@ -90,6 +90,12 @@
   color: var(--color-muted);
   font-size: 12px;
 }
+.mentionActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--space-2);
+}
 .navigationNotice .noticeAction {
   padding: 4px;
   border-color: transparent;

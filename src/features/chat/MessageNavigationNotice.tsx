@@ -6,23 +6,35 @@ import { useChatRealtime } from './realtime-context';
 import styles from './MessageStream.module.css';
 
 export function MessageNavigationNotice() {
-  const { navigation } = useChatRealtime();
+  const { navigation, composerRef } = useChatRealtime();
   const state = useStore(navigation.store, (state) => state);
   if (!state.mentions.length && !state.feedback) return null;
   return (
     <div className={styles.navigationNotice}>
       {state.mentions.length > 0 && (
-        <Button
-          variant="secondary"
-          className={styles.noticeAction}
-          aria-label={`有 ${state.mentions.length} 条消息 @我，点击查看`}
-          onClick={() => {
-            void navigation.locate(state.mentions[0]!);
-          }}
-        >
-          <AtSign size={16} aria-hidden="true" />
-          <span>{state.mentions.length} 条消息提到我</span>
-        </Button>
+        <div className={styles.mentionActions}>
+          <Button
+            variant="secondary"
+            className={styles.noticeAction}
+            aria-label={`有 ${state.mentions.length} 条消息 @我，点击查看`}
+            onClick={() => {
+              void navigation.locate(state.mentions[0]!);
+            }}
+          >
+            <AtSign size={16} aria-hidden="true" />
+            <span>{state.mentions.length} 条消息提到我</span>
+          </Button>
+          <Button
+            variant="secondary"
+            aria-label="忽略当前提到我的提醒"
+            onClick={(event) => {
+              navigation.ignoreMentions();
+              if (event.detail === 0) composerRef.current?.focus({ preventScroll: true });
+            }}
+          >
+            忽略
+          </Button>
+        </div>
       )}
       {state.feedback && (
         <span role="status" className={styles.navigationFeedback}>

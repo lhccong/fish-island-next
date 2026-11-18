@@ -54,21 +54,6 @@
 .emoji img {
   object-fit: contain;
 }
-.search {
-  display: flex;
-  gap: 8px;
-}
-.search input {
-  min-width: 0;
-  flex: 1;
-  height: 36px;
-  padding: 0 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  color: var(--color-text);
-  background: var(--color-canvas);
-  font: inherit;
-}
 .scroll {
   flex: 1;
   min-height: 0;
@@ -185,10 +170,6 @@
   }
 }
 @media (max-width: 760px) {
-  .search input {
-    height: 44px;
-    font-size: 16px;
-  }
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     padding-top: 12px;

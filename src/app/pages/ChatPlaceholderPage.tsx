@@ -7,6 +7,7 @@ import { useAuth } from '@/features/auth';
 import { ThemePicker, useAppearanceStore, useChatPanelStore } from '@/features/appearance';
 import { MyIslandProvider } from '@/features/my-island';
 import { ChatGameShortcuts } from '@/app/components/ChatGameShortcuts';
+import { ChatFarmHarvestStatus } from '@/app/components/ChatFarmHarvestStatus';
 import { IslandSidebar } from '@/app/components/IslandSidebar';
 import { IslandSidebarProvider } from '@/app/components/IslandSidebarProvider';
 import { ClassicCircleSidebar } from '@/app/components/ClassicCircleSidebar';
@@ -23,7 +24,7 @@ import styles from './ChatPlaceholderPage.module.css';
 import { ChatMusicTool } from '@/app/components/MusicSession';
 import { CirclePositionPicker } from '@/app/components/CirclePositionPicker';
 
-export function ChatPlaceholderPage() {
+export function ChatPlaceholderPage({ active }: { active: boolean }) {
   const { session } = useAuth();
   const skinId = useAppearanceStore((state) => state.skinId);
   const presentation = skinId === 'wps' ? 'worksheet' : 'conversation';
@@ -46,7 +47,7 @@ export function ChatPlaceholderPage() {
     visibleTrigger?.focus();
   };
   if (session.status !== 'authenticated') return null;
-  return (
+  const workspace = (
     <MyIslandProvider
       key={session.user.id}
       accountId={session.user.id}
@@ -192,5 +193,10 @@ export function ChatPlaceholderPage() {
         </ChatListProvider>
       </IslandSidebarProvider>
     </MyIslandProvider>
+  );
+  return (
+    <ChatFarmHarvestStatus key={session.user.id} active={active}>
+      {workspace}
+    </ChatFarmHarvestStatus>
   );
 }

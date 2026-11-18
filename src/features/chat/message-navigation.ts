@@ -120,6 +120,9 @@ export function createMessageNavigation(chat: ChatRealtimeController) {
     },
     locate,
     cancel,
+    ignoreMentions() {
+      store.setState({ mentions: [] });
+    },
     start(userId: string, name: string) {
       const unsubscribe = chat.subscribeIncoming((message) => {
         if (

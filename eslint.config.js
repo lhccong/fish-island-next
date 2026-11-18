@@ -10,6 +10,7 @@ const internalImports = {
   group: [
     '@/features/*/*',
     '!@/features/fish-circle/notifications',
+    '!@/features/farm/harvest-status',
     '@/shells/*/*',
     '@/skins/*/*',
     '@/third-party/*/*',

@@ -17,3 +17,19 @@
   border-color: transparent;
   background: var(--color-hover);
 }
+
+.icon[data-harvestable] {
+  position: relative;
+}
+
+.icon[data-harvestable]::after {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  content: '';
+  pointer-events: none;
+}

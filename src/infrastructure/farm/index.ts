@@ -40,6 +40,11 @@ export function createFarmClient(
     }
   }
   return {
+    async harvestStatus(signal) {
+      const result = await request('land/harvest-status', signal);
+      if (typeof result !== 'boolean') throw new Error('农场收获状态异常');
+      return result;
+    },
     async lands(friendId, signal) {
       return list(
         await request(

@@ -27,7 +27,7 @@ export function ChatPageHost({
   return (
     <div hidden={!active}>
       <Suspense fallback={active ? <PageLoading /> : null}>
-        <RequireAuth>{standalone ? <ChatMiniPage /> : <ChatPage />}</RequireAuth>
+        <RequireAuth>{standalone ? <ChatMiniPage /> : <ChatPage active={active} />}</RequireAuth>
       </Suspense>
     </div>
   );

@@ -3,6 +3,7 @@ import { useCallback, useContext, useState } from 'react';
 import { Smile } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { Popover } from '@/shared/ui/Popover';
+import { SearchForm } from '@/shared/ui/SearchForm';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { InfiniteScroll, useInfinitePages } from '@/shared/ui/InfiniteScroll';
 import { CommentEmoticonsContext } from './comment-emoticons-context';
@@ -44,13 +45,38 @@ export function CommentEmoticons({
   );
 }
 function SavedEmoticons({ onSelect }: { onSelect: (url: string) => void }) {
+  const [{ keyword, submitted }, setQuery] = useState({ keyword: '', submitted: 0 });
+  return (
+    <>
+      <div className={styles.search}>
+        <SearchForm
+          label="搜索收藏表情包"
+          placeholder="输入图片里的文字"
+          keyword={keyword}
+          onSearch={(value) =>
+            setQuery((query) => ({ keyword: value, submitted: query.submitted + 1 }))
+          }
+        />
+      </div>
+      <SavedEmoticonList key={submitted} keyword={keyword} onSelect={onSelect} />
+    </>
+  );
+}
+
+function SavedEmoticonList({
+  keyword,
+  onSelect,
+}: {
+  keyword: string;
+  onSelect: (url: string) => void;
+}) {
   const port = useContext(CommentEmoticonsContext);
   const load = useCallback(
     (page: number, signal: AbortSignal) => {
       if (!port) return Promise.reject(new Error('表情包暂不可用，请重新进入鱼小圈'));
-      return port.list(page, signal);
+      return port.list(page, signal, keyword);
     },
-    [port],
+    [port, keyword],
   );
   const pages = useInfinitePages(load);
   return (
@@ -67,7 +93,11 @@ function SavedEmoticons({ onSelect }: { onSelect: (url: string) => void }) {
       {pages.result.status === 'ready' && (
         <>
           {pages.result.data.items.length === 0 && (
-            <p>还没有收藏表情包，可在聊天图片菜单中添加收藏，也可直接粘贴图片。</p>
+            <p>
+              {keyword
+                ? '没有找到表情包，请换个关键词。'
+                : '还没有收藏表情包，可在聊天图片菜单中添加收藏，也可直接粘贴图片。'}
+            </p>
           )}
           <div className={styles.grid}>
             {pages.result.data.items.map((item, index) => (

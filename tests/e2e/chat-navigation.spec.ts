@@ -6,6 +6,60 @@ test.setTimeout(60000);
 
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
+    test(`${skin.id} ${mode}: ignoring current mention alerts`, async ({ page }, info) => {
+      const fixture = await setupChatMenu(page, skin.id, mode);
+      const mobile = page.viewportSize()!.width <= 760;
+      const draft = page.getByRole('textbox', { name: '消息草稿' });
+      const ignore = page.getByRole('button', { name: '忽略当前提到我的提醒', exact: true });
+      const alert = page.getByRole('button', { name: /条消息 @我，点击查看/ });
+      await expect(ignore).toHaveCount(0);
+      await draft.fill('保留当前草稿');
+      fixture.push('1', '@本人合成 第一条提醒');
+      fixture.push('2', '@本人合成 第二条提醒');
+      await expect(alert).toHaveText('2 条消息提到我');
+      const bounds = (await ignore.boundingBox())!;
+      const alertBounds = (await alert.boundingBox())!;
+      expect(bounds.height).toBe(mobile ? 44 : 32);
+      expect(bounds.x).toBeGreaterThanOrEqual(alertBounds.x + alertBounds.width);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+      await ignore.locator('..').screenshot({ path: info.outputPath('ignore-mention.png') });
+      if (mobile) await ignore.tap();
+      else {
+        const colors = () =>
+          ignore.evaluate((el) => {
+            const { backgroundColor, borderColor } = getComputedStyle(el);
+            return { backgroundColor, borderColor };
+          });
+        const normal = await colors();
+        await ignore.hover();
+        await expect.poll(colors).not.toEqual(normal);
+        await alert.focus();
+        await page.keyboard.press('Tab');
+        await expect(ignore).toBeFocused();
+        await expect(ignore).toHaveCSS('outline-style', 'solid');
+        await page.keyboard.press('Enter');
+        await expect(draft).toBeFocused();
+      }
+      await expect(ignore).toHaveCount(0);
+      await expect(alert).toHaveCount(0);
+      await expect(page.getByText('已定位消息', { exact: true })).toHaveCount(0);
+      await expect(page.locator('[data-message-id="1"]')).toContainText('第一条提醒');
+      await expect(page.locator('[data-message-id="2"]')).toContainText('第二条提醒');
+      expect(await draft.evaluate((el) => el.textContent)).toBe('保留当前草稿');
+
+      fixture.push('2', '@本人合成 第二条提醒');
+      fixture.push('3', '@本人合成 新提醒');
+      await expect(alert).toHaveText('1 条消息提到我');
+      if (mobile) await alert.tap();
+      else await alert.click();
+      await expect(page.locator('[data-message-id="3"]')).toHaveAttribute('data-located', 'true');
+      await expect(ignore).toHaveCount(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+      expect(fixture.stats()).toMatchObject({ connections: 1, historyRequests: 1 });
+    });
+
     test(`${skin.id} ${mode}: avatar mention, incoming alert and quote navigation`, async ({
       page,
     }, info) => {

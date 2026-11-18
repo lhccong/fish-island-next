@@ -53,6 +53,7 @@ export interface Visitor {
 }
 export type FarmAction = 'plant' | 'harvest' | 'water' | 'waterBatch' | 'unlock' | 'steal';
 export interface FarmPort {
+  harvestStatus(signal: AbortSignal): Promise<boolean>;
   lands(friendId: string | null, signal: AbortSignal): Promise<Land[]>;
   crops(signal: AbortSignal): Promise<Crop[]>;
   farmer(signal: AbortSignal): Promise<Farmer>;

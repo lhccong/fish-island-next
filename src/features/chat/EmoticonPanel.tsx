@@ -2,6 +2,7 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useState } from 'react';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
+import { SearchForm } from '@/shared/ui/SearchForm';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { InfiniteScroll, useInfinitePages } from '@/shared/ui/InfiniteScroll';
 import { useChatRealtime } from './realtime-context';
@@ -19,47 +20,36 @@ export default function EmoticonPanel({
   const { emoticons, draft, controller, user } = useChatRealtime();
   const revision = useStore(emoticons.store, (s) => s.revision);
   const pending = useStore(emoticons.store, (s) => s.pending);
-  const [input, setInput] = useState('');
-  const [keyword, setKeyword] = useState('');
+  const [{ keyword, submitted }, setQuery] = useState({ keyword: '', submitted: 0 });
   const [notice, setNotice] = useState('');
   const load = useCallback(
     async (page: number, signal: AbortSignal) => {
       // 收藏写入成功后才使列表失效；搜索不因收藏而重取。
-      if (keyword) {
+      if (search) {
         return emoticons.port.search(keyword, page, signal);
       }
-      return emoticons.port.list(page, signal);
+      return emoticons.port.list(page, signal, keyword);
     },
-    [emoticons, keyword],
+    [emoticons, keyword, search],
   );
   return (
     <>
-      {search && (
-        <form
-          className={styles.search}
-          onSubmit={(event) => {
-            event.preventDefault();
-            const value = input.trim();
-            if (value) setKeyword(value);
-          }}
-        >
-          <input
-            aria-label="搜索表情包"
-            placeholder="输入关键词搜索表情包"
-            maxLength={80}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <Button type="submit">搜索</Button>
-        </form>
-      )}
+      <SearchForm
+        label={search ? '搜索表情包' : '搜索收藏表情包'}
+        placeholder={search ? '输入关键词' : '输入图片里的文字'}
+        keyword={keyword}
+        onSearch={(value) =>
+          setQuery((query) => ({ keyword: value, submitted: query.submitted + 1 }))
+        }
+      />
       {search && !keyword ? (
         <p className={styles.caption}>输入关键词查找表情包</p>
       ) : (
         <EmoticonList
-          key={keyword ? `search:${keyword}` : `saved:${revision}`}
+          key={`${search ? 0 : revision}:${submitted}`}
           load={load}
-          saved={!keyword}
+          saved={!search}
+          filtered={Boolean(keyword)}
           pending={pending}
           onSelect={(url) => {
             const marker = `[img]${url}[/img]`;
@@ -79,7 +69,7 @@ export default function EmoticonPanel({
             onSelect();
           }}
           onToggle={(id, url) => {
-            void (keyword ? emoticons.add(url) : emoticons.remove(id));
+            void (search ? emoticons.add(url) : emoticons.remove(id));
           }}
         />
       )}
@@ -99,12 +89,14 @@ import type { ChatEmoticon } from '@/domain/chat';
 function EmoticonList({
   load,
   saved,
+  filtered,
   pending,
   onSelect,
   onToggle,
 }: {
   load: (page: number, signal: AbortSignal) => Promise<{ items: ChatEmoticon[]; total: number }>;
   saved: boolean;
+  filtered: boolean;
   pending: boolean;
   onSelect: (url: string) => void;
   onToggle: (id: string, url: string) => void;
@@ -123,10 +115,9 @@ function EmoticonList({
       )}
       {pages.result.status === 'ready' && (
         <>
-          <p className={styles.caption}>{saved ? '我的收藏' : '搜索结果'}</p>
           {pages.result.data.items.length === 0 && (
-            <p>
-              {saved
+            <p className={styles.caption}>
+              {saved && !filtered
                 ? '还没有收藏，打开聊天图片的消息菜单，选择“添加表情包”。'
                 : '没有找到表情包，请换个关键词。'}
             </p>

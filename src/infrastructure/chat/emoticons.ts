@@ -40,8 +40,14 @@ export function createChatEmoticons(
     return payload.data;
   }
   return {
-    async list(page, signal) {
-      const data = record(await request('list/page', { current: page, pageSize: 24 }, signal));
+    async list(page, signal, keyword) {
+      const data = record(
+        await request(
+          'list/page',
+          { current: page, pageSize: 24, keyword: keyword || undefined },
+          signal,
+        ),
+      );
       // 后端 JsonConfig 将 Long（包括分页 total）序列化为十进制字符串。
       const total =
         typeof data.total === 'number'

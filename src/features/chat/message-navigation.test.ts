@@ -139,6 +139,29 @@ describe('message navigation', () => {
     f.dispose();
     vi.useRealTimers();
   });
+  it('ignores the queued alerts without changing the current location or suppressing new alerts', async () => {
+    vi.useFakeTimers();
+    const f = setup();
+    for (const id of ['1', '2', '3']) {
+      f.receive({ type: 'message', message: message(id, '@本人 请查看') });
+    }
+    await vi.advanceTimersByTimeAsync(20);
+    await f.nav.locate('1');
+    const before = f.nav.store.getState();
+    expect(before.mentions).toEqual(['2', '3']);
+
+    f.nav.ignoreMentions();
+
+    expect(f.nav.store.getState()).toEqual({ ...before, mentions: [] });
+    expect(f.chat.store.getState().ids).toEqual(['1', '2', '3']);
+    for (const id of ['2', '3', '4']) {
+      f.receive({ type: 'message', message: message(id, '@本人 请查看') });
+    }
+    await vi.advanceTimersByTimeAsync(20);
+    expect(f.nav.store.getState().mentions).toEqual(['4']);
+    expect(f.loadHistory).not.toHaveBeenCalled();
+    f.dispose();
+  });
   it('finds folded repetition rows and confirmed local rendering keys', async () => {
     const f = setup();
     f.chat.store.setState({

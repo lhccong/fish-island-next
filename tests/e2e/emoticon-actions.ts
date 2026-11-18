@@ -1,4 +1,38 @@
-import { expect, type Page, type TestInfo } from '@playwright/test';
+import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+
+export async function scrollToEnd(page: Page, scroll: Locator, touch = false) {
+  if (touch) {
+    const session = await page.context().newCDPSession(page);
+    try {
+      const box = (await scroll.boundingBox())!;
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height - 16;
+      for (let swipe = 0; swipe < 8; swipe++) {
+        const remaining = await scroll.evaluate(
+          (el) => el.scrollHeight - el.clientHeight - el.scrollTop,
+        );
+        if (remaining < 48) break;
+        await session.send('Input.dispatchTouchEvent', {
+          type: 'touchStart',
+          touchPoints: [{ x, y }],
+        });
+        for (let step = 1; step <= 5; step++) {
+          await session.send('Input.dispatchTouchEvent', {
+            type: 'touchMove',
+            touchPoints: [{ x, y: y - ((box.height - 32) * step) / 5 }],
+          });
+        }
+        await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      }
+    } finally {
+      await session.detach();
+    }
+  } else {
+    await scroll.hover();
+    await page.mouse.wheel(0, 5000);
+  }
+  await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+}
 
 export async function openEmoticonActions(page: Page) {
   const tile = page.getByRole('button', { name: '使用表情包 1', exact: true });

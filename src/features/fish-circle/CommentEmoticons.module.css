@@ -3,6 +3,10 @@
   min-height: 44px;
   padding: 0;
 }
+.search {
+  flex: none;
+  padding: 8px 8px 4px;
+}
 .scroll {
   min-height: 0;
   max-height: min(280px, 40dvh);

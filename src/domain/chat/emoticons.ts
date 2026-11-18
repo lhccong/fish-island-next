@@ -3,7 +3,11 @@ export interface ChatEmoticon {
   url: string;
 }
 export interface ChatEmoticonPort {
-  list(page: number, signal: AbortSignal): Promise<{ items: ChatEmoticon[]; total: number }>;
+  list(
+    page: number,
+    signal: AbortSignal,
+    keyword?: string,
+  ): Promise<{ items: ChatEmoticon[]; total: number }>;
   search(
     keyword: string,
     page: number,
