@@ -60,29 +60,23 @@
 .tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  min-width: 0;
+  gap: 8px;
   justify-content: flex-end;
 }
-.tool {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid transparent;
+.tools .tool {
+  flex: 0 0 auto;
+  gap: 6px;
+  border-color: transparent;
   border-radius: 3px;
   background: transparent;
   color: var(--color-text);
-  cursor: pointer;
+  white-space: nowrap;
 }
-.tool:hover:not(:disabled) {
+.tools .tool:hover:not(:disabled) {
   background: var(--color-accent-soft);
   border-color: var(--color-accent-text);
   color: var(--color-accent-text);
-}
-.tool:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
 }
 .dashboard {
   display: grid;
@@ -131,10 +125,6 @@
   left: 0;
   top: 4px;
   font-size: 12px;
-}
-.iconAction {
-  min-width: 44px;
-  min-height: 44px;
 }
 .footnote {
   justify-self: center;
@@ -232,10 +222,6 @@
   .tools {
     width: 100%;
     justify-content: flex-start;
-    gap: 0;
-  }
-  .tool {
-    flex: 1 0 44px;
   }
   .dashboard {
     grid-template-columns: minmax(0, 1fr);

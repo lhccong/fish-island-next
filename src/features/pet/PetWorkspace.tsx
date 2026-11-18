@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { PageFooterOutlet } from '@/shared/ui/PageFooter';
+import { Button } from '@/shared/ui/Button';
 import {
   PawPrint,
   Backpack,
@@ -103,17 +104,17 @@ export function PetWorkspace({
           </h1>
           <nav ref={navigationRef} className={styles.tools} aria-label="伙伴功能">
             {panels.map(({ id, title, icon: Icon }) => (
-              <button
+              <Button
                 key={id}
-                type="button"
+                variant="secondary"
                 className={styles.tool}
                 aria-label={title}
-                title={title}
                 disabled={!pet}
                 onClick={() => openPanel(id)}
               >
-                <Icon size={22} aria-hidden="true" />
-              </button>
+                <Icon size={18} aria-hidden="true" />
+                <span>{title}</span>
+              </Button>
             ))}
           </nav>
         </header>

@@ -19,34 +19,22 @@ export function CareActions({
       <span className={styles.careStatus}>
         {pending && <LoadingIndicator compact>正在照料…</LoadingIndicator>}
       </span>
-      <Button
-        disabled={disabled}
-        aria-label="喂食 · 5 积分"
-        title="喂食 · 5 积分"
-        onClick={() => onCare('feed')}
-      >
+      <Button disabled={disabled} aria-label="喂食 · 5 积分" onClick={() => onCare('feed')}>
         <Apple size={16} aria-hidden="true" />
-        <span>5</span>
+        <span>喂食 · 5 积分</span>
       </Button>
       <Button
         variant="secondary"
         disabled={disabled}
         aria-label="抚摸 · 3 积分"
-        title="抚摸 · 3 积分"
         onClick={() => onCare('pat')}
       >
         <Heart size={16} aria-hidden="true" />
-        <span>3</span>
+        <span>抚摸 · 3 积分</span>
       </Button>
-      <Button
-        variant="secondary"
-        className={styles.iconAction}
-        disabled={disabled}
-        aria-label="设置自动喂食"
-        title="自动喂食"
-        onClick={onAuto}
-      >
+      <Button variant="secondary" disabled={disabled} aria-label="设置自动喂食" onClick={onAuto}>
         <Settings2 size={16} aria-hidden="true" />
+        <span>自动喂食</span>
       </Button>
     </div>
   );
