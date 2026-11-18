@@ -16,7 +16,7 @@ it('serializes mutations, aborts old account requests and suppresses late succes
     list: vi.fn(),
     search: vi.fn(),
   };
-  const controller = createEmoticonController(port, 'synthetic-owner');
+  const controller = createEmoticonController(port, 'synthetic-owner', { upload: vi.fn() });
   const first = controller.add('https://image.test/a.gif');
   await controller.add('https://image.test/a.gif');
   expect(port.add).toHaveBeenCalledOnce();
@@ -34,7 +34,7 @@ it('reports failure without invalidating the list and can retry after failure', 
     list: vi.fn(),
     search: vi.fn(),
   };
-  const controller = createEmoticonController(port, 'synthetic-owner');
+  const controller = createEmoticonController(port, 'synthetic-owner', { upload: vi.fn() });
   controller.dispose();
   controller.start();
   await controller.add('https://image.test/a.gif');
@@ -46,4 +46,23 @@ it('reports failure without invalidating the list and can retry after failure', 
     error: false,
     feedback: '已添加到表情包',
   });
+});
+
+it('does not save a local image if the account leaves before the upload completes', async () => {
+  const port: ChatEmoticonPort = { add: vi.fn(), remove: vi.fn(), list: vi.fn(), search: vi.fn() };
+  let finish!: (url: string) => void;
+  const upload = vi.fn(
+    () =>
+      new Promise<string>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const controller = createEmoticonController(port, 'synthetic-owner', { upload });
+  const pending = controller.upload(new File(['gif'], 'sticker.gif', { type: 'image/gif' }));
+  await vi.waitFor(() => expect(upload).toHaveBeenCalledOnce());
+  controller.dispose();
+  finish('https://image.test/sticker.gif');
+  await pending;
+  expect(port.add).not.toHaveBeenCalled();
+  expect(controller.store.getState().revision).toBe(0);
 });

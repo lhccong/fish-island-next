@@ -9,6 +9,7 @@ export default defineConfig({
     'music-message.spec.ts',
     'music-mini.spec.ts',
     'music-recommendations.spec.ts',
+    'music-daily.spec.ts',
   ],
   outputDir: 'test-results-music-task',
   projects: [{ name: 'music-chromium', use: { browserName: 'chromium' } }],

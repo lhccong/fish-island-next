@@ -39,7 +39,7 @@ function setup(
   resolve = vi.fn<MusicPort['resolve']>().mockResolvedValue('https://cdn.example.test/song.mp3'),
 ) {
   const audio = new FakeAudio();
-  const port: MusicPort = { search: vi.fn(), recommend: vi.fn(), resolve };
+  const port: MusicPort = { search: vi.fn(), recommend: vi.fn(), daily: vi.fn(), resolve };
   return { audio, port, player: createMusicPlayer(port, audio as unknown as HTMLAudioElement) };
 }
 describe('independent music player', () => {
@@ -195,7 +195,12 @@ describe('music search requests', () => {
     const search = vi
       .fn<MusicPort['search']>()
       .mockResolvedValue(Array.from({ length: 20 }, (_, n) => song(String(n))));
-    const controller = createMusicSearch({ search, recommend: vi.fn(), resolve: vi.fn() });
+    const controller = createMusicSearch({
+      search,
+      recommend: vi.fn(),
+      daily: vi.fn(),
+      resolve: vi.fn(),
+    });
     controller.search('netease', '合成');
     void controller.load();
     await settle();
@@ -219,7 +224,12 @@ describe('music search requests', () => {
       )
       .mockRejectedValueOnce(new Error('配置错误'))
       .mockResolvedValue([song('new')]);
-    const controller = createMusicSearch({ search, recommend: vi.fn(), resolve: vi.fn() });
+    const controller = createMusicSearch({
+      search,
+      recommend: vi.fn(),
+      daily: vi.fn(),
+      resolve: vi.fn(),
+    });
     controller.search('netease', '旧');
     controller.search('tencent', '新');
     await settle();

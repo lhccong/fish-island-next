@@ -3,6 +3,7 @@ import { useStore } from 'zustand';
 import { ImagePlus } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { useChatRealtime } from './realtime-context';
+import { chatImageAccept } from './prepare-image';
 
 export function ChatImageLauncher({
   inputRef,
@@ -31,7 +32,7 @@ export function ChatImageLauncher({
       <input
         ref={input}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
+        accept={chatImageAccept}
         aria-label="选择聊天图片"
         hidden
         onChange={(event) => {

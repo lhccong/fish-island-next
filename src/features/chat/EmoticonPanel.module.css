@@ -58,12 +58,27 @@
   flex: 1;
   min-height: 0;
 }
+.listContent {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   padding-block: 4px;
   padding-inline: 4px;
+}
+.grid .upload {
+  aspect-ratio: 1;
+  min-height: 44px;
+  padding: 4px;
+  background: var(--color-canvas);
+  color: var(--color-text);
+}
+.grid .upload:hover:not(:disabled) {
+  background: var(--color-hover);
 }
 .tile {
   position: relative;

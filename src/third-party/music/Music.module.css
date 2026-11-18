@@ -32,18 +32,32 @@
   color: var(--color-text);
   font: inherit;
 }
+.toolbar,
 .tabs,
+.discovery,
 .controls {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.recommendations {
+.toolbar {
+  flex-wrap: wrap;
+}
+.discovery {
   margin-left: auto;
 }
-.tabs button[aria-pressed='true'] {
+.toolbar button[aria-pressed='true'] {
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
+}
+.dailyError {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  height: 100%;
+  gap: 8px;
+  padding: 8px;
+  text-align: center;
 }
 .scroll {
   --scroll-area-reserved-gutter: 24px;

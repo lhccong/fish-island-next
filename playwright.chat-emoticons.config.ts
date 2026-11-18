@@ -3,7 +3,7 @@ import base from './playwright.chat-realtime.config';
 
 export default defineConfig({
   ...base,
-  testMatch: 'chat-emoticons.spec.ts',
+  testMatch: ['chat-emoticons.spec.ts', 'chat-emoticon-upload.spec.ts'],
   expect: { timeout: 15000 },
   outputDir: 'test-results-chat-emoticons/results',
   reporter: 'list',

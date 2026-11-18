@@ -2,9 +2,11 @@ import { isAnimatedImage } from './animated-image';
 
 const MiB = 1024 * 1024;
 const targetBytes = 256 * 1024;
+const imageTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+export const chatImageAccept = imageTypes.join(',');
+
 export async function prepareChatImage(file: File, signal: AbortSignal): Promise<File> {
-  if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(file.type))
-    throw new Error('仅支持 PNG、JPEG、WebP、GIF 图片');
+  if (!imageTypes.includes(file.type)) throw new Error('仅支持 PNG、JPEG、WebP、GIF 图片');
   if (!file.size || file.size > 10 * MiB) throw new Error('图片需在 10MB 以内且不能为空');
   signal.throwIfAborted();
   if (file.size <= 5 * MiB) return file;

@@ -58,8 +58,8 @@ export function createMusicClient(
       );
     return payload.data;
   }
-  function songs(data: unknown, source: MusicSource): Song[] {
-    if (!Array.isArray(data) || data.length > 20) throw new Error('音乐数据异常，请重试');
+  function songs(data: unknown, source: MusicSource, limit = 20): Song[] {
+    if (!Array.isArray(data) || data.length > limit) throw new Error('音乐数据异常，请重试');
     return data.map((raw): Song => {
       const row = object(raw);
       if (
@@ -94,6 +94,9 @@ export function createMusicClient(
         await request('recommendations', new URLSearchParams({ source }), signal),
         source,
       );
+    },
+    async daily(signal) {
+      return songs(await request('daily', new URLSearchParams(), signal), 'netease', 30);
     },
     async resolve(song, signal) {
       return playableUrl(

@@ -7,6 +7,7 @@ import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { InfiniteScroll, useInfinitePages } from '@/shared/ui/InfiniteScroll';
 import { useChatRealtime } from './realtime-context';
 import { EmoticonTile } from './EmoticonTile';
+import { EmoticonUploadTile } from './EmoticonUploadTile';
 import { EmoticonFeedback } from './EmoticonFeedback';
 import styles from './EmoticonPanel.module.css';
 
@@ -102,48 +103,55 @@ function EmoticonList({
   onToggle: (id: string, url: string) => void;
 }) {
   const pages = useInfinitePages(load);
+  const loading = pages.result.status === 'loading';
   return (
-    <ScrollArea label="表情包列表" gutter="reserved" className={styles.scroll ?? ''}>
-      {pages.result.status === 'loading' && <LoadingIndicator>正在加载表情包…</LoadingIndicator>}
-      {pages.result.status === 'error' && (
-        <div role="alert">
-          <p>{pages.result.message}</p>
-          <Button variant="secondary" onClick={pages.refresh}>
-            重试表情包
-          </Button>
-        </div>
-      )}
-      {pages.result.status === 'ready' && (
-        <>
-          {pages.result.data.items.length === 0 && (
-            <p className={styles.caption}>
-              {saved && !filtered
-                ? '还没有收藏，打开聊天图片的消息菜单，选择“添加表情包”。'
-                : '没有找到表情包，请换个关键词。'}
-            </p>
-          )}
+    <ScrollArea label="表情包列表" gutter="reserved" fillContent className={styles.scroll ?? ''}>
+      <div className={styles.listContent}>
+        {(saved || pages.result.status === 'ready') && (
           <div className={styles.grid}>
-            {pages.result.data.items.map((item, index) => (
-              <EmoticonTile
-                key={item.id}
-                item={item}
-                index={index}
-                saved={saved}
-                pending={pending}
-                onSelect={() => onSelect(item.url)}
-                onToggle={() => onToggle(item.id, item.url)}
-              />
-            ))}
+            {saved && <EmoticonUploadTile pending={pending} />}
+            {pages.result.status === 'ready' &&
+              pages.result.data.items.map((item, index) => (
+                <EmoticonTile
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  saved={saved}
+                  pending={pending}
+                  onSelect={() => onSelect(item.url)}
+                  onToggle={() => onToggle(item.id, item.url)}
+                />
+              ))}
           </div>
-          <InfiniteScroll
-            label="表情包"
-            loading={pages.loadingMore}
-            error={pages.error}
-            hasMore={pages.hasMore}
-            onLoadMore={pages.loadMore}
-          />
-        </>
-      )}
+        )}
+        {loading && <LoadingIndicator>正在加载表情包…</LoadingIndicator>}
+        {pages.result.status === 'error' && (
+          <div role="alert">
+            <p>{pages.result.message}</p>
+            <Button variant="secondary" onClick={pages.refresh}>
+              重试表情包
+            </Button>
+          </div>
+        )}
+        {pages.result.status === 'ready' && (
+          <>
+            {pages.result.data.items.length === 0 && (
+              <p className={styles.caption}>
+                {saved && !filtered
+                  ? '还没有收藏，点击加号上传表情包。'
+                  : '没有找到表情包，请换个关键词。'}
+              </p>
+            )}
+            <InfiniteScroll
+              label="表情包"
+              loading={pages.loadingMore}
+              error={pages.error}
+              hasMore={pages.hasMore}
+              onLoadMore={pages.loadMore}
+            />
+          </>
+        )}
+      </div>
     </ScrollArea>
   );
 }

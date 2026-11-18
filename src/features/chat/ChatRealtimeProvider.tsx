@@ -98,8 +98,8 @@ export function ChatRealtimeProvider({
   useEffect(() => navigation.start(userId, user?.name ?? ''), [navigation, userId, user?.name]);
   const composerRef = useRef<HTMLDivElement>(null);
   const emoticons = useMemo(
-    () => createEmoticonController(emoticonPort, userId),
-    [emoticonPort, userId],
+    () => createEmoticonController(emoticonPort, userId, imageUploadPort),
+    [emoticonPort, userId, imageUploadPort],
   );
   useEffect(() => {
     emoticons.start();

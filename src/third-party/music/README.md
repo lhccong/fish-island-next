@@ -4,6 +4,8 @@
 
 消息与悬浮球共用 `shared/ui/MediaDisc` 的静态光盘外观，包含反光盘面、同心纹路、中心孔及播放状态标记。纯音乐消息不显示矩形气泡背景；图片、引用、撤回和原有消息操作保留各自呈现，不增加持续动画或播放进度订阅。
 
+「每日30首」打开网易云公开热歌榜的当日选曲，支持逐首点歌和分享。后端 `/api/third-party/music/daily` 使用 Meting `type=playlist`，北京时间每天选取最多 30 首。
+
 ## 文件职责
 
 - `domain.ts`：纯歌曲和端口类型。
@@ -11,6 +13,7 @@
 - `search-controller.ts`：取消、分页和稳定 ID 去重，每次 20 首、最多 100 首。
 - `player-controller.ts`：单音频实例、最多 50 首待播、竞态取消、结束切歌、释放；进度使用独立 store。
 - `recommendation-controller.ts`：推荐候选去重及请求取消，保留服务端顺序；每批最多 20 首，不预取音频。
+- `DailyMusicList.tsx`：每日歌曲按需读取、取消及重试，与搜索共用歌曲行。
 - `MusicShareButton.tsx`：统一列表和当前歌曲分享入口，发送结果由聊天消息反馈。
 - `MusicProvider.tsx` / `music-context.ts`：账号宿主、按需加载和播放回调。
 - `MusicRuntime.tsx` / `MusicSearch.tsx` / `MusicPlayback.tsx`：音频生命周期和面板。

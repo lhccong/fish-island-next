@@ -41,6 +41,7 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
   let release: (() => void) | undefined;
   let searchRequests = 0;
   let recommendationRequests = 0;
+  let dailyRequests = 0;
   let resolveRequests = 0;
   let resolutionHeld = false;
   let releaseResolution: (() => void) | undefined;
@@ -80,7 +81,9 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
           json: { code: 0, data: `https://music.example.test/${url.searchParams.get('id')}.wav` },
         });
       }
-      if (url.pathname.endsWith('/recommendations')) recommendationRequests++;
+      const daily = url.pathname.endsWith('/daily');
+      if (daily) dailyRequests++;
+      else if (url.pathname.endsWith('/recommendations')) recommendationRequests++;
       else searchRequests++;
       if (phase === 'loading')
         await new Promise<void>((done) => {
@@ -94,7 +97,7 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
       const data =
         phase === 'empty'
           ? []
-          : Array.from({ length: pageNumber === 1 ? 20 : 2 }, (_, n) => ({
+          : Array.from({ length: daily ? 30 : pageNumber === 1 ? 20 : 2 }, (_, n) => ({
               id: String((pageNumber - 1) * 20 + n + 1),
               name: `合成歌曲${(pageNumber - 1) * 20 + n + 1}`,
               artist: '合成歌手与较长的专辑演唱者名称',
@@ -129,6 +132,7 @@ export async function setupMusic(page: Page, skin = 'wechat', mode = 'light') {
     },
     counts: () => ({ searchRequests, resolveRequests }),
     recommendationRequests: () => recommendationRequests,
+    dailyRequests: () => dailyRequests,
     sends: () => sentMessages,
     failSending(value: boolean) {
       sendFailure = value;
