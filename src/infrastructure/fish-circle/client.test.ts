@@ -59,6 +59,29 @@ describe('fish circle compatibility', () => {
     });
     expect(decoded.media).toEqual([{ type: 'image', url: 'https://example.com/a.png' }]);
     expect(decoded.content).toBe('hello<script>alert(1)</script>[img:javascript:bad]');
+    expect(decoded.reaction).toBeNull();
+  });
+  it('decodes account-specific comment likes and submits the desired state', async () => {
+    const fetcher = respond(true);
+    const client = createFishCircleClient('', token, vi.fn());
+    const decoded = comment({
+      id: '1',
+      userId: '2',
+      liked: true,
+      likeNum: 4,
+      children: [{ id: '2', userId: '3', liked: false, likeNum: 2 }],
+    });
+    expect(decoded.reaction).toEqual({ liked: true, likes: 4 });
+    expect(decoded.children[0]?.reaction).toEqual({ liked: false, likes: 2 });
+    await expect(client.setCommentLiked('9007199254740993', false, signal())).resolves.toBe(true);
+    const [url, options] = fetcher.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('/api/moments/comment/like');
+    expect(JSON.parse(String(options.body))).toEqual({
+      commentId: '9007199254740993',
+      liked: false,
+    });
+    respond(false);
+    await expect(client.setCommentLiked('1', true, signal())).rejects.toThrow('服务器未确认');
   });
   it('encodes image replies and preserves the parent identity', async () => {
     const fetcher = respond('3');

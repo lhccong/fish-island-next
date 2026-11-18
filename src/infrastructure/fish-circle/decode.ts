@@ -92,6 +92,13 @@ function decodeComment(v: unknown): Comment {
     replyName: text(c.replyUserName),
     createdAt: text(c.createTime),
     top: c.isTop === 1,
+    reaction:
+      typeof c.liked === 'boolean' &&
+      typeof c.likeNum === 'number' &&
+      Number.isSafeInteger(c.likeNum) &&
+      c.likeNum >= 0
+        ? { liked: c.liked, likes: c.likeNum }
+        : null,
     children: [],
   };
 }

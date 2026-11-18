@@ -18,6 +18,7 @@ const comment = (id: string, patch: Partial<Comment> = {}): Comment => ({
   avatar: '',
   replyName: '',
   top: false,
+  reaction: null,
   children: [],
   media: [],
   ...patch,

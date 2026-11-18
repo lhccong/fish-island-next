@@ -65,6 +65,13 @@
   min-width: 0;
   flex: 1;
 }
+.like[aria-pressed='true'] {
+  color: var(--color-accent-text);
+  border-color: var(--color-accent-text);
+}
+.like {
+  min-width: 44px;
+}
 .comment[data-comment-target='true'] {
   padding: 12px;
   border-inline-start: 3px solid var(--color-accent-text);
@@ -118,7 +125,7 @@
 .actions time {
   flex-shrink: 0;
 }
-.actions button {
+.actions button:not(.like) {
   min-height: 44px;
   padding: var(--space-1) var(--space-1);
   border: 0;
@@ -129,15 +136,15 @@
   border-radius: var(--radius-control);
   line-height: 1.5;
 }
-.actions button:hover {
+.actions button:not(.like):hover {
   background: var(--color-hover);
   color: var(--color-circle-author);
 }
-.actions button:focus-visible {
+.actions button:not(.like):focus-visible {
   outline: 2px solid var(--color-accent-text);
   outline-offset: 0;
 }
-.actions button:disabled {
+.actions button:not(.like):disabled {
   opacity: 0.5;
 }
 .replies {
@@ -169,7 +176,7 @@
 }
 @media (min-width: 761px) {
   .actions,
-  .actions button {
+  .actions button:not(.like) {
     min-height: 32px;
   }
 }

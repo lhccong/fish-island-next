@@ -112,15 +112,18 @@ for (const skin of builtinSkins)
       const cancel = form.getByRole('button', { name: '取消回复' });
       await expect(form.getByText('通知岛友', { exact: true })).toBeVisible();
       await expect(form.getByText(state.target, { exact: true })).toBeVisible();
-      await expect(target).toBeInViewport();
+      const targetBounds = (await target.boundingBox())!;
+      const listBounds = (await list.boundingBox())!;
+      expect(targetBounds.y).toBeLessThan(listBounds.y + listBounds.height);
+      expect(targetBounds.y + targetBounds.height).toBeGreaterThan(listBounds.y);
       await expect(editor).toBeInViewport();
       await expect(form.getByRole('button', { name: '发送评论' })).toBeInViewport();
       const cancelBox = (await cancel.boundingBox())!;
       expect(cancelBox.height).toBe(mobile ? 44 : 32);
       expect(cancelBox.width).toBeLessThan(120);
       expect(
-        (await form.boundingBox())!.y -
-          ((await list.boundingBox())!.y + (await list.boundingBox())!.height),
+        (await list.boundingBox())!.y -
+          ((await form.boundingBox())!.y + (await form.boundingBox())!.height),
       ).toBeGreaterThanOrEqual(10);
       expect(await form.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
         true,

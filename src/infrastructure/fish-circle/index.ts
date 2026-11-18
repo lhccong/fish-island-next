@@ -160,6 +160,9 @@ export function createFishCircleClient(
         comment,
       );
     },
+    async setCommentLiked(commentId, liked, signal) {
+      return confirmed(await request('moments/comment/like', { commentId, liked }, signal));
+    },
     async comment(momentId, content, parent, images, signal) {
       id(
         await request(

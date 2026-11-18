@@ -7,6 +7,7 @@ import type { Comment, FishCirclePort } from '@/domain/fish-circle';
 import { usePage } from './use-page';
 import { useOperation } from './use-operation';
 import { CommentComposer } from './CommentComposer';
+import { CommentLikeButton } from './CommentLikeButton';
 import { MediaGrid } from './MediaGrid';
 import { CircleAvatar } from './CircleAvatar';
 import { formatMomentTime } from './format-time';
@@ -44,6 +45,7 @@ export function Comments({
   const [replyOverrides, setReplyOverrides] = useState<ReadonlyMap<string, boolean>>(new Map());
   const [reply, setReply] = useState<Comment | null>(null);
   const operation = useOperation();
+  const [likingId, setLikingId] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const container = useRef<HTMLElement>(null);
   const replyElement = useRef<HTMLElement | null>(null);
@@ -74,6 +76,17 @@ export function Comments({
   function commentCount(c: Comment): number {
     return 1 + c.children.reduce((n, child) => n + commentCount(child), 0);
   }
+  async function setLiked(id: string, liked: boolean) {
+    if (operation.pending) return;
+    setNotice('');
+    setLikingId(id);
+    const ok = await operation.run((signal) => service.setCommentLiked(id, liked, signal));
+    setLikingId(null);
+    if (ok) {
+      setNotice(liked ? '已点赞评论' : '已取消评论点赞');
+      refresh();
+    }
+  }
   function renderComment(c: Comment, ancestors: string[] = []) {
     const highlighted = anchor.match?.status === 'found' && anchor.match.id === c.id;
     const repliesOpen =
@@ -98,6 +111,14 @@ export function Comments({
           <MediaGrid media={c.media} />
           <div className={styles.actions}>
             <time>{formatMomentTime(c.createdAt)}</time>
+            {c.reaction && (
+              <CommentLikeButton
+                reaction={c.reaction}
+                pending={likingId === c.id}
+                disabled={operation.pending}
+                onToggle={(liked) => void setLiked(c.id, liked)}
+              />
+            )}
             <button
               type="button"
               aria-label={`回复 ${c.userName}`}
@@ -185,6 +206,20 @@ export function Comments({
       data-composing={composerOpen || !!reply}
     >
       <h3 className={styles.heading}>评论</h3>
+      {(composerOpen || reply) && (
+        <CommentComposer
+          service={service}
+          momentId={momentId}
+          reply={reply}
+          onCancelReply={() => setReply(null)}
+          onSent={() => {
+            setReply(null);
+            onCountChange(1);
+            setNotice('评论成功');
+            refresh();
+          }}
+        />
+      )}
       <ScrollArea label="评论列表" gutter="reserved" className={styles.scroller || ''}>
         <div className={styles.scrollContent}>
           {anchor.message && (
@@ -243,21 +278,6 @@ export function Comments({
           )}
         </div>
       </ScrollArea>
-      {(composerOpen || reply) && (
-        <CommentComposer
-          service={service}
-          momentId={momentId}
-          reply={reply}
-          onCancelReply={() => setReply(null)}
-          onSent={() => {
-            setReply(null);
-            onCountChange(1);
-            setNotice('评论成功');
-            refresh();
-          }}
-        />
-      )}
-
       {operation.error && <p role="alert">{operation.error}</p>}
       {notice && <p role="status">{notice}</p>}
     </section>

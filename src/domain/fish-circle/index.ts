@@ -32,6 +32,7 @@ export interface Comment {
   replyName: string;
   createdAt: string;
   top: boolean;
+  reaction: { liked: boolean; likes: number } | null;
   children: Comment[];
   media: Media[];
 }
@@ -69,6 +70,7 @@ export interface FishCirclePort {
   like(id: string, signal: AbortSignal): Promise<boolean>;
   action(action: MomentAction, id: string, value: number, signal: AbortSignal): Promise<string>;
   comments(id: string, page: number, signal: AbortSignal): Promise<Page<Comment>>;
+  setCommentLiked(id: string, liked: boolean, signal: AbortSignal): Promise<boolean>;
   comment(
     id: string,
     content: string,
