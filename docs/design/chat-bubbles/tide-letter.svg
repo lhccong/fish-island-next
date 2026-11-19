@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="112" viewBox="0 0 280 112" role="img">
+  <title>潮汐来信</title>
+  <defs>
+    <style>
+      :root {
+        --bubble-top: #f1feff;
+        --bubble-mid: #dcf7ff;
+        --bubble-bottom: #b9e8f7;
+        --bubble-edge: #8bc8db;
+        --bubble-accent: #26758d;
+        --bubble-gloss: #ffffff;
+        --bubble-gloss-opacity: .82;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bubble-top: #233f50;
+          --bubble-mid: #213849;
+          --bubble-bottom: #203144;
+          --bubble-edge: #517f96;
+          --bubble-accent: #9cdae9;
+          --bubble-gloss: #9cdae9;
+          --bubble-gloss-opacity: .24;
+        }
+      }
+
+      .accent-line {
+        fill: none;
+        stroke: var(--bubble-accent);
+        stroke-width: 1.35;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .sticker-gloss {
+        fill: none;
+        stroke: white;
+        stroke-width: 1.55;
+        stroke-linecap: round;
+        opacity: .82;
+      }
+    </style>
+    <path id="bubble" d="M37 23C55 19 64 23 76 23H243C259 23 270 35 270 50v14c0 14-11 25-26 25H37C20 89 10 78 10 63V49c0-14 10-24 27-26Z"/>
+    <clipPath id="inside"><use href="#bubble"/></clipPath>
+    <linearGradient id="surface" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="var(--bubble-top)"/>
+      <stop offset=".52" stop-color="var(--bubble-mid)"/>
+      <stop offset="1" stop-color="var(--bubble-bottom)"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="var(--bubble-gloss)" stop-opacity="var(--bubble-gloss-opacity)"/>
+      <stop offset=".43" stop-color="var(--bubble-gloss)" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sticker" x1="0" y1="0" x2=".35" y2="1">
+      <stop stop-color="#f0ffff"/>
+      <stop offset=".46" stop-color="#a7e6f3"/>
+      <stop offset="1" stop-color="#54bcd4"/>
+    </linearGradient>
+  </defs>
+  <use href="#bubble" transform="translate(0 2.5)" fill="var(--bubble-edge)" opacity=".18"/>
+  <use href="#bubble" fill="url(#surface)" stroke="var(--bubble-edge)" stroke-width="1.35"/>
+  <rect x="15" y="27" width="250" height="58" rx="22" fill="url(#gloss)" clip-path="url(#inside)"/>
+  <path d="M11 28c6-7 13-8 20-3 5 4 11 4 17-1M17 34c4-3 7-3 11 0" class="accent-line" opacity=".52"/>
+  <circle cx="39" cy="13" r="5.4" fill="#b8f0fc" stroke="#60b8d3" stroke-width="1.2"/>
+  <path d="M36 12c.5-1.3 1.5-2 2.7-2.2" class="sticker-gloss"/>
+  <circle cx="53" cy="18" r="2.9" fill="#84d5e9"/>
+  <path d="M19 10c.5 3.7 1.5 4.5 5 5-3.5.5-4.5 1.3-5 5-.5-3.7-1.5-4.5-5-5 3.5-.5 4.5-1.3 5-5Z" fill="#83cadc"/>
+  <path d="M224 94c11 7 32 6 45-4M232 100c7 3 16 3 23 1" class="accent-line" opacity=".55"/>
+  <path d="M260 80c5-7 10-8 15-6l-3 6 3 6c-6 2-11 0-15-4Z" fill="#79d4e3" stroke="#367e9b" stroke-width="1.4"/>
+  <path d="M226 81c4-9 16-13 25-10 6 2 10 6 12 9-4 7-10 11-19 11-9 0-16-4-18-10Z" fill="url(#sticker)" stroke="#367e9b" stroke-width="1.4"/>
+  <path d="M245 74c-6 1-10 3-12 6" class="sticker-gloss"/>
+  <path d="M250 80c4-2 7-1 8 1-3 3-6 4-8 3" fill="#57b6d1" opacity=".8"/>
+  <circle cx="238" cy="81.2" r="1.6" fill="#1e5067"/><ellipse cx="234.5" cy="84" rx="2.4" ry="1.15" fill="#ffb7ac"/>
+  <circle cx="220" cy="75" r="2.3" fill="#b8ebf6" stroke="#7dc9dd" stroke-width="1"/>
+  <circle cx="266" cy="95.5" r="1.8" fill="#85c4d7"/>
+</svg>

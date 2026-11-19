@@ -1,4 +1,9 @@
-import { chatImageUrl, type ChatRealtimeEvent, type ReceivedMessage } from '@/domain/chat';
+import {
+  chatImageUrl,
+  parseBubbleStyle,
+  type ChatRealtimeEvent,
+  type ReceivedMessage,
+} from '@/domain/chat';
 import { decodeOnlineMembers } from './client';
 
 function object(value: unknown): Record<string, unknown> | null {
@@ -93,7 +98,10 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
   ]
     .filter(Boolean)
     .join(' · ');
+  const style = parseBubbleStyle(message.bubbleId, message.bubbleArtwork);
   return {
+    ...(style ? { bubbleId: style.id } : {}),
+    ...(style?.artwork ? { bubbleArtwork: style.artwork } : {}),
     ...(poke
       ? {
           poke: {

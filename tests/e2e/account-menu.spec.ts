@@ -35,6 +35,7 @@ for (const width of [1280, 375, 390]) {
             socket.onMessage(() => {});
           });
           await page.route('**/api/**', (route) => route.fulfill({ json: { code: 0, data: [] } }));
+          let following = true;
           await page.route('**/api/user/get/login', (route) =>
             route.fulfill({
               json: {
@@ -45,6 +46,10 @@ for (const width of [1280, 375, 390]) {
                   userRole: 'user',
                   email: 'test@example.test',
                   userProfile: '这是一条合成简介',
+                  points: 100,
+                  level: 2,
+                  followerCount: '0',
+                  followingCount: following ? '1' : '0',
                 },
               },
             }),
@@ -52,31 +57,26 @@ for (const width of [1280, 375, 390]) {
           let redeem = 0,
             appReads = 0;
           let apps: object[] = [];
-          await page.route('**/api/user/get/vo?*', (route) =>
-            route.fulfill({
-              json: {
-                code: 0,
-                data: { points: 100, level: 2, followerCount: 0, followingCount: 1 },
-              },
-            }),
-          );
           await page.route('**/api/follow/following?*', (route) =>
             route.fulfill({
               json: {
                 code: 0,
                 data: {
-                  total: 1,
-                  records: [{ userId: 'synthetic-follow', userName: '合成关注', isMutual: true }],
+                  total: following ? '1' : '0',
+                  records: following
+                    ? [{ userId: 'synthetic-follow', userName: '合成关注', isMutual: true }]
+                    : [],
                 },
               },
             }),
           );
           await page.route('**/api/follow/followers?*', (route) =>
-            route.fulfill({ json: { code: 0, data: { total: 0, records: [] } } }),
+            route.fulfill({ json: { code: 0, data: { total: '0', records: [] } } }),
           );
-          await page.route('**/api/follow/toggle?*', (route) =>
-            route.fulfill({ json: { code: 0, data: false } }),
-          );
+          await page.route('**/api/follow/toggle?*', (route) => {
+            following = false;
+            return route.fulfill({ json: { code: 0, data: false } });
+          });
           let release!: () => void;
           const gate = new Promise<void>((resolve) => {
             release = resolve;
@@ -148,8 +148,9 @@ for (const width of [1280, 375, 390]) {
           await page.getByRole('button', { name: '关注 1', exact: true }).click();
           await expect(page.getByText('合成关注', { exact: true })).toBeVisible();
           await page.getByRole('button', { name: '取消关注', exact: true }).click();
-          await expect(page.getByRole('button', { name: '关注', exact: true })).toBeVisible();
+          await expect(page.getByText('暂无关注。', { exact: true })).toBeVisible();
           await page.getByRole('button', { name: '返回卡片' }).click();
+          await expect(page.getByRole('button', { name: '关注 0', exact: true })).toBeFocused();
           await page.getByRole('button', { name: '粉丝 0', exact: true }).click();
           await expect(page.getByText('暂无粉丝。', { exact: true })).toBeVisible();
           await close(page);

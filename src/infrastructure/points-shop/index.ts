@@ -1,6 +1,6 @@
 import { AuthError, type SessionToken } from '@/domain/auth';
 import type { PointsShopPort } from '@/domain/points-shop';
-import { decodeItem, decodePage, decodePointsRecord, record } from './decode';
+import { decodeBubbles, decodeItem, decodePage, decodePointsRecord, record } from './decode';
 
 export function createPointsShopClient(
   baseUrl: string,
@@ -35,6 +35,17 @@ export function createPointsShopClient(
     }
   }
   return {
+    bubbles: async (signal) => decodeBubbles(await request('chat/bubble/list', signal)),
+    exchangeBubble: async (bubbleId, expectedPoints, signal) => {
+      const items = decodeBubbles(
+        await request('chat/bubble/exchange', signal, { bubbleId, expectedPoints }),
+      );
+      if (!items.some((item) => item.id === bubbleId && item.expiresAt !== null))
+        throw new Error('服务器未确认气泡权益，请重新读取后再试');
+      return items;
+    },
+    equipBubble: async (bubbleId, signal) =>
+      decodeBubbles(await request('chat/bubble/equip', signal, { bubbleId })),
     items: async (page, signal) =>
       decodePage(await request(`props/list/page?current=${page}&pageSize=12`, signal), decodeItem),
     records: async (page, signal) =>

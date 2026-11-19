@@ -1,9 +1,65 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createPointsShopClient } from './index';
-import { decodeItem, decodePage, decodePointsRecord } from './decode';
+import { decodeBubbles, decodeItem, decodePage, decodePointsRecord } from './decode';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('积分商城协议', () => {
+  it('只解码受支持的气泡，校验兑换回执和恢复默认的请求', async () => {
+    const item = {
+      id: 'berry-cat-paw',
+      name: '草莓猫爪',
+      points: 300,
+      durationDays: 30,
+      equipped: false,
+      expiresAt: '2026-12-19T00:00:00Z',
+    };
+    expect(decodeBubbles([item, { id: 'future-design' }])).toEqual([
+      { ...item, expiresAt: Date.parse(item.expiresAt) },
+    ]);
+    expect(() => decodeBubbles([item, item])).toThrow('气泡权益格式异常');
+    expect(() => decodeBubbles([{ ...item, equipped: true, expiresAt: null }])).toThrow();
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve(new Response(JSON.stringify({ code: 0, data: [item] }))),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const port = createPointsShopClient(
+      'https://shop.test',
+      () => ({ name: 'synthetic-session', value: 'synthetic' }),
+      vi.fn(),
+    );
+    const { signal } = new AbortController();
+    await expect(port.exchangeBubble('tide-letter', 300, signal)).rejects.toThrow('未确认气泡权益');
+    await expect(port.exchangeBubble('berry-cat-paw', 300, signal)).resolves.toHaveLength(1);
+    expect(fetchMock.mock.calls[1]).toMatchObject([
+      'https://shop.test/api/chat/bubble/exchange',
+      { method: 'POST', body: '{"bubbleId":"berry-cat-paw","expectedPoints":300}' },
+    ]);
+    await port.equipBubble(null, signal);
+    expect(fetchMock.mock.calls[2]).toMatchObject([
+      'https://shop.test/api/chat/bubble/equip',
+      { method: 'POST', body: '{"bubbleId":null}' },
+    ]);
+  });
+  it('接受后台新款及其价格，但过滤无安全图片的新款', () => {
+    const artwork = {
+      imageUrl: 'https://assets.test/kite.svg',
+      darkImageUrl: 'https://assets.test/kite-dark.svg',
+      textTone: 'theme',
+    };
+    const item = {
+      id: 'cloud-kite',
+      name: '云上风筝',
+      points: 425,
+      durationDays: 30,
+      expiresAt: null,
+      equipped: false,
+      artwork,
+    };
+    expect(decodeBubbles([item])).toEqual([item]);
+    expect(decodeBubbles([{ ...item, artwork: { imageUrl: 'javascript:alert(1)' } }])).toEqual([]);
+  });
   it('映射旧道具编号并只开放已实现类型，拒绝非法价格与图片协议', () => {
     const item = {
       frameId: '90071992547409930',

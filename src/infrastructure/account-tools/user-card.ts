@@ -1,5 +1,10 @@
 import type { UserCard } from '@/domain/account-tools';
 
+export function readNonNegativeInteger(raw: unknown): number | undefined {
+  const value = typeof raw === 'string' && /^\d+$/.test(raw) ? Number(raw) : raw;
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : undefined;
+}
+
 export function decodeUserCard(value: unknown): UserCard | null {
   if (value === null) return null;
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -11,16 +16,6 @@ export function decodeUserCard(value: unknown): UserCard | null {
     const url = text(key);
     return /^https?:\/\//i.test(url) ? url : null;
   };
-  const number = (key: string) => {
-    const raw = v[key];
-    const value =
-      typeof raw === 'number'
-        ? raw
-        : typeof raw === 'string' && /^\d+$/.test(raw)
-          ? Number(raw)
-          : NaN;
-    return Number.isSafeInteger(value) && value >= 0 ? value : undefined;
-  };
   return {
     id: String(v.id),
     name: text('userName') || '岛友',
@@ -28,9 +23,9 @@ export function decodeUserCard(value: unknown): UserCard | null {
     frame: image('avatarFramerUrl'),
     cover: image('momentsBgUrl'),
     profile: text('userProfile'),
-    level: number('level'),
-    followers: number('followerCount'),
-    following: number('followingCount'),
+    level: readNonNegativeInteger(v.level),
+    followers: readNonNegativeInteger(v.followerCount),
+    following: readNonNegativeInteger(v.followingCount),
     region: [text('country').trim(), text('region').trim()].filter(Boolean).join(' · '),
     vip: v.vip === true || v.isVip === true,
     admin: v.userRole === 'admin' || v.isAdmin === true,

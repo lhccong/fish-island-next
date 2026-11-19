@@ -199,7 +199,7 @@ export function ChatComposer({
             )}
             {content.length > 5000 && <span role="status">消息不能超过 5000 字</span>}
           </div>
-          <span className={styles.shortcutHint}>手机回车换行，电脑 Shift+Enter 换行</span>
+          <span className={styles.shortcutHint}>Shift+Enter 换行</span>
           <Button
             disabled={!user || !content.trim() || content.length > 5000 || imageBusy}
             onClick={send}

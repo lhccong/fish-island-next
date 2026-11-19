@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="112" viewBox="0 0 280 112" role="img">
+  <title>草莓猫爪</title>
+  <defs>
+    <style>
+      :root {
+        --bubble-top: #fff9fd;
+        --bubble-mid: #ffeaf3;
+        --bubble-bottom: #f5cddf;
+        --bubble-edge: #e8a8c4;
+        --bubble-accent: #a44b79;
+        --bubble-gloss: #ffffff;
+        --bubble-gloss-opacity: .82;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bubble-top: #482b43;
+          --bubble-mid: #412737;
+          --bubble-bottom: #382432;
+          --bubble-edge: #97627d;
+          --bubble-accent: #ecb5cd;
+          --bubble-gloss: #ecb5cd;
+          --bubble-gloss-opacity: .24;
+        }
+      }
+
+      .accent-line {
+        fill: none;
+        stroke: var(--bubble-accent);
+        stroke-width: 1.35;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .sticker-gloss {
+        fill: none;
+        stroke: white;
+        stroke-width: 1.55;
+        stroke-linecap: round;
+        opacity: .82;
+      }
+    </style>
+    <path id="bubble" d="M13 45c0-8 3-14 8-18l1-13c.2-4 3-5 6-3l15 13h6l15-10c3-2 6-.2 6 3l-.2 7H245c16 0 25 11 25 25v13c0 17-10 28-26 28H38C21 90 11 79 11 62V50l2-5Z"/>
+    <clipPath id="inside"><use href="#bubble"/></clipPath>
+    <linearGradient id="surface" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="var(--bubble-top)"/>
+      <stop offset=".52" stop-color="var(--bubble-mid)"/>
+      <stop offset="1" stop-color="var(--bubble-bottom)"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="var(--bubble-gloss)" stop-opacity="var(--bubble-gloss-opacity)"/>
+      <stop offset=".43" stop-color="var(--bubble-gloss)" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sticker" x1="0" y1="0" x2=".35" y2="1">
+      <stop stop-color="#fff9f9"/>
+      <stop offset=".46" stop-color="#ffe4ee"/>
+      <stop offset="1" stop-color="#f4b9d4"/>
+    </linearGradient>
+  </defs>
+  <use href="#bubble" transform="translate(0 2.5)" fill="var(--bubble-edge)" opacity=".18"/>
+  <use href="#bubble" fill="url(#surface)" stroke="var(--bubble-edge)" stroke-width="1.35"/>
+  <rect x="15" y="27" width="250" height="58" rx="22" fill="url(#gloss)" clip-path="url(#inside)"/>
+  <path d="m25 25 1-9 9 8m23 0 8-5-.5 5" fill="#f6aaca" opacity=".74"/>
+  <ellipse cx="27" cy="37" rx="4.5" ry="2.1" fill="#e88db2" opacity=".56"/>
+  <path d="m18 34-6-2m6 7-6 1" class="accent-line"/>
+  <path d="M32 32c1-2 3-2 4.2 0m4.7 1 1.8 1.6 1.8-1.6m4.6-1c1.2-2 3.4-2 4.6 0" class="accent-line"/>
+  <path d="M253 72c3-5 7-6 10-5 6 2 8 8 7 13 4 1 6 6 4 10-3 6-11 9-17 7-5 5-15 5-20 0-4-4-3-9 1-12-1-6 3-12 8-13 3-1 5 0 7 0Z" fill="url(#sticker)" stroke="#b66c93" stroke-width="1.35"/>
+  <ellipse cx="243.6" cy="83" rx="3.2" ry="4.1" transform="rotate(-15 244 83)" fill="#e78caf"/>
+  <ellipse cx="251" cy="77.4" rx="3.1" ry="4" transform="rotate(-4 251 77)" fill="#e78caf"/>
+  <ellipse cx="259.2" cy="77.6" rx="3.1" ry="4" transform="rotate(20 259 78)" fill="#e78caf"/>
+  <ellipse cx="266.1" cy="83.4" rx="3" ry="4" transform="rotate(34 266 83)" fill="#e78caf"/>
+  <path d="M245 92c0-3 5-8 10-8 5 0 9 5 9 8 0 3-4 4-8 2-4 2-11 1-11-2Z" fill="#e88cad"/>
+  <path d="M219 78c0-4 4-6 7-3 3-3 7-1 7 2 0 3-4 6-7 8-3-2-7-5-7-7Z" fill="#de7da4" stroke="#a85b83" stroke-width="1"/>
+  <path d="M238 92c.7-2 1.9-3.4 3.1-4.1" class="sticker-gloss"/>
+</svg>

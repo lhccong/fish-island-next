@@ -1,7 +1,7 @@
 import { AuthError, type SessionToken } from '@/domain/auth';
 import type { AccountToolsPort, DeveloperApp } from '@/domain/account-tools';
 import type { UserCardPort } from '@/domain/account-tools';
-import { decodeUserCard } from './user-card';
+import { decodeUserCard, readNonNegativeInteger } from './user-card';
 
 function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -26,6 +26,7 @@ export function createAccountToolsClient(
         method,
         headers,
         credentials: 'include',
+        cache: 'no-store',
         signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
         ...(body ? { body: JSON.stringify(body) } : {}),
       });
@@ -72,30 +73,41 @@ export function createAccountToolsClient(
       if (value !== true) throw new Error('服务器未确认禁言操作，请重试');
     },
     async card(id, signal) {
-      const v = record(await request(`user/get/vo?id=${encodeURIComponent(id)}`, signal));
-      const number = (key: string) =>
-        typeof v[key] === 'number' && Number.isFinite(v[key]) ? (v[key] as number) : 0;
+      const v = record(await request('user/get/login', signal));
+      const accountId = typeof v.id === 'string' ? v.id : readNonNegativeInteger(v.id);
+      if (accountId === undefined || String(accountId) !== id)
+        throw new Error('服务器返回的用户资料不匹配，请重试');
+      const following = readNonNegativeInteger(v.followingCount);
+      const followers = readNonNegativeInteger(v.followerCount);
+      const profile =
+        following === undefined || followers === undefined
+          ? decodeUserCard(await request(`user/get/vo?id=${encodeURIComponent(id)}`, signal))
+          : null;
+      if (profile && profile.id !== id) throw new Error('服务器返回的用户资料不匹配，请重试');
       return {
-        points: number('points'),
-        level: number('level'),
-        followers: number('followerCount'),
-        following: number('followingCount'),
-        region: [text(v.country), text(v.region)].filter(Boolean).join(' · '),
+        points: readNonNegativeInteger(v.points),
+        level: readNonNegativeInteger(v.level),
+        followers: followers ?? profile?.followers,
+        following: following ?? profile?.following,
+        region:
+          [text(v.country), text(v.region)].filter(Boolean).join(' · ') || profile?.region || '',
       };
     },
     async follows(kind, page, signal) {
       const value = record(await request(`follow/${kind}?current=${page}&pageSize=20`, signal));
-      if (!Array.isArray(value.records) || typeof value.total !== 'number')
+      const total = readNonNegativeInteger(value.total);
+      if (!Array.isArray(value.records) || total === undefined)
         throw new Error('关注列表格式不正确');
       return {
-        total: value.total,
+        total,
         items: value.records.map((item) => {
           const v = record(item);
-          if (typeof v.userId !== 'string' && typeof v.userId !== 'number')
-            throw new Error('关注用户资料不完整');
+          const id =
+            typeof v.userId === 'string' ? v.userId.trim() : readNonNegativeInteger(v.userId);
+          if (id === undefined || id === '' || id === 0) throw new Error('关注用户资料不完整');
           const avatar = text(v.userAvatar);
           return {
-            id: String(v.userId),
+            id: String(id),
             name: text(v.userName) || '岛友',
             profile: text(v.userProfile),
             avatar: /^https?:\/\//.test(avatar) ? avatar : '',

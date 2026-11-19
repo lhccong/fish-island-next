@@ -36,10 +36,10 @@ export interface AccountToolsPort {
   secret(id: string, reset: boolean, signal: AbortSignal): Promise<string>;
 }
 export interface PersonalStats {
-  points: number;
-  level: number;
-  followers: number;
-  following: number;
+  points: number | undefined;
+  level: number | undefined;
+  followers: number | undefined;
+  following: number | undefined;
   region: string;
 }
 export interface FollowUser {

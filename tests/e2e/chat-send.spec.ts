@@ -26,7 +26,7 @@ for (const skin of builtinSkins)
       await draft.fill('合成发送正文');
       const composer = page.getByRole('region', { name: '群聊输入区', exact: true });
       const beforeSend = await composer.boundingBox();
-      await send.click();
+      await draft.press('Enter');
       await expect(page.getByLabel('消息发送中')).toBeVisible();
       await expect(draft).toHaveText('');
       await expect(composer.getByText('消息已提交', { exact: true })).toHaveCount(0);

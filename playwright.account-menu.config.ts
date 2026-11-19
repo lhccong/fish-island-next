@@ -10,7 +10,7 @@ export default defineConfig({
     url: 'http://127.0.0.1:4212',
     reuseExistingServer: false,
   },
-  testMatch: '**/account-menu.spec.ts',
+  testMatch: ['**/account-menu.spec.ts', '**/account-card.spec.ts'],
   outputDir: 'test-results-account-menu-20261114',
   projects: [{ name: 'account-menu-chromium', use: { browserName: 'chromium' } }],
 });

@@ -4,15 +4,20 @@ import { setupChatMenu } from './chat-menu-fixture';
 
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
-    test(`${skin.id} ${mode}: rich draft emoji, deletion, undo, paste and newline`, async ({
-      page,
-    }, info) => {
-      await setupChatMenu(page, skin.id, mode);
+    test(`${skin.id} ${mode}: rich draft editing and keyboard send`, async ({ page }, info) => {
       const editor = page.getByRole('textbox', { name: '消息草稿' });
+      const mobile = page.viewportSize()!.width <= 760;
+      await setupChatMenu(page, skin.id, mode, 'user', async () => {
+        await page.route('**/api/chat/online/user', (route) =>
+          route.fulfill({
+            json: { code: 0, data: [{ id: '456', name: '合成岛友', avatar: null }] },
+          }),
+        );
+      });
       await editor.fill('草稿');
       await page.getByRole('button', { name: '表情包', exact: true }).click();
       const face = page.getByRole('button', { name: '/微笑', exact: true });
-      if (page.viewportSize()!.width <= 760) await face.tap();
+      if (mobile) await face.tap();
       else await face.click();
       await expect(editor.getByRole('img', { name: '[qqface:14]', exact: true })).toBeVisible();
       await expect(editor).toHaveText('草稿');
@@ -66,16 +71,37 @@ for (const skin of builtinSkins)
           },
         });
       });
+      const paragraph = () =>
+        editor.evaluate((el) =>
+          el.dispatchEvent(
+            new InputEvent('beforeinput', {
+              inputType: 'insertParagraph',
+              bubbles: true,
+              cancelable: true,
+            }),
+          ),
+        );
+      if (mobile) {
+        await expect(editor).toHaveAttribute('enterkeyhint', 'send');
+        await editor.fill('@合成');
+        await expect(page.getByRole('option', { name: '合成岛友', exact: true })).toBeVisible();
+        expect(await paragraph()).toBe(false);
+        await expect(editor).toHaveText('@合成岛友');
+        expect(sent).toBe('');
+      }
       await editor.fill('第一行');
-      await editor.dispatchEvent('compositionstart');
-      await editor.press('Enter');
-      expect(sent).toBe('');
-      await editor.dispatchEvent('compositionend');
-      await editor.fill('第一行');
+      if (mobile) {
+        await editor.dispatchEvent('compositionstart');
+        expect(await paragraph()).toBe(true);
+        await expect(editor).toHaveText('第一行');
+        await editor.dispatchEvent('compositionend');
+      }
       await editor.press('Shift+Enter');
       await editor.pressSequentially('第二行');
-      await page.getByRole('button', { name: '发送', exact: true }).click();
+      if (mobile) expect(await paragraph()).toBe(false);
+      else await editor.press('Enter');
       await expect.poll(() => sent).toBe('第一行\n第二行');
       await expect(editor).toHaveText('');
+      await expect(editor).toBeFocused();
     });
   }

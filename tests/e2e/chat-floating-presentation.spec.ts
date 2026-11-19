@@ -117,18 +117,34 @@ for (const skin of builtinSkins)
         await expect(page.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
         await expect(page.getByRole('button', { name: '发送', exact: true })).toBeEnabled();
         await page.screenshot({ path: info.outputPath('excel-empty.png') });
-        fixture.push('1', 'Excel 单元格中的长文本 ' + 'https://example.com/长链接'.repeat(8));
-        await expect(page.locator('[data-message-id="1"]')).toBeVisible();
+        fixture.broadcast({
+          id: '1',
+          bubbleId: 'berry-cat-paw',
+          content: 'Excel 单元格中的长文本 ' + 'https://example.com/长链接'.repeat(8),
+          sender: { id: '456', name: '合成岛友' },
+          timestamp: Date.now(),
+        });
+        const styledBubble = page.locator('[data-message-id="1"]').getByRole('group');
+        await expect(styledBubble).toHaveAttribute('data-bubble-style', 'berry-cat-paw');
+        await expect(styledBubble).toHaveCSS('border-image-source', /^url\(/);
         await assertLayout(page);
         fixture.push('2', '[img]https://menu.test/image.png[/img]');
         await page.getByRole('button', { name: '展开单元格图片', exact: true }).click();
         await expect(page.getByRole('button', { name: '放大聊天图片', exact: true })).toBeVisible();
-        fixture.push('3', '本人合成消息', true);
-        await expect(page.locator('[data-message-id="3"]')).toBeInViewport();
+        fixture.broadcast({
+          id: '3',
+          bubbleId: 'berry-cat-paw',
+          content: '本人合成消息',
+          sender: { id: '123', name: '本人合成' },
+          timestamp: Date.now(),
+        });
+        const selfBubble = page.locator('[data-message-id="3"]').getByRole('group');
+        await expect(selfBubble).toBeInViewport();
         const menu = await openMessageActions(page, '3');
         await menu.getByRole('menuitem', { name: '引用', exact: true }).click();
         await expect(page.getByRole('region', { name: '引用消息', exact: true })).toBeVisible();
         await chooseMode(page, '聊天气泡');
+        await expect(selfBubble).toHaveAttribute('data-bubble-style', 'berry-cat-paw');
         await expect(draft).toHaveText('切换 Excel 模式时保留的草稿');
         await expect(page.getByRole('region', { name: '引用消息', exact: true })).toBeVisible();
         await chooseMode(page, 'Excel 模式');

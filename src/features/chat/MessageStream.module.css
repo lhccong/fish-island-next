@@ -160,8 +160,8 @@
 .bubble {
   min-width: 0;
   max-width: 100%;
-  border-radius: var(--radius-control);
-  padding: 10px 12px;
+  border-radius: var(--chat-bubble-radius, var(--radius-control));
+  padding: var(--chat-bubble-padding, 10px 12px);
   background: var(--color-message-incoming);
   color: var(--color-text);
   font-size: 14px;
@@ -169,13 +169,27 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.row[data-self='true'] .bubble {
+.row[data-self='true'] .bubble:not([data-bubble-style]) {
   background: var(--color-message-outgoing);
 }
+.bubble[data-bubble-style] {
+  --chat-bubble-radius: 16px;
+  --chat-bubble-padding: 14px 32px 15px 30px;
+  --chat-bubble-flex: 0 1 auto;
+  --chat-bubble-width: fit-content;
+  --chat-quote-text: color-mix(in srgb, currentColor 72%, var(--color-muted));
+  --chat-quote-hover: color-mix(in srgb, currentColor 14%, transparent);
+  background: transparent;
+  color: var(--bubble-ink, var(--color-text));
+}
+.bubble[data-bubble-style]:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 1px;
+}
 :global([data-chat-decoration='island'])
-  .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
-    [data-music-only='true']
-  ):not([data-revoked='true']) {
+  .bubble:not([data-bubble-style]):not([data-image-only='true']):not(
+    [data-red-packet-content='true']
+  ):not([data-music-only='true']):not([data-revoked='true']) {
   --color-muted: var(--color-pixel-muted);
   --color-border: var(--color-pixel-border);
   color: var(--color-pixel-ink);
@@ -194,9 +208,9 @@
 }
 :global([data-chat-decoration='island'])
   .row[data-self='true']
-  .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
-    [data-music-only='true']
-  ):not([data-revoked='true']) {
+  .bubble:not([data-bubble-style]):not([data-image-only='true']):not(
+    [data-red-packet-content='true']
+  ):not([data-music-only='true']):not([data-revoked='true']) {
   border-color: var(--color-accent-text);
   background-color: var(--color-pixel-paper-inset);
 }
@@ -344,7 +358,7 @@
   margin: 0 0 8px;
   border-left: 2px solid var(--color-border);
   padding-left: 8px;
-  color: var(--color-muted);
+  color: var(--chat-quote-text, var(--color-muted));
   font-size: 12px;
 }
 @keyframes send-spin {
@@ -365,7 +379,7 @@
 }
 
 .quote:hover {
-  background: var(--color-hover);
+  background: var(--chat-quote-hover, var(--color-hover));
 }
 
 .stream[data-presentation='worksheet'] .list {
@@ -473,12 +487,12 @@
   align-items: center;
 }
 .row[data-presentation='worksheet'] .bubble {
-  flex: 1;
-  width: 100%;
+  flex: var(--chat-bubble-flex, 1);
+  width: var(--chat-bubble-width, 100%);
   min-height: 44px;
-  padding: 8px;
-  border-radius: 0;
-  background: transparent;
+  padding: var(--chat-bubble-padding, 8px);
+  border-radius: var(--chat-bubble-radius, 0);
+  background-color: transparent;
   font-size: 13px;
 }
 .row[data-presentation='worksheet'] .bubble:focus-visible {
@@ -571,9 +585,9 @@
   }
 }
 :global([data-chat-decoration='classic'])
-  .bubble:not([data-image-only='true']):not([data-red-packet-content='true']):not(
-    [data-revoked='true']
-  ) {
+  .bubble:not([data-bubble-style]):not([data-image-only='true']):not(
+    [data-red-packet-content='true']
+  ):not([data-revoked='true']) {
   border-radius: 14px;
   box-shadow: 0 1px 4px color-mix(in srgb, var(--color-text) 6%, transparent);
 }
@@ -655,8 +669,7 @@
 }
 :global([data-floating-excel='true']) .row[data-presentation='worksheet'] .bubble {
   min-height: 0;
-  padding: 2px 0;
-  color: var(--color-text);
+  padding: var(--chat-bubble-padding, 2px 0);
   font-size: 12px;
   line-height: 18px;
 }

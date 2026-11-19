@@ -1,4 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { bubbleArtworkClass, bubbleArtworkProps } from '@/shared/ui/BubbleArtwork';
 import { CircleAlert } from 'lucide-react';
 import { useMessageLocationPulse } from './use-message-location-pulse';
 import { MessageQuote } from './MessageQuote';
@@ -71,22 +72,27 @@ export const MessageRow = memo(function MessageRow({
     returnFocusRef: bubbleRef,
   };
   const local = message.delivery === 'sending' || message.delivery === 'failed';
+  const hasReward =
+    !message.revoked &&
+    parts.some((part) => part.kind === 'red-packet' || part.kind === 'lucky-bag');
+  const imageOnly =
+    !message.revoked &&
+    !message.quote &&
+    parts.some((part) => part.kind === 'image') &&
+    parts.every((part) => part.kind === 'image' || (part.kind === 'text' && !part.text.trim()));
+  const standaloneMusic = !message.revoked && !message.quote && musicOnly;
+  const bubbleId =
+    message.revoked || hasReward || imageOnly || standaloneMusic ? undefined : message.bubbleId;
   const bubble = (
     <div
       ref={bubbleRef}
-      className={styles.bubble}
+      className={bubbleId ? `${styles.bubble} ${bubbleArtworkClass}` : styles.bubble}
+      data-bubble-style={bubbleId}
+      {...bubbleArtworkProps(bubbleId ? message.bubbleArtwork : undefined)}
       data-revoked={message.revoked}
-      data-music-only={!message.revoked && !message.quote && musicOnly}
-      data-red-packet-content={
-        !message.revoked &&
-        parts.some((part) => part.kind === 'red-packet' || part.kind === 'lucky-bag')
-      }
-      data-image-only={
-        !message.revoked &&
-        !message.quote &&
-        parts.some((part) => part.kind === 'image') &&
-        parts.every((part) => part.kind === 'image' || (part.kind === 'text' && !part.text.trim()))
-      }
+      data-music-only={standaloneMusic}
+      data-red-packet-content={hasReward}
+      data-image-only={imageOnly}
       tabIndex={0}
       role="group"
       aria-label={`${message.senderName || '岛友'}的消息`}

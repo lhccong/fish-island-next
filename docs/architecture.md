@@ -301,6 +301,8 @@ app 负责注入端口与组装外壳；外壳不感知后端协议。
 
 ## 7. 外壳、组件与皮肤
 
+ADR-100 在积分商城接入限时聊天气泡。商品目录与权益分表，管理员通过后端维护商品和积分价格。商城独立持有目录与操作状态，后端在发送时快照已启用的有效样式及资源信息，聊天沿用历史、实时与共用消息行。
+
 ADR-082 由 app 的 SiteFooter 统一持有备案与版权，shared/ui/PageFooter 提供纯表现插槽；电脑端显示在页面实际滚动区末尾，手机端仅首页透明悬浮，聊天放在输入区底部。详见 ADR-082。
 
 ADR-026 统一 shared/ui/Button 的桌面紧凑尺寸及主题动作色；手机保持 44px 触控高度，资料弹窗移除固定宽度和橙色按钮覆盖。详见 ADR-026。
@@ -375,6 +377,8 @@ ADR-057 在 appearance 内新增独立标签页名称与图标本地偏好，app
 ADR-062 迁移联机五子棋 /game/piece：独立 domain/gomoku、infrastructure/gomoku、features/gomoku 分层；app 将游戏扩展注入现有账号 WebSocket，不新增连接。棋局规则、单机 AI 与联机状态隔离，断线停棋，邀请复用公共聊天，详见 ADR-062。
 
 ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；app 按账号同步屏蔽偏好，聊天统一投影可见消息。详见 ADR-065。
+
+ADR-065 补充我的卡片与关注名单：既有账号工具端口读取登录用户统计并兼容后端 Long 字符串；名单沿用共享滚动分页，取关后校准关注列表，返回卡片时回读计数。
 
 ADR-066 迁移你画我猜：domain/draw、infrastructure/draw、features/draw 分层；app 复用账号连接，整幅画布串行保存，独立游戏路由与窗口共享实现，见 ADR-066。
 

@@ -1,4 +1,5 @@
-import type { PointsRecord, ShopItem, ShopPage } from '@/domain/points-shop';
+import { parseBubbleStyle } from '@/domain/chat';
+import type { PointsRecord, ShopBubble, ShopItem, ShopPage } from '@/domain/points-shop';
 
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -66,4 +67,41 @@ export function decodePage<T>(value: unknown, decode: (value: unknown) => T): Sh
       ? Number(data.total)
       : data.total;
   return { items: data.records.map(decode), total: integer(total) };
+}
+
+export function decodeBubbles(value: unknown): ShopBubble[] {
+  if (!Array.isArray(value)) throw new Error('气泡列表格式异常，请重试');
+  const seen = new Set<string>();
+  return value.flatMap((value) => {
+    const item = record(value);
+    const style = parseBubbleStyle(item.id, item.artwork);
+    if (!style) return [];
+    const expiresAt =
+      item.expiresAt == null
+        ? null
+        : typeof item.expiresAt === 'string'
+          ? Date.parse(item.expiresAt)
+          : NaN;
+    if (
+      seen.has(style.id) ||
+      typeof item.name !== 'string' ||
+      !item.name.trim() ||
+      typeof item.equipped !== 'boolean' ||
+      (expiresAt !== null && !Number.isFinite(expiresAt)) ||
+      (item.equipped && expiresAt === null)
+    ) {
+      throw new Error('气泡权益格式异常，请重试');
+    }
+    seen.add(style.id);
+    return [
+      {
+        ...style,
+        name: item.name,
+        points: integer(item.points),
+        durationDays: integer(item.durationDays),
+        expiresAt,
+        equipped: item.equipped,
+      },
+    ];
+  });
 }

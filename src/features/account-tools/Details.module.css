@@ -67,6 +67,37 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+.followHeading {
+  margin: 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.people {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.followRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.followUser {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 500;
+}
+.followUser p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+}
 .app {
   display: grid;
   gap: 16px;
@@ -230,6 +261,9 @@
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 760px) {
+  .followRow {
+    gap: 8px;
+  }
   .identity {
     gap: 12px;
   }

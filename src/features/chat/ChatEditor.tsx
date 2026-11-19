@@ -37,6 +37,28 @@ export function ChatEditor({
   };
   useLayoutEffect(() => {
     const editor = composerRef.current;
+    if (!editor) return;
+    const handleBeforeInput = (event: InputEvent) => {
+      if (
+        event.inputType !== 'insertParagraph' ||
+        !event.cancelable ||
+        event.defaultPrevented ||
+        event.isComposing ||
+        composing.current ||
+        !window.matchMedia('(max-width: 760px)').matches
+      )
+        return;
+      event.preventDefault();
+      // Some soft keyboards only request a paragraph. Route that action through mention selection and send.
+      editor.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+      );
+    };
+    editor.addEventListener('beforeinput', handleBeforeInput);
+    return () => editor.removeEventListener('beforeinput', handleBeforeInput);
+  }, [composerRef]);
+  useLayoutEffect(() => {
+    const editor = composerRef.current;
     if (!editor || composing.current) return;
     const plainEmoji = parseEmojiText(editor.textContent ?? '').some((part) => part.id);
     if (readEditor(editor) === text && !plainEmoji) return;
@@ -55,6 +77,7 @@ export function ChatEditor({
           className={styles.editor}
           data-presentation={presentation}
           contentEditable
+          enterKeyHint="send"
           suppressContentEditableWarning
           role="textbox"
           aria-label="消息草稿"
@@ -102,15 +125,15 @@ export function ChatEditor({
           onKeyDown={(event) => {
             if (
               event.key !== 'Enter' ||
+              event.shiftKey ||
+              event.defaultPrevented ||
               event.nativeEvent.isComposing ||
               composing.current ||
               event.nativeEvent.keyCode === 229
             )
               return;
-            if (!event.shiftKey && window.matchMedia('(min-width: 761px)').matches) {
-              event.preventDefault();
-              onSend();
-            }
+            event.preventDefault();
+            onSend();
           }}
         />
       )}

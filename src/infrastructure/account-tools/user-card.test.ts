@@ -60,3 +60,73 @@ it('adapts follow and mute protocols and requires server confirmation', async ()
   await expect(client.mute('1 &', null, signal)).rejects.toThrow('未确认');
   expect(fetcher.mock.calls[3]?.[0]).toContain('user/mute/remove?userId=1%20%26');
 });
+
+it('reads the private card stats and falls back only for missing relationship counts', async () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal('fetch', fetcher);
+  const client = createAccountToolsClient(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic' }),
+    vi.fn(),
+  );
+  const signal = new AbortController().signal;
+  const reply = (data: unknown) =>
+    fetcher.mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data })));
+  const id = '90071992547409921';
+  reply({ id, level: 7, points: 220, followingCount: '13', followerCount: '9' });
+  expect(await client.card(id, signal)).toMatchObject({
+    level: 7,
+    points: 220,
+    following: 13,
+    followers: 9,
+  });
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(fetcher.mock.calls[0]?.[0]).toBe('https://example.test/api/user/get/login');
+
+  reply({ id, followingCount: '0' });
+  reply({ id, followingCount: '13', followerCount: '9' });
+  expect(await client.card(id, signal)).toMatchObject({
+    level: undefined,
+    points: undefined,
+    following: 0,
+    followers: 9,
+  });
+  expect(fetcher.mock.calls[2]?.[0]).toContain(`user/get/vo?id=${id}`);
+  reply({ id: '2' });
+  await expect(client.card(id, signal)).rejects.toThrow('资料不匹配');
+});
+
+it('reads follow pages with Long totals and preserves the exact target ID for toggling', async () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal('fetch', fetcher);
+  const client = createAccountToolsClient(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic' }),
+    vi.fn(),
+  );
+  const signal = new AbortController().signal;
+  const reply = (data: unknown) =>
+    fetcher.mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data })));
+  const id = '90071992547409921';
+  const user = { userId: id, userName: '合成岛友', isMutual: false };
+  reply({ records: [user, { userId: '2', isMutual: true }], total: '32' });
+  expect(await client.follows('followers', 2, signal)).toMatchObject({
+    total: 32,
+    items: [
+      { id, name: '合成岛友', following: false },
+      { id: '2', following: true },
+    ],
+  });
+  expect(fetcher.mock.calls[0]?.[0]).toContain('follow/followers?current=2&pageSize=20');
+  reply({ records: [user], total: 1 });
+  expect(await client.follows('following', 1, signal)).toMatchObject({
+    items: [{ id, following: true }],
+  });
+  reply({ records: [], total: '9007199254740992' });
+  await expect(client.follows('followers', 1, signal)).rejects.toThrow('关注列表格式不正确');
+  reply(true);
+  expect(await client.toggleFollow(id, signal)).toBe(true);
+  expect(fetcher.mock.calls[3]?.[0]).toContain(`follow/toggle?followUserId=${id}`);
+  reply(false);
+  expect(await client.toggleFollow(id, signal)).toBe(false);
+});

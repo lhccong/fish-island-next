@@ -1,0 +1,43 @@
+.art {
+  /* The nine slices keep the stickers in proportion as the center expands. */
+  border-image: var(--bubble-image) 49 68 50 72 fill /
+    var(--bubble-artwork-width, 25px 34px 25px 36px) stretch;
+}
+.art[data-bubble-style='tide-letter'] {
+  --bubble-image: url('./assets/tide-letter.svg');
+}
+.art[data-bubble-style='berry-cat-paw'] {
+  --bubble-image: url('./assets/berry-cat-paw.svg');
+}
+.art[data-bubble-style='moon-jellyfish'] {
+  --bubble-image: url('./assets/moon-jellyfish.svg');
+}
+.art[data-bubble-style='yuzu-capybara'] {
+  --bubble-image: url('./assets/yuzu-capybara.svg');
+}
+.art[data-bubble-style='sea-salt-seal'] {
+  --bubble-image: url('./assets/sea-salt-seal.svg');
+}
+.art[data-bubble-style='black-sugar-jelly'] {
+  --bubble-image: url('./assets/black-sugar-jelly.svg');
+  --bubble-ink: var(--color-on-accent);
+}
+.art[data-bubble-style][data-custom-bubble] {
+  --bubble-image: var(--bubble-light-image);
+  --bubble-fallback: var(--color-surface);
+  background-image: linear-gradient(var(--bubble-fallback), var(--bubble-fallback));
+  background-size: calc(100% - 18px) calc(100% - 28px);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+:global([data-color-mode='dark']) .art[data-custom-bubble] {
+  --bubble-image: var(--bubble-dark-image, var(--bubble-light-image));
+}
+.art[data-custom-bubble][data-bubble-tone='light'] {
+  --bubble-ink: var(--color-on-accent);
+  --bubble-fallback: light-dark(var(--color-text), var(--color-canvas));
+}
+.art[data-custom-bubble][data-bubble-tone='dark'] {
+  --bubble-ink: light-dark(var(--color-text), var(--color-canvas));
+  --bubble-fallback: light-dark(var(--color-surface), var(--color-on-accent));
+}

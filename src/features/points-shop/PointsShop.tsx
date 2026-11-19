@@ -3,10 +3,11 @@ import { useState, type ReactNode } from 'react';
 import type { PointsShopPort } from '@/domain/points-shop';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { ShopItems } from './ShopItems';
+import { ShopBubbles } from './ShopBubbles';
 import { ShopList } from './ShopList';
 import styles from './Shop.module.css';
 
-const tabs = ['头像框', '其他物品', '积分记录', '相关介绍'] as const;
+const tabs = ['头像框', '聊天气泡', '其他物品', '积分记录', '相关介绍'] as const;
 export function PointsShop({
   service,
   points,
@@ -24,6 +25,7 @@ export function PointsShop({
 }) {
   const [tab, setTab] = useState<(typeof tabs)[number]>('头像框');
   const [itemsVisited, setItemsVisited] = useState(false);
+  const [bubblesVisited, setBubblesVisited] = useState(false);
   const available = points === undefined || usedPoints === undefined ? null : points - usedPoints;
   return (
     <section className={styles.shop} aria-label="店铺">
@@ -45,6 +47,7 @@ export function PointsShop({
             aria-current={tab === name ? 'page' : undefined}
             onClick={() => {
               if (name === '其他物品') setItemsVisited(true);
+              if (name === '聊天气泡') setBubblesVisited(true);
               setTab(name);
             }}
           >
@@ -55,6 +58,11 @@ export function PointsShop({
       <div className={styles.panel} hidden={tab !== '头像框'}>
         {frames}
       </div>
+      {bubblesVisited && (
+        <div className={styles.panel} hidden={tab !== '聊天气泡'}>
+          <ShopBubbles service={service} available={available} onPurchased={onPurchased} />
+        </div>
+      )}
       {itemsVisited && (
         <div className={styles.panel} hidden={tab !== '其他物品'}>
           <ShopItems service={service} available={available} onPurchased={onPurchased} />
