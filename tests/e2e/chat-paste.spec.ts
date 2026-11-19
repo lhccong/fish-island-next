@@ -137,8 +137,15 @@ for (const skin of builtinSkins)
           },
         });
       });
-      await send.click();
+      if (page.viewportSize()!.width <= 760) await send.tap();
+      else await send.click();
       await expect.poll(() => sent).toBe('[img]https://menu.test/image.png[/img]');
+      const row = page.locator('[data-message-id="1794538888999"]');
+      await expect(row.getByRole('button', { name: '放大聊天图片' })).toBeEnabled();
+      await expect(row.locator('[data-image-only="true"]')).toHaveCSS(
+        'background-color',
+        'rgba(0, 0, 0, 0)',
+      );
       await expect(attachment).toHaveCount(0);
       await expect(draft).toHaveText('');
       expect(fixture.stats().connections).toBe(1);

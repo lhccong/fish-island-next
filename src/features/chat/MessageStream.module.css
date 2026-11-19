@@ -169,7 +169,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.row[data-self='true'] .bubble:not([data-bubble-style]) {
+.row[data-self='true'] .bubble:not([data-bubble-style], [data-image-only='true']) {
   background: var(--color-message-outgoing);
 }
 .bubble[data-bubble-style] {
