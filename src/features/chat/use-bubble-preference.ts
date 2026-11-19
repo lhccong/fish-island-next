@@ -2,22 +2,22 @@ import { useState } from 'react';
 import type { ChatPreferencesPort } from '@/domain/chat';
 
 export function useBubblePreference(preferences: ChatPreferencesPort) {
-  const [hideBubbles, setHideBubbles] = useState(() => {
+  const [hideBubbleDecorations, setHideBubbleDecorations] = useState(() => {
     try {
-      return preferences.readHideBubbles();
+      return preferences.readHideBubbleDecorations();
     } catch {
       return false;
     }
   });
   const [notice, setNotice] = useState('');
   const change = (value: boolean) => {
-    setHideBubbles(value);
+    setHideBubbleDecorations(value);
     try {
-      preferences.writeHideBubbles(value);
+      preferences.writeHideBubbleDecorations(value);
       setNotice('');
     } catch {
       setNotice('气泡偏好未能保存，当前页面已生效');
     }
   };
-  return { hideBubbles, change, notice };
+  return { hideBubbleDecorations, change, notice };
 }

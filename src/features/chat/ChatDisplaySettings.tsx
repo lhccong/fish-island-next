@@ -35,10 +35,10 @@ export function ChatDisplaySettings() {
       <p>开启后，点击消息中的图片占位按钮才加载图片。</p>
       {imagePreference.notice && <p role="status">{imagePreference.notice}</p>}
       <div className={styles.setting}>
-        <span>不渲染气泡</span>
+        <span>隐藏气泡装扮</span>
         <Switch
-          label="不渲染气泡"
-          checked={bubblePreference.hideBubbles}
+          label="隐藏气泡装扮"
+          checked={bubblePreference.hideBubbleDecorations}
           onCheckedChange={bubblePreference.change}
         />
       </div>

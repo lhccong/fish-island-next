@@ -6,9 +6,23 @@ import { openMessageActions } from './chat-message-actions';
 test.use({ serviceWorkers: 'block' });
 test.setTimeout(60000);
 
+function readBubbleStyle(bubble: Locator) {
+  return bubble.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      background: style.background,
+      border: style.border,
+      borderRadius: style.borderRadius,
+      boxShadow: style.boxShadow,
+      color: style.color,
+      padding: style.padding,
+    };
+  });
+}
+
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
-    test(`${skin.id} ${mode}: hide message bubbles and keep chat usable`, async ({
+    test(`${skin.id} ${mode}: keep default bubbles when hiding decorations`, async ({
       page,
     }, info) => {
       const artworkUrl = 'https://bubble.test/frame.svg';
@@ -52,7 +66,7 @@ for (const skin of builtinSkins)
       const activate = (target: Locator) => (mobile ? target.tap() : target.click());
       const details = page.getByRole('button', { name: '群聊详情', exact: true });
       const panel = page.getByRole('complementary', { name: '在线成员', exact: true });
-      const toggle = panel.getByRole('switch', { name: '不渲染气泡', exact: true });
+      const toggle = panel.getByRole('switch', { name: '隐藏气泡装扮', exact: true });
       const change = async () => {
         if (mobile) await toggle.tap();
         else {
@@ -70,8 +84,10 @@ for (const skin of builtinSkins)
       const draft = page.getByRole('textbox', { name: '消息草稿' });
       await draft.fill('气泡偏好合成草稿');
       const content = (id: string) => page.locator(`[data-message-id="${id}"]`).getByRole('group');
+      const own = content('100');
       const ordinary = content('101');
       const decorated = content('102');
+      fixture.push('100', '本人普通消息', true);
       fixture.push('101', '普通消息');
       fixture.broadcast({
         id: '102',
@@ -81,9 +97,8 @@ for (const skin of builtinSkins)
         timestamp: 1794441600102,
       });
       await expect(decorated).toHaveCSS('border-image-source', /^url\(/);
-      const originalBackground = await ordinary.evaluate(
-        (element) => getComputedStyle(element).background,
-      );
+      const incoming = await readBubbleStyle(ordinary);
+      const outgoing = await readBubbleStyle(own);
 
       await activate(details);
       await expect(panel.getByText('正在获取在线成员…')).toBeVisible();
@@ -163,13 +178,13 @@ for (const skin of builtinSkins)
         timestamp: 1794441600103,
       });
       const remote = content('103');
-      for (const message of [ordinary, decorated, remote]) {
-        await expect(message).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-        await expect(message).toHaveCSS('background-image', 'none');
+      for (const message of [decorated, remote]) {
         await expect(message).toHaveCSS('border-image-source', 'none');
-        await expect(message).toHaveCSS('box-shadow', 'none');
-        await expect(message).toHaveCSS('border-top-width', '0px');
       }
+      expect(await readBubbleStyle(ordinary)).toEqual(incoming);
+      expect(await readBubbleStyle(own)).toEqual(outgoing);
+      expect(await readBubbleStyle(decorated)).toEqual(outgoing);
+      expect(await readBubbleStyle(remote)).toEqual(incoming);
       await expect(remote).toHaveText('远程装扮消息');
       await expect(remote).not.toHaveAttribute('data-custom-bubble');
       expect(artworkRequests).toBe(0);
@@ -180,7 +195,7 @@ for (const skin of builtinSkins)
         );
       expect(overflow).toBe(false);
       if (['moyu-island', 'pixel-island', 'wps'].includes(skin.id))
-        await page.screenshot({ path: info.outputPath('plain-chat.png') });
+        await page.screenshot({ path: info.outputPath('default-bubbles.png') });
       const menu = await openMessageActions(page, '103');
       await activate(menu.getByRole('menuitem', { name: '复制', exact: true }));
       await expect.poll(fixture.clipboardText).toBe('远程装扮消息');
@@ -198,7 +213,7 @@ for (const skin of builtinSkins)
         element.scrollTop = 0;
       });
       await expect(decorated).toHaveCSS('border-image-source', /^url\(/);
-      await expect(ordinary).toHaveCSS('background', originalBackground);
+      expect(await readBubbleStyle(ordinary)).toEqual(incoming);
       await expect.poll(() => artworkRequests).toBeGreaterThan(0);
       await expect(draft).toHaveText('气泡偏好合成草稿');
       expect(fixture.stats().connections).toBe(1);
@@ -224,7 +239,7 @@ for (const skin of builtinSkins)
       await expect(draft).toHaveText('气泡偏好合成草稿');
       expect(fixture.stats().connections).toBe(1);
       expect(fixture.stats().historyRequests).toBe(1);
-      await page.reload();
+      await page.reload({ waitUntil: 'domcontentloaded' });
       await activate(details);
       await expect(toggle).toBeChecked();
       await page.evaluate(() => {
@@ -238,7 +253,7 @@ for (const skin of builtinSkins)
         panel.getByRole('status').getByText('气泡偏好未能保存，当前页面已生效'),
       ).toBeVisible();
 
-      await page.goto('/chat/mini');
+      await page.goto('/chat/mini', { waitUntil: 'domcontentloaded' });
       await expect(page.getByRole('dialog', { name: /\.xlsx — Excel$/ })).toBeVisible();
       await expect(page.getByRole('status', { name: '聊天室连接状态' })).toHaveText(
         '已连接 · HTTP 发送 / 实时接收',

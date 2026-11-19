@@ -82,14 +82,13 @@ export const MessageRow = memo(function MessageRow({
     parts.every((part) => part.kind === 'image' || (part.kind === 'text' && !part.text.trim()));
   const standaloneMusic = !message.revoked && !message.quote && musicOnly;
   const hasBubble = !message.revoked && !hasReward && !imageOnly && !standaloneMusic;
-  const hideBubble = hasBubble && bubblePreference.hideBubbles;
-  const bubbleId = hasBubble && !hideBubble ? message.bubbleId : undefined;
+  const bubbleId =
+    hasBubble && !bubblePreference.hideBubbleDecorations ? message.bubbleId : undefined;
   const bubble = (
     <div
       ref={bubbleRef}
       className={bubbleId ? `${styles.bubble} ${bubbleArtworkClass}` : styles.bubble}
       data-bubble-style={bubbleId}
-      data-bubble-hidden={hideBubble || undefined}
       {...bubbleArtworkProps(bubbleId ? message.bubbleArtwork : undefined)}
       data-revoked={message.revoked}
       data-music-only={standaloneMusic}
