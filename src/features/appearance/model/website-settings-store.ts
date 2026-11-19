@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export const defaultTabIdentity = { name: '摸鱼岛', icon: '/favicon.ico?v=moyudao' };
+export const defaultTabIdentity = { name: '摸鱼岛', icon: '/favicon.ico?v=moyudao-2' };
 export const tabIdentityStorageKey = 'fish-island:tab-identity';
 export const defaultFontScale = '100';
 export const fontScaleOptions = [
@@ -47,7 +47,8 @@ export function normalizeTabIdentity(value: unknown): TabIdentity | null {
   const item = value as Partial<TabIdentity>;
   if (typeof item.name !== 'string' || typeof item.icon !== 'string') return null;
   const name = item.name.trim();
-  const icon = item.icon.trim();
+  const storedIcon = item.icon.trim();
+  const icon = storedIcon === '/favicon.ico?v=moyudao' ? defaultTabIdentity.icon : storedIcon;
   return name && name.length <= 60 && isTabIcon(icon) ? { name, icon } : null;
 }
 

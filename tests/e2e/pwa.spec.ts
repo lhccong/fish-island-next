@@ -21,23 +21,66 @@ test('install assets, cache isolation, offline deep links and safe updates', asy
   await controlled(page);
   const cdp = await context.newCDPSession(page);
   await expect
-    .poll(async () => (await cdp.send('Page.getInstallabilityErrors')).installabilityErrors)
+    .poll(async () =>
+      (await cdp.send('Page.getInstallabilityErrors')).installabilityErrors.filter(
+        ({ errorId }) => errorId !== 'in-incognito',
+      ),
+    )
     .toEqual([]);
   await cdp.detach();
   const manifest = await (await request.get('/manifest.webmanifest')).json();
   expect(manifest).toMatchObject({ id: '/', start_url: '/', scope: '/', display: 'standalone' });
-  for (const icon of manifest.icons) {
+  expect(manifest.icons).toMatchObject([
+    { sizes: '192x192', purpose: 'any' },
+    { sizes: '512x512', purpose: 'any' },
+    { sizes: '512x512', purpose: 'maskable' },
+  ]);
+  const appleIcon = { src: '/pwa/apple-touch-icon-180.png', sizes: '180x180', purpose: 'any' };
+  const icons = [...manifest.icons, appleIcon];
+  for (const icon of icons) {
     const response = await request.get(icon.src);
     expect(response.headers()['content-type']).toContain('image/png');
     const bytes = await response.body();
     const size = Number(icon.sizes.split('x')[0]);
     expect(bytes.readUInt32BE(16)).toBe(size);
     expect(bytes.readUInt32BE(20)).toBe(size);
+    const artworkFits = await page.evaluate(async ({ src, purpose }) => {
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      const width = img.naturalWidth;
+      canvas.width = canvas.height = width;
+      const surface = canvas.getContext('2d')!;
+      surface.drawImage(img, 0, 0);
+      const { data } = surface.getImageData(0, 0, width, width);
+      const isOrange = (x: number, y: number) => {
+        const index = (y * width + x) * 4;
+        const [red, green, blue, alpha] = data.subarray(index, index + 4);
+        return red! > 220 && green! > 150 && blue! < 150 && alpha === 255;
+      };
+      for (let i = 0; i < width; i++) {
+        if (
+          ![isOrange(i, 0), isOrange(i, width - 1), isOrange(0, i), isOrange(width - 1, i)].every(
+            Boolean,
+          )
+        )
+          return false;
+      }
+      if (purpose !== 'maskable') return true;
+      const center = (width - 1) / 2;
+      for (let y = 0; y < width; y++) {
+        for (let x = 0; x < width; x++) {
+          if (Math.hypot(x - center, y - center) > width * 0.4 && !isOrange(x, y)) return false;
+        }
+      }
+      return true;
+    }, icon);
+    expect(artworkFits, icon.src).toBe(true);
   }
-  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
-    'href',
-    '/pwa/apple-touch-icon.png',
-  );
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', appleIcon.src);
+  const favicon = '/favicon.ico?v=moyudao-2';
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', favicon);
   const entries = await page.evaluate(async () => {
     const names = await caches.keys();
     const cache = await caches.open(names.find((name) => name.startsWith('fish-island-pwa-'))!);
@@ -45,9 +88,19 @@ test('install assets, cache isolation, offline deep links and safe updates', asy
   });
   expect(entries.some((url) => url.endsWith('/index.html'))).toBe(true);
   expect(entries.every((url) => !url.includes('/api/') && !url.includes('api.yucoder'))).toBe(true);
+  const appAssets = [...icons.map((icon) => icon.src), favicon];
+  expect(appAssets.every((asset) => entries.some((url) => url.endsWith(asset)))).toBe(true);
   await context.setOffline(true);
   await page.goto('/foundation');
   await expect(page.getByRole('main')).toBeVisible();
+  expect(
+    await page.evaluate(async (src) => {
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      return img.naturalWidth;
+    }, favicon),
+  ).toBeGreaterThanOrEqual(16);
   expect(
     await page.evaluate(() =>
       fetch('/api/pwa-probe').then(

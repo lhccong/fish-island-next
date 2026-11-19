@@ -154,7 +154,7 @@ for (const skin of builtinSkins)
         await expect(page.locator('a[title="摸鱼岛"]')).toHaveText('摸鱼岛');
       await expect(page.locator('head link[rel="icon"]')).toHaveAttribute(
         'href',
-        '/favicon.ico?v=moyudao',
+        '/favicon.ico?v=moyudao-2',
       );
       const bing = presets.getByRole('button', { name: '必应', exact: true });
       if (mobile) await bing.tap();

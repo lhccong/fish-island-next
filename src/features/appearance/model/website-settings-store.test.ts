@@ -32,6 +32,18 @@ test('restores valid preferences and rejects unsafe or corrupt configuration', a
   ).toBeNull();
 });
 
+test('upgrades the saved default icon while restoring the name and font scale', async () => {
+  vi.stubGlobal('localStorage', {
+    getItem: () =>
+      JSON.stringify({ name: '工作台', icon: '/favicon.ico?v=moyudao', fontScale: '110' }),
+  });
+  const { defaultTabIdentity, useWebsiteSettingsStore } = await import('./website-settings-store');
+  expect(useWebsiteSettingsStore.getState()).toMatchObject({
+    identity: { name: '工作台', icon: defaultTabIdentity.icon },
+    fontScale: '110',
+  });
+});
+
 test('storage failure preserves applied preferences and retry saves them together', async () => {
   let fail = true;
   const entries = new Map<string, string>();

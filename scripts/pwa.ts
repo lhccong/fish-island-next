@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Plugin } from 'vite';
 
-/** Only build outputs and explicit public installation assets may enter the cache. */
+/** Only build outputs and explicit public app assets may enter the cache. */
 export function pwa(): Plugin {
   return {
     name: 'fish-island-pwa',
@@ -10,11 +10,13 @@ export function pwa(): Plugin {
     enforce: 'post',
     generateBundle(_options, bundle) {
       const template = readFileSync(new URL('./pwa-worker.js', import.meta.url), 'utf8');
-      const publicFiles = [
+      const publicUrls = [
         'manifest.webmanifest',
-        'pwa/icon-192.png',
-        'pwa/icon-512.png',
-        'pwa/apple-touch-icon.png',
+        'pwa/app-192.png',
+        'pwa/app-512.png',
+        'pwa/app-maskable-512.png',
+        'pwa/apple-touch-icon-180.png',
+        'favicon.ico?v=moyudao-2',
       ];
       const builtFiles = Object.keys(bundle)
         .filter((name) => name === 'index.html' || /\.(js|css)$/.test(name))
@@ -24,15 +26,15 @@ export function pwa(): Plugin {
         const file = bundle[name]!;
         hash.update(name).update(file.type === 'chunk' ? file.code : file.source);
       }
-      for (const name of publicFiles) {
-        hash.update(name).update(readFileSync(new URL(`../public/${name}`, import.meta.url)));
+      for (const url of publicUrls) {
+        hash.update(url).update(readFileSync(new URL(`../public/${url}`, import.meta.url)));
       }
       this.emitFile({
         type: 'asset',
         fileName: 'sw.js',
         source: template
           .replace('__VERSION__', hash.digest('hex').slice(0, 20))
-          .replace('__PRECACHE__', JSON.stringify([...builtFiles, ...publicFiles])),
+          .replace('__PRECACHE__', JSON.stringify([...builtFiles, ...publicUrls])),
       });
     },
   };
