@@ -6,7 +6,7 @@ const record = (id: string) => ({
     message: {
       id,
       content: '合成历史',
-      sender: { id: 'u', name: '合成', avatar: 'https://example.test/a.png' },
+      sender: { id: 'u', name: '合成', avatar: 'https://example.test/a.png', region: '合成地区' },
       timestamp: 1,
     },
   },
@@ -27,7 +27,13 @@ it('loads mixed timestamp formats without rejecting the whole history page', () 
 it('decodes legacy wrappers, preserves long IDs and rejects malformed history', () => {
   expect(decodeHistory({ records: [record('9007199254740993')] }, 1)).toMatchObject({
     nextCursor: '9007199254740993',
-    messages: [{ id: '9007199254740993', senderAvatar: 'https://example.test/a.png' }],
+    messages: [
+      {
+        id: '9007199254740993',
+        senderAvatar: 'https://example.test/a.png',
+        senderRegion: '合成地区',
+      },
+    ],
   });
   expect(decodeHistory({ records: [] }, 50).nextCursor).toBeNull();
   for (const payload of [[], { records: [{}] }, { records: [record('1'), record('2')] }])

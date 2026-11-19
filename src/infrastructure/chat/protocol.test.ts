@@ -115,3 +115,18 @@ it('validates unknown envelopes and normalizes safe IDs without parsing HTML', (
     expect(decodeChatEvent(raw)).toBeNull();
   }
 });
+
+it('preserves only known country and region parts from the message sender snapshot', () => {
+  const withLocation = (country: unknown, region: unknown) =>
+    decodeReceivedMessage({
+      id: '1',
+      sender: { id: '2', country, region },
+      timestamp: 1,
+      content: '合成消息',
+    });
+  expect(withLocation(' 合成国家 ', '合成地区')?.senderRegion).toBe('合成国家 · 合成地区');
+  expect(withLocation('未知国家', '合成地区')?.senderRegion).toBe('合成地区');
+  expect(withLocation('合成国家', '未知地区')?.senderRegion).toBe('合成国家');
+  expect(withLocation('未知国家', ' 未知地区 ')?.senderRegion).toBeUndefined();
+  expect(withLocation(null, 1)?.senderRegion).toBeUndefined();
+});

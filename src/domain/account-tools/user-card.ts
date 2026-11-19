@@ -6,7 +6,6 @@ export interface UserCard {
   cover: string | null;
   profile: string;
   level: number | undefined;
-  points: number | undefined;
   followers: number | undefined;
   following: number | undefined;
   region: string;

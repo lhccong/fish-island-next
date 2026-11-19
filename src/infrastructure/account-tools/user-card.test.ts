@@ -3,9 +3,10 @@ import { createAccountToolsClient } from './client';
 import { decodeUserCard } from './user-card';
 afterEach(() => vi.unstubAllGlobals());
 it('decodes backend Long strings without turning missing, invalid or unsafe counts into zero', () => {
-  expect(
-    decodeUserCard({ id: '1', followingCount: '0', followerCount: '15', points: '2769' }),
-  ).toMatchObject({ following: 0, followers: 15, points: 2769 });
+  expect(decodeUserCard({ id: '1', followingCount: '0', followerCount: '15' })).toMatchObject({
+    following: 0,
+    followers: 15,
+  });
   for (const value of ['', ' ', null, '-1', '1.2', '1e3', '9007199254740992', true]) {
     expect(decodeUserCard({ id: '1', followingCount: value, followerCount: value })).toMatchObject({
       following: undefined,
@@ -22,16 +23,15 @@ it('keeps unavailable profile fields unknown and rejects unsafe image sources', 
       userName: '合成',
       userAvatar: 'javascript:bad',
       momentsBgUrl: 'https://example.test/cover',
-      points: NaN,
     }),
   ).toMatchObject({
     id: '1',
     name: '合成',
     avatar: null,
-    points: undefined,
     cover: 'https://example.test/cover',
     following: undefined,
     followers: undefined,
+    region: '',
   });
 });
 it('adapts follow and mute protocols and requires server confirmation', async () => {

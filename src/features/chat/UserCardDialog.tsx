@@ -191,12 +191,8 @@ export function UserCardDialog({
                       <dd>{card.level ?? target.level ?? '未提供'}</dd>
                     </div>
                     <div>
-                      <dt>积分</dt>
-                      <dd>{card.points ?? '未提供'}</dd>
-                    </div>
-                    <div>
                       <dt>地区</dt>
-                      <dd>{card.region || '未提供'}</dd>
+                      <dd>{card.region || target.region || '未提供'}</dd>
                     </div>
                     {user.role === 'admin' && (
                       <div>

@@ -18,6 +18,11 @@ function id(value: unknown): string | null {
   return null;
 }
 
+function locationPart(value: unknown, placeholder: string): string {
+  const text = typeof value === 'string' ? value.trim() : '';
+  return text === placeholder || text.length > 100 ? '' : text;
+}
+
 // Ignore unrelated game/system frames. Never fabricate identifiers or timestamps.
 export function decodeChatEvent(raw: unknown): ChatRealtimeEvent | null {
   if (typeof raw !== 'string' || raw.length > 262144) return null;
@@ -82,6 +87,12 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
     return null;
   const quotedSender = object(quoted?.sender);
   const quoteId = id(quoted?.id);
+  const senderRegion = [
+    locationPart(sender?.country, '未知国家'),
+    locationPart(sender?.region, '未知地区'),
+  ]
+    .filter(Boolean)
+    .join(' · ');
   return {
     ...(poke
       ? {
@@ -113,6 +124,7 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
       ? { senderLevel: sender.level }
       : {}),
     ...(id(sender?.titleId) ? { senderTitleId: id(sender?.titleId)! } : {}),
+    ...(senderRegion ? { senderRegion } : {}),
     content: message.content,
     createdAt,
     revoked: false,

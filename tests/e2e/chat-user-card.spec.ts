@@ -13,7 +13,6 @@ const data = {
   level: 6,
   followerCount: '5',
   followingCount: '0',
-  region: '合成地区',
   titleId: 1,
 };
 for (const skin of builtinSkins)
@@ -44,7 +43,12 @@ for (const skin of builtinSkins)
       await page.route('**/api/follow/toggle?*', (route) => {
         followWrite = route;
       });
-      fixture.push('7001', '用户卡片验证');
+      fixture.broadcast({
+        id: '7001',
+        content: '用户卡片验证',
+        sender: { id: '456', name: '合成岛友', country: '合成国家', region: '合成地区' },
+        timestamp: 1794441607001,
+      });
       const input = page.getByRole('textbox', { name: '消息草稿', exact: true });
       await input.fill('卡片操作保留草稿');
       const name = page
@@ -68,6 +72,12 @@ for (const skin of builtinSkins)
       await expect(card.getByRole('button', { name: '管理员操作', exact: true })).toHaveCount(0);
       await expect(card.getByText('0', { exact: true })).toBeVisible();
       await expect(card.getByText('5', { exact: true })).toBeVisible();
+      const region = card
+        .locator('dl > div')
+        .filter({ has: page.getByText('地区', { exact: true }) });
+      await expect(region.locator('dd')).toHaveText('合成国家 · 合成地区');
+      await expect(card.getByText('积分', { exact: true })).toHaveCount(0);
+      await expect(card.getByText('2769', { exact: true })).toHaveCount(0);
       const scroll = card.getByRole('region', { name: '用户卡片内容' });
       const cover = card.getByRole('img', { name: '合成岛友的封面', exact: true });
       const coverBox = (await cover.boundingBox())!;
@@ -104,7 +114,8 @@ for (const skin of builtinSkins)
       await scroll.hover();
       await page.screenshot({ path: info.outputPath('user-card-top.png') });
       await card.getByRole('button', { name: '关注', exact: true }).click();
-      await expect(card.getByRole('button', { name: '处理中…' })).toBeDisabled();
+      const processing = page.getByRole('status').filter({ hasText: '处理中…' });
+      await expect(card.getByRole('button').filter({ has: processing })).toBeDisabled();
       await expect.poll(() => Boolean(followWrite)).toBe(true);
       await followWrite!.fulfill({ json: { code: 50000, message: '合成关注失败' } });
       await expect(card.getByRole('alert')).toHaveText('合成关注失败');
@@ -116,7 +127,12 @@ for (const skin of builtinSkins)
       await followWrite!.fulfill({ json: { code: 0, data: following } });
       await expect(card.getByRole('button', { name: '取消关注' })).toBeEnabled();
       await expect(card.getByRole('status')).toHaveText('已关注');
-      await expect(card.getByText('6', { exact: true })).toHaveCount(2);
+      await expect(
+        card
+          .locator('dl > div')
+          .filter({ has: page.getByText('等级', { exact: true }) })
+          .locator('dd'),
+      ).toHaveText('6');
       await card.getByRole('button', { name: '设置备注', exact: true }).click();
       const remark = page.getByRole('dialog', { name: '设置备注', exact: true });
       const remarkInput = remark.getByRole('textbox', { name: '备注名称' });
@@ -134,6 +150,8 @@ for (const skin of builtinSkins)
         el.scrollTop = el.scrollHeight / 2;
       });
       await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+      await region.locator('dd').scrollIntoViewIfNeeded();
+      await expect(region.locator('dd')).toBeInViewport();
       await page.screenshot({ path: info.outputPath('user-card-middle.png') });
       await scroll.evaluate((el) => {
         el.scrollTop = el.scrollHeight;
@@ -157,13 +175,20 @@ for (const skin of builtinSkins)
       // No cover, missing fields, and failed relationship lookup must stay honest and recoverable.
       read = undefined;
       followReadFails = true;
-      await click();
+      fixture.push('7002', '无地区快照的消息');
+      const missingRegionName = page
+        .locator('[data-message-id="7002"]')
+        .getByRole('button', { name: '查看合成岛友的用户卡片' });
+      if (page.viewportSize()!.width <= 760) await missingRegionName.tap();
+      else await missingRegionName.click();
       await expect.poll(() => reads).toBe(4);
       await read!.fulfill({ json: { code: 0, data: { id: '456', userName: '合成岛友' } } });
       await expect(card.getByRole('heading', { name: '合成备注' })).toBeVisible();
       await expect(card.getByRole('button', { name: '关注', exact: true })).toBeDisabled();
       await expect(card.getByRole('button', { name: '重试关注状态' })).toBeVisible();
-      await expect(card.getByText('未提供', { exact: true })).toHaveCount(3);
+      await expect(region.locator('dd')).toHaveText('未提供');
+      await expect(card.getByText('未提供', { exact: true })).toHaveCount(2);
+      await expect(card.getByText('积分', { exact: true })).toHaveCount(0);
       const compactBox = (await card.boundingBox())!;
       if (page.viewportSize()!.width > 760) expect(compactBox.width).toBe(420);
       expect(compactBox.height).toBeLessThan(page.viewportSize()!.height - 32);
@@ -194,6 +219,15 @@ for (const skin of builtinSkins)
       expect(close.y - lastAction.y - lastAction.height).toBeLessThanOrEqual(56);
       await page.screenshot({ path: info.outputPath('compact-card.png') });
       await page.keyboard.press('Escape');
+      await expect(missingRegionName).toBeFocused();
+
+      await click();
+      await expect.poll(() => reads).toBe(6);
+      await read!.fulfill({ json: { code: 0, data: { ...data, region: '资料地区' } } });
+      await expect(region.locator('dd')).toHaveText('资料地区');
+      const closeCard = card.getByRole('button', { name: '关闭用户卡片' });
+      if (page.viewportSize()!.width <= 760) await closeCard.tap();
+      else await closeCard.click();
       await expect(name).toBeFocused();
     });
   }

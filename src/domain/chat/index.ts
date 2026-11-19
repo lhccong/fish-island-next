@@ -33,6 +33,7 @@ export interface ReceivedMessage {
   senderName: string;
   senderTitleId?: string;
   senderLevel?: number;
+  senderRegion?: string;
   senderAvatar?: string | null;
   senderAvatarFrame?: string;
   content: string;

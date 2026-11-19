@@ -120,6 +120,8 @@ ADR-070 迁移账号头像框，沿用 auth 资料端口与就地更新流程；
 
 ADR-069 将聊天消息和在线成员名称统一为按需打开用户卡片，由 app 注入 account-tools 资料/关注/禁言端口，chat 独立宿主管理弹窗与取消生命周期；保留备注和本机黑名单，详见 ADR-069。
 
+ADR-069 补充聊天用户卡片字段：资料不含地区时，沿历史与实时消息的共用解码链保留并使用打开卡片的发送者地区快照；卡片隐藏积分。
+
 ADR-067 迁移经典斗地主，domain/landlords、infrastructure/landlords、features/landlords 分层，app 注入账号唯一 WebSocket，房间、手牌选择、聊天和排行状态独立；见 ADR-067。
 
 ADR-064 迁移账号签到、月度日历和补签，domain/sign-in、infrastructure/sign-in、features/sign-in 分层，app 通过账号资料插槽注入，独立请求状态不影响聊天。见 ADR-064。
