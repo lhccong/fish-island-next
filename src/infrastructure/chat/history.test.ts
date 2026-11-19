@@ -91,6 +91,44 @@ it('uses a lucky bag UUID at the page boundary unchanged as the next request cur
   expect(JSON.parse(String(fetcher.mock.calls[1]?.[1].body)).messageId).toBe(uuid);
   expect(older.messages[0]?.id).toBe('123');
 });
+it('loads legacy history before a big fish reply using its full string ID', async () => {
+  const fishId = '1993012345678901234';
+  const fish = {
+    messageWrapper: {
+      message: {
+        id: fishId,
+        content: '合成台词',
+        sender: { id: '-2', name: '大肥鱼' },
+        timestamp: '2026-11-19T10:00:00.123456Z',
+        bigFish: true,
+      },
+    },
+  };
+  const olderId = 'a01b23456789cdef0123456789abcdef';
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce(
+      new Response(JSON.stringify({ code: 0, data: { records: [record('newer'), fish] } })),
+    )
+    .mockResolvedValueOnce(
+      new Response(JSON.stringify({ code: 0, data: { records: [record(olderId)] } })),
+    );
+  vi.stubGlobal('fetch', fetcher);
+  const client = createChatHistory(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic' }),
+    vi.fn(),
+  );
+  const input = { conversationId: 'public', limit: 2 };
+  const first = await client.loadHistory({ ...input, cursor: null });
+  expect(first.messages.at(-1)).toMatchObject({ id: fishId, bigFish: true });
+  expect(first.nextCursor).toBe(fishId);
+
+  const older = await client.loadHistory({ ...input, cursor: first.nextCursor });
+  expect(JSON.parse(String(fetcher.mock.calls[1]?.[1].body)).messageId).toBe(fishId);
+  expect(older.messages.map(({ id }) => id)).toEqual([olderId]);
+  expect(older.nextCursor).toBeNull();
+});
 it('expires unauthorized sessions and rejects HTTP or application failures', async () => {
   const expired = vi.fn();
   const fetcher = vi.fn();

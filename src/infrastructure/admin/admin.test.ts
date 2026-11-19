@@ -35,8 +35,36 @@ test('blocks missing credentials and non-admin before network', async () => {
     const client = createAdminClient('https://admin.test', credential, allowed, vi.fn());
     await expect(client.list('user', 1, {}, signal())).rejects.toThrow('仅管理员');
     await expect(client.publishBroadcast('合成播报', signal())).rejects.toThrow('仅管理员');
+    await expect(client.getBigFishEnabled(signal())).rejects.toThrow('仅管理员');
+    await expect(client.saveBigFishEnabled(false, signal())).rejects.toThrow('仅管理员');
   }
   expect(fetch).not.toHaveBeenCalled();
+});
+test('round-trips the admin big fish setting as a boolean, including a saved false', async () => {
+  const response = (data: unknown) => new Response(JSON.stringify({ code: 0, data }));
+  const fetchMock = vi
+    .fn<typeof fetch>()
+    .mockResolvedValueOnce(response(false))
+    .mockResolvedValueOnce(response(true))
+    .mockResolvedValueOnce(response(null));
+  vi.stubGlobal('fetch', fetchMock);
+  const client = createAdminClient(
+    'https://admin.test',
+    () => token,
+    () => true,
+    vi.fn(),
+  );
+  await expect(client.getBigFishEnabled(signal())).resolves.toBe(false);
+  expect(fetchMock.mock.calls[0]).toMatchObject([
+    'https://admin.test/api/admin/big-fish/settings',
+    { method: 'GET', cache: 'no-store', headers: { 'test-session': 'synthetic-value' } },
+  ]);
+  await client.saveBigFishEnabled(false, signal());
+  expect(fetchMock.mock.calls[1]).toMatchObject([
+    'https://admin.test/api/admin/big-fish/settings',
+    { method: 'POST', body: '{"enabled":false}' },
+  ]);
+  await expect(client.getBigFishEnabled(signal())).rejects.toThrow('设置数据异常');
 });
 test('keeps system level titles outside manual assignment', async () => {
   const fetch = vi.fn();

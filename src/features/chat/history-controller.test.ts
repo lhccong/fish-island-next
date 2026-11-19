@@ -122,6 +122,43 @@ it('merges delayed history with live messages and revoke tombstones without resu
   deactivate();
   stop();
 });
+it('deduplicates a live big fish reply at the history boundary and continues loading older messages', async () => {
+  vi.useFakeTimers();
+  let receive!: Parameters<Parameters<typeof createChatRealtimeController>[0]['connect']>[0];
+  const fish: ReceivedMessage = {
+    ...message('2'),
+    senderId: '-2',
+    senderName: '大肥鱼',
+    bigFish: true,
+  };
+  const load = vi
+    .fn<ChatHistoryPort['loadHistory']>()
+    .mockResolvedValueOnce({ messages: [message('3'), fish], nextCursor: fish.id })
+    .mockResolvedValueOnce({ messages: [message('1')], nextCursor: null });
+  const client = createChatRealtimeController(
+    {
+      connect(onEvent) {
+        receive = onEvent;
+        return { close() {}, retry() {}, revoke: () => true };
+      },
+    },
+    { loadHistory: load },
+  );
+  const stop = client.start();
+  const deactivate = client.history.activate();
+  const first = client.history.loadMore();
+  receive({ type: 'big-fish', id: '1', status: 'speech', text: fish.content, message: fish });
+  await first;
+  expect(client.store.getState().ids).toEqual(['2', '3']);
+  expect(client.history.store.getState().hasMore).toBe(true);
+
+  await client.history.loadMore();
+  expect(load.mock.calls.map(([request]) => request.cursor)).toEqual([null, fish.id]);
+  expect(client.store.getState().ids).toEqual(['1', '2', '3']);
+  expect(client.history.store.getState().hasMore).toBe(false);
+  deactivate();
+  stop();
+});
 it('serializes requests, stops repeated pages and preserves content on retryable failures', async () => {
   const merge = vi.fn();
   const load = vi.fn<ChatHistoryPort['loadHistory']>();

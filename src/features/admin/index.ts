@@ -1,5 +1,6 @@
 export { AdminAnalytics } from './AdminAnalytics';
 export { BroadcastPublisher } from './BroadcastPublisher';
+export { BigFishSettings } from './BigFishSettings';
 export { UserList } from './UserList';
 export { TitleList } from './TitleList';
 export { TagList } from './TagList';

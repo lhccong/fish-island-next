@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import type { AdminFilter, AdminSection } from '@/domain/admin';
 import {
   AdminAnalytics,
+  BigFishSettings,
   BroadcastPublisher,
   UserList,
   TitleList,
@@ -44,6 +45,8 @@ export function AdminPage({ section }: { section: AdminSection | 'overview' }) {
               <AdminNavigation hideHeading />
             ) : section === 'broadcast' ? (
               <BroadcastPublisher port={adminPort} />
+            ) : section === 'big-fish' ? (
+              <BigFishSettings port={adminPort} />
             ) : section === 'data' ? (
               <AdminAnalytics port={adminPort} onUsers={(t) => navigate(`/admin/user?type=${t}`)} />
             ) : section === 'user' ? (

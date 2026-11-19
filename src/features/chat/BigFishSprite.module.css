@@ -1,0 +1,41 @@
+.sprite {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--big-fish-sprite-width, 100%);
+  aspect-ratio: 12 / 13;
+  overflow: hidden;
+  color: var(--color-accent-text);
+}
+
+.sprite [data-loading-indicator] {
+  gap: 2px;
+  font-size: 0.625rem;
+}
+
+.sprite img {
+  position: absolute;
+  inset-block-start: -100%;
+  left: 0;
+  width: 600%;
+  max-width: none;
+  height: 300%;
+  visibility: hidden;
+}
+
+.sprite[data-image='ready'] img {
+  visibility: visible;
+  animation: speak 900ms steps(5, end) 2 alternate;
+}
+
+@keyframes speak {
+  to {
+    transform: translateX(-83.333333%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite[data-image='ready'] img {
+    animation: none;
+  }
+}

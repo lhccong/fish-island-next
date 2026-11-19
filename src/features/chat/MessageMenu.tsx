@@ -48,7 +48,7 @@ export function MessageMenu({
     useChatRealtime();
   const remarks = useRemarks();
   const report = useChatReport();
-  const reward = hasRewardMessageContent(message.content);
+  const reward = !message.bigFish && hasRewardMessageContent(message.content);
   const focusDraft = useRef(false);
   const closeFocus = () => {
     const target = focusDraft.current ? composerRef.current : returnFocusRef.current;
@@ -64,23 +64,29 @@ export function MessageMenu({
     if (reward) return;
     try {
       if (!navigator.clipboard) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(messageClipboardText(message.content));
+      await navigator.clipboard.writeText(
+        message.bigFish ? message.content : messageClipboardText(message.content),
+      );
       draft.notify('已复制消息文字或图片链接');
     } catch {
       draft.notify('复制失败，请选中消息文字后手动复制', 'error');
     }
   };
   const items: MessageAction[] = [
-    {
-      label: '戳一戳',
-      icon: <Hand size={16} aria-hidden="true" />,
-      disabled: !user,
-      onSelect: () => {
-        if (user && !controller.sender.poke(message.senderId, message.senderName, user))
-          draft.notify('戳一戳未提交，请处理待发送消息后重试', 'error');
-      },
-    },
-    ...(!self
+    ...(!message.bigFish
+      ? [
+          {
+            label: '戳一戳',
+            icon: <Hand size={16} aria-hidden="true" />,
+            disabled: !user,
+            onSelect: () => {
+              if (user && !controller.sender.poke(message.senderId, message.senderName, user))
+                draft.notify('戳一戳未提交，请处理待发送消息后重试', 'error');
+            },
+          },
+        ]
+      : []),
+    ...(!self && !message.bigFish
       ? [
           {
             label: '举报',
@@ -90,7 +96,7 @@ export function MessageMenu({
           },
         ]
       : []),
-    ...(!self
+    ...(!self && !message.bigFish
       ? [
           {
             label: '加入黑名单',
@@ -114,12 +120,16 @@ export function MessageMenu({
           },
         ]
       : []),
-    {
-      label: '设置备注',
-      icon: <Pencil size={16} aria-hidden="true" />,
-      onSelect: () =>
-        remarks.open({ id: message.senderId, name: message.senderName, returnFocusRef }),
-    },
+    ...(!message.bigFish
+      ? [
+          {
+            label: '设置备注',
+            icon: <Pencil size={16} aria-hidden="true" />,
+            onSelect: () =>
+              remarks.open({ id: message.senderId, name: message.senderName, returnFocusRef }),
+          },
+        ]
+      : []),
     ...(message.quote
       ? [
           {
@@ -131,7 +141,7 @@ export function MessageMenu({
           },
         ]
       : []),
-    ...parseMessageContent(message.content)
+    ...(message.bigFish ? [] : parseMessageContent(message.content))
       .filter((part) => part.kind === 'image')
       .map((part, index, images) => ({
         label: images.length === 1 ? '添加表情包' : `添加表情包（图片 ${index + 1}）`,
@@ -158,11 +168,11 @@ export function MessageMenu({
       onSelect: () => prepare(() => draft.quote(message.id, message.senderName)),
     },
     {
-      label: '@TA',
+      label: message.bigFish ? '@大肥鱼' : '@TA',
       icon: <AtSign size={16} aria-hidden="true" />,
       onSelect: () => prepare(() => draft.mention(message.senderName)),
     },
-    ...(reward
+    ...(reward || message.bigFish
       ? []
       : [
           {

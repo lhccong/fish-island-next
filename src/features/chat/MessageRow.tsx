@@ -16,6 +16,9 @@ import { useChatRealtime } from './realtime-context';
 import { MessageAvatar } from './MessageAvatar';
 import { MessageContent } from './MessageContent';
 import { MessageMenu } from './MessageMenu';
+import { BigFishSprite } from './BigFishSprite';
+import { MessageImage } from './MessageImage';
+import { CompactMessageImage } from './CompactMessageImage';
 import styles from './MessageStream.module.css';
 import type { ChatPresentation } from './chat-presentation';
 
@@ -34,7 +37,8 @@ export const MessageRow = memo(function MessageRow({
   rowNumber: number | undefined;
   compactWorksheet?: boolean;
 }) {
-  const { controller, userId, user, navigation, bubblePreference } = useChatRealtime();
+  const { controller, userId, user, navigation, bubblePreference, draft, composerRef } =
+    useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
     state.target === id ? state.revision : 0,
   );
@@ -45,12 +49,12 @@ export const MessageRow = memo(function MessageRow({
   const bubbleRef = useRef<HTMLDivElement>(null);
   useMessageLocationPulse(bubbleRef, navigation, id, locationRevision);
   const parts = useMemo(
-    () => (message?.poke ? [] : parseMessageContent(message?.content ?? '')),
-    [message?.content, message?.poke],
+    () => (message?.poke || message?.bigFish ? [] : parseMessageContent(message?.content ?? '')),
+    [message?.content, message?.poke, message?.bigFish],
   );
   const musicOnly = useMemo(
-    () => Boolean(parseMusicMessage(message?.content ?? '')),
-    [message?.content],
+    () => !message?.bigFish && Boolean(parseMusicMessage(message?.content ?? '')),
+    [message?.content, message?.bigFish],
   );
   if (!message) return null;
   const self = message.senderId === userId;
@@ -81,13 +85,36 @@ export const MessageRow = memo(function MessageRow({
     parts.some((part) => part.kind === 'image') &&
     parts.every((part) => part.kind === 'image' || (part.kind === 'text' && !part.text.trim()));
   const standaloneMusic = !message.revoked && !message.quote && musicOnly;
-  const hasBubble = !message.revoked && !hasReward && !imageOnly && !standaloneMusic;
+  const canDecorateBubble =
+    !message.bigFish && !message.revoked && !hasReward && !imageOnly && !standaloneMusic;
   const bubbleId =
-    hasBubble && !bubblePreference.hideBubbleDecorations ? message.bubbleId : undefined;
+    canDecorateBubble && !bubblePreference.hideBubbleDecorations ? message.bubbleId : undefined;
+  const fishInWorksheet = message.bigFish && presentation === 'worksheet';
+  const mentionBigFish = () => {
+    draft.mention('大肥鱼');
+    composerRef.current?.focus({ preventScroll: true });
+  };
+  const fishAvatar = message.bigFish && (
+    <Button
+      variant="inline"
+      className={styles.bigFishAvatar}
+      aria-label="通过头像 @大肥鱼"
+      title="@大肥鱼"
+      onClick={mentionBigFish}
+    >
+      <BigFishSprite />
+    </Button>
+  );
   const bubble = (
     <div
       ref={bubbleRef}
-      className={bubbleId ? `${styles.bubble} ${bubbleArtworkClass}` : styles.bubble}
+      className={
+        fishInWorksheet
+          ? styles.bigFishLine
+          : bubbleId
+            ? `${styles.bubble} ${bubbleArtworkClass}`
+            : styles.bubble
+      }
       data-bubble-style={bubbleId}
       {...bubbleArtworkProps(bubbleId ? message.bubbleArtwork : undefined)}
       data-revoked={message.revoked}
@@ -101,6 +128,19 @@ export const MessageRow = memo(function MessageRow({
     >
       {message.revoked ? (
         '消息已撤回'
+      ) : message.bigFish ? (
+        <>
+          {fishInWorksheet && fishAvatar}
+          <div className={styles.bigFishDialogue}>
+            <span className={fishInWorksheet ? styles.bubble : undefined}>{message.content}</span>
+            {message.bigFishEmoticonUrl &&
+              (compactWorksheet ? (
+                <CompactMessageImage url={message.bigFishEmoticonUrl} />
+              ) : (
+                <MessageImage url={message.bigFishEmoticonUrl} />
+              ))}
+          </div>
+        </>
       ) : (
         <>
           {message.quote && <MessageQuote quote={message.quote} />}
@@ -115,7 +155,8 @@ export const MessageRow = memo(function MessageRow({
       data-self={self}
       data-located={locationRevision > 0}
       data-message-id={message.id}
-      data-show-avatars={showAvatars}
+      data-show-avatars={showAvatars || (message.bigFish && presentation === 'conversation')}
+      data-message-kind={message.bigFish ? 'big-fish' : undefined}
       data-delivery={message.delivery}
       data-presentation={presentation}
     >
@@ -124,18 +165,32 @@ export const MessageRow = memo(function MessageRow({
           {rowNumber}
         </span>
       )}
-      {showAvatars && <MessageAvatar message={message} showFrame={showAvatarFrames} />}
+      {presentation === 'conversation' && fishAvatar}
+      {!message.bigFish && showAvatars && (
+        <MessageAvatar message={message} showFrame={showAvatarFrames} />
+      )}
       <div className={styles.messageBody}>
         <div className={styles.meta}>
           <div className={styles.identity}>
-            <RemarkName
-              id={message.senderId}
-              name={message.senderName}
-              level={message.senderLevel}
-              titleId={message.senderTitleId}
-              region={message.senderRegion}
-            />
-            {presentation !== 'worksheet' && (
+            {message.bigFish ? (
+              <Button
+                variant="inline"
+                className={styles.bigFishName}
+                aria-label="@大肥鱼"
+                onClick={mentionBigFish}
+              >
+                大肥鱼
+              </Button>
+            ) : (
+              <RemarkName
+                id={message.senderId}
+                name={message.senderName}
+                level={message.senderLevel}
+                titleId={message.senderTitleId}
+                region={message.senderRegion}
+              />
+            )}
+            {!message.bigFish && presentation !== 'worksheet' && (
               <SenderTitle titleId={message.senderTitleId} level={message.senderLevel} />
             )}
           </div>

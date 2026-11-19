@@ -121,8 +121,25 @@ export function ChatWindow({
                   href={miniChatHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="新标签页打开聊天小窗"
-                  title="新标签页打开聊天小窗"
+                  aria-label="在新窗口打开聊天小窗"
+                  title="在新窗口打开聊天小窗"
+                  onClick={(event) => {
+                    if (
+                      event.button !== 0 ||
+                      event.ctrlKey ||
+                      event.metaKey ||
+                      event.shiftKey ||
+                      event.altKey
+                    ) {
+                      return;
+                    }
+                    event.preventDefault();
+                    window.open(
+                      event.currentTarget.href,
+                      '_blank',
+                      'popup,width=400,height=560,noopener,noreferrer',
+                    );
+                  }}
                 >
                   <ExternalLink size={16} aria-hidden="true" />
                 </a>

@@ -32,6 +32,7 @@ export function createAdminClient(
     try {
       const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/api/${path}`, {
         method,
+        ...(method === 'GET' ? { cache: 'no-store' } : {}),
         credentials: 'include',
         headers: {
           [token.name]: token.value,
@@ -76,6 +77,12 @@ export function createAdminClient(
   }
   return {
     publishBroadcast: (content, signal) => mutate('admin/broadcast/publish', signal, { content }),
+    async getBigFishEnabled(signal) {
+      const enabled = await request('admin/big-fish/settings', signal, undefined, 'GET');
+      if (typeof enabled !== 'boolean') throw new Error('大肥鱼设置数据异常，请重试');
+      return enabled;
+    },
+    saveBigFishEnabled: (enabled, signal) => mutate('admin/big-fish/settings', signal, { enabled }),
     async list<K extends AdminCollection>(
       section: K,
       page: number,

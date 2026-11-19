@@ -1,4 +1,5 @@
 import type {
+  BigFishEvent,
   ChatConnection,
   ChatEvent,
   ChatRealtimePort,
@@ -23,6 +24,8 @@ export function createChatRealtimeController(
   const model = createMessageStore();
   const sender = createSendController(sendPort, model);
   const incoming = new Set<(message: ReceivedMessage) => void>();
+  const bigFish = new Set<(event: BigFishEvent) => void>();
+  const bigFishPhases = new Map<string, BigFishEvent['status']>();
   let connection: ChatConnection | null = null;
   let queue: ChatEvent[] = [];
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -53,6 +56,11 @@ export function createChatRealtimeController(
       }
     }
   };
+  const enqueue = (event: ChatEvent) => {
+    queue.push(event);
+    if (queue.length >= 200) flush();
+    else timer ??= setTimeout(flush, 16);
+  };
   let historyAfter: string | null = null;
   const history = createHistoryController(
     historyPort && {
@@ -82,6 +90,7 @@ export function createChatRealtimeController(
     queue = [];
     pending.forEach(clearTimeout);
     pending.clear();
+    bigFishPhases.clear();
     model.reset();
   };
   return {
@@ -93,6 +102,12 @@ export function createChatRealtimeController(
         incoming.delete(listener);
       };
     },
+    subscribeBigFish(listener: (event: BigFishEvent) => void) {
+      bigFish.add(listener);
+      return () => {
+        bigFish.delete(listener);
+      };
+    },
     history,
     store: model.store,
     setBlockedSenders: model.setBlockedSenders,
@@ -100,13 +115,20 @@ export function createChatRealtimeController(
       if (connection) return stop;
       connection = port.connect(
         (event) => {
+          if (event.type === 'big-fish') {
+            const previous = bigFishPhases.get(event.id);
+            if (previous && (previous !== 'thinking' || event.status === 'thinking')) return;
+            bigFishPhases.set(event.id, event.status);
+            if (bigFishPhases.size > 128) bigFishPhases.delete(bigFishPhases.keys().next().value!);
+            if (event.status === 'speech') enqueue({ type: 'message', message: event.message });
+            bigFish.forEach((listener) => listener(event));
+            return;
+          }
           if (event.type !== 'message' && event.type !== 'revoke') {
             members.receive(event);
             return;
           }
-          queue.push(event);
-          if (queue.length >= 200) flush();
-          else timer ??= setTimeout(flush, 16);
+          enqueue(event);
         },
         (state) => model.store.setState({ connection: state }),
       );

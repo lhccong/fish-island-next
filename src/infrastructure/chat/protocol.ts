@@ -52,6 +52,27 @@ export function decodeChatEvent(raw: unknown): ChatRealtimeEvent | null {
     const messageId = id(frame.data);
     return messageId ? { type: 'revoke', id: messageId } : null;
   }
+  if (frame?.type === 'bigFish') {
+    const data = object(frame.data);
+    const source = id(data?.id);
+    const status = data?.status;
+    const text = typeof data?.text === 'string' ? data.text.trim() : null;
+    if (
+      !source ||
+      data?.roomId !== '-1' ||
+      (status !== 'thinking' && status !== 'speech' && status !== 'error') ||
+      text === null ||
+      text.length > 480 ||
+      (status === 'thinking' ? text !== '' : text === '')
+    )
+      return null;
+    if (status === 'speech') {
+      const message = decodeReceivedMessage(data.message);
+      if (!message?.bigFish || message.content !== text) return null;
+      return { type: 'big-fish', id: source, status, text, message };
+    }
+    return { type: 'big-fish', id: source, status, text };
+  }
   if (frame?.type !== 'chat') return null;
   const message = decodeReceivedMessage(object(frame.data)?.message);
   return message ? { type: 'message', message } : null;
@@ -99,7 +120,11 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
     .filter(Boolean)
     .join(' · ');
   const style = parseBubbleStyle(message.bubbleId, message.bubbleArtwork);
+  const bigFish = message.bigFish === true && senderId === '-2';
+  const bigFishEmoticonUrl = bigFish ? chatImageUrl(message.bigFishEmoticonUrl) : null;
   return {
+    ...(bigFish ? { bigFish: true } : {}),
+    ...(bigFishEmoticonUrl ? { bigFishEmoticonUrl } : {}),
     ...(style ? { bubbleId: style.id } : {}),
     ...(style?.artwork ? { bubbleArtwork: style.artwork } : {}),
     ...(poke

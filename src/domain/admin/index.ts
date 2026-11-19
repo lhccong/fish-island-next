@@ -1,6 +1,6 @@
 export type AdminSection =
-  'data' | 'user' | 'title' | 'tags' | 'word' | 'equipment' | 'report' | 'broadcast';
-export type AdminCollection = Exclude<AdminSection, 'data' | 'broadcast'>;
+  'data' | 'user' | 'title' | 'tags' | 'word' | 'equipment' | 'report' | 'broadcast' | 'big-fish';
+export type AdminCollection = Exclude<AdminSection, 'data' | 'broadcast' | 'big-fish'>;
 export function isAssignableTitle(id: string): boolean {
   return /^[1-9]\d*$/.test(id) && !(Number(id) >= 2 && Number(id) <= 10);
 }
@@ -98,6 +98,8 @@ export interface AdminTrend {
 }
 export interface AdminPort {
   publishBroadcast(content: string, signal: AbortSignal): Promise<void>;
+  getBigFishEnabled(signal: AbortSignal): Promise<boolean>;
+  saveBigFishEnabled(enabled: boolean, signal: AbortSignal): Promise<void>;
   list<K extends AdminCollection>(
     section: K,
     page: number,

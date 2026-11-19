@@ -35,6 +35,8 @@ export type { RedPacketCreateInput, RedPacketFormValues } from './red-packet';
 export { RedPacketCreateError, validateRedPacketForm } from './red-packet';
 
 export interface ReceivedMessage {
+  bigFish?: true;
+  bigFishEmoticonUrl?: string;
   bubbleId?: string;
   bubbleArtwork?: ChatBubbleArtwork;
   poke?: { targetId: string; targetName: string; suffix: string };
@@ -59,7 +61,12 @@ export type ChatEvent =
 export type OnlineMembersEvent =
   | { type: 'members-snapshot' | 'members-online'; members: readonly OnlineMember[] }
   | { type: 'member-offline'; id: string };
-export type ChatRealtimeEvent = ChatEvent | OnlineMembersEvent;
+export type BigFishEvent = {
+  type: 'big-fish';
+  id: string;
+  text: string;
+} & ({ status: 'thinking' | 'error' } | { status: 'speech'; message: ReceivedMessage });
+export type ChatRealtimeEvent = ChatEvent | OnlineMembersEvent | BigFishEvent;
 export type ChatConnectionState =
   'connecting' | 'connected' | 'reconnecting' | 'offline' | 'unauthorized' | 'closed';
 export interface ChatConnection {

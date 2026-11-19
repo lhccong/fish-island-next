@@ -5,8 +5,9 @@ import { setupChatMenu } from './chat-menu-fixture';
 test.setTimeout(60000);
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark'])
-    test(`${skin.id} ${mode}: new tab opens authenticated mini Excel and returns to chat`, async ({
+    test(`${skin.id} ${mode}: new window opens authenticated mini Excel and returns to chat`, async ({
       page,
+      hasTouch,
     }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode);
       await page.getByRole('textbox', { name: '消息草稿', exact: true }).fill('原窗口保留的草稿');
@@ -41,10 +42,28 @@ for (const skin of builtinSkins)
         miniConnections++;
         ws.onMessage(() => {});
       });
+      const openMini = page.getByRole('link', { name: '在新窗口打开聊天小窗', exact: true });
+      const openTarget = await openMini.boundingBox();
+      expect(openTarget?.width).toBe(44);
+      expect(openTarget?.height).toBe(44);
       const opened = context.waitForEvent('page');
-      await page.getByRole('link', { name: '新标签页打开聊天小窗', exact: true }).click();
+      if (hasTouch) await openMini.tap();
+      else if (mode === 'dark') await openMini.press('Enter');
+      else await openMini.click();
       const mini = await opened;
+      if (hasTouch) await mini.setViewportSize(page.viewportSize()!);
       await expect(mini).toHaveURL('/chat/mini');
+      expect(await mini.evaluate(() => window.opener === null)).toBe(true);
+      if (info.project.use.headless === false && !hasTouch) {
+        const sourceSession = await context.newCDPSession(page);
+        const miniSession = await context.newCDPSession(mini);
+        const [sourceWindow, miniWindow] = await Promise.all([
+          sourceSession.send('Browser.getWindowForTarget'),
+          miniSession.send('Browser.getWindowForTarget'),
+        ]);
+        expect(miniWindow.windowId).not.toBe(sourceWindow.windowId);
+        await Promise.all([sourceSession.detach(), miniSession.detach()]);
+      }
       await expect(
         mini.getByRole('status').filter({ hasText: '正在加载历史消息…' }).locator('svg'),
       ).toBeVisible();
@@ -71,7 +90,7 @@ for (const skin of builtinSkins)
       await retry.click();
       await expect(mini.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
       const draft = mini.getByRole('textbox', { name: '消息草稿', exact: true });
-      await draft.fill('新标签页自己的草稿');
+      await draft.fill('新窗口自己的草稿');
       const original = await draft.elementHandle();
       await select.press('Enter');
       await mini.getByRole('option', { name: '聊天气泡', exact: true }).click();
@@ -79,7 +98,7 @@ for (const skin of builtinSkins)
       await expect(select).toBeFocused();
       await select.press('Enter');
       await mini.getByRole('option', { name: 'Excel 模式', exact: true }).click();
-      await expect(draft).toHaveText('新标签页自己的草稿');
+      await expect(draft).toHaveText('新窗口自己的草稿');
       expect(await draft.evaluate((el, original) => el === original, original)).toBe(true);
       expect(await surface.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
       expect(await mini.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -94,7 +113,7 @@ for (const skin of builtinSkins)
       expect(fixture.stats().connections).toBe(1);
       await mini.getByRole('button', { name: '关闭聊天窗口', exact: true }).click();
       await expect(mini).toHaveURL('/chat');
-      await expect(draft).toHaveText('新标签页自己的草稿');
+      await expect(draft).toHaveText('新窗口自己的草稿');
       await original?.dispose();
       await mini.close();
     });

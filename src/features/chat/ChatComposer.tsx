@@ -4,6 +4,7 @@ import { useId, useRef, useState, type ReactNode } from 'react';
 import { Folder, Plus, Scissors, PictureInPicture2, Maximize2 } from 'lucide-react';
 import { EmoticonLauncher } from './EmoticonLauncher';
 import { EmoticonFeedback } from './EmoticonFeedback';
+import { BigFishReplyStatus } from './BigFishReplyStatus';
 import { RedPacketLauncher } from './RedPacketLauncher';
 import { LuckyBagLauncher } from './LuckyBagLauncher';
 import { Button } from '@/shared/ui/Button';
@@ -192,6 +193,7 @@ export function ChatComposer({
           )}
           <div className={styles.composerFeedback}>
             <EmoticonFeedback />
+            <BigFishReplyStatus />
             {feedback && (
               <span role="status" data-tone={feedback.kind}>
                 {feedback.text}
