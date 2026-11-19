@@ -7,8 +7,19 @@ export interface TabIdentity {
   icon: string;
 }
 
+export const tabIdentityPresets: readonly TabIdentity[] = [
+  defaultTabIdentity,
+  { name: '百度', icon: '/tab-icons/baidu.ico' },
+  { name: '必应', icon: '/tab-icons/bing.ico' },
+  { name: '知乎', icon: '/tab-icons/zhihu.ico' },
+];
+
+export function isPresetTabIcon(value: string): boolean {
+  return tabIdentityPresets.some(({ icon }) => icon === value);
+}
+
 export function isTabIcon(value: string): boolean {
-  if (value === defaultTabIdentity.icon) return true;
+  if (isPresetTabIcon(value)) return true;
   if (
     /^data:image\/(png|jpeg|webp|x-icon|vnd.microsoft.icon);base64,[A-Za-z0-9+/]+=*$/.test(value)
   ) {

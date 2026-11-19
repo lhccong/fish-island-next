@@ -9,11 +9,16 @@ test('restores valid preferences and rejects unsafe or corrupt configuration', a
   });
   const { useTabIdentityStore, normalizeTabIdentity } = await import('./tab-identity-store');
   expect(useTabIdentityStore.getState().identity.name).toBe('工作台');
+  expect(normalizeTabIdentity({ name: ' 搜索 ', icon: '/tab-icons/baidu.ico' })).toEqual({
+    name: '搜索',
+    icon: '/tab-icons/baidu.ico',
+  });
   for (const icon of [
     'javascript:alert(1)',
     'http://example.com/a.png',
     'data:image/svg+xml;base64,PHN2Zz4=',
     'https://user:pass@example.com/a.png',
+    '/tab-icons/unrecognized.ico',
   ]) {
     expect(normalizeTabIdentity({ name: '名称', icon })).toBeNull();
   }

@@ -90,6 +90,20 @@
   place-items: center;
   color: var(--color-muted);
 }
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.preset[aria-pressed='true'] {
+  border-color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+.preset img {
+  flex: none;
+  object-fit: contain;
+}
 .hint {
   margin: 0;
   font-size: 12px;
@@ -126,5 +140,10 @@
   }
   .field {
     font-size: 14px;
+  }
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-items: start;
   }
 }

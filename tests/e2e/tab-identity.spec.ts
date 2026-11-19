@@ -52,6 +52,59 @@ for (const skin of builtinSkins)
       );
       await page.goto('/');
       let dialog = await openSettings(page);
+      const mobile = page.viewportSize()!.width <= 760;
+      const presets = dialog.getByRole('group', { name: '网站图标预设' });
+      const choices = presets.getByRole('button');
+      await expect(choices).toHaveText(['摸鱼岛', '百度', '必应', '知乎']);
+      await expect(choices.first()).toHaveAttribute('aria-pressed', 'true');
+      await expect
+        .poll(() =>
+          choices
+            .locator('img')
+            .evaluateAll((icons) =>
+              icons.every((icon) => (icon as HTMLImageElement).naturalWidth > 0),
+            ),
+        )
+        .toBe(true);
+      const layout = await choices.evaluateAll((elements) =>
+        elements.map((element) => {
+          const { top, height } = element.getBoundingClientRect();
+          return { top, height };
+        }),
+      );
+      expect(new Set(layout.map(({ top }) => top)).size).toBe(mobile ? 2 : 1);
+      expect(layout.every(({ height }) => height === (mobile ? 44 : 32))).toBe(true);
+      const baidu = presets.getByRole('button', { name: '百度', exact: true });
+      if (mobile) await baidu.tap();
+      else {
+        await baidu.hover();
+        await dialog.getByRole('textbox', { name: '网站名称', exact: true }).press('Tab');
+        await page.keyboard.press('Tab');
+        await expect(baidu).toBeFocused();
+        await expect(baidu).toHaveCSS('outline-style', 'solid');
+        await baidu.press('Enter');
+      }
+      await expect(baidu).toHaveAttribute('aria-pressed', 'true');
+      await expect(dialog.getByRole('textbox', { name: '网站名称', exact: true })).toHaveValue(
+        '百度',
+      );
+      await expect(dialog.getByRole('textbox', { name: '图标地址', exact: true })).toHaveValue('');
+      await expect(dialog.getByRole('img', { name: '网站图标预览' })).toHaveAttribute(
+        'src',
+        '/tab-icons/baidu.ico',
+      );
+      await expect(page).toHaveTitle('摸鱼岛');
+      await page.screenshot({ path: info.outputPath('selected-preset.png') });
+      await dialog.getByRole('button', { name: '保存', exact: true }).click();
+      await expect(page).toHaveTitle('百度');
+      await expect(page.locator('head link[rel="icon"]')).toHaveAttribute(
+        'href',
+        '/tab-icons/baidu.ico',
+      );
+      await page.reload();
+      await expect(page).toHaveTitle('百度');
+      dialog = await openSettings(page);
+      await expect(baidu).toHaveAttribute('aria-pressed', 'true');
       await dialog.getByRole('textbox', { name: '网站名称', exact: true }).fill('  项目文档  ');
       await dialog
         .locator('input[type=file]')
@@ -103,7 +156,12 @@ for (const skin of builtinSkins)
         'href',
         '/favicon.ico?v=moyudao',
       );
-      await dialog.getByRole('textbox', { name: '网站名称', exact: true }).fill('未保存的修改');
+      const bing = presets.getByRole('button', { name: '必应', exact: true });
+      if (mobile) await bing.tap();
+      else await bing.click();
+      await expect(dialog.getByRole('textbox', { name: '网站名称', exact: true })).toHaveValue(
+        '必应',
+      );
       await page.keyboard.press('Escape');
       await expect(page.getByRole('button', { name: '切换主题', exact: true })).toBeFocused();
       dialog = await openSettings(page);
@@ -211,6 +269,7 @@ test('online icon loading, saving and cancellation', async ({ page }) => {
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
   await expect(dialog.getByRole('status')).toHaveText('正在处理图标…');
   await expect(dialog.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
+  await expect(dialog.getByRole('button', { name: '百度', exact: true })).toBeDisabled();
   releaseImage();
   await expect(dialog.getByRole('status')).toHaveText('已保存到此浏览器');
   await expect(page.locator('head link[rel="icon"]')).toHaveAttribute(

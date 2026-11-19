@@ -4,8 +4,10 @@ import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import {
   defaultTabIdentity,
+  isPresetTabIcon,
   isTabIcon,
   normalizeTabIdentity,
+  tabIdentityPresets,
   useTabIdentityStore,
 } from './model/tab-identity-store';
 import { checkTabImage, readTabImage } from './tab-image';
@@ -85,9 +87,32 @@ export function WebsiteSettingsForm() {
               {previewFailed || !isTabIcon(icon) ? (
                 <span className={styles.placeholder}>?</span>
               ) : (
-                <img src={icon} alt="网站图标预览" onError={() => setPreviewFailed(true)} />
+                <img
+                  key={icon}
+                  src={icon}
+                  alt="网站图标预览"
+                  onError={() => setPreviewFailed(true)}
+                />
               )}
               <span>{name.trim() || '网站名称'}</span>
+            </div>
+            <div className={styles.presets} role="group" aria-label="网站图标预设">
+              {tabIdentityPresets.map((preset) => (
+                <Button
+                  key={preset.icon}
+                  className={styles.preset ?? ''}
+                  variant="secondary"
+                  aria-pressed={icon === preset.icon && name.trim() === preset.name}
+                  disabled={busy}
+                  onClick={() => {
+                    setName(preset.name);
+                    updateIcon(preset.icon);
+                  }}
+                >
+                  <img src={preset.icon} alt="" width={16} height={16} />
+                  {preset.name}
+                </Button>
+              ))}
             </div>
             <label className={styles.field}>
               <span>图标地址</span>
@@ -99,7 +124,7 @@ export function WebsiteSettingsForm() {
                 placeholder={
                   icon.startsWith('data:') ? '已选择本地图片' : 'https://example.com/icon.png'
                 }
-                value={icon.startsWith('data:') || icon === defaultTabIdentity.icon ? '' : icon}
+                value={icon.startsWith('data:') || isPresetTabIcon(icon) ? '' : icon}
                 onChange={(event) => updateIcon(event.target.value || defaultTabIdentity.icon)}
               />
             </label>
