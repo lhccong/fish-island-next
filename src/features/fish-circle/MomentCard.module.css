@@ -54,7 +54,7 @@
   min-height: 44px;
   color: var(--color-circle-text);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
   background: transparent;
   cursor: pointer;
   text-align: left;
@@ -62,7 +62,7 @@
 }
 .private {
   color: var(--color-circle-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   margin-left: var(--space-2);
 }
 .body {
@@ -80,7 +80,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   line-height: 1.85;
-  font-size: 14px;
+  font-size: 0.875rem;
   margin: calc(-1 * var(--space-1)) 0 var(--space-3);
 }
 .body > button {
@@ -101,7 +101,7 @@
   border-radius: 24px;
   background: var(--color-circle-location);
   color: var(--color-circle-location-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 0 0 var(--space-3);
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -117,7 +117,7 @@
   background: var(--color-circle-likes);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-control);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
   color: var(--color-circle-author);
   margin: 0 0 var(--space-3);
@@ -141,7 +141,7 @@
 }
 .time {
   color: var(--color-circle-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .actions {
@@ -163,7 +163,7 @@
   color: var(--color-circle-muted);
   cursor: pointer;
   border-radius: var(--radius-control);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .actions > button[aria-pressed='true'] {
   color: var(--color-circle-heart);
@@ -185,7 +185,7 @@
 }
 .body [role='alert'] {
   color: var(--color-danger);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .card[data-variant='detail'] {
   padding: 4px;
@@ -234,7 +234,7 @@
 }
 .card[data-variant='detail'] .time {
   max-width: none;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .card[data-variant='detail'] .likes {
   order: 1;
@@ -296,7 +296,7 @@
   }
   .time {
     max-width: 45%;
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .footer {
     margin-top: var(--space-2);
@@ -305,7 +305,7 @@
 .islandTime {
   margin-left: auto;
   color: var(--color-muted);
-  font-size: 10px;
+  font-size: 0.625rem;
   white-space: nowrap;
 }
 .card[data-variant='island'] {
@@ -349,7 +349,7 @@
 }
 .card[data-variant='island'] .name {
   min-height: 24px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 20px;
 }
 .card[data-variant='island'] .islandTime {
@@ -362,7 +362,7 @@
   margin: 0;
 }
 .card[data-variant='island'] .text {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.65;
   margin: 2px 0 6px;
 }
@@ -387,7 +387,7 @@
 .card[data-variant='island'] .likes {
   padding: 4px 6px;
   margin: 6px 0 0;
-  font-size: 11px;
+  font-size: 0.6875rem;
   border-radius: 3px;
   line-height: 1.5;
 }
@@ -446,7 +446,7 @@
 .card[data-variant='island'] .location {
   padding: 2px 4px;
   margin: 4px 0 0;
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .card[data-variant='island'] .footer {
   margin-top: 2px;

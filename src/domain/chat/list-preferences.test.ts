@@ -29,4 +29,31 @@ describe('chat list appearance', () => {
     ])
       expect(() => parseChatListAppearance(value)).toThrow();
   });
+
+  it('validates stable keys and persists only nonempty overrides', () => {
+    const appearance = {
+      ...defaultChatListAppearance(),
+      conversationOrder: ['cover:service', 'member:synthetic'],
+      conversationEdits: {
+        'cover:service': { name: ' 通知 ', preview: ' ' },
+        'member:synthetic': { name: '', preview: '' },
+      },
+    };
+    expect(parseChatListAppearance(appearance)).toEqual({
+      ...appearance,
+      conversationEdits: { 'cover:service': { name: '通知', preview: '' } },
+    });
+    expect(() =>
+      parseChatListAppearance({
+        ...appearance,
+        conversationOrder: ['cover:service', 'cover:service'],
+      }),
+    ).toThrow('对话顺序格式无效');
+    expect(() =>
+      parseChatListAppearance({
+        ...appearance,
+        conversationEdits: { unrelated: { name: '', preview: '' } },
+      }),
+    ).toThrow('对话文案格式无效');
+  });
 });

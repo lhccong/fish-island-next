@@ -15,14 +15,14 @@
 }
 .editorDialog > h2 {
   margin: 0 40px 6px 0;
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 650;
   letter-spacing: -0.4px;
   line-height: 1.5;
 }
 .editorDialog > p {
   margin: 0 0 24px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .form {
@@ -52,7 +52,7 @@
   align-content: start;
   gap: 10px;
   min-width: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -71,7 +71,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
 }
@@ -109,7 +109,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   pointer-events: none;
 }
@@ -125,7 +125,7 @@
   border-radius: 50%;
   background: transparent;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   cursor: help;
 }
 .ruleHint,
@@ -133,7 +133,7 @@
   overflow-wrap: anywhere;
   margin: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.75;
   font-weight: 400;
 }
@@ -141,7 +141,7 @@
   margin-top: -4px;
   text-align: right;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
 }
 .confirmed {
@@ -155,7 +155,7 @@
   border-radius: var(--radius-control);
   background: var(--color-profile-success-bg);
   color: var(--color-profile-success-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
   font-weight: 400;
   overflow-wrap: anywhere;
@@ -175,7 +175,7 @@
 .titleSection h3,
 .milestoneSection h3 {
   margin: 0 0 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   font-weight: 600;
 }
@@ -222,7 +222,7 @@
   min-width: 0;
 }
 .uploadRow > input {
-  font-size: 12px;
+  font-size: 0.75rem;
   text-overflow: ellipsis;
 }
 .upload {
@@ -238,7 +238,7 @@
   border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -361,7 +361,7 @@
 .titleSection .confirmed {
   min-height: 32px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
   border-color: transparent;
 }
 .emailSection {
@@ -378,7 +378,7 @@
 .emailActions button {
   min-height: 44px;
   padding: 8px 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .emailActions button:last-child {
   grid-column: 1 / -1;
@@ -387,14 +387,14 @@
   display: grid;
   gap: 8px;
   color: var(--color-danger);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.75;
 }
 .sectionError button {
   justify-self: start;
   min-height: 44px;
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .milestones {
   display: grid;
@@ -420,13 +420,13 @@
 }
 .memberCard strong,
 .birthdayCard strong {
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.6;
 }
 .memberCard p,
 .birthdayCard p {
   margin: 5px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
   overflow-wrap: anywhere;
 }
@@ -438,7 +438,7 @@
   height: 36px;
   border-radius: 50%;
   background: var(--color-profile-icon-bg);
-  font-size: 21px;
+  font-size: 1.3125rem;
 }
 .badge {
   display: inline-block;
@@ -465,7 +465,7 @@
 .error {
   margin: 0;
   color: var(--color-danger);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
   overflow-wrap: anywhere;
 }
@@ -479,7 +479,7 @@
   border-radius: var(--radius-control);
   color: var(--color-accent-text);
   background: var(--color-accent-soft);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .identity {
   display: flex;
@@ -496,7 +496,7 @@
 }
 .identityText h3 {
   margin: 0 0 8px;
-  font-size: 23px;
+  font-size: 1.4375rem;
   overflow-wrap: anywhere;
 }
 .identityText span {
@@ -504,7 +504,7 @@
   align-items: center;
   gap: 4px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   overflow-wrap: anywhere;
 }
 .details {
@@ -516,7 +516,7 @@
   display: grid;
   grid-template-columns: 80px minmax(0, 1fr);
   gap: 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.8;
 }
 .details dt {
@@ -551,11 +551,11 @@
     border-radius: 16px;
   }
   .editorDialog > h2 {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
   .editorDialog > p {
     margin-bottom: 20px;
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .grid,
   .backgroundRow,
@@ -570,7 +570,7 @@
   .label textarea,
   .uploadRow > input,
   .emailActions > input {
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .imageField {
     grid-template-columns: 64px minmax(0, 1fr);

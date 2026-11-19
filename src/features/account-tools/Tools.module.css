@@ -14,7 +14,7 @@
 .dialog > h2 {
   flex: none;
   margin: 0 40px 8px 4px;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 650;
   line-height: 1.5;
   letter-spacing: -0.3px;
@@ -22,7 +22,7 @@
 .dialog > p {
   flex: none;
   margin: 0 20px 24px 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .password {
@@ -85,7 +85,7 @@
   align-content: start;
   gap: 8px;
   min-width: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -156,7 +156,7 @@
 .hint {
   margin: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   line-height: 1.7;
 }
@@ -183,11 +183,11 @@
 }
 .toolbar > span {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .feedback {
   flex: none;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
   overflow-wrap: anywhere;
 }
@@ -215,13 +215,13 @@
   flex: 1;
   min-width: 100px;
   overflow-wrap: anywhere;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .text p {
   margin: 4px 0 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   line-height: 1.7;
 }
@@ -242,7 +242,7 @@
   max-width: 30em;
   margin: 0;
   color: var(--color-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.9;
 }
 @media (max-width: 760px) {
@@ -260,18 +260,18 @@
     max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
   .dialog > h2 {
-    font-size: 19px;
+    font-size: 1.1875rem;
   }
   .dialog > p {
     margin-bottom: 20px;
   }
   .field {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .field input,
   .field textarea {
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .formGrid {
     grid-template-columns: minmax(0, 1fr);

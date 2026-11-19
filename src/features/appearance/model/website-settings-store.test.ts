@@ -7,8 +7,10 @@ test('restores valid preferences and rejects unsafe or corrupt configuration', a
   vi.stubGlobal('localStorage', {
     getItem: () => JSON.stringify({ name: ' 工作台 ', icon: 'https://example.com/icon.png' }),
   });
-  const { useTabIdentityStore, normalizeTabIdentity } = await import('./tab-identity-store');
-  expect(useTabIdentityStore.getState().identity.name).toBe('工作台');
+  const { useWebsiteSettingsStore, normalizeTabIdentity } =
+    await import('./website-settings-store');
+  expect(useWebsiteSettingsStore.getState().identity.name).toBe('工作台');
+  expect(useWebsiteSettingsStore.getState().fontScale).toBe('100');
   expect(normalizeTabIdentity({ name: ' 搜索 ', icon: '/tab-icons/baidu.ico' })).toEqual({
     name: '搜索',
     icon: '/tab-icons/baidu.ico',
@@ -30,7 +32,7 @@ test('restores valid preferences and rejects unsafe or corrupt configuration', a
   ).toBeNull();
 });
 
-test('storage failure preserves applied identity and retry saves only tab preferences', async () => {
+test('storage failure preserves applied preferences and retry saves them together', async () => {
   let fail = true;
   const entries = new Map<string, string>();
   vi.stubGlobal('localStorage', {
@@ -41,18 +43,38 @@ test('storage failure preserves applied identity and retry saves only tab prefer
     },
   });
   const {
-    useTabIdentityStore: store,
+    useWebsiteSettingsStore: store,
     defaultTabIdentity,
     tabIdentityStorageKey,
-  } = await import('./tab-identity-store');
+  } = await import('./website-settings-store');
   expect(store.getState().identity).toEqual(defaultTabIdentity);
   const identity = { name: '文档', icon: 'https://example.com/icon.png' };
-  expect(() => store.getState().save(identity)).toThrow('本地保存失败');
+  expect(() => store.getState().save(identity, '120')).toThrow('本地保存失败');
   expect(store.getState().identity).toEqual(defaultTabIdentity);
+  expect(store.getState().fontScale).toBe('100');
   fail = false;
-  store.getState().save(identity);
+  store.getState().save(identity, '120');
   expect(store.getState().identity).toEqual(identity);
-  expect([...entries.keys()]).toEqual([tabIdentityStorageKey]);
-  store.getState().save(defaultTabIdentity);
+  expect(store.getState().fontScale).toBe('120');
+  expect([...entries.entries()]).toEqual([
+    [tabIdentityStorageKey, JSON.stringify({ ...identity, fontScale: '120' })],
+  ]);
+  const appliedIdentity = store.getState().identity;
+  store.getState().save(identity, '110');
+  expect(store.getState().identity).toBe(appliedIdentity);
+  store.getState().save(defaultTabIdentity, '100');
   expect(store.getState().identity).toEqual(defaultTabIdentity);
+  expect(store.getState().fontScale).toBe('100');
+});
+
+test.each([
+  ['90', '90'],
+  ['110', '110'],
+  ['120', '120'],
+  [120, '100'],
+  ['150', '100'],
+])('restores saved font scale %s as %s', async (fontScale, expected) => {
+  vi.stubGlobal('localStorage', { getItem: () => JSON.stringify({ fontScale }) });
+  const { useWebsiteSettingsStore } = await import('./website-settings-store');
+  expect(useWebsiteSettingsStore.getState().fontScale).toBe(expected);
 });

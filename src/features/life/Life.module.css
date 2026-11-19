@@ -25,7 +25,7 @@
 }
 .home h1 {
   margin: 12px 0 4px;
-  font-size: 48px;
+  font-size: 3rem;
   color: var(--color-text);
 }
 .home p {
@@ -114,13 +114,13 @@
   border-bottom: 1px solid var(--color-border);
 }
 .pickHeader h2 {
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1.4;
   margin: 5px 0 0;
   font-weight: 700;
 }
 .pickEyebrow {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-accent-text);
 }
@@ -137,7 +137,7 @@
   align-items: center;
   gap: 8px;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .progressSteps b {
   display: grid;
@@ -146,7 +146,7 @@
   height: 24px;
   border: 1px solid var(--color-border);
   border-radius: 50%;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .progressSteps [aria-current] {
   color: var(--color-accent-text);
@@ -168,7 +168,7 @@
 }
 .drawStage h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text);
 }
@@ -230,11 +230,11 @@
 }
 .pickStatus h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
 }
 .pickStatus span {
   color: var(--color-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
   white-space: nowrap;
 }
 .pickStatus span b {
@@ -276,7 +276,7 @@
   align-items: center;
   gap: 5px;
   padding: 7px 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   border-bottom: 2px solid var(--color-border);
 }
@@ -297,7 +297,7 @@
     padding-bottom: 18px;
   }
   .pickHeader h2 {
-    font-size: 22px;
+    font-size: 1.375rem;
   }
   .progressSteps {
     gap: 20px;
@@ -344,7 +344,7 @@
   color: var(--color-accent-text);
 }
 .lifeModes button strong {
-  font-size: 19px;
+  font-size: 1.1875rem;
 }
 .lifeModes button small {
   display: block;
@@ -375,7 +375,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-accent-text);
 }
 .cultivationAllocation {
@@ -390,7 +390,7 @@
   border-top: 1px solid var(--color-border);
 }
 .realmRoad h3 {
-  font-size: 14px;
+  font-size: 0.875rem;
   margin: 0 0 16px;
   color: var(--color-text);
 }
@@ -406,7 +406,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
   white-space: nowrap;
 }
@@ -415,7 +415,7 @@
   place-items: center;
   width: 21px;
   height: 21px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   border: 1px solid var(--color-border);
   border-radius: 50%;
 }
@@ -432,12 +432,12 @@
 }
 .realmTitle h2 {
   margin: 4px 0 0;
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1.4;
   color: var(--color-text);
 }
 .realmTitle > div > span {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .realmEmblem {
@@ -453,7 +453,7 @@
 .rootLabel {
   margin-left: auto;
   padding: 5px 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-accent-text);
   white-space: nowrap;
 }
@@ -469,25 +469,25 @@
 }
 .cultivationMetrics span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-bottom: 6px;
 }
 .cultivationMetrics b {
-  font-size: 17px;
+  font-size: 1.0625rem;
   color: var(--color-text);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 .cultivationMetrics small {
   font-weight: 400;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .cultivationProgress > div {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-bottom: 8px;
   color: var(--color-muted);
 }
@@ -528,7 +528,7 @@
   padding: 8px 4px;
 }
 .cultivationAttributes span {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .cultivationAttributes b {
@@ -544,7 +544,7 @@
   grid-template-columns: minmax(58px, 85px) minmax(0, 1fr);
 }
 .logs.cultivationLogs article > b {
-  font-size: 12px;
+  font-size: 0.75rem;
   overflow-wrap: anywhere;
 }
 .cultivationRealmLog {
@@ -564,14 +564,14 @@
 }
 .cultivationEnding h2 {
   margin: 4px 0 0;
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 .cultivationEnding span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .cultivationSectionTitle {
-  font-size: 16px;
+  font-size: 1rem;
   margin: 24px 0 16px;
 }
 .cultivationBadges {
@@ -584,7 +584,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-accent-text);
 }
 .cultivationPanel > .primary {
@@ -602,10 +602,10 @@
     flex-wrap: wrap;
   }
   .realmTitle h2 {
-    font-size: 21px;
+    font-size: 1.3125rem;
   }
   .rootLabel {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .cultivationMetrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -860,12 +860,12 @@
   min-width: 0;
 }
 .celebrityIdentity > div > span {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-muted);
 }
 .celebrityIdentity h3 {
   margin: 3px 0 0;
-  font-size: 21px;
+  font-size: 1.3125rem;
   line-height: 1.4;
   color: var(--color-text);
   overflow-wrap: anywhere;
@@ -901,13 +901,13 @@
   min-width: 0;
 }
 .celebrityProperties > div > span:first-child {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .celebrityProperties b {
   display: block;
   color: var(--color-text);
-  font-size: 22px;
+  font-size: 1.375rem;
   font-variant-numeric: tabular-nums;
   margin: 4px 0 8px;
 }
@@ -929,12 +929,12 @@
   align-items: center;
   gap: 6px;
   color: var(--color-accent-text);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .celebrityTalentHeading small {
   margin-left: auto;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .celebrityTalents {
   list-style: none;
@@ -953,13 +953,13 @@
   min-width: 0;
 }
 .celebrityTalents strong {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-text);
 }
 .celebrityTalents p {
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.65;
   color: var(--color-muted);
   overflow-wrap: anywhere;
@@ -976,7 +976,7 @@
   justify-content: space-between;
 }
 .celebrityFooter > span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .celebrityFooter > span b {
@@ -1147,7 +1147,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .collectionStat > div {
@@ -1157,13 +1157,13 @@
   margin-top: 8px;
 }
 .collectionStat b {
-  font-size: 30px;
+  font-size: 1.875rem;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
   color: var(--color-text);
 }
 .collectionStat small {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .collectionStat:last-child svg,
@@ -1177,7 +1177,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 9px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .collectionProgress > div b {
@@ -1234,13 +1234,13 @@
   align-items: center;
   gap: 7px;
   padding: 9px 12px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   border-radius: 6px;
   color: var(--color-muted);
   white-space: nowrap;
 }
 .achievementFilters b {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
@@ -1271,7 +1271,7 @@
   width: 100%;
   min-width: 0;
   background: transparent;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text);
 }
 .achievementSearch:focus-within {
@@ -1280,7 +1280,7 @@
 }
 .achievementResults {
   margin: 16px 0 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .achievementGrid {
@@ -1319,7 +1319,7 @@
 }
 .achievementBody h3 {
   margin: 1px 0 6px;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   font-weight: 600;
   color: var(--color-muted);
@@ -1327,7 +1327,7 @@
 }
 .achievementBody p {
   margin: 0 0 16px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.7;
   color: var(--color-muted);
   overflow-wrap: anywhere;
@@ -1338,7 +1338,7 @@
   gap: 8px;
   flex-wrap: wrap;
   margin-top: auto;
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .achievementMeta span {
   display: inline-flex;
@@ -1372,7 +1372,7 @@
 }
 .achievementEmpty h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--color-muted);
 }
 @media (max-width: 900px) {
@@ -1387,7 +1387,7 @@
     padding: 22px 0;
   }
   .collectionStat b {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
   .achievementGrid {
     grid-template-columns: minmax(0, 1fr);
@@ -1412,7 +1412,7 @@
 }
 @media (max-width: 600px) {
   .home h1 {
-    font-size: 30px;
+    font-size: 1.875rem;
   }
 }
 @media (max-width: 600px) {
@@ -1441,13 +1441,13 @@
   min-height: 44px;
 }
 .container input {
-  font-size: 16px;
+  font-size: max(16px, 1rem);
 }
 @media (max-width: 760px) {
   .container {
     padding: 16px 12px max(24px, env(safe-area-inset-bottom));
   }
   .home h1 {
-    font-size: 30px;
+    font-size: 1.875rem;
   }
 }

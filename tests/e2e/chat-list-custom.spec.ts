@@ -30,7 +30,7 @@ test('switching appearances preserves custom list and chat state', async ({ page
     await page.keyboard.press('Escape');
     for (const width of [1280, 375, 390]) {
       await page.setViewportSize({ width, height: 900 });
-      const popup = width <= 760 || skin.id === 'wps';
+      const popup = width <= 760 || ['wps', 'moyu-island', 'pixel-island'].includes(skin.id);
       if (popup) await page.getByRole('button', { name: '查看聊天列表', exact: true }).click();
       const list = page.getByRole('region', { name: '聊天列表滚动区', exact: true });
       await expect(list.getByText('整理需求', { exact: true })).toBeVisible();
@@ -57,7 +57,7 @@ for (const skin of builtinSkins)
     }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode);
       const mobile = page.viewportSize()!.width <= 760;
-      const popup = mobile || skin.id === 'wps';
+      const popup = mobile || ['wps', 'moyu-island', 'pixel-island'].includes(skin.id);
       await page.getByRole('textbox', { name: '消息草稿' }).fill('保留聊天草稿');
       const baseline = fixture.stats();
       const openList = async () => {
@@ -65,9 +65,9 @@ for (const skin of builtinSkins)
       };
       await openList();
       const list = page.getByRole('region', { name: '聊天列表滚动区', exact: true });
-      const editor = page.getByRole('dialog', { name: '自定义聊天列表', exact: true });
+      const editor = page.getByRole('dialog', { name: '编辑聊天列表', exact: true });
       const edit = async () =>
-        page.getByRole('button', { name: '自定义聊天列表', exact: true }).click();
+        page.getByRole('button', { name: '编辑聊天列表', exact: true }).click();
       await edit();
       await editor.getByRole('combobox').click();
       await page.getByRole('option', { name: '自定义清单', exact: true }).click();
@@ -98,7 +98,7 @@ for (const skin of builtinSkins)
       );
       await editor.getByRole('button', { name: '保存', exact: true }).click();
       await expect(editor).toHaveCount(0);
-      await expect(page.getByRole('button', { name: '自定义聊天列表', exact: true })).toBeFocused();
+      await expect(page.getByRole('button', { name: '编辑聊天列表', exact: true })).toBeFocused();
       await expect(list.getByText('整理项目需求', { exact: true })).toBeVisible();
       await expect(list.getByText('本周 Todo', { exact: true })).toBeVisible();
       await expect(list.locator('[data-kind="member"]')).toHaveCount(0);

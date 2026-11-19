@@ -10,6 +10,7 @@ export function RemarkName({
   level,
   titleId,
   region,
+  displayName,
 }: {
   id: string;
   name: string;
@@ -17,6 +18,7 @@ export function RemarkName({
   level?: number | undefined;
   titleId?: string | undefined;
   region?: string | undefined;
+  displayName?: string | undefined;
 }) {
   const remark = useRemark(id);
   const open = useUserCard();
@@ -28,11 +30,11 @@ export function RemarkName({
       ref={ref}
       type="button"
       className={styles.name}
-      title={remark ? `${remark}（${name}）` : name}
-      aria-label={`查看${name}的用户卡片`}
+      title={displayName || (remark ? `${remark}（${name}）` : name)}
+      aria-label={`查看${displayName || name}的用户卡片`}
       onClick={() => open({ id, name, level, titleId, region, returnFocusRef: ref })}
     >
-      {remark || name}
+      {displayName || remark || name}
     </button>
   );
 }

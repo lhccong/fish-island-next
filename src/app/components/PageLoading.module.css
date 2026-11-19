@@ -38,7 +38,7 @@
 
 .title {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -46,7 +46,7 @@
 .hint {
   margin: var(--space-2) 0 0;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 

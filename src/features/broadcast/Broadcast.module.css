@@ -26,7 +26,7 @@
   );
   color: color-mix(in srgb, var(--color-warning) 30%, var(--color-text));
   pointer-events: auto;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
   animation: arrive 180ms ease-out both;
 }
@@ -82,7 +82,7 @@
 @media (max-width: 760px) {
   .ribbon {
     gap: 8px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

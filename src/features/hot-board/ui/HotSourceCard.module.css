@@ -49,7 +49,7 @@
   background: var(--color-pixel-wood);
   color: var(--color-on-accent);
   box-shadow: 2px 2px 0 var(--color-pixel-wood-dark);
-  font-size: 12px;
+  font-size: 0.75rem;
   height: 24px;
   line-height: 20px;
 }
@@ -78,7 +78,7 @@
   border: 0;
   background: transparent;
   color: var(--color-hot-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
   cursor: pointer;
 }
@@ -93,7 +93,7 @@
 .update {
   flex-shrink: 0;
   color: var(--color-hot-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   white-space: nowrap;
 }
 .body {
@@ -119,9 +119,9 @@
   justify-content: space-between;
   min-height: 22px;
   color: var(--color-hot-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
-  line-height: 22px;
+  line-height: 1.375rem;
   text-decoration: none;
 }
 .link:hover {
@@ -144,7 +144,7 @@
   background: var(--color-hot-rank);
   text-align: center;
   line-height: 18px;
-  font-size: 12px;
+  font-size: 0.75rem;
   vertical-align: baseline;
 }
 .rank[data-rank='1'] {
@@ -159,7 +159,7 @@
 .heat {
   flex-shrink: 0;
   margin: 0 10px 0 var(--space-2);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .ribbon {
   position: absolute;
@@ -173,7 +173,7 @@
   border-radius: 2px 2px 0 2px;
   background: var(--color-hot-ribbon);
   color: var(--color-on-accent);
-  font-size: 14px;
+  font-size: 0.875rem;
   white-space: nowrap;
 }
 .ribbon::after {
@@ -190,7 +190,7 @@
   text-align: center;
   padding: var(--space-6);
   color: var(--color-hot-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 @media (max-width: 760px) {
   .header {
@@ -198,10 +198,10 @@
     gap: var(--space-1);
   }
   .update {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .open {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .link {
     min-height: 28px;

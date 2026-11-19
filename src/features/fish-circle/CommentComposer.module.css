@@ -25,7 +25,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .replyTarget strong {
   font-weight: 500;
@@ -42,7 +42,7 @@
   overflow-wrap: anywhere;
   margin: 4px 0 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .form textarea {
@@ -57,7 +57,7 @@
   background: var(--color-message-surface);
   color: var(--color-text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 .form textarea:focus-visible {
@@ -72,7 +72,7 @@
 }
 .count {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   white-space: nowrap;
 }
 .send {
@@ -105,7 +105,7 @@
 }
 .form p[role] {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 .form [role='alert'] {
@@ -116,6 +116,6 @@
     padding-right: 20px;
   }
   .form textarea {
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }

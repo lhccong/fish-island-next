@@ -51,15 +51,15 @@
   max-width: 100%;
   margin: 0 0 12px;
   color: var(--color-text);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
 }
 .empty p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin: 0 0 8px;
 }
 .empty > span {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
 }
 .composer {
@@ -124,7 +124,7 @@
   min-width: 0;
 }
 .composerFooter footer {
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .composerFooter ~ .shortcutHint {
   display: none;
@@ -133,7 +133,7 @@
   flex: 1;
 }
 .actions > span {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .composerFeedback {
@@ -142,7 +142,7 @@
   gap: 4px;
   min-width: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   overflow-wrap: anywhere;
 }
 .composerFeedback [data-tone='error'] {
@@ -171,7 +171,7 @@
   margin-left: auto;
 }
 .memberHeader h2 {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   margin: 0;
 }
@@ -194,7 +194,7 @@
   border: 0;
   background: transparent;
   color: var(--color-text);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .search input:focus-visible {
   outline-offset: 0;
@@ -209,7 +209,7 @@
 }
 .memberBody {
   padding: 4px 0 16px 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
   overflow-wrap: anywhere;
 }
@@ -252,7 +252,7 @@
   place-items: center;
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
-  font-size: 18px;
+  font-size: 1.125rem;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -271,20 +271,20 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .avatar[data-size='classic'] {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .memberName {
   width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 16px;
   text-align: center;
   color: var(--color-muted);
@@ -314,12 +314,12 @@
   color: var(--color-text);
 }
 .groupInfo h3 {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   margin: 16px 0 6px;
 }
 .groupInfo p {
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 0;
 }
 .workspace[data-presentation='worksheet'] {
@@ -346,7 +346,7 @@
   box-shadow: inset 0 -2px var(--color-accent);
   background: var(--color-surface);
   color: var(--color-accent-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 .sheetTab svg {
@@ -378,7 +378,7 @@
   flex-shrink: 0;
   padding: 6px 10px;
   color: var(--color-muted);
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-style: italic;
   line-height: 18px;
 }
@@ -461,7 +461,7 @@
     min-height: 44px;
   }
   .search input {
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .memberGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -527,7 +527,7 @@
   .composerFeedback {
     order: 3;
     width: 100%;
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .shortcutHint {
     display: none;
@@ -666,12 +666,12 @@
   border-radius: 0;
   background: transparent;
   color: inherit;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .ribbonActive,
 .ribbonLabel {
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 20px;
 }
 .ribbonActive {
@@ -688,7 +688,7 @@
 }
 .workspace[data-floating-excel='true'] .formulaIcon {
   padding: 4px 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .cellAddress {
   flex-shrink: 0;
@@ -697,7 +697,7 @@
   border-right: 1px solid var(--color-border);
   color: var(--color-muted);
   text-align: center;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
 }
 .workspace[data-floating-excel='true'] .editorInput {
@@ -725,14 +725,14 @@
   min-height: 24px;
   padding: 2px 8px;
   border-inline: 1px solid var(--color-border);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .workspace[data-floating-excel='true'] .sheetTab > svg {
   display: none;
 }
 .sheetStatus {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 @media (max-width: 760px) {
   .workspace[data-floating-excel='true'] {
@@ -742,12 +742,12 @@
   .workspace[data-floating-excel='true'] .tools .moreTools {
     height: 44px;
     min-height: 44px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .ribbonActive,
   .ribbonLabel {
     padding-block: 12px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .workspace[data-floating-excel='true'] .sheetBar {
     padding-bottom: env(safe-area-inset-bottom);

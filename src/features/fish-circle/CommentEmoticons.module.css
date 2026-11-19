@@ -11,7 +11,7 @@
   min-height: 0;
   max-height: min(280px, 40dvh);
   padding: 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .grid {
   display: grid;

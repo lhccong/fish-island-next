@@ -4,10 +4,10 @@
   background: var(--color-surface);
 }
 .error h1 {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .error p {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.7;
 }
 .error button,

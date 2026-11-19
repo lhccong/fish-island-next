@@ -1,8 +1,16 @@
 import { useLayoutEffect } from 'react';
-import { useTabIdentityStore } from '@/features/appearance';
+import { useWebsiteSettingsStore } from '@/features/appearance';
 
-export function TabIdentityProvider() {
-  const identity = useTabIdentityStore((state) => state.identity);
+export function WebsiteSettingsProvider() {
+  const identity = useWebsiteSettingsStore((state) => state.identity);
+  const fontScale = useWebsiteSettingsStore((state) => state.fontScale);
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--ui-font-scale', String(Number(fontScale) / 100));
+    return () => {
+      root.style.removeProperty('--ui-font-scale');
+    };
+  }, [fontScale]);
   useLayoutEffect(() => {
     const previousTitle = document.title;
     document.title = identity.name;

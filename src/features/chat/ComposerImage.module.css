@@ -9,7 +9,7 @@
   min-height: 44px;
   padding: 4px 48px 4px 4px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .attachment[data-ready='true'] {
   width: 88px;

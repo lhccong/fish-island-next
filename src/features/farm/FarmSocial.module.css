@@ -19,7 +19,7 @@
   margin: 0;
   padding: 0 32px;
   text-align: center;
-  font-size: 20px;
+  font-size: 1.25rem;
   color: var(--color-pixel-ink);
   letter-spacing: 2px;
   font-weight: 700;
@@ -86,7 +86,7 @@
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .search input:focus-visible {
   outline: none;
@@ -110,7 +110,7 @@
 .rank {
   min-width: 16px;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
   font-family: monospace;
@@ -126,7 +126,7 @@
   background: var(--color-pixel-paper-inset);
   border: 2px solid var(--color-pixel-border);
   color: var(--color-pixel-ink);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
 }
 .avatar img {
@@ -138,7 +138,7 @@
   flex-basis: 24px;
   width: 24px;
   height: 24px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .info {
   flex: 1;
@@ -148,19 +148,19 @@
 }
 .info strong {
   color: var(--color-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 .info small {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .meta {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-muted);
 }
 .meta > span {
@@ -193,21 +193,21 @@
   min-width: 0;
 }
 .self strong {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-pixel-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .self small {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-pixel-muted);
 }
 .empty {
   padding: 24px 8px;
   text-align: center;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
 }
 @media (max-width: 760px) {
@@ -233,6 +233,6 @@
     min-width: 12px;
   }
   .search input {
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }

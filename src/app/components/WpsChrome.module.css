@@ -3,7 +3,7 @@
   grid-row: 1;
   min-width: 0;
   color: var(--color-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   user-select: none;
 }
 .documents {
@@ -24,7 +24,7 @@
 .logo {
   justify-content: center;
   width: 120px;
-  font-size: 17px;
+  font-size: 1.0625rem;
   color: var(--color-wps-blue);
   font-style: italic;
 }
@@ -78,7 +78,7 @@
   content: '';
 }
 .quickSymbol {
-  font-size: 19px;
+  font-size: 1.1875rem;
 }
 .tabs {
   gap: 32px;
@@ -142,7 +142,7 @@
   .logo {
     width: 66px;
     padding: 0 6px;
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
   .windowActions {
     display: none;

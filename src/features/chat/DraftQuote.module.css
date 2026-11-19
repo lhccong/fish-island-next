@@ -9,7 +9,7 @@
   border-radius: var(--radius-control);
   background: var(--color-canvas);
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .content {
   min-width: 0;

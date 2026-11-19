@@ -23,7 +23,7 @@
 }
 .tableToolbar h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
 }
 .tableToolbar .actions {
@@ -57,7 +57,7 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text);
 }
 .field input,
@@ -148,7 +148,7 @@
 }
 .heading {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
 }
 @media (max-width: 760px) {
@@ -173,14 +173,14 @@
     gap: 14px;
   }
   .field {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .field input {
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .field textarea {
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .dialog {
     max-height: calc(
@@ -218,13 +218,13 @@
 .details dt {
   padding: 10px;
   background: var(--color-sidebar);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .details dd {
   margin: 0;
   padding: 10px;
   overflow-wrap: anywhere;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .details .wide {
   grid-column: 1/-1;
@@ -234,7 +234,7 @@
 }
 .attributeGroup h3 {
   margin: 12px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .attributeFields {

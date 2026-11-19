@@ -1,6 +1,7 @@
 @import './excel-tokens.css';
 
 :root {
+  font-size: calc(100% * var(--ui-font-scale, 1));
   --color-chat-cover-blue: #1677cc;
   --color-chat-cover-orange: #d95e13;
   --color-chat-cover-ink: #ffffff;

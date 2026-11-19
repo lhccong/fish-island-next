@@ -10,5 +10,5 @@
   place-items: center;
   background: var(--color-overlay);
   color: var(--color-on-accent);
-  font-size: 14px;
+  font-size: 0.875rem;
 }

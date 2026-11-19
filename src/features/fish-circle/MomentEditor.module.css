@@ -5,7 +5,7 @@
 }
 .dialog h2 {
   margin: 0 0 24px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
 }
 .form {
@@ -23,7 +23,7 @@
   border-radius: 12px;
   background: var(--color-canvas);
   color: var(--color-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.7;
 }
 .form textarea::placeholder,
@@ -42,7 +42,7 @@
   color: var(--color-text);
   border-radius: 24px;
   padding: 0 20px;
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 .form button:not(.action):hover {
@@ -101,7 +101,7 @@
   flex-shrink: 0;
 }
 .upload span {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
   color: var(--color-muted);
 }
@@ -129,7 +129,7 @@
   box-shadow: none;
   background: transparent;
   color: var(--color-text);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .location input:focus-visible {
   outline: none;
@@ -152,7 +152,7 @@
 }
 .form p {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .form [role='alert'] {
@@ -169,7 +169,7 @@
   }
   .form textarea,
   .location input {
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .upload {
     flex-wrap: wrap;

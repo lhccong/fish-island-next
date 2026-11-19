@@ -14,13 +14,13 @@
 }
 .heading {
   padding: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .panel p {
   padding: 4px 8px;
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 .scroll {
@@ -41,7 +41,7 @@
   color: var(--color-text);
   background: transparent;
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: start;
   overflow-wrap: anywhere;
   cursor: pointer;

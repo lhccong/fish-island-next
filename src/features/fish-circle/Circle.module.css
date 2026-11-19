@@ -54,7 +54,7 @@
   padding: var(--space-2) var(--space-3);
   cursor: pointer;
   border-radius: var(--radius-control);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .tabs button[aria-pressed='true'] {
   color: var(--color-circle-text);
@@ -143,7 +143,7 @@
 .form label {
   display: grid;
   gap: var(--space-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .form textarea,
 .form input {
@@ -154,7 +154,7 @@
   padding: var(--space-3);
   color: var(--color-text);
   background: var(--color-message-surface);
-  font-size: 16px;
+  font-size: max(16px, 1rem);
 }
 .form textarea {
   resize: vertical;
@@ -172,7 +172,7 @@
 }
 .commentUpload > span {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .form button {
   min-height: 44px;
@@ -200,7 +200,7 @@
   background: var(--color-circle-card);
   border-radius: var(--radius-circle-card);
   color: var(--color-circle-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .circleEntry {
@@ -216,7 +216,7 @@
   color: var(--color-text);
   cursor: pointer;
   text-align: left;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .circleEntry > span:first-of-type {
   flex: 1;
@@ -240,11 +240,11 @@
   min-height: 70px;
 }
 .header h1 {
-  font-size: 20px;
+  font-size: 1.25rem;
   margin: 0;
 }
 .header span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
   overflow-wrap: anywhere;
 }
@@ -272,14 +272,14 @@
   }
   .tabs button {
     padding: var(--space-2);
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .tools {
     gap: 0;
   }
   .tools .publish {
     padding: var(--space-2) var(--space-3);
-    font-size: 12px;
+    font-size: 0.75rem;
     gap: var(--space-1);
   }
   .header {

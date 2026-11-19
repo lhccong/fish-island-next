@@ -30,11 +30,11 @@
   height: min(820px, calc(100dvh - 32px));
 }
 .dialogShell > h2 {
-  font-size: 19px;
+  font-size: 1.1875rem;
 }
 .dialogShell > p {
   margin: 0 0 var(--space-4);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .intro {
   display: flex;
@@ -76,18 +76,18 @@
   background: var(--color-accent-soft);
 }
 .eyebrow {
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 1px;
 }
 .intro h3 {
   margin: var(--space-2) 0;
-  font-size: 20px;
+  font-size: 1.25rem;
   line-height: 1.5;
   letter-spacing: -0.5px;
 }
 .intro p {
   margin: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .amounts {
   display: grid;
@@ -108,13 +108,13 @@
     background-color 150ms;
 }
 .amountCard strong {
-  font-size: 23px;
+  font-size: 1.4375rem;
   line-height: 1.2;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .amountCard > span {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-muted);
 }
 .amountCard[aria-pressed='true'],
@@ -140,7 +140,7 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0 0 var(--space-3);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .benefits svg {
   flex-shrink: 0;
@@ -163,13 +163,13 @@
   gap: 4px;
 }
 .benefits strong {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 .benefits span,
 .benefits p {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .benefits p {
   margin-bottom: 0;
@@ -222,20 +222,20 @@
     width: 16px;
   }
   .intro h3 {
-    font-size: 16px;
+    font-size: 1rem;
   }
   .eyebrow {
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0;
   }
   .intro p {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .amounts {
     gap: var(--space-2);
   }
   .amountCard strong {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

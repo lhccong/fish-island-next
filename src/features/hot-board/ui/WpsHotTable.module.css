@@ -2,7 +2,7 @@
   min-height: 100%;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .heading {
   display: flex;
@@ -17,12 +17,12 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .heading > span {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 @media (max-width: 760px) {
   .heading {
@@ -85,7 +85,7 @@
   border: 0;
   background: transparent;
   color: var(--color-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .search:focus-within {
   outline: 2px solid var(--color-accent);
@@ -168,7 +168,7 @@
 .summary {
   padding: 0 var(--space-4) var(--space-3);
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .feedback {
   margin: var(--space-3) var(--space-4);
@@ -196,7 +196,7 @@
 .empty h2,
 .empty p {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 400;
 }
 @media (max-width: 760px) {
@@ -218,7 +218,7 @@
   }
   .search input {
     width: 100%;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .desktop {
     display: none;
@@ -245,7 +245,7 @@
     display: block;
     padding-bottom: var(--space-3);
     color: var(--color-muted);
-    font-size: 11px;
+    font-size: 0.6875rem;
     line-height: 1.7;
   }
   .frame {

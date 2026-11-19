@@ -127,7 +127,12 @@ export function ChatPlaceholderPage({ active }: { active: boolean }) {
                       <div className={styles.mobileAppearance}>
                         <ThemePicker />
                       </div>
-                      <MobileOnlineUsers groupName={groupName} />
+                      <MobileOnlineUsers
+                        groupName={groupName}
+                        visibility={
+                          skinId === 'moyu-island' || skinId === 'pixel-island' ? 'all' : 'mobile'
+                        }
+                      />
                       <button
                         type="button"
                         ref={trigger}
@@ -170,7 +175,7 @@ export function ChatPlaceholderPage({ active }: { active: boolean }) {
                           <div className={styles.formulaShortcuts}>
                             <ChatGameShortcuts />
                           </div>
-                          <MobileOnlineUsers groupName={groupName} alwaysVisible />
+                          <MobileOnlineUsers groupName={groupName} visibility="desktop" />
                           <button
                             type="button"
                             ref={formulaTrigger}

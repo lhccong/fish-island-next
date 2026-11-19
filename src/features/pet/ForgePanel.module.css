@@ -3,7 +3,7 @@
   align-items: center;
   gap: 16px;
   max-width: 360px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .selector > span {
@@ -27,11 +27,11 @@
 .summary dt {
   margin-bottom: 6px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .summary dd {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-pet-heading);
 }
@@ -55,7 +55,7 @@
     var(--color-surface) 65%
   );
   box-shadow: inset 3px 0 var(--forge-grade-color);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .entry[data-grade='2'] {
   --forge-grade-color: var(--color-life-rare);
@@ -91,7 +91,7 @@
   border-radius: 5px;
   background: color-mix(in srgb, var(--forge-grade-color) 9%, var(--color-surface));
   color: var(--forge-grade-color);
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 18px;
   font-weight: 600;
 }
@@ -102,7 +102,7 @@
   display: block;
   margin-top: 4px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .entry strong {
   font-variant-numeric: tabular-nums;
@@ -122,15 +122,15 @@
     margin-bottom: 12px;
   }
   .summary dd {
-    font-size: 16px;
+    font-size: 1rem;
     overflow-wrap: anywhere;
   }
   .entry {
     padding: 12px;
     gap: 10px;
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .entry strong {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

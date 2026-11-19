@@ -20,11 +20,11 @@
 }
 .summary span,
 .summary p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .summary strong {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 600;
 }
 .tabs {
@@ -71,7 +71,7 @@
   overflow-wrap: anywhere;
 }
 .body h2 {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
 }
 .body p {
@@ -98,7 +98,7 @@
 }
 .card p {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .product {
@@ -112,7 +112,7 @@
 }
 .details h2 {
   margin-bottom: 6px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -128,13 +128,13 @@
 }
 .purchase strong {
   color: var(--color-accent-text);
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 .purchase strong span {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   color: var(--color-muted);
 }
@@ -148,7 +148,7 @@
   color: var(--color-muted);
   background: var(--color-canvas);
   border-radius: var(--radius-control);
-  font-size: 13px;
+  font-size: 0.8125rem;
   text-align: center;
 }
 .image img {
@@ -168,13 +168,13 @@
 }
 .record h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   overflow-wrap: anywhere;
 }
 .record p {
   margin: 6px 0 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .record strong {
   flex-shrink: 0;
@@ -185,7 +185,7 @@
 }
 .feedback {
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 .feedback p {
@@ -217,7 +217,7 @@
     flex: 1;
     min-height: 44px;
     padding: 8px 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .grid {
     grid-template-columns: minmax(0, 1fr);

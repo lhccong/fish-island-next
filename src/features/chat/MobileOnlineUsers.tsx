@@ -5,15 +5,15 @@ import styles from './MobileOnlineUsers.module.css';
 
 export function MobileOnlineUsers({
   groupName,
-  alwaysVisible = false,
+  visibility = 'mobile',
 }: {
   groupName: string;
-  alwaysVisible?: boolean;
+  visibility?: 'mobile' | 'desktop' | 'all';
 }) {
   return (
     <Dialog
       title="聊天列表"
-      description="浏览联系人列表，可搜索和手动刷新。"
+      description="浏览、搜索和编辑聊天列表。"
       hideDescription
       className={styles.dialog ?? ''}
       showCloseAction={false}
@@ -21,7 +21,8 @@ export function MobileOnlineUsers({
       trigger={
         <button
           type="button"
-          className={`${styles.trigger} ${alwaysVisible ? styles.alwaysVisible : ''}`}
+          className={styles.trigger}
+          data-visibility={visibility}
           aria-label="查看聊天列表"
         >
           <UsersRound size={21} aria-hidden="true" />

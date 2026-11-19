@@ -1,5 +1,5 @@
 import { BrowserRouter } from 'react-router';
-import { TabIdentityProvider } from '@/app/providers/TabIdentityProvider';
+import { WebsiteSettingsProvider } from '@/app/providers/WebsiteSettingsProvider';
 import { SkinProvider } from '@/app/providers/SkinProvider';
 import { AuthProvider } from '@/features/auth';
 import { authController } from '@/app/config/auth';
@@ -16,7 +16,7 @@ export function App() {
   return (
     <BrowserRouter>
       <MobileViewport />
-      <TabIdentityProvider />
+      <WebsiteSettingsProvider />
       <AuthProvider controller={authController}>
         <ChatConnectionProvider>
           <SkinProvider>

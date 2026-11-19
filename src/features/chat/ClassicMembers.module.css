@@ -28,7 +28,7 @@
 .members h2 {
   white-space: nowrap;
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-align: center;
   color: var(--color-accent-text);
@@ -80,7 +80,7 @@
 }
 .status {
   display: block;
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 14px;
   color: var(--color-muted);
 }
@@ -89,7 +89,7 @@
   padding: 1px 4px;
   border-radius: 6px;
   background: var(--color-hover);
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 14px;
 }
 .scroll {
@@ -101,7 +101,7 @@
   flex-direction: column;
   min-height: 100%;
   padding: 4px 0 20px 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .body ul {
@@ -134,7 +134,7 @@
     width: 176px;
   }
   .members h2 {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 @media (max-width: 760px) {

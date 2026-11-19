@@ -1,21 +1,32 @@
 import { useState } from 'react';
-import { Settings2 } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { Select } from '@/shared/ui/Select';
 import { useChatListAppearance } from './chat-list-context';
+import { moveListItem, type ConversationEditorRow } from './camouflage-conversations';
+import { DefaultChatEntriesEditor } from './DefaultChatEntriesEditor';
+import { ChatListOrderButtons } from './ChatListOrderButtons';
 import styles from './ChatListEditor.module.css';
 
-export function ChatListEditor() {
+export function ChatListEditor({
+  entries,
+  status,
+  onRefresh,
+}: {
+  entries: readonly ConversationEditorRow[];
+  status: 'loading' | 'error' | 'success';
+  onRefresh: () => void;
+}) {
   const { appearance, readError, save } = useChatListAppearance();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(appearance);
   const [error, setError] = useState('');
   return (
     <Dialog
-      title="自定义聊天列表"
-      description="仅修改列表外观，保存在当前浏览器；不创建真实任务或对话。"
+      title="编辑聊天列表"
+      description="设置保存在当前浏览器。默认对话的文案留空可恢复原文。"
       open={open}
       onOpenChange={(next) => {
         if (next) {
@@ -26,20 +37,20 @@ export function ChatListEditor() {
       }}
       className={styles.dialog ?? ''}
       showCloseAction={false}
-      dismissLabel="关闭自定义列表"
+      dismissLabel="关闭列表编辑"
       trigger={
         <button
           type="button"
           className={styles.trigger}
-          aria-label="自定义聊天列表"
-          title="自定义聊天列表"
+          aria-label="编辑聊天列表"
+          title="编辑聊天列表"
         >
-          <Settings2 size={18} aria-hidden="true" />
+          <Pencil size={18} aria-hidden="true" />
         </button>
       }
     >
       <div className={styles.scroll}>
-        <ScrollArea label="列表设置滚动区" gutter="reserved">
+        <ScrollArea label="列表设置滚动区" gutter="reserved" fillContent>
           <div className={styles.body}>
             <Select
               label="列表显示方式"
@@ -58,7 +69,7 @@ export function ChatListEditor() {
                 onChange={(event) => setDraft({ ...draft, groupPreview: event.target.value })}
               />
             </label>
-            {draft.custom && (
+            {draft.custom ? (
               <>
                 {draft.entries.length === 0 && (
                   <p className={styles.notice} role="status">
@@ -99,6 +110,17 @@ export function ChatListEditor() {
                       />
                     </label>
                     <div className={styles.actions}>
+                      <ChatListOrderButtons
+                        name={`条目 ${index + 1}`}
+                        index={index}
+                        count={draft.entries.length}
+                        onMove={(direction) =>
+                          setDraft({
+                            ...draft,
+                            entries: moveListItem(draft.entries, index, direction),
+                          })
+                        }
+                      />
                       <Button
                         variant="secondary"
                         onClick={() =>
@@ -131,6 +153,23 @@ export function ChatListEditor() {
                 </Button>
                 {draft.entries.length >= 50 && <p className={styles.notice}>最多添加 50 条</p>}
               </>
+            ) : (
+              <DefaultChatEntriesEditor
+                entries={entries}
+                status={status}
+                order={draft.conversationOrder}
+                edits={draft.conversationEdits}
+                onRefresh={onRefresh}
+                onOrderChange={(conversationOrder) =>
+                  setDraft((current) => ({ ...current, conversationOrder }))
+                }
+                onEdit={(key, edit) =>
+                  setDraft((current) => ({
+                    ...current,
+                    conversationEdits: { ...current.conversationEdits, [key]: edit },
+                  }))
+                }
+              />
             )}
           </div>
         </ScrollArea>

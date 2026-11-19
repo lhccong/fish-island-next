@@ -9,25 +9,25 @@
   color: var(--color-text);
 }
 .name {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
 }
 .dates,
 .empty {
   margin: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .remaining {
   color: var(--color-accent-text);
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 760px) {
   .dates,
   .empty {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

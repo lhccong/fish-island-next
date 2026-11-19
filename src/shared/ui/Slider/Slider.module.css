@@ -6,7 +6,7 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text);
 }
 .heading output {
@@ -16,7 +16,7 @@
   border-radius: var(--radius-control);
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 .input {
@@ -95,6 +95,6 @@
     height: 44px;
   }
   .heading {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

@@ -15,10 +15,10 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 .header h2 small {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -49,7 +49,7 @@
 }
 .filters button {
   border-color: var(--color-border);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .filters button[aria-pressed='true'] {
   background: var(--color-accent-soft);
@@ -125,7 +125,7 @@
   padding: 0 2px;
   color: var(--color-text);
   background: var(--color-surface);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   line-height: 14px;
 }
@@ -156,19 +156,19 @@
 }
 .itemTitle h3 {
   margin: 0 0 4px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   overflow-wrap: anywhere;
 }
 .itemTitle small {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .stats {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
   margin: 12px 0;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .stats > div {
   display: flex;
@@ -198,11 +198,11 @@
 }
 .empty h3 {
   margin: 12px 0 0;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .empty p {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 @media (max-width: 760px) {
   .scroll {

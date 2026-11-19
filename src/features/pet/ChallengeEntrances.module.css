@@ -37,7 +37,7 @@
   display: grid;
   place-items: center;
   padding: 8px 2px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   border-top: 2px solid var(--color-pixel-border);
   background: var(--color-pixel-paper);
 }
@@ -54,7 +54,7 @@
     gap: 12px;
   }
   .entrance strong {
-    font-size: 12px;
+    font-size: 0.75rem;
     min-height: 36px;
   }
 }

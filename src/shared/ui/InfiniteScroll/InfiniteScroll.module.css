@@ -2,7 +2,7 @@
   min-width: 0;
   padding: 12px 4px;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   text-align: center;
   overflow-wrap: anywhere;
 }

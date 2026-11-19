@@ -43,7 +43,7 @@
   border-radius: 16px;
   color: var(--color-hot-text);
   background: transparent;
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 .pills button[aria-pressed='true'] {
@@ -65,7 +65,7 @@
   background: transparent;
   color: var(--color-hot-text);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   border-radius: var(--radius-control);
 }
 .settings:hover {
@@ -81,7 +81,7 @@
   margin: 0;
 }
 .fieldset legend {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   margin-bottom: var(--space-2);
 }
@@ -90,7 +90,7 @@
   gap: var(--space-3);
   align-items: center;
   min-height: 44px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .fieldset input {
   width: 16px;
@@ -114,7 +114,7 @@
   .pills button {
     min-height: 44px;
     padding: var(--space-2) var(--space-3);
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .settings {
     padding: 0 var(--space-2);

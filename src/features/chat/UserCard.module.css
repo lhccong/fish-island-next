@@ -68,18 +68,18 @@
 }
 .name h3 {
   margin: 0 0 4px;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
 }
 .name p {
   margin: 4px 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .vip {
   display: inline-block;
   margin-left: 8px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-accent-text);
 }
@@ -108,13 +108,13 @@
   line-height: 1.25;
 }
 .counts strong {
-  font-size: 16px;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
 .counts span,
 .profile,
 .details {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .counts span,
 .profile,
@@ -143,7 +143,7 @@
 }
 .details dd {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 .iconAction {
@@ -165,13 +165,13 @@
   display: grid;
   place-items: center;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .footer {
   flex-shrink: 0;
   padding-top: 12px;
   padding-inline-end: 16px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 .footer p {
@@ -186,7 +186,7 @@
   padding-top: 8px;
   display: grid;
   gap: 12px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .moderationControls {
   display: grid;
@@ -222,7 +222,7 @@
   gap: 14px;
 }
 .compact .name h3 {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .compact .counts {
   grid-template-columns: 72px 72px;
@@ -231,14 +231,14 @@
   padding: 2px 0;
 }
 .compact .counts strong {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .compact .details {
   border-radius: 0;
   border-top: 1px solid var(--color-border);
   background: transparent;
   padding: 4px 0 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .compact .details div {
   grid-template-columns: 64px minmax(0, 1fr);
@@ -275,12 +275,12 @@
     padding-inline-end: 0;
   }
   .name h3 {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
   .profile,
   .details,
   .counts span {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .compact {
     height: auto;

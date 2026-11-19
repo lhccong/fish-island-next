@@ -7,7 +7,7 @@
 }
 .sidebar h2 {
   margin: 0 20px 24px;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
 }
 .selected {
@@ -26,13 +26,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .selected p,
 .note {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .selected p {
   margin: 6px 0 0;
@@ -63,7 +63,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 500;
   margin: 0;
 }
@@ -142,7 +142,7 @@
   display: flex;
   align-items: center;
   color: var(--color-accent-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 @media (max-width: 760px) {
@@ -153,6 +153,6 @@
     background: transparent;
   }
   .header[data-classic='true'] h1 {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

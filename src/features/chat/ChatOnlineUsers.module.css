@@ -31,7 +31,7 @@
   border: 0;
   background: transparent;
   color: var(--color-text);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .search input:focus-visible {
   outline: none;
@@ -97,7 +97,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text);
 }
@@ -108,7 +108,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .avatarWrap {
@@ -122,7 +122,7 @@
   position: absolute;
   top: 13px;
   right: 24px;
-  font-size: 10px;
+  font-size: 0.625rem;
   line-height: 14px;
   color: var(--color-muted);
 }
@@ -151,7 +151,7 @@
 }
 .notice {
   margin: 12px 24px 12px 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
   color: var(--color-muted);
   overflow-wrap: anywhere;
@@ -165,6 +165,6 @@
 @media (max-width: 760px) {
   .search input {
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }

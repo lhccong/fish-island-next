@@ -62,7 +62,7 @@
 .counter {
   min-width: 48px;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -107,7 +107,7 @@
   padding: 16px;
   text-align: center;
   color: var(--color-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .thumbnails {
   height: min(180px, 25dvh);
@@ -149,7 +149,7 @@
   right: 0;
   padding: 0 4px;
   background: var(--color-surface);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 @media (max-width: 760px) {
   .dialog {

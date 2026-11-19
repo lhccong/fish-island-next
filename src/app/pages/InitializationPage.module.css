@@ -19,14 +19,14 @@
   align-items: center;
   gap: var(--space-3);
   text-decoration: none;
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 750;
 }
 .brand svg {
   color: var(--color-accent-text);
 }
 .brand span {
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 2px;
   color: var(--color-muted);
 }
@@ -34,7 +34,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .status > span {
@@ -54,12 +54,12 @@
 }
 .eyebrow {
   color: var(--color-accent-text);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 2px;
 }
 .hero h1 {
-  font-size: clamp(30px, 3.5vw, 46px);
+  font-size: calc(clamp(30px, 3.5vw, 46px) * var(--ui-font-scale, 1));
   line-height: 1.5;
   letter-spacing: -1.5px;
   margin: var(--space-5) 0;
@@ -70,7 +70,7 @@
 .lead {
   max-width: 420px;
   color: var(--color-muted);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.9;
   margin-bottom: var(--space-6);
 }
@@ -87,7 +87,7 @@
   gap: var(--space-4);
   padding: var(--space-5);
   border-bottom: 1px solid var(--color-border);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 1px;
   color: var(--color-muted);
@@ -106,12 +106,12 @@
 }
 .preview h2 {
   margin: var(--space-5) 0 var(--space-3);
-  font-size: 23px;
+  font-size: 1.4375rem;
 }
 .preview p,
 .foundation p {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.9;
 }
 .skinOptions {
@@ -162,7 +162,7 @@
   width: 40%;
 }
 .preview .note {
-  font-size: 11px;
+  font-size: 0.6875rem;
   margin-bottom: 0;
 }
 .foundations {
@@ -180,7 +180,7 @@
   color: var(--color-accent-text);
 }
 .foundation h2 {
-  font-size: 16px;
+  font-size: 1rem;
   margin: var(--space-4) 0 var(--space-2);
 }
 .foundation p {
@@ -190,13 +190,13 @@
   padding: var(--space-5) 0;
   border-top: 1px solid var(--color-border);
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .footer span:last-child {
   letter-spacing: 1px;
 }
 .docList {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.9;
   color: var(--color-muted);
 }
@@ -231,6 +231,6 @@
     padding: var(--space-5);
   }
   .status {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 }

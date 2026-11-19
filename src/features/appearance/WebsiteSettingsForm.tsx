@@ -2,22 +2,28 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
+import { Select } from '@/shared/ui/Select';
 import {
+  defaultFontScale,
   defaultTabIdentity,
+  fontScaleOptions,
+  isFontScale,
   isPresetTabIcon,
   isTabIcon,
   normalizeTabIdentity,
   tabIdentityPresets,
-  useTabIdentityStore,
-} from './model/tab-identity-store';
+  useWebsiteSettingsStore,
+} from './model/website-settings-store';
 import { checkTabImage, readTabImage } from './tab-image';
 import styles from './WebsiteSettings.module.css';
 
 export function WebsiteSettingsForm() {
-  const saved = useTabIdentityStore((state) => state.identity);
-  const save = useTabIdentityStore((state) => state.save);
+  const saved = useWebsiteSettingsStore((state) => state.identity);
+  const savedFontScale = useWebsiteSettingsStore((state) => state.fontScale);
+  const save = useWebsiteSettingsStore((state) => state.save);
   const [name, setName] = useState(saved.name);
   const [icon, setIcon] = useState(saved.icon);
+  const [fontScale, setFontScale] = useState(savedFontScale);
   const [previewFailed, setPreviewFailed] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
@@ -51,9 +57,11 @@ export function WebsiteSettingsForm() {
           // Validate the address before letting the browser request it.
           const identity = normalizeTabIdentity({ name, icon });
           if (!identity) throw new Error('请输入 HTTPS 图标地址，或选择本地图片。');
-          await checkTabImage(identity.icon, operation.current?.signal);
+          if (identity.icon !== saved.icon) {
+            await checkTabImage(identity.icon, operation.current?.signal);
+          }
           if (operation.current?.signal.aborted) return;
-          save(identity);
+          save(identity, fontScale);
           setName(identity.name);
           setIcon(identity.icon);
           setFeedback('已保存到此浏览器');
@@ -66,10 +74,24 @@ export function WebsiteSettingsForm() {
     >
       <ScrollArea label="网站设置内容" gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.fields}>
+          <div className={styles.field}>
+            <span>界面字号</span>
+            <Select
+              label="界面字号"
+              value={fontScale}
+              options={fontScaleOptions}
+              disabled={busy}
+              onValueChange={(value) => {
+                if (!isFontScale(value)) return;
+                setFontScale(value);
+                setFeedback('');
+                setError('');
+              }}
+            />
+          </div>
           <label className={styles.field}>
             <span>网站名称</span>
             <input
-              autoFocus
               aria-label="网站名称"
               value={name}
               maxLength={60}
@@ -174,6 +196,7 @@ export function WebsiteSettingsForm() {
           onClick={() => {
             setName(defaultTabIdentity.name);
             updateIcon(defaultTabIdentity.icon);
+            setFontScale(defaultFontScale);
           }}
         >
           恢复默认

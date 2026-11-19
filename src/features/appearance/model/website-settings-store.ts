@@ -2,6 +2,15 @@ import { create } from 'zustand';
 
 export const defaultTabIdentity = { name: '摸鱼岛', icon: '/favicon.ico?v=moyudao' };
 export const tabIdentityStorageKey = 'fish-island:tab-identity';
+export const defaultFontScale = '100';
+export const fontScaleOptions = [
+  { value: '90', label: '较小（90%）' },
+  { value: defaultFontScale, label: '标准（100%）' },
+  { value: '110', label: '较大（110%）' },
+  { value: '120', label: '特大（120%）' },
+] as const;
+type FontScale = (typeof fontScaleOptions)[number]['value'];
+
 export interface TabIdentity {
   name: string;
   icon: string;
@@ -42,33 +51,56 @@ export function normalizeTabIdentity(value: unknown): TabIdentity | null {
   return name && name.length <= 60 && isTabIcon(icon) ? { name, icon } : null;
 }
 
-function readIdentity(): TabIdentity {
+export function isFontScale(value: unknown): value is FontScale {
+  return fontScaleOptions.some((option) => option.value === value);
+}
+
+interface WebsitePreferences {
+  identity: TabIdentity;
+  fontScale: FontScale;
+}
+
+function readPreferences(): WebsitePreferences {
+  const defaults: WebsitePreferences = {
+    identity: defaultTabIdentity,
+    fontScale: defaultFontScale,
+  };
   try {
-    return (
-      normalizeTabIdentity(JSON.parse(localStorage.getItem(tabIdentityStorageKey) ?? 'null')) ??
-      defaultTabIdentity
-    );
+    const stored: unknown = JSON.parse(localStorage.getItem(tabIdentityStorageKey) ?? 'null');
+    if (!stored || typeof stored !== 'object') return defaults;
+    return {
+      identity: normalizeTabIdentity(stored) ?? defaultTabIdentity,
+      fontScale:
+        'fontScale' in stored && isFontScale(stored.fontScale)
+          ? stored.fontScale
+          : defaultFontScale,
+    };
   } catch {
-    return defaultTabIdentity;
+    return defaults;
   }
 }
 
-interface TabIdentityState {
-  identity: TabIdentity;
-  save: (identity: TabIdentity) => void;
+interface WebsiteSettingsState extends WebsitePreferences {
+  save: (identity: TabIdentity, fontScale: FontScale) => void;
 }
 
-export const useTabIdentityStore = create<TabIdentityState>((set) => ({
-  identity: readIdentity(),
-  save: (value) => {
+export const useWebsiteSettingsStore = create<WebsiteSettingsState>((set) => ({
+  ...readPreferences(),
+  save: (value, fontScale) => {
     const identity = normalizeTabIdentity(value);
     if (!identity)
       throw new Error('请输入 1～60 字的网站名称和有效的 HTTPS 图标地址，或选择本地图片。');
     try {
-      localStorage.setItem(tabIdentityStorageKey, JSON.stringify(identity));
+      localStorage.setItem(tabIdentityStorageKey, JSON.stringify({ ...identity, fontScale }));
     } catch {
       throw new Error('本地保存失败，请检查浏览器存储权限或释放空间后重试。');
     }
-    set({ identity });
+    set((state) => ({
+      identity:
+        identity.name === state.identity.name && identity.icon === state.identity.icon
+          ? state.identity
+          : identity,
+      fontScale,
+    }));
   },
 }));

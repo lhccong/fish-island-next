@@ -7,7 +7,11 @@ export type { ChatBubbleArtwork } from './bubble-style';
 export type { ChatMusicSong } from './music-message';
 export type { ChatReportPort, ChatReportReason } from './report';
 export type MessageId = string;
-export type { ChatListAppearance, ChatListPreferencesPort } from './list-preferences';
+export type {
+  ChatListAppearance,
+  ChatListPreferencesPort,
+  ConversationListEdit,
+} from './list-preferences';
 export { defaultChatListAppearance, parseChatListAppearance } from './list-preferences';
 export type { UserRemarks, ChatRemarksPort } from './remarks';
 export { parseEmojiText } from './emoji';

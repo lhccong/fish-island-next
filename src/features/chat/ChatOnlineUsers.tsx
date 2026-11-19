@@ -1,6 +1,6 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { sortMembersByLevel } from '@/domain/chat';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 import { useRemarks } from './remarks-context';
 import { RemarkName } from './RemarkName';
@@ -8,11 +8,13 @@ import { MessageCircle, RefreshCw, Search } from 'lucide-react';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { useChatMembers } from './chat-members-context';
-import { MemberAvatar } from './MemberAvatar';
-import { getWorkPreview } from './work-preview';
+import { ConversationAvatar } from './ConversationAvatar';
 import { withWorkTimes } from './work-time';
-import { buildConversationEntries } from './camouflage-conversations';
-import { CoverAvatar } from './CoverAvatar';
+import {
+  buildConversationEntries,
+  describeConversation,
+  orderConversations,
+} from './camouflage-conversations';
 import styles from './ChatOnlineUsers.module.css';
 import { useChatListAppearance } from './chat-list-context';
 import { ChatListEditor } from './ChatListEditor';
@@ -30,20 +32,54 @@ export function ChatOnlineUsers({
   const [query, setQuery] = useState('');
   const { controller } = useRemarks();
   const remarks = useStore(controller.store, (state) => state.remarks);
-  const showGroup =
-    !query.trim() || groupName.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
+  const search = query.trim().toLocaleLowerCase();
+  const showGroup = groupName.toLocaleLowerCase().includes(search);
   const loading = state.status === 'idle' || state.status === 'loading';
-  const users =
-    state.status === 'success'
-      ? withWorkTimes(
-          buildConversationEntries(sortMembersByLevel(state.members)),
-          referenceAt,
-        ).filter((entry) =>
-          `${entry.name} ${entry.kind === 'member' && Object.hasOwn(remarks, entry.id) ? remarks[entry.id] : ''}`
-            .toLocaleLowerCase()
-            .includes(query.trim().toLocaleLowerCase()),
-        )
-      : [];
+  const entries = useMemo(
+    () =>
+      state.status === 'success'
+        ? buildConversationEntries(sortMembersByLevel(state.members)).map((entry) => ({
+            ...entry,
+            ...describeConversation(
+              entry,
+              entry.kind === 'member' && Object.hasOwn(remarks, entry.id)
+                ? remarks[entry.id]
+                : undefined,
+            ),
+          }))
+        : [],
+    [state, remarks],
+  );
+  const displayedUsers = useMemo(
+    () =>
+      appearance.custom
+        ? []
+        : withWorkTimes(orderConversations(entries, appearance.conversationOrder), referenceAt).map(
+            (entry) => {
+              const edit = appearance.conversationEdits?.[entry.key];
+              return {
+                ...entry,
+                displayName: edit?.name || entry.defaultName,
+                displayPreview: edit?.preview || entry.defaultPreview,
+                alias: edit?.name,
+              };
+            },
+          ),
+    [
+      appearance.custom,
+      appearance.conversationEdits,
+      appearance.conversationOrder,
+      entries,
+      referenceAt,
+    ],
+  );
+  const users = search
+    ? displayedUsers.filter((entry) =>
+        [entry.name, entry.defaultName, entry.displayName, entry.displayPreview].some((text) =>
+          text.toLocaleLowerCase().includes(search),
+        ),
+      )
+    : displayedUsers;
   const time =
     state.status === 'success'
       ? new Intl.DateTimeFormat('zh-CN', {
@@ -65,7 +101,11 @@ export function ChatOnlineUsers({
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
-        <ChatListEditor />
+        <ChatListEditor
+          entries={entries}
+          status={loading ? 'loading' : state.status === 'error' ? 'error' : 'success'}
+          onRefresh={refresh}
+        />
         {!appearance.custom && (
           <button
             type="button"
@@ -133,46 +173,36 @@ export function ChatOnlineUsers({
                 )
               ) : (
                 <ul className={styles.list}>
-                  {users.map((entry) => {
-                    const preview =
-                      entry.kind === 'member' ? getWorkPreview(entry.id) : entry.preview;
-                    return (
-                      <li
-                        className={styles.row}
-                        key={`${entry.kind}:${entry.id}`}
-                        data-kind={entry.kind}
-                        title={entry.kind === 'cover' ? '本地伪装会话' : entry.name}
-                      >
-                        <span className={styles.avatarWrap}>
+                  {users.map((entry) => (
+                    <li
+                      className={styles.row}
+                      key={entry.key}
+                      data-kind={entry.kind}
+                      title={entry.kind === 'cover' ? '本地伪装会话' : entry.displayName}
+                    >
+                      <span className={styles.avatarWrap}>
+                        <ConversationAvatar entry={entry} />
+                      </span>
+                      <div className={styles.text}>
+                        <span className={styles.name} title={entry.displayName}>
                           {entry.kind === 'member' ? (
-                            <MemberAvatar
-                              key={`${entry.id}:${entry.member.avatar}`}
-                              member={entry.member}
-                              size="list"
-                              showFrame={false}
-                            />
+                            <RemarkName id={entry.id} name={entry.name} displayName={entry.alias} />
                           ) : (
-                            <CoverAvatar conversation={entry} />
+                            entry.displayName
                           )}
                         </span>
-                        <div className={styles.text}>
-                          <span className={styles.name} title={entry.name}>
-                            {entry.kind === 'member' ? (
-                              <RemarkName id={entry.id} name={entry.name} />
-                            ) : (
-                              entry.name
-                            )}
-                          </span>
-                          <span className={styles.preview} title={`本地工作伪装摘要：${preview}`}>
-                            {preview}
-                          </span>
-                        </div>
-                        <time className={styles.time} title="本地工作伪装时间（非真实消息时间）">
-                          {entry.time}
-                        </time>
-                      </li>
-                    );
-                  })}
+                        <span
+                          className={styles.preview}
+                          title={`本地工作伪装摘要：${entry.displayPreview}`}
+                        >
+                          {entry.displayPreview}
+                        </span>
+                      </div>
+                      <time className={styles.time} title="本地工作伪装时间（非真实消息时间）">
+                        {entry.time}
+                      </time>
+                    </li>
+                  ))}
                 </ul>
               ))}
           </div>

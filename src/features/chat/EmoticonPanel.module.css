@@ -113,7 +113,7 @@
   object-fit: contain;
 }
 .previewImage span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
 }
 .picture {
@@ -127,7 +127,7 @@
   background: var(--color-canvas);
   color: var(--color-muted);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .picture:hover {
   background: var(--color-hover);
@@ -141,11 +141,11 @@
 .caption {
   padding-block: 4px 12px;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .feedback {
   min-height: 20px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
   flex: none;
   color: var(--color-muted);

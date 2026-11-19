@@ -1,7 +1,14 @@
+export interface ConversationListEdit {
+  name: string;
+  preview: string;
+}
+
 export interface ChatListAppearance {
   custom: boolean;
   groupPreview: string;
   entries: { id: string; name: string; preview: string }[];
+  conversationOrder?: string[];
+  conversationEdits?: Record<string, ConversationListEdit>;
 }
 
 export interface ChatListPreferencesPort {
@@ -42,5 +49,45 @@ export function parseChatListAppearance(value: unknown): ChatListAppearance {
     ids.add(row.id);
     return { id: row.id, name: row.name.trim(), preview: row.preview.trim() };
   });
-  return { custom: data.custom, groupPreview: data.groupPreview.trim(), entries };
+  const appearance: ChatListAppearance = {
+    custom: data.custom,
+    groupPreview: data.groupPreview.trim(),
+    entries,
+  };
+  if (data.conversationOrder !== undefined) {
+    if (
+      !Array.isArray(data.conversationOrder) ||
+      !data.conversationOrder.every(isConversationKey) ||
+      new Set(data.conversationOrder).size !== data.conversationOrder.length
+    )
+      throw new Error('对话顺序格式无效');
+    appearance.conversationOrder = data.conversationOrder;
+  }
+  if (data.conversationEdits !== undefined)
+    appearance.conversationEdits = parseConversationEdits(data.conversationEdits);
+  return appearance;
+}
+
+function isConversationKey(value: unknown): value is string {
+  return typeof value === 'string' && /^(member|cover):.+$/.test(value);
+}
+
+function parseConversationEdits(value: unknown): Record<string, ConversationListEdit> {
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new Error('对话文案格式无效');
+  const edits: Record<string, ConversationListEdit> = {};
+  for (const [key, edit] of Object.entries(value as Record<string, unknown>)) {
+    if (!isConversationKey(key) || !edit || typeof edit !== 'object')
+      throw new Error('对话文案格式无效');
+    const { name, preview } = edit as Record<string, unknown>;
+    if (
+      typeof name !== 'string' ||
+      name.length > 30 ||
+      typeof preview !== 'string' ||
+      preview.length > 100
+    )
+      throw new Error('显示名称最多 30 字，摘要最多 100 字');
+    if (name.trim() || preview.trim()) edits[key] = { name: name.trim(), preview: preview.trim() };
+  }
+  return edits;
 }

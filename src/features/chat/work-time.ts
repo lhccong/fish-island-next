@@ -22,7 +22,7 @@ export function formatWorkTime(timestamp: number, referenceAt: number): string {
 }
 
 // Presentation only: keep the member order and calculate before search filtering.
-export function withWorkTimes(entries: readonly ChatListEntry[], referenceAt: number) {
+export function withWorkTimes<T extends ChatListEntry>(entries: readonly T[], referenceAt: number) {
   let minutes = 0;
   return entries.map((entry, index) => {
     let hash = 0;

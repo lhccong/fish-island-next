@@ -28,7 +28,7 @@
 }
 .label {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-bottom: 8px;
   color: var(--color-muted);
 }
@@ -41,7 +41,7 @@
   padding: 8px;
   background: var(--color-canvas);
   color: var(--color-text);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .section input:focus-visible {
   outline-color: var(--color-accent-text);
@@ -52,13 +52,13 @@
 }
 .section .help {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-top: 8px;
   line-height: 1.7;
 }
 .section .error {
   color: var(--color-danger);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-top: 8px;
 }
 .actions {
@@ -70,6 +70,6 @@
 @media (max-width: 760px) {
   .section input {
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }

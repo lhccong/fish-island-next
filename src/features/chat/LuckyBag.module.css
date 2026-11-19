@@ -48,12 +48,12 @@
   overflow-wrap: anywhere;
 }
 .cardText strong {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 .cardText > span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .dialog {
   display: flex;
@@ -68,7 +68,7 @@
 }
 .dialog h2 {
   margin: 0 40px 20px 0;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
 }
 .scroll {
@@ -83,7 +83,7 @@
   gap: 16px;
   min-width: 0;
   padding: 4px 0 8px 4px;
-  font-size: 14px;
+  font-size: 0.875rem;
   overflow-wrap: anywhere;
 }
 .content p {
@@ -99,7 +99,7 @@
 .heading h3,
 .content h3 {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
 }
 .heading p {
@@ -113,7 +113,7 @@
 }
 .meta dt {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .meta dd {
   margin: 6px 0 0;
@@ -127,7 +127,7 @@
   border-top: 1px solid var(--color-border);
 }
 .feedback {
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 .feedback [role='alert'],

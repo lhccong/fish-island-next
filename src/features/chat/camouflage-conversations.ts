@@ -1,4 +1,5 @@
 import type { OnlineMember } from '@/domain/chat';
+import { getWorkPreview } from './work-preview';
 
 export interface CoverConversation {
   kind: 'cover';
@@ -10,6 +11,14 @@ export interface CoverConversation {
 
 export type ChatListEntry =
   CoverConversation | { kind: 'member'; id: string; name: string; member: OnlineMember };
+
+export interface EditableConversation {
+  key: string;
+  defaultName: string;
+  defaultPreview: string;
+}
+
+export type ConversationEditorRow = ChatListEntry & EditableConversation;
 
 const covers: readonly { after: number; entry: CoverConversation }[] = [
   {
@@ -77,4 +86,37 @@ export function buildConversationEntries(
   });
   while (next < covers.length) entries.push(covers[next++]!.entry);
   return entries;
+}
+
+export function describeConversation(entry: ChatListEntry, remark?: string): EditableConversation {
+  return {
+    key: `${entry.kind}:${entry.id}`,
+    defaultName: remark || entry.name,
+    defaultPreview: entry.kind === 'member' ? getWorkPreview(entry.id) : entry.preview,
+  };
+}
+
+export function orderConversations<T extends EditableConversation>(
+  entries: readonly T[],
+  order: readonly string[] = [],
+): readonly T[] {
+  if (!order.length) return entries;
+  const remaining = new Map(entries.map((entry) => [entry.key, entry]));
+  const ordered: T[] = [];
+  for (const key of order) {
+    const entry = remaining.get(key);
+    if (entry) {
+      ordered.push(entry);
+      remaining.delete(key);
+    }
+  }
+  return [...ordered, ...remaining.values()];
+}
+
+export function moveListItem<T>(items: readonly T[], index: number, direction: -1 | 1): T[] {
+  const reordered = [...items];
+  const next = index + direction;
+  if (index >= 0 && index < reordered.length && next >= 0 && next < reordered.length)
+    [reordered[index], reordered[next]] = [reordered[next]!, reordered[index]!];
+  return reordered;
 }

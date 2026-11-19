@@ -24,7 +24,7 @@
   flex: 1;
   min-width: 0;
   margin: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .header > button {
   display: grid;
@@ -57,7 +57,7 @@
   color: var(--color-text);
   background: transparent;
   font: inherit;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
 }

@@ -14,19 +14,19 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 .stat:hover {
   background: var(--color-hover);
 }
 .stat strong {
-  font-size: 30px;
+  font-size: 1.875rem;
   line-height: 1.2;
   font-weight: 500;
 }
 .stat small {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
 }
 .trend {
@@ -37,7 +37,7 @@
 }
 .trend h2 {
   margin: 0 0 20px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
 }
 .controls {
@@ -73,7 +73,7 @@
 }
 .chart text {
   fill: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .chart polyline {
   fill: none;
@@ -102,7 +102,7 @@
     gap: 10px;
   }
   .stat strong {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
   .trend {
     padding: 12px;
@@ -133,7 +133,7 @@
 }
 .range > span {
   flex: none;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .range > div {
   flex: 1;
@@ -144,6 +144,6 @@
     flex-basis: 100%;
   }
   .range > span {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

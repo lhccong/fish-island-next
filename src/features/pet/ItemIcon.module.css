@@ -44,7 +44,7 @@
   border-radius: 3px;
 }
 .itemIcon[data-size='compact'] .badgeText {
-  font-size: 8px;
+  font-size: 0.5rem;
   line-height: 10px;
   padding: 0 2px;
   border-radius: 2px;
@@ -136,7 +136,7 @@
   border-radius: 6px;
   background: transparent;
   color: var(--color-pet-enhance-label-ink);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 800;
   line-height: 16px;
   font-variant-numeric: tabular-nums;

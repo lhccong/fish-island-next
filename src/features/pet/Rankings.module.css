@@ -43,7 +43,7 @@
   min-width: 28px;
   height: 28px;
   font:
-    700 14px ui-monospace,
+    700 0.875rem ui-monospace,
     monospace;
   color: var(--color-muted);
 }
@@ -109,12 +109,12 @@
   max-width: 100%;
 }
 .identity strong {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   max-height: 1.5em;
 }
 .identity small {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   max-height: 1.5em;
 }
@@ -122,7 +122,7 @@
   text-align: right;
   color: var(--color-text);
   font:
-    600 14px ui-monospace,
+    600 0.875rem ui-monospace,
     monospace;
   white-space: nowrap;
 }
@@ -150,13 +150,13 @@
   .metric {
     grid-column: 3;
     text-align: left;
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .actions {
     grid-column: 2 / -1;
     margin-top: 8px;
   }
   .identity strong {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

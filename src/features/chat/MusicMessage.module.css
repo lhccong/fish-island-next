@@ -28,12 +28,12 @@
   overflow-wrap: anywhere;
 }
 .info strong {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .info span,
 .info small {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
 }

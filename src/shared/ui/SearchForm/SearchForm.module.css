@@ -14,7 +14,7 @@
   color: var(--color-text);
   background: var(--color-canvas);
   font: inherit;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .form input::placeholder {
@@ -24,6 +24,6 @@
 @media (max-width: 760px) {
   .form input {
     height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }

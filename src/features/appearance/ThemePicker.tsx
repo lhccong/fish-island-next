@@ -27,11 +27,7 @@ export function ThemePicker({ presentation = 'rail' }: { presentation?: 'rail' |
       dismissLabel={website ? '关闭网站设置' : '关闭主题弹窗'}
       showCloseAction={false}
       title={website ? '网站设置' : '主题模式'}
-      description={
-        website
-          ? '自定义标签页名称和图标，保存到此浏览器，刷新后保留。'
-          : '选择后立即生效，刷新后保留。'
-      }
+      description={website ? '设置保存在此浏览器。' : '选择后立即生效，刷新后保留。'}
       trigger={
         <button
           className={styles.trigger}

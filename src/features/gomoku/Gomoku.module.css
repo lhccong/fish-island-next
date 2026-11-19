@@ -15,10 +15,10 @@
 }
 .topline h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .connection {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
 }
 .lobby {
@@ -32,20 +32,20 @@
 }
 .intro h2 {
   margin: var(--space-4) 0;
-  font-size: clamp(26px, 3vw, 40px);
+  font-size: calc(clamp(26px, 3vw, 40px) * var(--ui-font-scale, 1));
   line-height: 1.4;
   font-weight: 600;
 }
 .eyebrow {
   color: var(--color-accent-text);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .intro p,
 .practice p,
 .history p,
 .boardHelp {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
 }
 .lobbyActions {
@@ -60,7 +60,7 @@
 }
 .join label {
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-bottom: var(--space-2);
 }
 .join > div {
@@ -76,7 +76,7 @@
   background: var(--color-canvas);
   color: var(--color-text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 8px 10px;
 }
 .join input::placeholder,
@@ -99,7 +99,7 @@
 .practice h3,
 .roomToolbar h3,
 .social h3 {
-  font-size: 14px;
+  font-size: 0.875rem;
   margin: 0 0 var(--space-3);
 }
 .actions {
@@ -130,7 +130,7 @@
   padding: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control);
-  font-size: 13px;
+  font-size: 0.8125rem;
   min-width: 0;
 }
 .players > div > span:last-child {
@@ -161,7 +161,7 @@
   gap: var(--space-2);
   margin-top: var(--space-2);
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .players > div[data-active='true'] {
   border-color: var(--color-accent-text);
@@ -181,17 +181,17 @@
 }
 .versus {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .turn {
   padding: var(--space-4) 0;
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 600;
 }
 .turn small {
   display: block;
   margin-top: var(--space-1);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   color: var(--color-muted);
 }
@@ -285,7 +285,7 @@
 .boardHelp {
   margin: var(--space-2) 0;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .history,
@@ -301,7 +301,7 @@
   display: flex;
   justify-content: space-between;
   margin: 0 0 var(--space-3);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .history small {
   font-weight: 400;
@@ -321,13 +321,13 @@
   gap: var(--space-3);
   padding: 8px 4px;
   border-bottom: 1px solid var(--color-border);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .historyScroll strong {
   font-weight: 500;
 }
 .feedback {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
   color: var(--color-accent-text);
   margin: var(--space-3) 0;
@@ -339,7 +339,7 @@
   border: 1px solid var(--color-danger);
   border-radius: var(--radius-control);
   color: var(--color-danger);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .error > div {
@@ -350,7 +350,7 @@
 }
 .social > p {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.7;
 }
 .chatScroll {
@@ -362,7 +362,7 @@
   padding: 4px;
 }
 .chatScroll li {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
   margin-bottom: var(--space-2);
   overflow-wrap: anywhere;
@@ -403,7 +403,7 @@
     gap: var(--space-5);
   }
   .intro h2 {
-    font-size: 30px;
+    font-size: 1.875rem;
   }
   .lobbyActions {
     width: 100%;
@@ -411,11 +411,11 @@
   .join input,
   .chatForm input {
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .players > div {
     padding: var(--space-2);
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 
@@ -466,22 +466,22 @@
 }
 .roomIdentity h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .roomIdentity > span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   overflow-wrap: anywhere;
 }
 .roomIdentity strong {
   margin-left: var(--space-2);
   color: var(--color-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 .toolbarFeedback {
   flex-basis: 100%;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   margin: 0;
 }
@@ -512,7 +512,7 @@
   min-height: 40px;
 }
 .chatScroll p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
   line-height: 1.7;
 }

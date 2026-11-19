@@ -8,7 +8,7 @@
   border-radius: 4px;
   background: var(--color-pixel-paper);
   color: var(--color-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .status p {
   margin: 0;
@@ -32,7 +32,7 @@
   color: var(--color-muted);
 }
 .status small {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .reward {
@@ -90,7 +90,7 @@
   background: var(--color-pixel-paper);
   color: var(--color-pixel-ink);
   font: inherit;
-  font-size: 11px;
+  font-size: 0.6875rem;
   box-shadow: 2px 2px 0 var(--color-pet-shadow);
   transform: translate(-50%, -50%);
   pointer-events: auto;
@@ -186,7 +186,7 @@
 @media (max-width: 760px) {
   .status {
     gap: 10px;
-    font-size: 14px;
+    font-size: 0.875rem;
     padding-top: 14px;
   }
   .site {
@@ -195,7 +195,7 @@
     padding: 2px 4px;
   }
   .site span {
-    font-size: 10px;
+    font-size: 0.625rem;
     line-height: 14px;
   }
   .error {

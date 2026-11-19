@@ -19,7 +19,7 @@
   border-radius: calc(var(--radius-control) - 2px);
   background: transparent;
   color: var(--color-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 .options button:hover {

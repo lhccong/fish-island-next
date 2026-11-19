@@ -22,7 +22,7 @@
   margin-top: 0;
 }
 .description {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.9;
   color: var(--color-muted);
 }

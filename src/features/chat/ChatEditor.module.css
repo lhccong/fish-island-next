@@ -8,7 +8,7 @@
   color: var(--color-text);
   background: transparent;
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   border-radius: var(--radius-control);
   white-space: pre-wrap;
@@ -44,7 +44,7 @@
     max-height: min(120px, 24dvh);
     padding: 7px 10px;
     background: var(--color-surface);
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .editor[data-presentation='worksheet'] {
     height: auto;
@@ -59,7 +59,7 @@
     max-height: min(120px, 24dvh);
     padding: 7px 10px;
     background: var(--color-surface);
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }
 :global([data-decoration='classic']) .editor {
@@ -72,12 +72,12 @@
   height: 32px;
   min-height: 32px;
   padding: 5px 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 @media (max-width: 760px) {
   :global([data-floating-excel='true']) .editor[data-presentation='worksheet'] {
     height: auto;
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }

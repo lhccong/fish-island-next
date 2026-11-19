@@ -41,11 +41,11 @@
   gap: 8px;
 }
 .identity strong {
-  font-size: 17px;
+  font-size: 1.0625rem;
   overflow-wrap: anywhere;
 }
 .identity > span {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-muted);
   flex-shrink: 0;
 }
@@ -57,7 +57,7 @@
 }
 .healthLine b {
   font:
-    700 12px ui-monospace,
+    700 0.75rem ui-monospace,
     monospace;
   color: var(--color-pet-battle-hp);
 }
@@ -82,7 +82,7 @@
   text-align: right;
   margin-top: 4px;
   font:
-    12px ui-monospace,
+    0.75rem ui-monospace,
     monospace;
 }
 .fighter {
@@ -140,13 +140,13 @@
   background: var(--color-surface);
   border: 2px solid var(--color-pet-battle-ink);
   color: var(--color-danger);
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 800;
   white-space: nowrap;
   animation: damage 800ms steps(8, end) both;
 }
 .hit[data-effect='critical'] {
-  font-size: 24px;
+  font-size: 1.5rem;
   background: var(--color-pet-header-amber);
   color: var(--color-pet-header-amber-ink);
   box-shadow: 4px 4px 0 var(--color-pet-shadow);
@@ -211,7 +211,7 @@
   border: 4px dashed var(--color-pet-battle-hp);
   color: var(--color-pet-battle-hp);
   font:
-    700 60px ui-monospace,
+    700 3.75rem ui-monospace,
     monospace;
   animation: recover 800ms steps(8, end) both;
 }
@@ -290,12 +290,12 @@
 }
 .battleHeader h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .battleHeader span {
   color: var(--color-muted);
   font:
-    12px ui-monospace,
+    0.75rem ui-monospace,
     monospace;
 }
 .console {
@@ -311,7 +311,7 @@
 .console p {
   margin: 0;
   line-height: 1.8;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .console small {
   color: var(--color-muted);
@@ -331,11 +331,11 @@
 }
 .result h3 {
   margin: 0 0 6px;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .result p {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .disclosure {
   border-block: 1px solid var(--color-border);
@@ -343,7 +343,7 @@
 }
 .disclosure summary {
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   min-height: 32px;
   display: flex;
   align-items: center;
@@ -353,7 +353,7 @@
   content: '+';
   color: var(--color-accent-text);
   font:
-    20px ui-monospace,
+    1.25rem ui-monospace,
     monospace;
 }
 .disclosure[open] summary::before {
@@ -361,13 +361,13 @@
 }
 .log {
   padding-left: 28px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 2;
 }
 .note {
   margin: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
 }
 .hub {
@@ -395,11 +395,11 @@
   opacity: 0.4;
 }
 .entrance strong {
-  font-size: 20px;
+  font-size: 1.25rem;
   letter-spacing: 1px;
 }
 .entrance span {
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-top: 8px;
 }
 .entrance:hover:not(:disabled) {
@@ -442,7 +442,7 @@
 }
 .bossInfo h3 {
   margin: 0 0 12px;
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 .stats {
   display: flex;
@@ -456,12 +456,12 @@
 }
 .stats dt {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .stats dd {
   margin: 0;
   font:
-    700 18px ui-monospace,
+    700 1.125rem ui-monospace,
     monospace;
 }
 .tower {
@@ -485,16 +485,16 @@
 }
 .towerBanner h3 {
   margin: 8px 0;
-  font-size: 28px;
+  font-size: 1.75rem;
 }
 .towerBanner p {
   margin: 8px 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
 }
 .towerBanner .floor {
   font:
-    700 48px ui-monospace,
+    700 3rem ui-monospace,
     monospace;
 }
 .towerBanner > div {
@@ -515,7 +515,7 @@
   color: var(--color-text);
   cursor: pointer;
   font:
-    14px ui-monospace,
+    0.875rem ui-monospace,
     monospace;
 }
 .floorTrack button:hover,
@@ -533,7 +533,7 @@
 .floorForm label {
   display: grid;
   gap: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .floorForm input {
   appearance: textfield;
@@ -560,7 +560,7 @@
 }
 .empty p {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
 }
 @keyframes damage {
@@ -611,10 +611,10 @@
     gap: 4px;
   }
   .identity strong {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .identity > span {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
   .healthLine {
     margin-top: 6px;
@@ -643,17 +643,17 @@
     padding: 12px;
   }
   .console p {
-    font-size: 13px;
+    font-size: 0.8125rem;
     min-height: 46px;
   }
   .battleHeader h3 {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .battleHeader {
     align-items: start;
   }
   .battleHeader span {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .hub {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -664,10 +664,10 @@
     min-height: 120px;
   }
   .entrance strong {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .entrance span {
-    font-size: 11px;
+    font-size: 0.6875rem;
     line-height: 1.7;
   }
   .entrance > svg:not(.landscape) {
@@ -683,7 +683,7 @@
     padding: 14px;
   }
   .bossInfo h3 {
-    font-size: 19px;
+    font-size: 1.1875rem;
   }
   .towerBanner {
     grid-template-columns: 1fr;
@@ -693,7 +693,7 @@
     justify-self: end;
   }
   .towerBanner h3 {
-    font-size: 23px;
+    font-size: 1.4375rem;
   }
   .floorForm input,
   .disclosure summary {
@@ -735,7 +735,7 @@
 }
 .equipment > small {
   color: var(--color-muted);
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .gearGrid {
   display: grid;

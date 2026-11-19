@@ -17,7 +17,7 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0;
-  font-size: 21px;
+  font-size: 1.3125rem;
   font-weight: 600;
   letter-spacing: -0.4px;
 }
@@ -28,7 +28,7 @@
 .heading p {
   margin: 8px 0 0;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 .heading button {
@@ -54,7 +54,7 @@
 }
 .rankTitle {
   margin: 0 0 var(--space-4);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
 }
 .rankScroll,
@@ -102,7 +102,7 @@
   gap: 4px;
   min-height: 23px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 .leader[data-rank='1'] .medal {
@@ -116,18 +116,18 @@
 }
 .leaderName {
   max-width: 100%;
-  font-size: 14px;
+  font-size: 0.875rem;
   overflow-wrap: anywhere;
 }
 .leaderAmount {
-  font-size: 21px;
+  font-size: 1.3125rem;
   font-variant-numeric: tabular-nums;
   color: var(--color-accent-text);
 }
 .leader p {
   margin: 0;
   max-width: 100%;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
   color: var(--color-muted);
   overflow-wrap: anywhere;
@@ -155,7 +155,7 @@
   width: 48px;
   height: 48px;
   margin: 4px;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .avatar .frame {
   inset: -20%;
@@ -181,7 +181,7 @@
   flex-shrink: 0;
   min-width: 24px;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   text-align: center;
 }
 .rowText {
@@ -189,11 +189,11 @@
   min-width: 0;
 }
 .rowText strong {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .rowText p {
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
   color: var(--color-muted);
   overflow-wrap: anywhere;
@@ -201,7 +201,7 @@
 .rowAmount {
   flex-shrink: 0;
   color: var(--color-accent-text);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .activity .activityHeading {
   display: flex;
@@ -211,7 +211,7 @@
   padding: 0 var(--space-4) var(--space-4) 0;
   margin: 0 0 4px;
   border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .activity h2 > svg {
   color: var(--color-accent-text);
@@ -221,7 +221,7 @@
   border-radius: var(--radius-panel);
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 .activityBody {
@@ -255,7 +255,7 @@
   align-items: baseline;
   gap: var(--space-2);
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .activityTop strong {
   min-width: 0;
@@ -271,7 +271,7 @@
 .activity .activityText p {
   margin: 4px 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -280,14 +280,14 @@
   align-items: center;
   gap: 4px;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .feedback {
   margin: 0;
   padding: var(--space-6) var(--space-2);
   color: var(--color-muted);
   text-align: center;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .end {
@@ -297,7 +297,7 @@
 .end p {
   margin: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.7;
 }
 .sentinel {
@@ -319,7 +319,7 @@
     margin-bottom: var(--space-5);
   }
   .heading h2 {
-    font-size: 18px;
+    font-size: 1.125rem;
     line-height: 1.5;
     letter-spacing: 0;
   }
@@ -328,7 +328,7 @@
   }
   .heading p {
     margin-top: 6px;
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .rewardGrid {
     grid-template-columns: minmax(0, 1fr);
@@ -341,7 +341,7 @@
   }
   .rankTitle {
     margin-bottom: var(--space-2);
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .rankBody {
     padding: 4px;
@@ -369,7 +369,7 @@
     grid-column: 1;
     grid-row: 1 / 3;
     justify-content: center;
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .rankLabel,
   .medal svg {
@@ -385,23 +385,23 @@
     width: 36px;
     height: 36px;
     margin: 0;
-    font-size: 16px;
+    font-size: 1rem;
   }
   .leaderName {
     grid-column: 3;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.5;
   }
   .leaderAmount {
     grid-column: 4;
     align-self: start;
     padding-top: 2px;
-    font-size: 14px;
+    font-size: 0.875rem;
     white-space: nowrap;
   }
   .leader p {
     grid-column: 3 / -1;
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .rows li {
     display: grid;

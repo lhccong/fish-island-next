@@ -9,7 +9,7 @@
   border-radius: 50%;
   background: var(--color-circle-cover);
   color: var(--color-circle-author);
-  font-size: 16px;
+  font-size: 1rem;
 }
 .avatar img {
   position: absolute;
@@ -21,7 +21,7 @@
 .small {
   width: 28px;
   height: 28px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .cover {
   border-radius: 50%;
@@ -29,13 +29,13 @@
   height: 80px;
   border: 3px solid var(--color-circle-card);
   box-shadow: var(--shadow-circle-avatar);
-  font-size: 28px;
+  font-size: 1.75rem;
 }
 @media (max-width: 760px) {
   .cover {
     border-radius: 50%;
     width: 64px;
     height: 64px;
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }

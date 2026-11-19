@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-circle-text);
 }
 .desktop h2 {
@@ -32,7 +32,7 @@
 .mobile summary span {
   margin-left: auto;
   color: var(--color-circle-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 400;
 }
 .list button {
@@ -58,27 +58,27 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-2);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .author time {
   flex-shrink: 0;
   color: var(--color-circle-muted);
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .excerpt {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.7;
   margin-top: var(--space-1);
   overflow-wrap: anywhere;
 }
 .empty {
   color: var(--color-circle-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-bottom: 0;
 }
 .mobile {
@@ -101,7 +101,7 @@
   .mobile summary::after {
     content: '+';
     color: var(--color-circle-muted);
-    font-size: 18px;
+    font-size: 1.125rem;
   }
   .mobile[open] summary::after {
     content: '−';

@@ -17,7 +17,7 @@
   border-radius: var(--radius-control);
   color: var(--color-muted);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 0.8125rem;
   text-align: center;
 }
 .navigation a:hover {
@@ -46,7 +46,7 @@
     padding: var(--space-2) 2px;
     border-radius: 0;
     border-bottom: 2px solid transparent;
-    font-size: 14px;
+    font-size: 0.875rem;
     white-space: nowrap;
   }
   .navigation a svg {

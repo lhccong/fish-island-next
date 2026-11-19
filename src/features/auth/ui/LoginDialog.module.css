@@ -17,14 +17,14 @@
 }
 .modal > h2 {
   text-align: center;
-  font-size: 30px;
+  font-size: 1.875rem;
   font-weight: 600;
   margin: 0 0 var(--space-2);
 }
 .modal > p {
   text-align: center;
   margin: 0 0 var(--space-5);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .tabs {
   display: flex;
@@ -40,7 +40,7 @@
   background: transparent;
   color: var(--color-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .tabs button[aria-pressed='true'] {
   border-bottom-color: var(--color-accent);
@@ -64,7 +64,7 @@
 }
 .success {
   color: var(--color-accent-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 @media (max-width: 760px) {
@@ -73,6 +73,6 @@
     max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
   }
   .modal > h2 {
-    font-size: 27px;
+    font-size: 1.6875rem;
   }
 }

@@ -47,11 +47,11 @@
 }
 .song strong {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .song span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .actions {
   display: flex;
@@ -60,7 +60,7 @@
 }
 .error {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-danger);
   overflow-wrap: anywhere;
 }

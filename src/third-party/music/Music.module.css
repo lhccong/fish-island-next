@@ -12,7 +12,7 @@
 .dialog h2 {
   margin: 0;
   padding-right: 44px;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 28px;
 }
 .search {
@@ -99,13 +99,13 @@
 }
 .song strong,
 .now strong {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 .song span,
 .now span {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   overflow-wrap: anywhere;
 }
@@ -128,7 +128,7 @@
   line-height: 1.7;
   margin: 0;
   padding: 16px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .playback {
   display: grid;
@@ -154,7 +154,7 @@
 .error,
 .notice {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -192,7 +192,7 @@
   }
   .search input {
     height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
   .controls {
     flex-wrap: wrap;

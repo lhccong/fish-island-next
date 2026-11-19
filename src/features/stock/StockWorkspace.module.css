@@ -6,15 +6,15 @@
 }
 .workspace h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 .workspace h2 {
   margin: 0 0 16px;
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 .workspace h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .listPanel,
 .detailPanel {
@@ -27,7 +27,7 @@
 }
 .muted {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .sectionHeading {
@@ -50,7 +50,7 @@
 .overviewToolbar p {
   margin: 0;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .stats {
   display: grid;
@@ -71,18 +71,18 @@
 }
 .stats > article > span {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .stats strong {
-  font-size: clamp(22px, 1.6vw, 28px);
+  font-size: calc(clamp(22px, 1.6vw, 28px) * var(--ui-font-scale, 1));
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 .stats strong small {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .stats > article > small {
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.5;
   color: var(--color-muted);
 }
@@ -143,17 +143,17 @@
   text-align: left;
 }
 .quoteHeading > strong {
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 .quoteHeading > small {
   color: var(--color-muted);
   background: var(--color-canvas);
   border-radius: 4px;
   padding: 4px 8px;
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .quotePrice {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   margin-top: 14px;
@@ -161,7 +161,7 @@
 .quoteChanges {
   display: flex;
   gap: 12px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .quoteChanges > span {
   padding: 5px 10px;
@@ -184,7 +184,7 @@
   align-items: center;
   gap: 4px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .feedback {
   padding: 24px;
@@ -203,7 +203,7 @@
 }
 .detailHeading small {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   margin-left: 12px;
 }
@@ -224,7 +224,7 @@
   flex-wrap: wrap;
   gap: 8px 16px;
   min-height: 44px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 .plot {
@@ -242,7 +242,7 @@
 }
 .axis {
   fill: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .inspect {
   position: absolute;
@@ -264,7 +264,7 @@
   left: 0;
   pointer-events: none;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
 }
 .filters > button {
@@ -278,14 +278,14 @@
   height: 44px;
   border: 2px solid currentColor;
   border-radius: var(--radius-control);
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 700;
   background: var(--color-surface);
   cursor: pointer;
   z-index: 1;
 }
 .marker small {
-  font-size: 10px;
+  font-size: 0.625rem;
   margin-left: 2px;
 }
 .buyMarker {
@@ -303,7 +303,7 @@
   display: flex;
   justify-content: space-between;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-bottom: 16px;
 }
 .positions,
@@ -323,7 +323,7 @@
   overflow-wrap: anywhere;
 }
 .positions p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
   line-height: 1.7;
   margin: 6px 0;
@@ -332,7 +332,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 .trades li > div:last-child {
@@ -412,10 +412,10 @@
     gap: 10px;
   }
   .stats strong {
-    font-size: 21px;
+    font-size: 1.3125rem;
   }
   .stats strong small {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .quotes {
     grid-template-columns: 1fr;
@@ -425,7 +425,7 @@
     padding: 20px;
   }
   .quotePrice {
-    font-size: 32px;
+    font-size: 2rem;
   }
   .quoteFooter {
     padding: 12px 20px;

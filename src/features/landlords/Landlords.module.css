@@ -10,12 +10,12 @@
   margin: 0;
 }
 .workspace h2 {
-  font-size: 21px;
+  font-size: 1.3125rem;
   letter-spacing: -0.03em;
 }
 .workspace h3,
 .chat h3 {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .workspace p {
   overflow-wrap: anywhere;
@@ -26,7 +26,7 @@
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .playerIdentity > span:last-child,
 .myIdentity strong {
@@ -72,7 +72,7 @@
 .hand small,
 .phaseHeader small {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
 }
 .actions {
@@ -105,7 +105,7 @@
   border: 1px solid var(--color-border);
 }
 .hero h2 {
-  font-size: clamp(24px, 3vw, 36px);
+  font-size: calc(clamp(24px, 3vw, 36px) * var(--ui-font-scale, 1));
   margin: 14px 0 10px;
   font-weight: 600;
   letter-spacing: -0.04em;
@@ -113,12 +113,12 @@
 .hero p {
   color: var(--color-muted);
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .eyebrow {
   letter-spacing: 12px;
   color: var(--color-accent-text);
-  font-size: 25px;
+  font-size: 1.5625rem;
 }
 .roomGrid {
   display: grid;
@@ -135,7 +135,7 @@
 }
 .room p {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
   margin: var(--space-3) 0 calc(var(--space-4) + var(--space-1));
 }
@@ -150,7 +150,7 @@
   color: var(--color-text);
 }
 .empty p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-bottom: 0;
 }
 .table {
@@ -161,7 +161,7 @@
 }
 .phaseHeader {
   padding: var(--space-4) calc(var(--space-4) + var(--space-1));
-  font-size: 13px;
+  font-size: 0.8125rem;
   border-bottom: 1px solid var(--color-border);
 }
 .phaseHeader > strong {
@@ -214,14 +214,14 @@
   gap: 6px;
 }
 .seat p {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-muted);
   margin: var(--space-2) 0;
   line-height: 1.6;
 }
 .seat strong {
   color: var(--color-accent-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 .center {
@@ -234,7 +234,7 @@
   text-align: center;
 }
 .center p {
-  font-size: 14px;
+  font-size: 0.875rem;
   margin: var(--space-1) 0;
   font-weight: 500;
 }
@@ -258,11 +258,11 @@
   border-radius: calc(var(--radius-control) - 2px);
   padding: 9px 10px;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 1.125rem;
   box-shadow: 0 2px 0 var(--color-border);
 }
 .smallCard small {
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .cardBacks {
   display: flex;
@@ -277,7 +277,7 @@
   color: var(--color-accent-text);
   border: 1px solid var(--color-border);
   border-radius: calc(var(--radius-control) - 2px);
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .hand {
   padding: var(--space-1) calc(var(--space-4) + var(--space-1))
@@ -304,7 +304,7 @@
   border-radius: calc(var(--radius-control) - 1px);
   color: var(--color-text);
   cursor: pointer;
-  font-size: 19px;
+  font-size: 1.1875rem;
   box-shadow: 0 2px 0 var(--color-border);
   transition:
     translate 120ms ease,
@@ -316,7 +316,7 @@
   position: absolute;
   bottom: 8px;
   right: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   transform: rotate(180deg);
   opacity: 0.65;
 }
@@ -360,10 +360,10 @@
 }
 .result h2 {
   color: var(--color-accent-text);
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .result p {
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .chat {
   margin: 0;
@@ -383,7 +383,7 @@
   margin-top: var(--space-3);
 }
 .messages p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
   overflow-wrap: anywhere;
 }
@@ -419,7 +419,7 @@
 .form label {
   display: grid;
   gap: var(--space-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .error {
   color: var(--color-danger);
@@ -436,7 +436,7 @@
   gap: var(--space-2);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-4) var(--space-1);
-  font-size: 13px;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 .rankRow span {
@@ -478,7 +478,7 @@
     gap: var(--space-4);
   }
   .seat h3 {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .seat .row {
     align-items: start;
@@ -493,7 +493,7 @@
   }
   .poker {
     min-height: 70px;
-    font-size: 16px;
+    font-size: 1rem;
   }
   .chat {
     padding: var(--space-4);
@@ -512,15 +512,15 @@
     padding-bottom: var(--space-4);
   }
   .workspace h2 {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
   .hero h2 {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
   .chatForm input,
   .form input {
     min-height: 44px;
-    font-size: 16px;
+    font-size: max(16px, 1rem);
   }
 }
 @media (prefers-reduced-motion: reduce) {

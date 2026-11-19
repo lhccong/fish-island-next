@@ -7,7 +7,7 @@
 .dialog > h2 {
   padding-right: var(--space-6);
   margin-bottom: var(--space-2);
-  font-size: 22px;
+  font-size: 1.375rem;
   line-height: 1.5;
 }
 .dialog > p {
@@ -31,12 +31,12 @@
 }
 .import span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .error {
   color: var(--color-danger);
-  font-size: 13px;
+  font-size: 0.8125rem;
   padding-top: var(--space-3);
 }
 @media (max-width: 760px) {
@@ -46,7 +46,7 @@
     max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
   .dialog > h2 {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
   .dialog > p {
     margin-bottom: var(--space-4);
@@ -58,7 +58,7 @@
   }
   .import span {
     max-width: 240px;
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .footer {
     align-items: flex-start;

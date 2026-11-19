@@ -25,7 +25,7 @@
   margin: 0;
   padding: 0 192px 0 16px;
   border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   justify-content: flex-start;
   white-space: nowrap;
@@ -53,7 +53,7 @@
   flex-shrink: 0;
   padding: 8px 16px;
   margin: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
 }
@@ -170,12 +170,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-circle-author);
 }
 .meta time {
   flex-shrink: 0;
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-muted);
 }
 .action {
@@ -184,7 +184,7 @@
   margin-top: 4px;
   align-items: center;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -200,7 +200,7 @@
   overflow-wrap: anywhere;
   margin-top: 6px;
   line-height: 1.65;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text);
 }
 .thumbnail {
@@ -222,7 +222,7 @@
   padding: 36px 16px;
   text-align: center;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .confirm {
   flex-shrink: 0;
@@ -231,7 +231,7 @@
   justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-muted);
   padding: 8px 16px;
   border-top: 1px solid var(--color-border);

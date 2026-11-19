@@ -19,14 +19,14 @@
 }
 .heading h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 .heading > span {
   display: flex;
   align-items: center;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .recentGame {
   align-items: center;
@@ -40,7 +40,7 @@
   border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   cursor: pointer;
 }
 .recentGame:hover {
@@ -61,7 +61,7 @@
 }
 .recentGame > span:nth-child(2) {
   align-self: end;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 .recentGame small {
@@ -76,11 +76,11 @@
 }
 .empty p {
   margin: 0 0 var(--space-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .empty div > span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 .recommendations {
@@ -114,7 +114,7 @@
   color: var(--color-game-ink);
 }
 .artLabel {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 3px;
 }
@@ -122,7 +122,7 @@
   position: relative;
   z-index: 2;
   margin-top: 24px;
-  font-size: clamp(28px, 4vw, 38px);
+  font-size: calc(clamp(28px, 4vw, 38px) * var(--ui-font-scale, 1));
   line-height: 1.25;
   font-weight: 800;
   letter-spacing: 2px;
@@ -170,7 +170,7 @@
   padding: 8px 12px;
   border-radius: 6px;
   background: var(--color-game-frame);
-  font-size: 11px;
+  font-size: 0.6875rem;
   transform: rotate(-9deg);
 }
 .orbit {
@@ -187,13 +187,13 @@
   bottom: 25px;
   left: 25px;
   z-index: 2;
-  font-size: 11px;
+  font-size: 0.6875rem;
   max-width: 150px;
   line-height: 1.6;
 }
 .note {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
 }
 @media (max-width: 760px) {
@@ -249,11 +249,11 @@
   background: var(--color-accent-soft);
 }
 .stockArt > span {
-  font-size: 10px;
+  font-size: 0.625rem;
   letter-spacing: 2px;
 }
 .stockArt h3 {
-  font-size: 32px;
+  font-size: 2rem;
   line-height: 1.4;
   margin: 24px 0;
 }
@@ -264,7 +264,7 @@
   opacity: 0.5;
 }
 .stockArt p {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .stockCaption {
   display: flex;
@@ -281,7 +281,7 @@
 .stockCaption > span {
   flex-shrink: 0;
   color: var(--color-accent-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 32px;
 }
@@ -296,16 +296,16 @@
   outline-offset: 4px;
 }
 .stockCaption h3 {
-  font-size: 20px;
+  font-size: 1.25rem;
   margin: 5px 0;
 }
 .stockCaption p {
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 0;
   line-height: 1.6;
 }
 .stockCaption div > span {
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 @media (max-width: 760px) {
   .cards {
@@ -325,10 +325,10 @@
   }
   .stockCaption > span {
     line-height: 44px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .stockCaption h3 {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 }
 
@@ -348,12 +348,12 @@
   overflow: hidden;
 }
 .farmArt > span {
-  font-size: 10px;
+  font-size: 0.625rem;
   letter-spacing: 2px;
   font-weight: 700;
 }
 .farmArt h3 {
-  font-size: 32px;
+  font-size: 2rem;
   line-height: 1.4;
   margin: 24px 0;
   position: relative;

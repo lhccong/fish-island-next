@@ -67,7 +67,7 @@
   border-radius: 3px;
   color: var(--color-text);
   background: var(--color-surface);
-  font-size: 12px;
+  font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -94,19 +94,19 @@
   left: 14px;
   padding: 8px 10px;
   border-radius: 3px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 .sceneLabel small {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 400;
 }
 .weather {
   right: 14px;
   padding: 7px 10px;
   border-radius: 3px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .hint {
   position: absolute;
@@ -126,7 +126,7 @@
   border-radius: 3px;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 12px;
+  font-size: 0.75rem;
   pointer-events: none;
 }
 .hint small {
@@ -149,10 +149,10 @@
   .weather {
     top: 10px;
     right: 10px;
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
   .hint {
-    font-size: 11px;
+    font-size: 0.6875rem;
     gap: 4px;
   }
   .hint small {

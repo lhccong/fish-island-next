@@ -96,7 +96,7 @@ export function WorkspaceAccount() {
               }}
               returnFocusRef={origin}
               title="网站设置"
-              description="自定义标签页名称和图标，保存到此浏览器。布局和配色可从主题入口选择。"
+              description="设置保存在此浏览器。"
               dismissLabel="关闭网站设置"
               showCloseAction={false}
               className={styles.dialog ?? ''}
