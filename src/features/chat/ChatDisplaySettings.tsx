@@ -3,7 +3,7 @@ import { useChatRealtime } from './realtime-context';
 import styles from './ChatDisplaySettings.module.css';
 
 export function ChatDisplaySettings() {
-  const { avatarPreference, imagePreference } = useChatRealtime();
+  const { avatarPreference, bubblePreference, imagePreference } = useChatRealtime();
   return (
     <section aria-label="消息显示设置" className={styles.settings}>
       <div className={styles.setting}>
@@ -34,6 +34,15 @@ export function ChatDisplaySettings() {
       </div>
       <p>开启后，点击消息中的图片占位按钮才加载图片。</p>
       {imagePreference.notice && <p role="status">{imagePreference.notice}</p>}
+      <div className={styles.setting}>
+        <span>不渲染气泡</span>
+        <Switch
+          label="不渲染气泡"
+          checked={bubblePreference.hideBubbles}
+          onCheckedChange={bubblePreference.change}
+        />
+      </div>
+      {bubblePreference.notice && <p role="status">{bubblePreference.notice}</p>}
     </section>
   );
 }

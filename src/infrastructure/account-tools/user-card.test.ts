@@ -113,14 +113,17 @@ it('reads follow pages with Long totals and preserves the exact target ID for to
   expect(await client.follows('followers', 2, signal)).toMatchObject({
     total: 32,
     items: [
-      { id, name: '合成岛友', following: false },
-      { id: '2', following: true },
+      { id, name: '合成岛友', mutual: false },
+      { id: '2', mutual: true },
     ],
   });
   expect(fetcher.mock.calls[0]?.[0]).toContain('follow/followers?current=2&pageSize=20');
-  reply({ records: [user], total: 1 });
+  reply({ records: [user, { userId: '2', isMutual: true }], total: 2 });
   expect(await client.follows('following', 1, signal)).toMatchObject({
-    items: [{ id, following: true }],
+    items: [
+      { id, mutual: false },
+      { id: '2', mutual: true },
+    ],
   });
   reply({ records: [], total: '9007199254740992' });
   await expect(client.follows('followers', 1, signal)).rejects.toThrow('关注列表格式不正确');
@@ -129,4 +132,27 @@ it('reads follow pages with Long totals and preserves the exact target ID for to
   expect(fetcher.mock.calls[3]?.[0]).toContain(`follow/toggle?followUserId=${id}`);
   reply(false);
   expect(await client.toggleFollow(id, signal)).toBe(false);
+});
+
+it('requests another user’s follow pages with their full ID and the dedicated endpoint', async () => {
+  const fetcher = vi.fn(() =>
+    Promise.resolve(new Response(JSON.stringify({ code: 0, data: { total: '0', records: [] } }))),
+  );
+  vi.stubGlobal('fetch', fetcher);
+  const client = createAccountToolsClient(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic' }),
+    vi.fn(),
+  );
+  const signal = new AbortController().signal;
+  for (const kind of ['following', 'followers'] as const) {
+    expect(await client.follows(kind, 2, signal, '90071992547409921')).toEqual({
+      total: 0,
+      items: [],
+    });
+    expect(fetcher).toHaveBeenLastCalledWith(
+      `https://example.test/api/follow/user/${kind}?current=2&pageSize=20&userId=90071992547409921`,
+      expect.any(Object),
+    );
+  }
 });

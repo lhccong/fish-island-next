@@ -19,6 +19,10 @@
   grid-template-columns: minmax(0, 212px) minmax(0, 1fr);
   gap: 0;
 }
+.content[hidden],
+.footer[hidden] {
+  display: none;
+}
 .coverPanel {
   min-height: 0;
   min-width: 0;
@@ -92,13 +96,16 @@
 }
 .counts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   padding: 6px 0;
 }
-.counts div {
+.counts .countOption {
   display: grid;
   gap: 2px;
-  text-align: center;
+  min-height: 44px;
+  padding-inline: 6px;
+  line-height: 1.25;
 }
 .counts strong {
   font-size: 16px;
@@ -243,6 +250,11 @@
 .compact .footer {
   margin-top: 16px;
   border-top: 1px solid var(--color-border);
+}
+.dialog.relationships {
+  width: min(480px, calc(100% - 32px));
+  height: min(520px, calc(100dvh - 32px));
+  padding: 24px 16px max(16px, env(safe-area-inset-bottom));
 }
 @media (max-width: 760px) {
   .dialog {

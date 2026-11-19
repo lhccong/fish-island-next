@@ -93,8 +93,11 @@ export function createAccountToolsClient(
           [text(v.country), text(v.region)].filter(Boolean).join(' · ') || profile?.region || '',
       };
     },
-    async follows(kind, page, signal) {
-      const value = record(await request(`follow/${kind}?current=${page}&pageSize=20`, signal));
+    async follows(kind, page, signal, ownerId) {
+      const path = ownerId === undefined ? `follow/${kind}` : `follow/user/${kind}`;
+      const params = new URLSearchParams({ current: String(page), pageSize: '20' });
+      if (ownerId !== undefined) params.set('userId', ownerId);
+      const value = record(await request(`${path}?${params}`, signal));
       const total = readNonNegativeInteger(value.total);
       if (!Array.isArray(value.records) || total === undefined)
         throw new Error('关注列表格式不正确');
@@ -111,7 +114,7 @@ export function createAccountToolsClient(
             name: text(v.userName) || '岛友',
             profile: text(v.userProfile),
             avatar: /^https?:\/\//.test(avatar) ? avatar : '',
-            following: kind === 'following' || v.isMutual === true,
+            mutual: v.isMutual === true,
           };
         }),
       };

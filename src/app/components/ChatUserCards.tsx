@@ -3,12 +3,18 @@ import { lazy, Suspense, useCallback, useState, useRef, type ReactNode } from 'r
 import { useNavigate } from 'react-router';
 import { UserCardProvider } from '@/features/chat';
 import type { AuthUser } from '@/domain/auth';
+import type { FollowListTarget } from '@/domain/account-tools';
+import { FollowList } from '@/features/account-tools';
 import { accountTools } from '@/app/config/account-tools';
 import { petService } from '@/app/config/pet';
 import { Dialog } from '@/shared/ui/Dialog';
 const OtherCompanionPanel = lazy(() =>
   import('@/features/pet').then((m) => ({ default: m.OtherCompanionPanel })),
 );
+
+function renderFollowList(target: FollowListTarget, onBack: () => void) {
+  return <FollowList port={accountTools} kind={target.kind} owner={target} onBack={onBack} />;
+}
 
 export function ChatUserCards({
   user,
@@ -34,7 +40,12 @@ export function ChatUserCards({
     [navigate],
   );
   return (
-    <UserCardProvider user={user} port={accountTools} onVisit={onVisit}>
+    <UserCardProvider
+      user={user}
+      port={accountTools}
+      onVisit={onVisit}
+      renderFollowList={renderFollowList}
+    >
       {children}
       {pet && (
         <Suspense

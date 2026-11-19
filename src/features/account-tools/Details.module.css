@@ -73,6 +73,10 @@
   font-weight: 600;
   line-height: 1.5;
 }
+.followHeading[data-other='true'] {
+  margin-inline-end: 44px;
+  overflow-wrap: anywhere;
+}
 .people {
   margin: 0;
   padding: 0;
@@ -86,10 +90,22 @@
   padding: 12px 0;
   border-bottom: 1px solid var(--color-border);
 }
+.followRow[data-read-only='true'] {
+  grid-template-columns: auto minmax(0, 1fr);
+}
 .followUser {
   overflow-wrap: anywhere;
   font-size: 14px;
   font-weight: 500;
+}
+.followIdentity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.followIdentity > span:first-child {
+  min-width: 0;
 }
 .followUser p {
   margin: 4px 0 0;

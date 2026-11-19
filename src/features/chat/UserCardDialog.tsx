@@ -1,18 +1,19 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Bug, Sprout, Aperture } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
-import type { UserCardPort } from '@/domain/account-tools';
+import type { FollowKind, UserCardPort } from '@/domain/account-tools';
 import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import { useChatRealtime } from './realtime-context';
 import { useRemark, useRemarks } from './remarks-context';
-import type { UserCardTarget } from './user-card-context';
+import type { RenderFollowList, UserCardTarget } from './user-card-context';
 import { useUserCardResource } from './use-user-card';
 import { UserCardMedia } from './UserCardMedia';
 import { UserCardModeration } from './UserCardModeration';
+import { UserCardCounts } from './UserCardCounts';
 import { SenderTitle } from './SenderTitle';
 import styles from './UserCard.module.css';
 
@@ -22,12 +23,14 @@ export function UserCardDialog({
   port,
   onClose,
   onVisit,
+  renderFollowList,
 }: {
   target: UserCardTarget;
   user: AuthUser;
   port: UserCardPort;
   onClose: () => void;
   onVisit: (kind: 'pet' | 'farm' | 'moments', id: string) => void;
+  renderFollowList: RenderFollowList;
 }) {
   const self = user.id === target.id;
   const resource = useUserCardResource(port, target.id, self);
@@ -41,7 +44,15 @@ export function UserCardDialog({
     blacklist.read(user.id).some((v) => v.id === target.id),
   );
   const [confirmBlock, setConfirmBlock] = useState(false);
+  const [list, setList] = useState<FollowKind | null>(null);
+  const listTrigger = useRef<HTMLButtonElement | null>(null);
   const name = card?.name || target.name;
+  useEffect(() => {
+    if (!list && listTrigger.current) {
+      listTrigger.current.focus();
+      listTrigger.current = null;
+    }
+  }, [list]);
   function toggleBlock() {
     try {
       const old = blacklist.read(user.id).filter((v) => v.id !== target.id);
@@ -73,11 +84,11 @@ export function UserCardDialog({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      className={`${styles.dialog} ${!card?.cover ? styles.compact : ''}`}
+      className={`${styles.dialog} ${list ? styles.relationships : !card?.cover ? styles.compact : ''}`}
       showCloseAction={false}
       dismissLabel="关闭用户卡片"
     >
-      <div className={styles.content} data-cover={!!card?.cover}>
+      <div className={styles.content} data-cover={!!card?.cover} hidden={!!list}>
         <ScrollArea label="用户卡片内容" gutter="reserved" className={styles.scroll ?? ''}>
           <div className={styles.body}>
             {state.status === 'loading' && <LoadingIndicator>正在读取用户资料…</LoadingIndicator>}
@@ -165,16 +176,7 @@ export function UserCardDialog({
                       </Button>
                     </div>
                   )}
-                  <div className={styles.counts}>
-                    <div>
-                      <strong>{card.following ?? '—'}</strong>
-                      <span>关注</span>
-                    </div>
-                    <div>
-                      <strong>{card.followers ?? '—'}</strong>
-                      <span>粉丝</span>
-                    </div>
-                  </div>
+                  <UserCardCounts card={card} triggerRef={listTrigger} onSelect={setList} />
                   {(card.titleId ||
                     target.titleId ||
                     card.level !== undefined ||
@@ -253,7 +255,7 @@ export function UserCardDialog({
           </div>
         )}
       </div>
-      <div className={styles.footer}>
+      <div className={styles.footer} hidden={!!list}>
         {feedback.message && <p role={feedback.error ? 'alert' : 'status'}>{feedback.message}</p>}
         {confirmBlock && <p>仅在此浏览器屏蔽该岛友的聊天消息，确认加入黑名单？</p>}
         <div className={styles.actions}>
@@ -290,6 +292,7 @@ export function UserCardDialog({
           </Button>
         </div>
       </div>
+      {list && renderFollowList({ id: target.id, name, kind: list }, () => setList(null))}
     </Dialog>
   );
 }

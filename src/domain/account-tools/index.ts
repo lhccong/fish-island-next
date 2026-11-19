@@ -1,4 +1,10 @@
 export type { UserCard, UserCardPort, UserMute } from './user-card';
+export type FollowKind = 'following' | 'followers';
+export interface FollowListTarget {
+  id: string;
+  name: string;
+  kind: FollowKind;
+}
 export interface DeveloperApp {
   id: string;
   appName: string;
@@ -19,9 +25,10 @@ export type AppInput = Pick<
 export interface AccountToolsPort {
   card(id: string, signal: AbortSignal): Promise<PersonalStats>;
   follows(
-    kind: 'following' | 'followers',
+    kind: FollowKind,
     page: number,
     signal: AbortSignal,
+    ownerId?: string,
   ): Promise<{ items: FollowUser[]; total: number }>;
   toggleFollow(id: string, signal: AbortSignal): Promise<boolean>;
   sendCode(email: string, signal: AbortSignal): Promise<void>;
@@ -47,7 +54,7 @@ export interface FollowUser {
   name: string;
   profile: string;
   avatar: string;
-  following: boolean;
+  mutual: boolean;
 }
 export interface BlockedUser {
   id: string;

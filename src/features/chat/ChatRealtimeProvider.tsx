@@ -14,6 +14,7 @@ import { createRedPacketCreation } from './red-packet-creation';
 import type { ChatRealtimeController } from './realtime-controller';
 import { ChatRealtimeContext } from './realtime-context';
 import { useAvatarPreference } from './use-avatar-preference';
+import { useBubblePreference } from './use-bubble-preference';
 import { useImagePreference } from './use-image-preference';
 import type { BlacklistPort } from '@/domain/account-tools';
 import { createImageGeometry } from './image-geometry';
@@ -42,6 +43,7 @@ export function ChatRealtimeProvider({
   blacklist: BlacklistPort;
 }) {
   const avatarPreference = useAvatarPreference(preferences);
+  const bubblePreference = useBubblePreference(preferences);
   const luckyBags = useMemo(
     () => createLuckyBagController(luckyBagPort, userId),
     [luckyBagPort, userId],
@@ -116,6 +118,7 @@ export function ChatRealtimeProvider({
         user,
         userId,
         avatarPreference,
+        bubblePreference,
         imagePreference,
         imageGeometry: geometryScope.cache,
         draft,

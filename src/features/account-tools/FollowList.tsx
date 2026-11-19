@@ -1,6 +1,11 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AccountToolsPort, FollowUser } from '@/domain/account-tools';
+import type {
+  AccountToolsPort,
+  FollowKind,
+  FollowListTarget,
+  FollowUser,
+} from '@/domain/account-tools';
 import { Button } from '@/shared/ui/Button';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -13,17 +18,20 @@ import details from './Details.module.css';
 export function FollowList({
   port,
   kind,
+  owner,
   onChange,
   onBack,
 }: {
-  port: AccountToolsPort;
-  kind: 'following' | 'followers';
-  onChange: () => void;
+  port: Pick<AccountToolsPort, 'follows' | 'toggleFollow'>;
+  kind: FollowKind;
+  owner?: Pick<FollowListTarget, 'id' | 'name'>;
+  onChange?: () => void;
   onBack: () => void;
 }) {
+  const ownerId = owner?.id;
   const load = useCallback(
-    (page: number, signal: AbortSignal) => port.follows(kind, page, signal),
-    [port, kind],
+    (page: number, signal: AbortSignal) => port.follows(kind, page, signal, ownerId),
+    [port, kind, ownerId],
   );
   const pages = useInfinitePages(load);
   const [changed, setChanged] = useState<Record<string, boolean>>({});
@@ -38,7 +46,7 @@ export function FollowList({
     void operation.run(async (signal) => {
       const following = await port.toggleFollow(user.id, signal);
       if (signal.aborted) return;
-      onChange();
+      onChange?.();
       if (followingList) {
         heading.current?.focus();
         pages.refresh();
@@ -51,8 +59,8 @@ export function FollowList({
 
   return (
     <div className={styles.body}>
-      <h3 ref={heading} tabIndex={-1} className={details.followHeading}>
-        我的{label}
+      <h3 ref={heading} tabIndex={-1} className={details.followHeading} data-other={!!owner}>
+        {owner ? `${owner.name}的${label}` : `我的${label}`}
       </h3>
       <ScrollArea label={`${label}列表`} gutter="reserved" className={styles.scroll ?? ''}>
         {pages.result.status === 'loading' ? (
@@ -75,24 +83,32 @@ export function FollowList({
               ) : (
                 <>
                   <ul role="list" className={details.people}>
-                    {pages.result.data.items.map((user) => (
-                      <li className={details.followRow} key={user.id}>
-                        <div className={styles.avatar}>
-                          <SourceAvatar name={user.name} src={user.avatar || null} />
-                        </div>
-                        <div className={details.followUser}>
-                          {user.name}
-                          {user.profile && <p>{user.profile}</p>}
-                        </div>
-                        <Button
-                          variant="secondary"
-                          disabled={operation.busy}
-                          onClick={() => toggle(user)}
-                        >
-                          {(changed[user.id] ?? user.following) ? '取消关注' : '回关'}
-                        </Button>
-                      </li>
-                    ))}
+                    {pages.result.data.items.map((user) => {
+                      const mutual = changed[user.id] ?? user.mutual;
+                      return (
+                        <li className={details.followRow} data-read-only={!onChange} key={user.id}>
+                          <div className={styles.avatar}>
+                            <SourceAvatar name={user.name} src={user.avatar || null} />
+                          </div>
+                          <div className={details.followUser}>
+                            <div className={details.followIdentity}>
+                              <span>{user.name}</span>
+                              {mutual && <span className={details.status}>互相关注</span>}
+                            </div>
+                            {user.profile && <p>{user.profile}</p>}
+                          </div>
+                          {onChange && (
+                            <Button
+                              variant="secondary"
+                              disabled={operation.busy}
+                              onClick={() => toggle(user)}
+                            >
+                              {followingList || mutual ? '取消关注' : '回关'}
+                            </Button>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                   <InfiniteScroll
                     hasMore={pages.hasMore}

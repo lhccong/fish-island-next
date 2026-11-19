@@ -122,6 +122,8 @@ ADR-069 将聊天消息和在线成员名称统一为按需打开用户卡片，
 
 ADR-069 补充聊天用户卡片字段：资料不含地区时，沿历史与实时消息的共用解码链保留并使用打开卡片的发送者地区快照；卡片隐藏积分。
 
+ADR-069 补充他人关注和粉丝名单：后端按资料所属用户提供登录后可读名单，app 向聊天卡片注入既有 account-tools 名单呈现；聊天卡片内切换视图，分页及请求由名单独立管理。
+
 ADR-067 迁移经典斗地主，domain/landlords、infrastructure/landlords、features/landlords 分层，app 注入账号唯一 WebSocket，房间、手牌选择、聊天和排行状态独立；见 ADR-067。
 
 ADR-064 迁移账号签到、月度日历和补签，domain/sign-in、infrastructure/sign-in、features/sign-in 分层，app 通过账号资料插槽注入，独立请求状态不影响聊天。见 ADR-064。

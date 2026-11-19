@@ -10,6 +10,7 @@ import type { RedPacketController } from './red-packet-controller';
 import type { RedPacketCreation } from './red-packet-creation';
 import type { ChatRealtimeController } from './realtime-controller';
 import type { useAvatarPreference } from './use-avatar-preference';
+import type { useBubblePreference } from './use-bubble-preference';
 import type { useImagePreference } from './use-image-preference';
 
 import type { MessageNavigation } from './message-navigation';
@@ -24,6 +25,7 @@ export const ChatRealtimeContext = createContext<{
   userId: string;
   user?: AuthUser | undefined;
   avatarPreference: ReturnType<typeof useAvatarPreference>;
+  bubblePreference: ReturnType<typeof useBubblePreference>;
   imagePreference: ReturnType<typeof useImagePreference>;
   imageGeometry: ImageGeometry;
   draft: ChatDraft;

@@ -75,6 +75,8 @@ export interface ChatPreferencesPort {
   writeHideAvatarFrames(value: boolean): void;
   readDeferImages(): boolean;
   writeDeferImages(value: boolean): void;
+  readHideBubbles(): boolean;
+  writeHideBubbles(value: boolean): void;
   readShowAvatars(): boolean;
   writeShowAvatars(value: boolean): void;
   readGroupName(): string | null;

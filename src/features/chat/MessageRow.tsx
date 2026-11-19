@@ -34,7 +34,7 @@ export const MessageRow = memo(function MessageRow({
   rowNumber: number | undefined;
   compactWorksheet?: boolean;
 }) {
-  const { controller, userId, user, navigation } = useChatRealtime();
+  const { controller, userId, user, navigation, bubblePreference } = useChatRealtime();
   const locationRevision = useStore(navigation.store, (state) =>
     state.target === id ? state.revision : 0,
   );
@@ -81,13 +81,15 @@ export const MessageRow = memo(function MessageRow({
     parts.some((part) => part.kind === 'image') &&
     parts.every((part) => part.kind === 'image' || (part.kind === 'text' && !part.text.trim()));
   const standaloneMusic = !message.revoked && !message.quote && musicOnly;
-  const bubbleId =
-    message.revoked || hasReward || imageOnly || standaloneMusic ? undefined : message.bubbleId;
+  const hasBubble = !message.revoked && !hasReward && !imageOnly && !standaloneMusic;
+  const hideBubble = hasBubble && bubblePreference.hideBubbles;
+  const bubbleId = hasBubble && !hideBubble ? message.bubbleId : undefined;
   const bubble = (
     <div
       ref={bubbleRef}
       className={bubbleId ? `${styles.bubble} ${bubbleArtworkClass}` : styles.bubble}
       data-bubble-style={bubbleId}
+      data-bubble-hidden={hideBubble || undefined}
       {...bubbleArtworkProps(bubbleId ? message.bubbleArtwork : undefined)}
       data-revoked={message.revoked}
       data-music-only={standaloneMusic}
