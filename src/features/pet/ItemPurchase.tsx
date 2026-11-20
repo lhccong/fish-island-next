@@ -22,11 +22,12 @@ export function ItemPurchase({
   const errorId = useId();
   const quantity = Number(value);
   const maxQuantity = Math.floor(maxPurchaseValue / Math.max(1, item.price));
-  const error = !/^\d+$/.test(value) || quantity < 1
-    ? '请输入正整数'
-    : quantity > maxQuantity
-      ? `单次最多购买 ${formatPoints.format(maxQuantity)} 件`
-      : '';
+  const error =
+    !/^\d+$/.test(value) || quantity < 1
+      ? '请输入正整数'
+      : quantity > maxQuantity
+        ? `单次最多购买 ${formatPoints.format(maxQuantity)} 件`
+        : '';
   const total = error ? '' : formatPoints.format(item.price * quantity);
 
   return (
@@ -66,7 +67,9 @@ export function ItemPurchase({
         </p>
       )}
       <OperationNotice
-        notice={purchased ? { error: false, message: `已购买 ${purchased} 件「${item.name}」` } : null}
+        notice={
+          purchased ? { error: false, message: `已购买 ${purchased} 件「${item.name}」` } : null
+        }
       />
     </>
   );
