@@ -19,6 +19,13 @@ import {
   forge,
 } from './decode';
 
+function decomposePoints(value: unknown) {
+  if (value == null) throw new Error('服务器未返回分解所得积分');
+  const points = number(value);
+  if (!Number.isSafeInteger(points) || points < 0) throw new Error('伙伴服务返回的分解积分异常');
+  return points;
+}
+
 export function createPetClient(
   baseUrl: string,
   token: () => SessionToken | null,
@@ -98,8 +105,7 @@ export function createPetClient(
     },
     async batchDecompose(signal) {
       const data = await request('itemInstances/batchDecomposeBlueGreen', signal, undefined, true);
-      if (typeof data !== 'number') throw new Error('服务器未返回分解所得积分');
-      return number(data);
+      return decomposePoints(data);
     },
     async mine(signal) {
       const data = await request('pet/my/get', signal);
@@ -148,10 +154,8 @@ export function createPetClient(
               signal,
               action === 'unequip' ? { equipSlot: itemId } : { itemInstanceId: itemId },
             );
-      if (action === 'decompose') {
-        if (typeof data !== 'number') throw new Error('服务器未返回分解所得积分');
-        number(data);
-      } else confirmed(data);
+      if (action === 'decompose') decomposePoints(data);
+      else confirmed(data);
     },
     async skins(current, signal) {
       return page(

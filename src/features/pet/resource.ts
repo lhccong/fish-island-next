@@ -71,5 +71,5 @@ export function usePetOperation() {
       }
     }
   }
-  return { pending, notice, run };
+  return { pending, notice, run, clearNotice: () => setNotice(null) };
 }

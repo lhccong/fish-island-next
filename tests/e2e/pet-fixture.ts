@@ -153,7 +153,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
         if (path === 'itemInstances/batchDecomposeBlueGreen') {
           state.bagEmpty = true;
           state.actions.push('batch');
-          data = 20;
+          data = '20';
         } else if (path === 'itemInstances/my/list/page/vo') {
           const category = (route.request().postDataJSON() as { category?: string }).category;
           if (category === 'consumable' && state.foodsFail)

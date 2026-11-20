@@ -3,6 +3,7 @@ import { builtinSkins } from '../../src/skins/builtin';
 import { setupAdmin } from './admin-fixture';
 
 test.setTimeout(60000);
+test.use({ serviceWorkers: 'block' });
 
 test('ordinary users cannot open the big fish settings', async ({ page }) => {
   await setupAdmin(page, 'wechat', 'light', 'user');
@@ -61,6 +62,7 @@ for (const skin of builtinSkins) {
       const settings = page.getByRole('region', { name: '大肥鱼设置' });
       const toggle = settings.getByRole('switch', { name: '启动大肥鱼' });
       const save = settings.getByRole('button', { name: '保存', exact: true });
+      const current = settings.getByRole('status').filter({ hasText: '当前' });
       const click = (control: typeof toggle) => (isMobile ? control.tap() : control.click());
 
       await expect(
@@ -88,19 +90,15 @@ for (const skin of builtinSkins) {
       await expect(settings.getByRole('alert')).toHaveText('合成保存失败');
       await expect(toggle).not.toBeChecked();
       await click(save);
-      await expect(settings.getByRole('status')).toHaveText('当前已关闭');
+      await expect(current).toHaveText('当前已关闭');
       await expect(save).toBeDisabled();
 
       await page.reload({ waitUntil: 'domcontentloaded' });
       await expect(toggle).not.toBeChecked();
-      await expect(settings.getByRole('status')).toHaveText('当前已关闭');
+      await expect(current).toHaveText('当前已关闭');
       await click(toggle);
       await click(save);
-      await expect(settings.getByRole('status')).toHaveText('当前已开启');
-      if (skin.id === 'wecom' && mode === 'light') {
-        const { project } = test.info();
-        await page.screenshot({ path: `${project.outputDir}/admin-${project.name}.png` });
-      }
+      await expect(current).toHaveText('当前已开启');
       expect(writes).toBe(3);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,

@@ -36,7 +36,8 @@ export function ItemsPanel({
   );
   const resource = usePetPages(load);
   const operation = usePetOperation();
-  const [batchResult, setBatchResult] = useState<number | null>(null);
+  const [decomposeResult, setDecomposeResult] = useState('');
+  const equippedIds = new Set(pet.equipment.map(({ item }) => item.id));
   function refresh() {
     resource.reload();
     onChange();
@@ -79,15 +80,18 @@ export function ItemsPanel({
         <div className={styles.actions}>
           <ConfirmAction
             label="批量分解"
-            description="分解行囊中所有优良和精良品质装备，所得积分以服务端结算为准，操作无法恢复。确认继续？"
-            action={async (signal) => setBatchResult(await service.batchDecompose(signal))}
+            description="分解行囊中未穿戴的优良和精良装备。操作无法恢复。"
+            action={async (signal) => {
+              const points = await service.batchDecompose(signal);
+              setDecomposeResult(`批量分解完成，获得 ${points} 积分`);
+            }}
             onSuccess={refresh}
           />
         </div>
       )}
-      {batchResult !== null && (
+      {decomposeResult && (
         <p className={styles.notice} role="status">
-          批量分解完成，获得 {batchResult} 积分
+          {decomposeResult}
         </p>
       )}
       {kind === 'bag' && pet.equipment.length > 0 && (
@@ -159,19 +163,28 @@ export function ItemsPanel({
                     ))}
                   </dl>
                   <div className={styles.actions}>
-                    {kind === 'bag' && item.slot && (
-                      <Button disabled={operation.pending} onClick={() => equip(item.id)}>
-                        穿戴
-                      </Button>
-                    )}
-                    {kind === 'bag' && (
-                      <ConfirmAction
-                        label="分解"
-                        description={`确认分解「${item.name}」？分解后无法恢复，所得积分以服务端结算为准。`}
-                        action={(s) => service.itemAction('decompose', item.id, s)}
-                        onSuccess={refresh}
-                      />
-                    )}
+                    {kind === 'bag' &&
+                      (equippedIds.has(item.id) ? (
+                        <span className={styles.equippedLabel}>已穿戴</span>
+                      ) : (
+                        <>
+                          {item.slot && (
+                            <Button disabled={operation.pending} onClick={() => equip(item.id)}>
+                              穿戴
+                            </Button>
+                          )}
+                          <ConfirmAction
+                            label="分解"
+                            description={`分解「${item.name}」后无法恢复。`}
+                            action={(s) => service.itemAction('decompose', item.id, s)}
+                            disabled={operation.pending}
+                            onSuccess={() => {
+                              setDecomposeResult(`已分解「${item.name}」`);
+                              refresh();
+                            }}
+                          />
+                        </>
+                      ))}
                     {kind === 'shop' && (
                       <ConfirmAction
                         label={`购买 · ${item.price} 积分`}

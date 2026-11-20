@@ -2,6 +2,7 @@ import { expect, test, type WebSocketRoute } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 
 test.setTimeout(60000);
+test.use({ serviceWorkers: 'block' });
 
 const stickerUrl = 'https://fixture.example.test/big-fish.gif';
 const fishMessage = (id: string, content: string, bigFishEmoticonUrl?: string) => ({
@@ -42,7 +43,7 @@ for (const skin of builtinSkins) {
       await page.route('**/assets/chat/big-fish.webp', async (route) => {
         await spriteReady;
         if (spriteUnavailable) await route.abort();
-        else await route.continue();
+        else await route.fulfill({ path: 'public/assets/chat/big-fish.webp' });
       });
       await page.route(stickerUrl, (route) =>
         route.fulfill({
@@ -155,6 +156,7 @@ for (const skin of builtinSkins) {
       releaseSprite();
       const sprite = first.locator('[data-image="ready"]');
       const image = sprite.locator('img');
+      await expect(sprite).toBeVisible({ timeout: 15000 });
       await expect(image).toHaveCSS('animation-timing-function', 'steps(5)');
       await expect(image).toHaveCSS('animation-iteration-count', '2');
       await expect(thinking).toHaveCount(0);
@@ -209,9 +211,6 @@ for (const skin of builtinSkins) {
         await expect(draft).toBeFocused();
       }
       await expect(popup).toHaveCount(0);
-      if (skin.id === 'wecom' && mode === 'light') {
-        await page.screenshot({ path: `${info.project.outputDir}/chat-${info.project.name}.png` });
-      }
       post('reply', 'thinking', '');
       post('reply', 'speech', reply);
       post('error', 'error', '大肥鱼没能回复，请稍后再试。');
@@ -233,6 +232,13 @@ for (const skin of builtinSkins) {
       const line = history
         .getByRole('group', { name: '大肥鱼的消息' })
         .filter({ hasText: longText });
+      const viewport = history.getByRole('region', { name: '群聊消息区', exact: true });
+      await expect
+        .poll(async () => {
+          await viewport.evaluate((node) => node.scrollTo({ top: node.scrollHeight }));
+          return line.count();
+        })
+        .toBe(1);
       await expect(line).toBeVisible();
       expect(
         await line.evaluate((node) => node.scrollWidth - node.clientWidth),

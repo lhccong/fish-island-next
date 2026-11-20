@@ -88,7 +88,11 @@ export function BigFishSettings({ port }: { port: AdminPort }) {
             <p role="status" className={styles.settingHelp}>
               {state.saved ? '当前已开启' : '当前已关闭'}
             </p>
-            <Button type="submit" disabled={state.enabled === state.saved || mutation.pending}>
+            <Button
+              type="submit"
+              aria-label={mutation.pending ? '保存中…' : undefined}
+              disabled={state.enabled === state.saved || mutation.pending}
+            >
               {mutation.pending ? <LoadingIndicator compact>保存中…</LoadingIndicator> : '保存'}
             </Button>
           </div>

@@ -26,8 +26,12 @@ export function ConfirmAction({
     <Dialog
       title={label}
       description={description}
+      hideDescription
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen && !operation.pending) operation.clearNotice();
+        setOpen(nextOpen);
+      }}
       trigger={
         <Button variant="secondary" disabled={disabled}>
           {label}
@@ -35,13 +39,14 @@ export function ConfirmAction({
       }
       showCloseAction={false}
       dismissLabel="关闭确认"
+      className={styles.confirmation ?? ''}
     >
       <ScrollArea label="操作确认内容" gutter="reserved" className={styles.confirmScroll ?? ''}>
-        <div className={styles.body}>
-          <p>{description}</p>
-        </div>
+        <p className={styles.confirmText} aria-hidden="true">
+          {description}
+        </p>
       </ScrollArea>
-      <OperationNotice notice={operation.notice} />
+      <OperationNotice notice={operation.notice?.error ? operation.notice : null} />
       <div className={styles.actions}>
         <Button variant="secondary" disabled={operation.pending} onClick={() => setOpen(false)}>
           取消
