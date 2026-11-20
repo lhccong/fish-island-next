@@ -1,16 +1,17 @@
 import { expect, test, type WebSocketRoute } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
+import { mockBigFishEmoticons } from './chat-big-fish-emoticon-fixture';
 
 test.setTimeout(60000);
 test.use({ serviceWorkers: 'block' });
 
-const stickerUrl = 'https://fixture.example.test/big-fish.gif';
-const fishMessage = (id: string, content: string, bigFishEmoticonUrl?: string) => ({
+type FishEmoticon = { bigFishEmoticonUrl?: string; bigFishEmoticonKeyword?: string };
+const fishMessage = (id: string, content: string, emoticon?: FishEmoticon) => ({
   id,
   roomId: '-1',
   bigFish: true,
   content,
-  bigFishEmoticonUrl,
+  ...emoticon,
   sender: { id: '-2', name: '大肥鱼' },
   timestamp: Date.now(),
 });
@@ -27,6 +28,7 @@ for (const skin of builtinSkins) {
       const spriteReady = new Promise<void>((resolve) => {
         releaseSprite = resolve;
       });
+      const { searches, stickerUrls, releaseSearch } = await mockBigFishEmoticons(page);
       const saved = new Map<string, ReturnType<typeof fishMessage>>();
       await page.addInitScript(
         ({ skin, mode }) => {
@@ -45,12 +47,6 @@ for (const skin of builtinSkins) {
         if (spriteUnavailable) await route.abort();
         else await route.fulfill({ path: 'public/assets/chat/big-fish.webp' });
       });
-      await page.route(stickerUrl, (route) =>
-        route.fulfill({
-          contentType: 'image/gif',
-          body: Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64'),
-        }),
-      );
       await page.route('**/api/chat/message/page/vo', (route) =>
         route.fulfill({
           json: {
@@ -111,7 +107,13 @@ for (const skin of builtinSkins) {
       const popup = page.getByRole('complementary', { name: '大肥鱼', exact: true });
       const composer = page.getByRole('region', { name: '群聊输入区' });
       const history = page.getByRole('region', { name: '群聊实时消息', exact: true });
-      const post = (id: string, status: string, text: string, roomId = '-1', emoticon?: string) => {
+      const post = (
+        id: string,
+        status: string,
+        text: string,
+        roomId = '-1',
+        emoticon?: FishEmoticon,
+      ) => {
         const message =
           status === 'speech'
             ? (saved.get(id) ?? fishMessage(`2600${saved.size}`, text, emoticon))
@@ -219,14 +221,31 @@ for (const skin of builtinSkins) {
       await expect(first).toHaveCount(1);
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await expect(image).toHaveCSS('animation-name', 'none');
-      post('interjection', 'speech', '肥鱼偶尔接一句。', '-1', stickerUrl);
+      post('empty-search', 'speech', '这句没有合适的图。', '-1', {
+        bigFishEmoticonKeyword: '无语',
+      });
+      post('failed-search', 'speech', '这句仍会显示。', '-1', { bigFishEmoticonKeyword: '震惊' });
+      for (const text of ['这句没有合适的图。', '这句仍会显示。']) {
+        const row = history.locator('[data-message-kind="big-fish"]').filter({ hasText: text });
+        await expect(row).toBeVisible();
+        await expect(row.getByRole('status')).toHaveCount(0);
+        await expect(row.getByRole('button', { name: '放大聊天图片' })).toHaveCount(0);
+      }
+      await expect.poll(() => searches.slice().sort()).toEqual(['无语表情', '震惊表情'].sort());
+      post('interjection', 'speech', '肥鱼偶尔接一句。', '-1', { bigFishEmoticonKeyword: '开心' });
       const stickerRow = history
         .locator('[data-message-kind="big-fish"]')
         .filter({ hasText: '肥鱼偶尔接一句。' });
-      const savedSticker = stickerRow.locator(
-        `[data-image-state="ready"] img[src="${stickerUrl}"]`,
-      );
+      const searchStatus = stickerRow.getByRole('status').filter({ hasText: '查找表情包' });
+      await expect(searchStatus.locator('svg')).toBeVisible();
+      releaseSearch();
+      const savedSticker = stickerRow.locator('[data-image-state="ready"] img');
       await expect(savedSticker).toBeVisible();
+      const chosenSticker = (await savedSticker.getAttribute('src'))!;
+      expect(stickerUrls).toContain(chosenSticker);
+      post('interjection', 'speech', '肥鱼偶尔接一句。');
+      await expect(savedSticker).toHaveCount(1);
+      expect(searches.filter((keyword) => keyword === '开心表情')).toHaveLength(1);
       const longText = '接着说，我听着呢。'.repeat(15);
       post('long', 'speech', longText);
       const line = history
@@ -261,6 +280,7 @@ for (const skin of builtinSkins) {
       await expect(draft).toBeFocused();
       await expect(popup).toHaveCount(0);
       await expect(savedSticker).toBeVisible();
+      await expect(savedSticker).toHaveAttribute('src', chosenSticker);
 
       spriteUnavailable = false;
       await page.goto('/chat/mini', { waitUntil: 'domcontentloaded' });

@@ -101,6 +101,7 @@ it('loads legacy history before a big fish reply using its full string ID', asyn
         sender: { id: '-2', name: '大肥鱼' },
         timestamp: '2026-11-19T10:00:00.123456Z',
         bigFish: true,
+        bigFishEmoticonUrl: 'https://image.test/legacy.gif',
       },
     },
   };
@@ -121,7 +122,11 @@ it('loads legacy history before a big fish reply using its full string ID', asyn
   );
   const input = { conversationId: 'public', limit: 2 };
   const first = await client.loadHistory({ ...input, cursor: null });
-  expect(first.messages.at(-1)).toMatchObject({ id: fishId, bigFish: true });
+  expect(first.messages.at(-1)).toMatchObject({
+    id: fishId,
+    bigFish: true,
+    bigFishEmoticonUrl: 'https://image.test/legacy.gif',
+  });
   expect(first.nextCursor).toBe(fishId);
 
   const older = await client.loadHistory({ ...input, cursor: first.nextCursor });

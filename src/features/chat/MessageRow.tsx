@@ -17,8 +17,7 @@ import { MessageAvatar } from './MessageAvatar';
 import { MessageContent } from './MessageContent';
 import { MessageMenu } from './MessageMenu';
 import { BigFishSprite } from './BigFishSprite';
-import { MessageImage } from './MessageImage';
-import { CompactMessageImage } from './CompactMessageImage';
+import { BigFishEmoticon } from './BigFishEmoticon';
 import styles from './MessageStream.module.css';
 import type { ChatPresentation } from './chat-presentation';
 
@@ -133,12 +132,12 @@ export const MessageRow = memo(function MessageRow({
           {fishInWorksheet && fishAvatar}
           <div className={styles.bigFishDialogue}>
             <span className={fishInWorksheet ? styles.bubble : undefined}>{message.content}</span>
-            {message.bigFishEmoticonUrl &&
-              (compactWorksheet ? (
-                <CompactMessageImage url={message.bigFishEmoticonUrl} />
-              ) : (
-                <MessageImage url={message.bigFishEmoticonUrl} />
-              ))}
+            <BigFishEmoticon
+              id={message.id}
+              url={message.bigFishEmoticonUrl}
+              keyword={message.bigFishEmoticonKeyword}
+              compact={compactWorksheet}
+            />
           </div>
         </>
       ) : (

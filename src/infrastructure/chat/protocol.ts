@@ -1,5 +1,6 @@
 import {
   chatImageUrl,
+  parseBigFishEmoticonKeyword,
   parseBubbleStyle,
   type ChatRealtimeEvent,
   type ReceivedMessage,
@@ -122,9 +123,13 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
   const style = parseBubbleStyle(message.bubbleId, message.bubbleArtwork);
   const bigFish = message.bigFish === true && senderId === '-2';
   const bigFishEmoticonUrl = bigFish ? chatImageUrl(message.bigFishEmoticonUrl) : null;
+  const bigFishEmoticonKeyword = bigFish
+    ? parseBigFishEmoticonKeyword(message.bigFishEmoticonKeyword)
+    : undefined;
   return {
     ...(bigFish ? { bigFish: true } : {}),
     ...(bigFishEmoticonUrl ? { bigFishEmoticonUrl } : {}),
+    ...(bigFishEmoticonKeyword ? { bigFishEmoticonKeyword } : {}),
     ...(style ? { bubbleId: style.id } : {}),
     ...(style?.artwork ? { bubbleArtwork: style.artwork } : {}),
     ...(poke

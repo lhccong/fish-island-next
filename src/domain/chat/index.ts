@@ -1,5 +1,6 @@
 // 客户端领域模型；后端 DTO 必须在 infrastructure 映射后进入此边界。
 import type { ChatBubbleArtwork } from './bubble-style';
+import type { BigFishEmoticonKeyword } from './big-fish-emoticon';
 
 export { encodeMusicMessage, parseMusicMessage } from './music-message';
 export { parseBubbleStyle } from './bubble-style';
@@ -21,6 +22,8 @@ export type { ChatImageUploadPort } from './image-upload';
 export { senderTitle, memberLevelEmoji } from './sender-title';
 export { sortMembersByLevel } from './member-order';
 export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';
+export { parseBigFishEmoticonKeyword } from './big-fish-emoticon';
+export type { BigFishEmoticonKeyword } from './big-fish-emoticon';
 export type ConversationId = string;
 export {
   parseMessageContent,
@@ -37,6 +40,7 @@ export { RedPacketCreateError, validateRedPacketForm } from './red-packet';
 export interface ReceivedMessage {
   bigFish?: true;
   bigFishEmoticonUrl?: string;
+  bigFishEmoticonKeyword?: BigFishEmoticonKeyword;
   bubbleId?: string;
   bubbleArtwork?: ChatBubbleArtwork;
   poke?: { targetId: string; targetName: string; suffix: string };

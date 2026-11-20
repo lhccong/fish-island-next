@@ -66,3 +66,25 @@ it('does not save a local image if the account leaves before the upload complete
   expect(port.add).not.toHaveBeenCalled();
   expect(controller.store.getState().revision).toBe(0);
 });
+
+it('shares a keyword search across rows and releases it on account disposal', async () => {
+  const items = [
+    { id: 'b', url: 'https://image.test/b.gif' },
+    { id: 'a', url: 'https://image.test/a.gif' },
+  ];
+  const search = vi.fn<ChatEmoticonPort['search']>().mockResolvedValue({ items, total: 2 });
+  const port: ChatEmoticonPort = { add: vi.fn(), remove: vi.fn(), list: vi.fn(), search };
+  const controller = createEmoticonController(port, 'synthetic-owner', { upload: vi.fn() });
+
+  const first = controller.searchForBigFish('开心');
+  expect(controller.searchForBigFish('开心')).toBe(first);
+  await expect(first).resolves.toEqual(['https://image.test/a.gif', 'https://image.test/b.gif']);
+  expect(search).toHaveBeenCalledOnce();
+  expect(search.mock.calls[0]?.slice(0, 2)).toEqual(['开心', 1]);
+
+  controller.dispose();
+  expect(search.mock.calls[0]?.[2].aborted).toBe(true);
+  controller.start();
+  expect(controller.searchForBigFish('开心')).not.toBe(first);
+  expect(search).toHaveBeenCalledTimes(2);
+});

@@ -1,6 +1,8 @@
 import { createStore } from 'zustand/vanilla';
-import type { ChatEmoticonPort, ChatImageUploadPort } from '@/domain/chat';
+import type { BigFishEmoticonKeyword, ChatEmoticonPort, ChatImageUploadPort } from '@/domain/chat';
 import { prepareChatImage } from './prepare-image';
+
+type BigFishSearch = { results: Promise<string[]>; retryAfter: number };
 
 export function createEmoticonController(
   port: ChatEmoticonPort,
@@ -10,6 +12,31 @@ export function createEmoticonController(
   const store = createStore(() => ({ revision: 0, pending: false, feedback: '', error: false }));
   let active: AbortController | null = null;
   let disposed = false;
+  let searchRequests = new AbortController();
+  const bigFishSearches = new Map<BigFishEmoticonKeyword, BigFishSearch>();
+
+  function searchForBigFish(keyword: BigFishEmoticonKeyword): Promise<string[]> {
+    if (disposed) return Promise.resolve([]);
+    const cached = bigFishSearches.get(keyword);
+    if (cached && Date.now() < cached.retryAfter) return cached.results;
+
+    const search: BigFishSearch = {
+      retryAfter: Infinity,
+      results: port
+        .search(keyword, 1, searchRequests.signal)
+        .then(
+          ({ items }) => items.map(({ url }) => url).sort(),
+          () => [],
+        )
+        .then((urls) => {
+          if (!urls.length) search.retryAfter = Date.now() + 30_000;
+          return urls;
+        }),
+    };
+    bigFishSearches.set(keyword, search);
+    return search.results;
+  }
+
   async function mutate(
     action: (signal: AbortSignal) => Promise<void>,
     success: string,
@@ -37,8 +64,10 @@ export function createEmoticonController(
   return {
     port,
     store,
+    searchForBigFish,
     start() {
       disposed = false;
+      if (searchRequests.signal.aborted) searchRequests = new AbortController();
     },
     add: (url: string) => mutate((signal) => port.add(url, signal), '已添加到表情包'),
     upload: (file: File) =>
@@ -59,6 +88,8 @@ export function createEmoticonController(
       disposed = true;
       active?.abort();
       active = null;
+      searchRequests.abort();
+      bigFishSearches.clear();
       store.setState({ pending: false });
     },
   };
