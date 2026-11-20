@@ -23,6 +23,7 @@ export function GomokuGame() {
       profiles={accountTools}
       social={gomokuSocial}
       initialRoom={room}
+      initialSpectator={params.get('mode') === 'spectator'}
       onRoomHandled={handled}
       onReconnect={() => chatRealtime.retry()}
     />

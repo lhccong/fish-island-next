@@ -56,7 +56,7 @@ test('two isolated accounts exchange the real legacy envelopes and agree on the 
   }
 });
 
-test('public chat renders the old invitation as a route link, and unanswered room requests time out', async ({
+test('public chat opens the invited room, and unanswered room requests time out', async ({
   page,
 }) => {
   const f = await setupGomoku(page, 'wechat', 'light', 1440);
@@ -73,7 +73,7 @@ test('public chat renders the old invitation as a route link, and unanswered roo
       timestamp: 1794654000000,
     },
   });
-  await page.getByRole('link', { name: '加入五子棋房间 invite-room', exact: true }).click();
+  await page.getByRole('button', { name: '进入五子棋房间 invite-room', exact: true }).click();
   await expect
     .poll(
       () => f.commands.filter((command) => command.data?.type === 'joinRoom').at(-1)?.data?.content,

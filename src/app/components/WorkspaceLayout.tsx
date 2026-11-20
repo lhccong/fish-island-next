@@ -93,7 +93,7 @@ export function WorkspaceLayout({
       mobileNavigation={mobileNavigationMode}
       slots={{
         ...slots,
-        status: <AccountToolsHost />,
+        status: slots.status === undefined ? <AccountToolsHost /> : slots.status,
         header: (
           <div
             className={styles.header}

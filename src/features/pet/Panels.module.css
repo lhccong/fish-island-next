@@ -237,6 +237,31 @@
   background: var(--color-canvas);
   color: var(--color-text);
 }
+.card .purchaseQuantity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+.purchaseQuantity input {
+  width: 4.5rem;
+  min-height: 32px;
+  padding: 4px 8px;
+  background: var(--color-surface);
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.purchaseQuantity input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+.purchaseError {
+  color: var(--color-danger);
+  text-align: end;
+}
+.purchaseQuantity + button {
+  margin-top: 0;
+}
 .form .checkbox {
   display: flex;
   align-items: center;
@@ -318,6 +343,12 @@
   }
   .dialog > h2 {
     font-size: 1.1875rem;
+  }
+  .visualViewport {
+    --pet-viewport-height: var(--visual-viewport-height, 100dvh);
+
+    top: calc(var(--visual-viewport-top, 0px) + var(--pet-viewport-height) / 2);
+    max-height: calc(var(--pet-viewport-height) - 24px - env(safe-area-inset-bottom));
   }
   .pixelDialog {
     border-radius: 4px;

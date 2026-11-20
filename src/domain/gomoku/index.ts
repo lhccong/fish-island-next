@@ -14,6 +14,7 @@ export type {
   GomokuCommand,
   GomokuEvent,
   GomokuPort,
+  GomokuPlayer,
   GomokuSocialPort,
   Move,
   Point,

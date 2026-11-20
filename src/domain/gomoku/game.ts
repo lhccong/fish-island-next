@@ -50,8 +50,12 @@ export function winningLine(board: Board, point: Point, player: Stone): readonly
   }
   return [];
 }
+export interface GomokuPlayer {
+  name: string;
+  avatar: string | null;
+}
 export type GomokuEvent =
-  | { type: 'created'; roomId: string }
+  | { type: 'created'; roomId: string; spectatable?: true }
   | {
       type: 'joined';
       roomId: string;
@@ -59,12 +63,26 @@ export type GomokuEvent =
       opponentId: string;
       opponentName: string;
       opponentAvatar?: string | null;
+      spectatable?: true;
     }
   | { type: 'move'; roomId: string; move: Move }
+  | {
+      type: 'watched';
+      roomId: string;
+      requestId: string;
+      players: Record<Stone, GomokuPlayer>;
+      moves: readonly Move[];
+    }
+  | { type: 'watchError'; roomId: string; requestId: string; message: string }
+  | { type: 'watchMove'; roomId: string; number: number; move: Move }
+  | { type: 'roomClosed'; roomId: string }
+  | { type: 'moveRejected'; roomId: string; message: string }
   | { type: 'error'; message: string };
 export type GomokuCommand =
   | { type: 'create' }
   | { type: 'join'; roomId: string }
+  | { type: 'watch'; roomId: string; requestId: string }
+  | { type: 'leave'; roomId: string }
   | { type: 'move'; roomId: string; opponentId: string; move: Move };
 export type ConnectionStatus =
   'connecting' | 'connected' | 'reconnecting' | 'offline' | 'unauthorized' | 'closed';

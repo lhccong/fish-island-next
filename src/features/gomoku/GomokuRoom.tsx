@@ -5,8 +5,27 @@ import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { GomokuBoard } from './GomokuBoard';
 import { GomokuPlayers } from './GomokuPlayers';
 import { RoomToolbar } from './RoomToolbar';
-import type { GameState, GomokuController } from './controller';
+import type { GomokuController } from './controller';
+import type { GameState } from './game-state';
 import styles from './Gomoku.module.css';
+
+function turnLabel(s: GameState, canMove: boolean) {
+  if (s.phase === 'interrupted') {
+    if (s.mode === 'spectator') return s.spectatable ? '观战已暂停' : '观战已结束';
+    return '对局已暂停';
+  }
+  if (s.winner === 'draw') return '棋盘已满，本局和棋';
+  if (s.winner) {
+    const winner = s.winner === 'black' ? '黑棋获胜' : '白棋获胜';
+    if (s.mode === 'spectator') return winner;
+    if (s.winner === s.color) return `${winner} · 你赢了！`;
+    return `${winner} · ${s.mode === 'single' ? '电脑获胜' : '对方获胜'}`;
+  }
+  if (s.phase === 'waiting') return '等待岛友加入';
+  if (s.mode === 'spectator') return s.turn === 'black' ? '轮到黑棋落子' : '轮到白棋落子';
+  if (s.thinking) return '电脑正在思考…';
+  return canMove ? '轮到你落子' : '等待对方落子';
+}
 
 export function GomokuRoom({
   state: s,
@@ -25,21 +44,8 @@ export function GomokuRoom({
   user: ComponentProps<typeof GomokuPlayers>['user'];
   profiles: ComponentProps<typeof GomokuPlayers>['profiles'];
 }) {
-  const canMove = s.phase === 'playing' && s.turn === s.color && !s.thinking;
-  const result =
-    s.winner === 'draw'
-      ? '棋盘已满，本局和棋'
-      : s.winner
-        ? `${s.winner === 'black' ? '黑棋' : '白棋'}获胜 · ${s.winner === s.color ? '你赢了！' : s.mode === 'single' ? '电脑获胜' : '对方获胜'}`
-        : s.phase === 'waiting'
-          ? '等待岛友加入'
-          : s.phase === 'interrupted'
-            ? '对局已暂停'
-            : s.thinking
-              ? '电脑正在思考…'
-              : canMove
-                ? '轮到你落子'
-                : '等待对方落子';
+  const watching = s.mode === 'spectator';
+  const canMove = !watching && s.phase === 'playing' && s.turn === s.color && !s.thinking;
   return (
     <>
       <RoomToolbar
@@ -52,7 +58,7 @@ export function GomokuRoom({
       <section className={styles.playArea} aria-label="当前对局">
         <GomokuPlayers state={s} user={user} profiles={profiles} />
         <div className={styles.turn} role="status">
-          {result}
+          {turnLabel(s, canMove)}
           <small>
             {s.moves.length
               ? `第 ${s.moves.length} 手 · 最近落子 ${coordinate(s.moves.at(-1)!)}`
@@ -65,13 +71,14 @@ export function GomokuRoom({
           line={s.line}
           onMove={(point) => controller.move(point)}
           canMove={canMove}
+          readOnly={watching}
         />
         {s.notice && (
           <p role="status" className={styles.feedback}>
             {s.notice}
           </p>
         )}
-        {s.phase === 'finished' && (
+        {!watching && s.phase === 'finished' && (
           <div className={styles.actions}>
             <Button
               onClick={() =>

@@ -198,6 +198,8 @@ ADR-030 的聊天会话栏采用 sidebarVariant="chat"：桌面与 WPS 为 300px
 
 ADR-027 新增懒加载伙伴营地 `/pet`：domain/pet、infrastructure/pet、features/pet 分离，app 注入账号与服务。原生 SVG/CSS 分层场景复用旧二维精灵，保留养成、装备与服务端回合结算；营地移动仅为本地互动，不新增实时战斗协议。详见 ADR-027。
 
+ADR-027 补充补给铺数量购买：商品卡片持有数量草稿，按商品叠加能力校验，确认后通过 pet 端口提交既有批量购买协议；手机面板沿用可视视口变量适配数字键盘。
+
 ADR-025 迁移独立阅读模块：domain/reader 端口、infrastructure/reader 协议与存储、features/reader 控制器及单一阅读内核；app 注入并挂载跨路由宿主，发现区提供 `/reader`。画中画与悬浮窗共享同一 DOM 和业务状态，不新增依赖，见 ADR-025。
 
 ADR-028 按用户明确授权在 app/config 注入旧版阅读服务默认 accessToken，覆盖 ADR-025 的仅手动配置决策；搜索、目录和正文共用。独立导入弹窗修复 Portal 控件样式与状态布局，详见 ADR-028。
@@ -389,6 +391,8 @@ ADR-051 为三款游戏接入 app 跨路由浮窗宿主，共享 FloatingWindow 
 ADR-057 在 appearance 内新增独立标签页名称与图标本地偏好，app 的 TabIdentityProvider 应用浏览器标题及图标；复用主题弹窗入口，与主题、模式和业务状态独立，详见 ADR-057。
 
 ADR-062 迁移联机五子棋 /game/piece：独立 domain/gomoku、infrastructure/gomoku、features/gomoku 分层；app 将游戏扩展注入现有账号 WebSocket，不新增连接。棋局规则、单机 AI 与联机状态隔离，断线停棋，邀请复用公共聊天，详见 ADR-062。
+
+ADR-062 补充五子棋观战：新增房间可通过房间号或链接观战。后端独立管理房间成员、合法落子与观战快照，沿用账号 WebSocket。五子棋 feature 复用棋盘和棋谱呈现只读视图，外壳切换保留观战状态。旧版棋类房间继续使用各自协议。
 
 ADR-065 迁移账号下拉菜单：domain/account-tools 定义账号工具、应用管理与本地屏蔽端口，infrastructure/account-tools 适配旧协议和账号隔离偏好，features/account-tools 独立面板由 app 组合；app 按账号同步屏蔽偏好，聊天统一投影可见消息。详见 ADR-065。
 

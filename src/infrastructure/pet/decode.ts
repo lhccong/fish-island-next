@@ -94,6 +94,7 @@ export function item(value: unknown, instance = false): PetItem {
     category: text(template.category),
     subType: text(template.subType),
     slot: text(template.equipSlot),
+    stackable: template.stackable === 1 || template.stackable === '1',
     quantity: number(data.quantity, 1),
     level: number(data.enhanceLevel),
     rarity: number(template.rarity),

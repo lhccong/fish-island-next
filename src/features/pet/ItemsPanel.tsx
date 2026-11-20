@@ -7,6 +7,7 @@ import { usePetOperation } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
 import { ItemIcon } from './ItemIcon';
+import { ItemPurchase } from './ItemPurchase';
 import { InventoryGrid } from './InventoryGrid';
 import { formatPetStat } from './format-stat';
 import styles from './Panels.module.css';
@@ -162,9 +163,9 @@ export function ItemsPanel({
                       </div>
                     ))}
                   </dl>
-                  <div className={styles.actions}>
-                    {kind === 'bag' &&
-                      (equippedIds.has(item.id) ? (
+                  {kind === 'bag' && (
+                    <div className={styles.actions}>
+                      {equippedIds.has(item.id) ? (
                         <span className={styles.equippedLabel}>已穿戴</span>
                       ) : (
                         <>
@@ -184,16 +185,18 @@ export function ItemsPanel({
                             }}
                           />
                         </>
-                      ))}
-                    {kind === 'shop' && (
-                      <ConfirmAction
-                        label={`购买 · ${item.price} 积分`}
-                        description={`消耗 ${item.price} 积分购买 1 件「${item.name}」，是否继续？`}
-                        action={(s) => service.itemAction('purchase', item.id, s)}
-                        onSuccess={refresh}
-                      />
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
+                  {kind === 'shop' && (
+                    <ItemPurchase
+                      item={item}
+                      onPurchase={(quantity, signal) =>
+                        service.purchaseItem(item.id, quantity, signal)
+                      }
+                      onSuccess={onChange}
+                    />
+                  )}
                 </article>
               ))}
             </div>

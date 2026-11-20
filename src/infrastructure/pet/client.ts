@@ -141,21 +141,23 @@ export function createPetClient(
       );
     },
     async itemAction(action, itemId, signal) {
-      const data =
-        action === 'purchase'
-          ? await request(
-              `itemTemplates/purchase?${query({ templateId: itemId, quantity: 1 })}`,
-              signal,
-              undefined,
-              true,
-            )
-          : await request(
-              `itemInstances/${action}`,
-              signal,
-              action === 'unequip' ? { equipSlot: itemId } : { itemInstanceId: itemId },
-            );
+      const data = await request(
+        `itemInstances/${action}`,
+        signal,
+        action === 'unequip' ? { equipSlot: itemId } : { itemInstanceId: itemId },
+      );
       if (action === 'decompose') decomposePoints(data);
       else confirmed(data);
+    },
+    async purchaseItem(templateId, quantity, signal) {
+      confirmed(
+        await request(
+          `itemTemplates/purchase?${query({ templateId, quantity })}`,
+          signal,
+          undefined,
+          true,
+        ),
+      );
     },
     async skins(current, signal) {
       return page(

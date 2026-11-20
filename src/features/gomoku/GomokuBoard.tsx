@@ -8,12 +8,14 @@ export function GomokuBoard({
   line,
   onMove,
   canMove,
+  readOnly,
 }: {
   board: Board;
   moves: readonly Move[];
   line: readonly Point[];
   onMove: (point: Point) => void;
   canMove: boolean;
+  readOnly: boolean;
 }) {
   const [cursor, setCursor] = useState({ row: 7, col: 7 });
   const root = useRef<HTMLDivElement>(null);
@@ -42,6 +44,7 @@ export function GomokuBoard({
         className={styles.board}
         role="grid"
         aria-label="五子棋棋盘"
+        aria-readonly={readOnly}
         aria-rowcount={15}
         aria-colcount={15}
         ref={root}

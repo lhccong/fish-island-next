@@ -11,6 +11,7 @@ export interface PetItem {
   category: string;
   subType: string;
   slot: string;
+  stackable: boolean;
   quantity: number;
   level: number;
   rarity: number;
@@ -156,10 +157,11 @@ export interface PetPort extends TreasurePort {
     category?: 'consumable',
   ): Promise<PetPage<PetItem>>;
   itemAction(
-    action: 'equip' | 'unequip' | 'purchase' | 'decompose',
+    action: 'equip' | 'unequip' | 'decompose',
     id: string,
     signal: AbortSignal,
   ): Promise<void>;
+  purchaseItem(templateId: string, quantity: number, signal: AbortSignal): Promise<void>;
   skins(page: number, signal: AbortSignal): Promise<PetPage<PetSkin>>;
   skinAction(action: 'set' | 'exchange', id: string, signal: AbortSignal): Promise<void>;
   ranks(signal: AbortSignal): Promise<PetRank[]>;

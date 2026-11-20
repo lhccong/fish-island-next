@@ -1,12 +1,33 @@
 import { useEffect, useState } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import type { UserCardPort } from '@/domain/account-tools';
-import { opposite } from '@/domain/gomoku';
+import { opposite, type GomokuPlayer, type Stone } from '@/domain/gomoku';
 import { UserAvatar } from '@/shared/ui/UserAvatar';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { Button } from '@/shared/ui/Button';
-import type { GameState } from './controller';
+import type { GameState } from './game-state';
 import styles from './Gomoku.module.css';
+
+function Player({
+  name,
+  avatar,
+  color,
+  active,
+  self = false,
+}: GomokuPlayer & { color: Stone; active: boolean; self?: boolean }) {
+  return (
+    <div data-active={active}>
+      <UserAvatar name={name} src={avatar} />
+      <span className={styles.playerText}>
+        <strong>{self ? `${name}（你）` : name}</strong>
+        <small>
+          <span className={styles.stone} data-color={color} />
+          {color === 'black' ? '黑棋' : '白棋'}
+        </small>
+      </span>
+    </div>
+  );
+}
 
 export function GomokuPlayers({
   state: s,
@@ -49,34 +70,37 @@ export function GomokuPlayers({
   const status = !current ? 'loading' : profile ? 'ready' : 'error';
   const opponent =
     s.mode === 'single' ? '电脑' : !s.opponentId ? '等待加入' : profile?.name || s.opponentName;
+  const first = s.mode === 'spectator' ? 'black' : s.color;
+  const second = opposite(first);
+  const players =
+    s.mode === 'spectator'
+      ? s.watchedPlayers
+      : {
+          [first]: { name: user.name, avatar: user.avatarUrl },
+          [second]: {
+            name: opponent,
+            avatar:
+              s.mode === 'online' && s.opponentId ? profile?.avatar || s.opponentAvatar : null,
+          },
+        };
   return (
     <div>
-      <div className={styles.players}>
-        <div data-active={s.turn === s.color && s.phase === 'playing'}>
-          <UserAvatar name={user.name} src={user.avatarUrl} />
-          <span className={styles.playerText}>
-            <strong>{user.name}（你）</strong>
-            <small>
-              <span className={styles.stone} data-color={s.color} />
-              {s.color === 'black' ? '黑棋' : '白棋'}
-            </small>
-          </span>
-        </div>
-        <span className={styles.versus}>VS</span>
-        <div data-active={s.turn !== s.color && s.phase === 'playing'}>
-          <UserAvatar
-            name={opponent}
-            src={s.mode === 'online' && s.opponentId ? profile?.avatar || s.opponentAvatar : null}
+      {players?.[first] && players[second] && (
+        <div className={styles.players}>
+          <Player
+            {...players[first]}
+            color={first}
+            active={s.turn === first && s.phase === 'playing'}
+            self={s.mode !== 'spectator'}
           />
-          <span className={styles.playerText}>
-            <strong>{opponent}</strong>
-            <small>
-              <span className={styles.stone} data-color={opposite(s.color)} />
-              {s.color === 'black' ? '白棋' : '黑棋'}
-            </small>
-          </span>
+          <span className={styles.versus}>VS</span>
+          <Player
+            {...players[second]}
+            color={second}
+            active={s.turn === second && s.phase === 'playing'}
+          />
         </div>
-      </div>
+      )}
       {needsProfile && status === 'loading' && (
         <LoadingIndicator compact>正在读取对手资料…</LoadingIndicator>
       )}

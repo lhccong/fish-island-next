@@ -24,6 +24,7 @@ export function GomokuWorkspace({
   controller,
   social,
   initialRoom = '',
+  initialSpectator = false,
   onRoomHandled,
   onReconnect,
   user,
@@ -32,6 +33,7 @@ export function GomokuWorkspace({
   controller: GomokuController;
   social: GomokuSocialPort;
   initialRoom?: string;
+  initialSpectator?: boolean;
   onRoomHandled?: () => void;
   onReconnect: () => void;
   user: Pick<AuthUser, 'name' | 'avatarUrl'>;
@@ -41,24 +43,36 @@ export function GomokuWorkspace({
   const [inviteState, setInviteState] = useState('');
   const [inviteRoom, setInviteRoom] = useState('');
   const [inviteBusy, setInviteBusy] = useState(false);
-  const [joinPrompt, setJoinPrompt] = useState('');
+  const [joinPrompt, setJoinPrompt] = useState<{ roomId: string; spectator: boolean } | null>(null);
   const invitation = useRef<AbortController | null>(null);
   const invitationId = useRef<{ roomId: string; id: string } | null>(null);
   const cooldown = useRef(0);
+  const sameRoom = s.roomId === initialRoom;
+  const busy = ['creating', 'joining', 'loading-watch'].includes(s.phase);
+  const active = s.phase === 'waiting' || s.phase === 'playing';
+  const lobby = s.phase === 'lobby' || busy;
   useEffect(() => () => invitation.current?.abort(), []);
   useEffect(() => {
     if (!initialRoom || s.connection !== 'connected') return;
-    if (s.roomId === initialRoom && ['waiting', 'playing', 'finished'].includes(s.phase)) {
+    if (sameRoom && (active || s.phase === 'finished')) {
       onRoomHandled?.();
       return;
     }
-    if (['waiting', 'playing', 'creating', 'joining'].includes(s.phase)) {
-      // Keep an active game intact; URL invitations need an explicit choice.
-      return;
-    }
-    controller.join(initialRoom);
+    if (active || busy) return;
+    if (initialSpectator) controller.watch(initialRoom);
+    else controller.join(initialRoom);
     onRoomHandled?.();
-  }, [initialRoom, s.connection, s.phase, s.roomId, controller, onRoomHandled]);
+  }, [
+    initialRoom,
+    initialSpectator,
+    s.connection,
+    s.phase,
+    sameRoom,
+    active,
+    busy,
+    controller,
+    onRoomHandled,
+  ]);
   const invite = async () => {
     if (invitation.current) return;
     setInviteRoom(s.roomId);
@@ -93,9 +107,7 @@ export function GomokuWorkspace({
       }
     }
   };
-  const busy = s.phase === 'creating' || s.phase === 'joining';
-  const conflictingInvite =
-    initialRoom && initialRoom !== s.roomId && ['waiting', 'playing'].includes(s.phase);
+  const conflictingInvite = initialRoom && !sameRoom && active;
   return (
     <div className={styles.workspace}>
       <div className={styles.topline}>
@@ -112,10 +124,13 @@ export function GomokuWorkspace({
         <div role="alert" className={styles.error}>
           {s.error}
           {s.phase === 'interrupted' && (
-            <div>
+            <div className={styles.actions}>
               <Button variant="secondary" onClick={() => controller.leave()}>
                 返回大厅
               </Button>
+              {s.mode === 'spectator' && s.spectatable && s.connection === 'connected' && (
+                <Button onClick={() => controller.watch(s.roomId)}>重新观战</Button>
+              )}
             </div>
           )}
           {s.connection !== 'connected' && (
@@ -129,27 +144,45 @@ export function GomokuWorkspace({
       )}
       {conflictingInvite && (
         <div className={styles.feedback}>
-          收到了房间 {initialRoom} 的邀请。
-          <Button variant="secondary" onClick={() => setJoinPrompt(initialRoom)}>
-            切换到邀请房间
+          收到了房间 {initialRoom} 的{initialSpectator ? '观战链接' : '邀请'}。
+          <Button
+            variant="secondary"
+            onClick={() => setJoinPrompt({ roomId: initialRoom, spectator: initialSpectator })}
+          >
+            {initialSpectator ? '切换到观战房间' : '切换到邀请房间'}
           </Button>
         </div>
       )}
       <div
         className={styles.gameLayout}
-        data-lobby={['lobby', 'creating', 'joining'].includes(s.phase)}
+        data-lobby={lobby}
+        data-spectator={!lobby && s.mode === 'spectator'}
       >
-        {['lobby', 'creating', 'joining'].includes(s.phase) ? (
+        {lobby ? (
           <>
             <GomokuLobby
               controller={controller}
               busy={busy}
               connected={s.connection === 'connected'}
+              requestedRoom={s.roomId || initialRoom}
             />
             {busy && (
-              <LoadingIndicator>
-                {s.phase === 'creating' ? '正在创建房间…' : '正在加入房间…'}
-              </LoadingIndicator>
+              <div className={styles.feedback}>
+                <LoadingIndicator>
+                  {s.phase === 'creating'
+                    ? '正在创建房间…'
+                    : s.phase === 'loading-watch'
+                      ? '正在加载观战棋谱…'
+                      : '正在加入房间…'}
+                </LoadingIndicator>
+                {s.phase === 'loading-watch' && (
+                  <div className={styles.actions}>
+                    <Button variant="secondary" onClick={() => controller.leave()}>
+                      取消观战
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
           </>
         ) : (
@@ -168,22 +201,24 @@ export function GomokuWorkspace({
       </div>
       <Dialog
         title="切换房间？"
-        description="当前本机对局将结束，旧服务不会通知对方离房。"
+        description={s.mode === 'spectator' ? '将退出当前观战。' : '将退出当前对局。'}
         open={!!joinPrompt}
         onOpenChange={(open) => {
-          if (!open) setJoinPrompt('');
+          if (!open) setJoinPrompt(null);
         }}
         showCloseAction={false}
       >
         <div className={styles.actions}>
-          <Button variant="secondary" onClick={() => setJoinPrompt('')}>
-            继续当前对局
+          <Button variant="secondary" onClick={() => setJoinPrompt(null)}>
+            {s.mode === 'spectator' ? '继续观战' : '继续当前对局'}
           </Button>
           <Button
             onClick={() => {
+              if (!joinPrompt) return;
               controller.leave();
-              controller.join(joinPrompt);
-              setJoinPrompt('');
+              if (joinPrompt.spectator) controller.watch(joinPrompt.roomId);
+              else controller.join(joinPrompt.roomId);
+              setJoinPrompt(null);
               onRoomHandled?.();
             }}
           >

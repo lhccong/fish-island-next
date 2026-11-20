@@ -204,3 +204,68 @@ it('reminds after 30 seconds without declaring a timeout loss, and ignores event
   f.game.dispose();
   expect(vi.getTimerCount()).toBe(0);
 });
+
+const watchSnapshot = {
+  type: 'watched',
+  roomId: 'g-synthetic',
+  requestId: '1',
+  players: { black: { name: '黑方岛友', avatar: null }, white: { name: '白方岛友', avatar: null } },
+  moves: [{ row: 7, col: 7, player: 'black' }],
+} as const;
+
+it('hydrates the current watch request and applies numbered moves without sending moves as a spectator', () => {
+  const f = fixture();
+  f.game.watch(watchSnapshot.roomId);
+  f.event(watchSnapshot);
+  expect(f.game.store.getState()).toMatchObject({
+    mode: 'spectator',
+    phase: 'playing',
+    turn: 'white',
+  });
+  const white = { row: 8, col: 7, player: 'white' } as const;
+  const update = {
+    type: 'watchMove',
+    roomId: watchSnapshot.roomId,
+    number: 2,
+    move: white,
+  } as const;
+  f.event({ ...update, roomId: 'other' });
+  f.event(update);
+  f.event(update);
+  expect(f.game.store.getState().moves).toHaveLength(2);
+  expect(f.game.move({ row: 1, col: 1 })).toBe(false);
+  expect(f.send).toHaveBeenCalledTimes(1);
+  f.event({ ...update, number: 4 });
+  expect(f.game.store.getState()).toMatchObject({
+    phase: 'interrupted',
+    moves: [...watchSnapshot.moves, white],
+  });
+  expect(f.send).toHaveBeenLastCalledWith({ type: 'leave', roomId: watchSnapshot.roomId });
+  f.game.dispose();
+});
+
+it('ignores timed-out snapshots and can rejoin from a fresh snapshot after reconnecting', () => {
+  const f = fixture();
+  f.game.watch(watchSnapshot.roomId);
+  vi.advanceTimersByTime(12000);
+  expect(f.game.store.getState()).toMatchObject({
+    phase: 'lobby',
+    error: '观战请求超时，请重试。',
+  });
+  expect(f.send).toHaveBeenLastCalledWith({ type: 'leave', roomId: watchSnapshot.roomId });
+  f.game.watch(watchSnapshot.roomId);
+  f.event(watchSnapshot);
+  expect(f.game.store.getState().phase).toBe('loading-watch');
+  f.event({ ...watchSnapshot, requestId: '2' });
+  f.state('reconnecting');
+  f.state('connected');
+  expect(f.game.store.getState().phase).toBe('interrupted');
+  f.game.watch(watchSnapshot.roomId);
+  f.event({ ...watchSnapshot, requestId: '3', moves: [] });
+  expect(f.game.store.getState()).toMatchObject({ phase: 'playing', moves: [] });
+  f.game.leave();
+  f.event({ ...watchSnapshot, requestId: '3' });
+  expect(f.game.store.getState().phase).toBe('lobby');
+  expect(vi.getTimerCount()).toBe(0);
+  f.game.dispose();
+});

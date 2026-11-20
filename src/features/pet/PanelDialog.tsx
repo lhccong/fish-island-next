@@ -9,6 +9,7 @@ export function PanelDialog({
   onClose,
   children,
   appearance = 'default',
+  followVisualViewport = false,
   returnFocusRef,
 }: {
   title: string;
@@ -16,6 +17,7 @@ export function PanelDialog({
   onClose: () => void;
   children: ReactNode;
   appearance?: 'default' | 'pixel';
+  followVisualViewport?: boolean;
   returnFocusRef?: RefObject<HTMLElement | null> | undefined;
 }) {
   return (
@@ -29,7 +31,7 @@ export function PanelDialog({
       description={description}
       showCloseAction={false}
       dismissLabel="关闭面板"
-      className={`${styles.dialog} ${appearance === 'pixel' ? styles.pixelDialog : ''}`}
+      className={`${styles.dialog} ${appearance === 'pixel' ? styles.pixelDialog : ''} ${followVisualViewport ? styles.visualViewport : ''}`}
     >
       <ScrollArea label={`${title}内容`} gutter="reserved" className={styles.scroll ?? ''}>
         <div className={styles.body}>{children}</div>

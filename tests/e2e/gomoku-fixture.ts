@@ -52,6 +52,10 @@ export async function setupGomoku(
   });
   await page.route('**/api/**', (route) => route.fulfill({ json: { code: 0, data: [] } }));
   await page.route('**/api/user/**', (route) => route.fulfill({ json: { code: 0, data: user } }));
+  await page.route('**/api/user/get/vo?*', (route) => {
+    const id = new URL(route.request().url()).searchParams.get('id');
+    return route.fulfill({ json: { code: 0, data: { id, userName: `合成棋手${id}` } } });
+  });
   await page.route('**/api/chat/message/send', async (route) => {
     const input = route.request().postDataJSON() as { content: string; clientMessageId: string };
     if (failSend) return route.fulfill({ json: { code: 50000, message: '合成发送失败' } });

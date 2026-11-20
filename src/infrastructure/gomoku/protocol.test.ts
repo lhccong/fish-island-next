@@ -69,7 +69,7 @@ it('keeps the old envelope and string user identifiers without exposing credenti
   expect(encodeGomokuCommand({ type: 'create' })).toEqual({
     type: 2,
     userId: -1,
-    data: { type: 'createChessRoom', content: { gameType: 'normal' } },
+    data: { type: 'createChessRoom', content: { gameType: 'normal', spectatable: true } },
   });
   expect(encodeGomokuCommand({ type: 'join', roomId: '12345' })).toEqual({
     type: 2,
@@ -90,6 +90,39 @@ it('keeps the old envelope and string user identifiers without exposing credenti
       type: 'moveChess',
       content: { roomId: '12345', position: { row: 1, col: 2 }, player: 'black' },
     },
+  });
+});
+it('decodes bounded spectator snapshots and numbered updates', () => {
+  const roomId = 'g-synthetic';
+  const move = { row: 7, col: 7, player: 'black' };
+  const snapshot = {
+    roomId,
+    requestId: '1',
+    black: { name: '黑方岛友', avatar: 'https://example.test/avatar.png' },
+    white: { name: '白方岛友', avatar: 'data:unsafe' },
+    moves: [move],
+  };
+  expect(decodeGomokuEvent(frame('chessWatched', snapshot))).toEqual({
+    type: 'watched',
+    roomId,
+    requestId: '1',
+    players: { black: snapshot.black, white: { name: '白方岛友', avatar: null } },
+    moves: [move],
+  });
+  expect(
+    decodeGomokuEvent(frame('chessWatched', { ...snapshot, moves: [{ ...move, row: 15 }] })),
+  ).toBeNull();
+  expect(decodeGomokuEvent(frame('chessWatchMove', { roomId, number: 0, move }))).toBeNull();
+  expect(decodeGomokuEvent(frame('chessWatchMove', { roomId, number: 1, move }))).toEqual({
+    type: 'watchMove',
+    roomId,
+    number: 1,
+    move,
+  });
+  expect(encodeGomokuCommand({ type: 'watch', roomId, requestId: '1' })).toMatchObject({
+    type: 2,
+    userId: -1,
+    data: { type: 'watchChess', content: { roomId, requestId: '1' } },
   });
 });
 it('reuses the bound transport, stops sends offline and releases subscriptions', () => {

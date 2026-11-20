@@ -8,12 +8,15 @@ export function GomokuLobby({
   controller,
   busy,
   connected,
+  requestedRoom,
 }: {
   controller: GomokuController;
   busy: boolean;
   connected: boolean;
+  requestedRoom: string;
 }) {
-  const [room, setRoom] = useState('');
+  const [editedRoom, setRoom] = useState<string | null>(null);
+  const room = editedRoom ?? requestedRoom;
   const roomInputId = useId();
   return (
     <div className={styles.lobby}>
@@ -24,7 +27,7 @@ export function GomokuLobby({
           <br />
           连起片刻闲暇。
         </h2>
-        <p>创建房间邀请岛友，或输入房间号加入对局。</p>
+        <p>创建房间邀请岛友，或输入房间号加入对局、观战。</p>
       </div>
       <div className={styles.lobbyActions}>
         <Button onClick={() => controller.create()} disabled={busy || !connected}>
@@ -34,22 +37,31 @@ export function GomokuLobby({
           className={styles.join}
           onSubmit={(event) => {
             event.preventDefault();
-            controller.join(room);
+            if (!busy && connected && room.trim()) controller.join(room);
           }}
         >
           <label htmlFor={roomInputId}>房间号</label>
-          <div>
-            <input
-              id={roomInputId}
-              value={room}
-              onChange={(event) => setRoom(event.target.value)}
-              maxLength={64}
-              placeholder="输入好友的房间号"
-              autoComplete="off"
-              disabled={busy}
-            />
+          <input
+            id={roomInputId}
+            value={room}
+            onChange={(event) => setRoom(event.target.value)}
+            maxLength={64}
+            placeholder="输入好友的房间号"
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            disabled={busy}
+          />
+          <div className={styles.actions}>
             <Button variant="secondary" type="submit" disabled={busy || !connected || !room.trim()}>
               加入房间
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => controller.watch(room)}
+              disabled={busy || !connected || !room.trim()}
+            >
+              进入观战
             </Button>
           </div>
         </form>

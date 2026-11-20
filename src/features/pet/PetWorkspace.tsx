@@ -204,6 +204,7 @@ export function PetWorkspace({
             setPanel(null);
           }}
           appearance="pixel"
+          followVisualViewport={panel === 'shop'}
           returnFocusRef={returnFocusRef}
         >
           {panel === 'care' && <CarePanel service={service} pet={pet} onChange={onChange} />}

@@ -11,6 +11,7 @@ export function GomokuPage() {
       sidebarLabel="发现导航"
       mobileHeader="back-only"
       slots={{
+        status: null,
         sidebar: <DiscoveryNavigation />,
         header: (
           <div className={styles.header}>
