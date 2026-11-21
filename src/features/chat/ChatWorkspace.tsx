@@ -1,4 +1,5 @@
 import { ChatWindow } from './ChatWindow';
+import { ActiveLuckyBagsLauncher } from './ActiveLuckyBagsLauncher';
 import { MessageStream } from './MessageStream';
 import { PageFooterOutlet } from '@/shared/ui/PageFooter';
 import { ChatComposer } from './ChatComposer';
@@ -69,6 +70,9 @@ export function ChatWorkspace({
           }}
         >
           <div className={styles.conversation}>
+            <div className={styles.roomTools}>
+              <ActiveLuckyBagsLauncher />
+            </div>
             {[
               renderMessages(floating ? windowPresentation : presentation, floating),
               <ChatComposer

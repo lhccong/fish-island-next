@@ -9,7 +9,6 @@ for (const skin of builtinSkins)
       const fixture = await setupChatMenu(page, skin.id, mode);
       const mobile = page.viewportSize()!.width <= 760;
       const act = async (target: Locator) => {
-        await target.scrollIntoViewIfNeeded();
         if (mobile) await target.tap();
         else await target.click();
       };
@@ -37,8 +36,13 @@ for (const skin of builtinSkins)
       let failed = false;
       let reads = 0;
       let joins = 0;
+      let finishFailedRead!: () => void;
+      const failedRead = new Promise<void>((resolve) => {
+        finishFailedRead = resolve;
+      });
       await page.route('**/api/luckybag/active', async (route) => {
         reads++;
+        if (failed) await failedRead;
         await route.fulfill({
           json: failed ? { code: 50001, message: '合成福袋列表读取失败' } : { code: 0, data: bags },
         });
@@ -61,13 +65,19 @@ for (const skin of builtinSkins)
       const draft = page.getByRole('textbox', { name: '消息草稿' });
       await draft.fill('数量角标不影响草稿');
       fixture.push('101', '合成新福袋[luckybag]a[/luckybag]');
-      if (mobile) await act(page.getByRole('button', { name: '更多聊天工具' }));
       const launcher = page.getByRole('button', { name: '进行中的福袋', exact: true });
+      const composer = page.getByRole('region', { name: '群聊输入区' });
+      const messages = page.getByRole('region', { name: '群聊实时消息' });
+      await expect(composer.getByRole('button', { name: '进行中的福袋' })).toHaveCount(0);
       const badge = launcher.locator('[data-lucky-bag-count]');
       await expect(badge).toHaveText('2');
       await expect(launcher).toHaveAttribute('title', '2 个福袋可参与');
       const bounds = (await launcher.boundingBox())!,
         badgeBounds = (await badge.boundingBox())!;
+      const messageBounds = (await messages.boundingBox())!;
+      expect(bounds.x - messageBounds.x).toBeGreaterThanOrEqual(4);
+      expect(bounds.x - messageBounds.x).toBeLessThanOrEqual(16);
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(messageBounds.y + 1);
       expect(bounds.width).toBeGreaterThanOrEqual(44);
       expect(bounds.height).toBeGreaterThanOrEqual(44);
       expect(badgeBounds.x).toBeGreaterThanOrEqual(bounds.x);
@@ -79,7 +89,9 @@ for (const skin of builtinSkins)
       await page.waitForTimeout(250);
       expect(reads).toBe(before);
       if (mobile) await act(page.getByRole('link', { name: '返回热榜', exact: true }));
-      await act(page.getByRole('button', { name: '切换主题', exact: true }));
+      await act(
+        page.getByRole('button', { name: '切换主题', exact: true }).filter({ visible: true }),
+      );
       const picker = page.getByRole('dialog', { name: '主题模式' });
       await act(
         picker.getByRole('button', {
@@ -100,7 +112,6 @@ for (const skin of builtinSkins)
             .getByRole('navigation', { name: '主要功能', exact: true })
             .getByRole('link', { name: '聊天', exact: true }),
         );
-        await act(page.getByRole('button', { name: '更多聊天工具' }));
       }
       await expect(badge).toHaveText('2');
       expect(reads).toBe(before);
@@ -119,6 +130,8 @@ for (const skin of builtinSkins)
       fixture.push('103', '[luckybag]b[/luckybag]');
       await expect.poll(() => reads).toBeGreaterThan(before + 1);
       await act(launcher);
+      await expect(list.getByRole('status')).toContainText('福袋列表加载中');
+      finishFailedRead();
       await expect(list.getByRole('alert')).toContainText('合成福袋列表读取失败');
       // A failed read retains the known count and cards.
       await page.keyboard.press('Escape');

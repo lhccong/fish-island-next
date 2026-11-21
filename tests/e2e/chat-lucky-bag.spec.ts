@@ -1,7 +1,7 @@
 import { expect, test, type Locator } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
-import { assertArea } from './lucky-bag-assertions';
+import { assertArea, openLuckyBagForm } from './lucky-bag-assertions';
 
 test.setTimeout(90000);
 for (const skin of builtinSkins)
@@ -14,7 +14,6 @@ for (const skin of builtinSkins)
       const fixture = await setupChatMenu(page, skin.id, mode);
       const mobile = page.viewportSize()!.width <= 760;
       const act = async (target: Locator) => {
-        await target.scrollIntoViewIfNeeded();
         if (mobile) await target.tap();
         else await target.click();
       };
@@ -115,10 +114,8 @@ for (const skin of builtinSkins)
       );
       const draft = page.getByRole('textbox', { name: '消息草稿' });
       await draft.fill('保留福袋测试草稿');
-      if (mobile) await act(page.getByRole('button', { name: '更多聊天工具' }));
-      const launcher = page.getByRole('button', { name: '发福袋', exact: true });
-      await expect(launcher).toHaveCSS('width', '44px');
-      await act(launcher);
+      const openSend = () => openLuckyBagForm(page, act);
+      const sendTrigger = await openSend();
       const sendDialog = page.getByRole('dialog', { name: '发送福袋', exact: true });
       const formScroll = sendDialog.getByRole('region', { name: '发送福袋表单' });
       const send = sendDialog.getByRole('button', { name: '发送福袋', exact: true });
@@ -139,13 +136,16 @@ for (const skin of builtinSkins)
       await act(send);
       await expect(sendDialog.getByRole('alert')).toContainText('积分不足');
       await act(send);
-      await expect(sendDialog.getByRole('button', { name: '发送中…' })).toBeDisabled();
+      const sending = sendDialog.getByRole('button').filter({ hasText: '发送中…' });
+      await expect(sending).toBeDisabled();
       await act(sendDialog.getByRole('button', { name: '关闭福袋面板' }));
-      await expect(launcher).toBeFocused();
-      await act(launcher);
-      await expect(sendDialog.getByRole('button', { name: '发送中…' })).toBeDisabled();
+      await expect(sendTrigger).toBeFocused();
+      await openSend();
+      await expect(sending).toBeDisabled();
       release();
-      await expect(sendDialog.getByRole('status')).toContainText('福袋发送成功');
+      await expect(
+        sendDialog.getByRole('status').filter({ hasText: '福袋发送成功' }),
+      ).toBeVisible();
       expect(creates).toBe(2);
       expect(sends).toBe(0);
       await assertArea(formScroll, mobile);
@@ -254,7 +254,9 @@ for (const skin of builtinSkins)
       await expect(listLauncher).toBeFocused();
       const counts = { details, active, creates };
       if (mobile) await act(page.getByRole('link', { name: '返回热榜', exact: true }));
-      await page.getByRole('button', { name: '切换主题', exact: true }).click();
+      await act(
+        page.getByRole('button', { name: '切换主题', exact: true }).filter({ visible: true }),
+      );
       const picker = page.getByRole('dialog', { name: '主题模式' });
       await picker
         .getByRole('button', { name: mode === 'light' ? '暗夜模式' : '明亮模式', exact: true })
@@ -269,10 +271,9 @@ for (const skin of builtinSkins)
             .getByRole('navigation', { name: '主要功能', exact: true })
             .getByRole('link', { name: '聊天', exact: true }),
         );
-        await act(page.getByRole('button', { name: '更多聊天工具' }));
       }
       expect({ details, active, creates }).toEqual(counts);
-      await act(launcher);
+      await openSend();
       await act(sendDialog.getByRole('button', { name: '再发一个' }));
       expect(creates).toBe(2);
       await act(sendDialog.getByRole('combobox'));
@@ -281,7 +282,7 @@ for (const skin of builtinSkins)
       await expect(sendDialog.getByRole('alert')).toContainText('福袋创建结果未确认');
       await expect(sendDialog.getByRole('button', { name: '等待确认' })).toBeDisabled();
       await page.keyboard.press('Escape');
-      await act(launcher);
+      await openSend();
       await expect(sendDialog.getByRole('button', { name: '等待确认' })).toBeDisabled();
       expect(creates).toBe(3);
       expect(sends).toBe(0);
