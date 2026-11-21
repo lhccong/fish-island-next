@@ -23,9 +23,30 @@ for (const skin of builtinSkins)
         await expect(page.locator('html')).toHaveAttribute('data-skin', skin.id);
         await expect(page.locator('html')).toHaveAttribute('data-color-mode', mode);
         await expect(page.getByRole('button', { name: '工作时间设置' })).toHaveCount(0);
+        f.send('chat', {
+          message: {
+            id: 'synthetic-watch-invite',
+            content: `[invite/chess]${roomId}[/invite]`,
+            sender: { id: '202', name: '合成棋手' },
+            timestamp: 1794654000000,
+          },
+        });
+        const chat = page.getByRole('region', { name: '公共聊天室', exact: true });
+        for (const name of [`加入五子棋房间 ${roomId}`, `观战五子棋房间 ${roomId}`]) {
+          const action = chat.getByRole('button', { name, exact: true });
+          await expect(action).toBeEnabled();
+          expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(
+            width <= 760 ? 44 : 32,
+          );
+        }
         const watch = page.getByRole('button', { name: '进入观战', exact: true });
         const room = page.getByRole('textbox', { name: '房间号', exact: true });
         await expect(watch).toBeDisabled();
+        await room.fill('12345');
+        await act(page, '进入观战', width);
+        await expect(page.getByRole('alert')).toContainText('该房间使用旧版协议');
+        await expect(page.getByRole('status', { name: '五子棋连接状态' })).toHaveText('联机已连接');
+        expect(f.commands.some((command) => command.data?.type === 'watchChess')).toBe(false);
         await room.fill(roomId);
         await expect(watch).toBeEnabled();
         if (width > 760) await watch.hover();
@@ -45,9 +66,16 @@ for (const skin of builtinSkins)
         await expect(page.getByRole('alert')).toContainText('对局尚未开始');
         await expect(room).toHaveValue(roomId);
         await assertLayout(page, width);
-        await act(page, '进入观战', width);
-        await expect.poll(() => watchCommands().length).toBe(2);
-        const second = watchCommands()[1]!.data!.content as { roomId: string; requestId: string };
+        await page.evaluate((id) => {
+          history.pushState(history.state, '', `/game/piece?roomId=${id}&mode=online`);
+          dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+        }, roomId);
+        const joins = () => f.commands.filter((command) => command.data?.type === 'joinRoom');
+        await expect.poll(() => joins().length).toBe(1);
+        const invitation = joins()[0]!.data!;
+        expect(invitation.content).toBe(roomId);
+        expect(invitation.watchRequestId).toBeTruthy();
+        const second = { roomId, requestId: invitation.watchRequestId };
         f.send('chessWatched', { ...first, ...players, moves: [moves[0]] });
         f.send('chessWatched', { ...second, ...players, moves: [] });
         const board = page.getByRole('grid', { name: '五子棋棋盘' });
@@ -70,7 +98,6 @@ for (const skin of builtinSkins)
 
         const history = page.getByRole('region', { name: '对局棋谱' });
         if (width <= 760) {
-          const chat = page.getByRole('region', { name: '公共聊天室', exact: true });
           expect((await history.boundingBox())!.y).toBeLessThan((await chat.boundingBox())!.y);
         }
         for (const [index, move] of moves.entries())
@@ -100,7 +127,8 @@ for (const skin of builtinSkins)
         await expect(page.getByText('棋手已离开房间。')).toBeVisible();
         await act(page, '退出观战', width);
         await expect(watch).toBeVisible();
-        expect(f.commands.filter((command) => command.data?.type === 'joinRoom')).toHaveLength(0);
+        expect(joins()).toHaveLength(1);
+        expect(watchCommands()).toHaveLength(1);
         expect(f.sockets()).toBe(1);
       });
     }

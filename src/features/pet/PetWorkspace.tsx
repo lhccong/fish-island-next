@@ -123,7 +123,7 @@ export function PetWorkspace({
             <ResourceView state={resource.state} reload={resource.reload}>
               {(data) =>
                 data ? (
-                  <CompanionSummary pet={data} onOpen={openPanel} compact />
+                  <CompanionSummary pet={data} service={service} onOpen={openPanel} compact />
                 ) : (
                   <PetWelcome
                     pending={operation.pending}

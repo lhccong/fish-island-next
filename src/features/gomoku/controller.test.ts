@@ -213,6 +213,38 @@ const watchSnapshot = {
   moves: [{ row: 7, col: 7, player: 'black' }],
 } as const;
 
+it('opens the original invitation as a spectator when the server replies with a matching score', () => {
+  const f = fixture();
+  f.game.enter(watchSnapshot.roomId);
+  expect(f.send).toHaveBeenCalledWith({
+    type: 'join',
+    roomId: watchSnapshot.roomId,
+    watchRequestId: '1',
+  });
+  f.event({ ...watchSnapshot, requestId: 'old' });
+  expect(f.game.store.getState().phase).toBe('joining');
+  f.event(watchSnapshot);
+  expect(f.game.store.getState()).toMatchObject({
+    mode: 'spectator',
+    phase: 'playing',
+    moves: watchSnapshot.moves,
+  });
+  expect(f.send).toHaveBeenCalledTimes(1);
+  expect(vi.getTimerCount()).toBe(0);
+  f.game.dispose();
+});
+
+it('preserves old invitation joins and refuses to send watch commands for legacy rooms', () => {
+  const f = fixture();
+  f.game.watch('12345');
+  expect(f.send).not.toHaveBeenCalled();
+  expect(f.game.store.getState()).toMatchObject({ phase: 'lobby', roomId: '12345' });
+  expect(f.game.store.getState().error).toContain('旧版协议');
+  f.game.enter('12345');
+  expect(f.send).toHaveBeenCalledWith({ type: 'join', roomId: '12345' });
+  f.game.dispose();
+});
+
 it('hydrates the current watch request and applies numbered moves without sending moves as a spectator', () => {
   const f = fixture();
   f.game.watch(watchSnapshot.roomId);

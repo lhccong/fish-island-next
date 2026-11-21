@@ -27,14 +27,18 @@ const LandlordsGame = lazy(() =>
 const UndercoverGame = lazy(() =>
   import('./UndercoverGame').then((m) => ({ default: m.UndercoverGame })),
 );
+const DarkRoomGame = lazy(() =>
+  import('./DarkRoomGame').then((m) => ({ default: m.DarkRoomGame })),
+);
 
-export function GameWindowContent({ game }: { game: GameId }) {
+export function GameWindowContent({ game, onEscape }: { game: GameId; onEscape: () => void }) {
   const { session, restore, refreshUser } = useAuth();
   const open = useGameWindows();
   const navigate = useNavigate();
   const location = useLocation();
   const [detailCode, setDetailCode] = useState<string | null>(null);
   if (game === 'life') return <LifeGame />;
+  if (game === 'dark-room') return <DarkRoomGame onEscape={onEscape} />;
   if (game === 'draw') return <DrawGame />;
   if (game === 'undercover') return <UndercoverGame />;
   if (session.status === 'checking') return <LoadingIndicator>正在恢复登录状态…</LoadingIndicator>;

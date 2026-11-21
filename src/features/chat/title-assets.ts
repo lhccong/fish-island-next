@@ -3,6 +3,7 @@ interface TitleAsset {
   src: string;
   name: string;
   remote: boolean;
+  personal?: boolean;
   width: number;
   height: number;
 }
@@ -98,6 +99,7 @@ export function titleAsset(
         width,
         height: 14,
         remote: true,
+        personal: id !== '16' && id !== '17' && id !== '18',
         src: `https://oss.cqbo.com/moyu/title/${file}`,
       };
     }

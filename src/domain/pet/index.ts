@@ -114,12 +114,14 @@ export interface AutoFeed {
   foodName: string;
   remaining: number;
 }
-export interface ForgeDetail {
+export interface EquipmentForge {
   level: number;
+  entries: { number: number; name: string; value: number; locked: boolean; grade: number | null }[];
+}
+export interface ForgeDetail extends EquipmentForge {
   cost: number;
   chance: number;
   max: boolean;
-  entries: { number: number; name: string; value: number; locked: boolean; grade: number | null }[];
 }
 export interface PetPort extends TreasurePort {
   other(userId: string, signal: AbortSignal): Promise<Companion | null>;
@@ -173,6 +175,7 @@ export interface PetPort extends TreasurePort {
   towerRanks(signal: AbortSignal): Promise<TowerRank[]>;
   autoFeed(petId: string, signal: AbortSignal): Promise<AutoFeed | null>;
   saveAutoFeed(petId: string, value: AutoFeed, signal: AbortSignal): Promise<AutoFeed>;
+  equipmentForge(petId: string, slot: number, signal: AbortSignal): Promise<EquipmentForge | null>;
   forge(petId: string, slot: number, signal: AbortSignal): Promise<ForgeDetail>;
   forgeAction(
     action: 'upgrade' | 'refresh' | 'lock',
@@ -201,7 +204,7 @@ export interface Supply {
   guarantee: number;
   prizes: SupplyPrize[];
 }
-export const equipmentSlots: Readonly<Record<string, string>> = {
+const equipmentSlotLabels = {
   weapon: '武器',
   hand: '手部',
   foot: '足部',
@@ -209,14 +212,15 @@ export const equipmentSlots: Readonly<Record<string, string>> = {
   necklace: '项链',
   wing: '羽翼',
   wings: '羽翼',
-};
+} as const;
+export const equipmentSlots: Readonly<Record<string, string>> = equipmentSlotLabels;
 export const forgeSlots = [
-  { value: '1', label: '武器' },
-  { value: '2', label: '手部' },
-  { value: '3', label: '足部' },
-  { value: '4', label: '头部' },
-  { value: '7', label: '项链' },
-  { value: '8', label: '羽翼' },
+  { slot: 'weapon', value: '1', label: equipmentSlotLabels.weapon },
+  { slot: 'hand', value: '2', label: equipmentSlotLabels.hand },
+  { slot: 'foot', value: '3', label: equipmentSlotLabels.foot },
+  { slot: 'head', value: '4', label: equipmentSlotLabels.head },
+  { slot: 'necklace', value: '7', label: equipmentSlotLabels.necklace },
+  { slot: 'wing', value: '8', label: equipmentSlotLabels.wing },
 ] as const;
 export function boundedPercent(value: number) {
   return Math.max(0, Math.min(100, value));

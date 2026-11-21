@@ -76,6 +76,13 @@ it('keeps the old envelope and string user identifiers without exposing credenti
     userId: -1,
     data: { type: 'joinRoom', content: '12345' },
   });
+  expect(encodeGomokuCommand({ type: 'join', roomId: 'g-synthetic', watchRequestId: '1' })).toEqual(
+    {
+      type: 2,
+      userId: -1,
+      data: { type: 'joinRoom', content: 'g-synthetic', watchRequestId: '1' },
+    },
+  );
   expect(
     encodeGomokuCommand({
       type: 'move',

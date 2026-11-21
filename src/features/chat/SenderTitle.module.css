@@ -14,6 +14,50 @@
   object-fit: contain;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .badge[data-title-shine] {
+    overflow: clip;
+  }
+
+  .badge[data-title-shine]::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 28%,
+      color-mix(in srgb, var(--color-on-accent) 36%, transparent) 50%,
+      transparent 72%
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .badge[data-title-shine='preview']::after,
+  button:focus-visible + .badge[data-title-shine='interactive']::after {
+    content: '';
+    animation: title-sweep 900ms ease-out;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .badge[data-title-shine='interactive']:hover::after,
+    button:hover + .badge[data-title-shine='interactive']::after {
+      content: '';
+      animation: title-sweep 900ms ease-out;
+    }
+  }
+}
+
+@keyframes title-sweep {
+  from {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(100%);
+  }
+}
+
 .artwork {
   display: block;
   overflow: visible;

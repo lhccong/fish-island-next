@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 export type GameId =
-  'farm' | 'pet' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords';
+  'farm' | 'pet' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords' | 'dark-room';
 export const gameTitles: Record<GameId, string> = {
   farm: '摸鱼农场',
   pet: '伙伴营地',
@@ -11,10 +11,15 @@ export const gameTitles: Record<GameId, string> = {
   undercover: '谁是卧底',
   draw: '你画我猜',
   landlords: '斗地主',
+  'dark-room': '小黑屋模拟器',
 };
 export const GameWindowsContext = createContext<(id: GameId, origin?: HTMLElement) => void>(
   () => {},
 );
+export const OpenedGameWindowsContext = createContext<readonly GameId[]>([]);
+export function useIsGameWindowOpen(game: GameId) {
+  return useContext(OpenedGameWindowsContext).includes(game);
+}
 export function useGameWindows() {
   return useContext(GameWindowsContext);
 }

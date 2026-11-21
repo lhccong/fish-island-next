@@ -61,6 +61,9 @@ const GomokuPage = lazy(() =>
 const LifeGamePage = lazy(() =>
   import('@/app/pages/LifeGamePage').then((module) => ({ default: module.LifeGamePage })),
 );
+const DarkRoomPage = lazy(() =>
+  import('@/app/pages/DarkRoomPage').then((module) => ({ default: module.DarkRoomPage })),
+);
 const FishCirclePage = lazy(() =>
   import('@/app/pages/FishCirclePage').then((module) => ({ default: module.FishCirclePage })),
 );
@@ -134,6 +137,14 @@ export function AppRoutes() {
             <Route path="/rank/welfare" element={<AboutPage section="welfare" />} />
             <Route path="/rank/other" element={<AboutPage section="other" />} />
             <Route path="/discover/games" element={<GamesPage />} />
+            <Route
+              path="/game/darkRoom"
+              element={
+                <GameErrorBoundary>
+                  <DarkRoomPage />
+                </GameErrorBoundary>
+              }
+            />
             <Route
               path="/game/undercover"
               element={

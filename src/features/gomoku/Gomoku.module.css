@@ -374,9 +374,6 @@
   font-weight: 500;
   margin-right: var(--space-2);
 }
-.chatScroll a {
-  color: var(--color-accent-text);
-}
 .chatForm {
   display: flex;
   gap: var(--space-2);

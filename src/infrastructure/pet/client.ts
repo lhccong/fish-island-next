@@ -16,6 +16,7 @@ import {
   challenger,
   round,
   autoFeed,
+  equipmentForge,
   forge,
 } from './decode';
 
@@ -252,6 +253,11 @@ export function createPetClient(
           enabled: value.enabled ? 1 : 0,
         }),
       );
+    },
+    async equipmentForge(petId, equipSlot, signal) {
+      const records = list(await request(`pet/forge/list?${query({ petId })}`, signal), record);
+      const match = records.find((entry) => number(entry.equipSlot) === equipSlot);
+      return match ? equipmentForge(match) : null;
     },
     async forge(petId, equipSlot, signal) {
       return forge(await request('pet/forge/detail', signal, { petId, equipSlot }));

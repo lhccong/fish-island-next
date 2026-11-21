@@ -5,7 +5,12 @@ import { FloatingWindow } from '@/shared/ui/FloatingWindow';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
 import { GameErrorBoundary } from './GameErrorBoundary';
-import { GameWindowsContext, gameTitles, type GameId } from './game-windows-context';
+import {
+  GameWindowsContext,
+  OpenedGameWindowsContext,
+  gameTitles,
+  type GameId,
+} from './game-windows-context';
 import styles from './GameWindows.module.css';
 
 const GameWindowContent = lazy(() =>
@@ -36,7 +41,7 @@ export function GameWindowsProvider({ children }: { children: ReactNode }) {
   };
   return (
     <GameWindowsContext value={open}>
-      {children}
+      <OpenedGameWindowsContext value={opened}>{children}</OpenedGameWindowsContext>
       {opened.length > 0 && (
         <FloatingWindow
           returnFocusRef={returnFocus}
@@ -47,11 +52,18 @@ export function GameWindowsProvider({ children }: { children: ReactNode }) {
         >
           {opened.map((id) => (
             <div key={id} hidden={id !== active} className={styles.pane}>
-              <ScrollArea label={`${gameTitles[id]}内容`} gutter="reserved">
-                <div className={styles.content}>
+              <ScrollArea
+                label={`${gameTitles[id]}内容`}
+                gutter="reserved"
+                fillContent={id === 'dark-room'}
+              >
+                <div className={styles.content} data-fill={id === 'dark-room'}>
                   <GameErrorBoundary>
                     <Suspense fallback={<LoadingIndicator>正在打开游戏…</LoadingIndicator>}>
-                      <GameWindowContent game={id} />
+                      <GameWindowContent
+                        game={id}
+                        onEscape={() => setActive((current) => (current === id ? null : current))}
+                      />
                     </Suspense>
                   </GameErrorBoundary>
                 </div>

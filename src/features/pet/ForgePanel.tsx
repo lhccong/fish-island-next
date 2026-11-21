@@ -5,17 +5,10 @@ import { Button } from '@/shared/ui/Button';
 import { usePetResource, usePetOperation } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { ConfirmAction } from './ConfirmAction';
+import { ForgeEntryName } from './ForgeEntryName';
 import { formatPetNumber, formatPetStat } from './format-stat';
 import forgeStyles from './ForgePanel.module.css';
 import styles from './Panels.module.css';
-
-const gradeNames: Readonly<Record<number, string>> = {
-  1: '白',
-  2: '蓝',
-  3: '紫',
-  4: '金',
-  5: '红',
-};
 
 export function ForgePanel({
   service,
@@ -100,15 +93,7 @@ function ForgeSlot({
                     key={entry.number}
                   >
                     <span>
-                      <span className={forgeStyles.name}>
-                        <span
-                          className={forgeStyles.grade}
-                          aria-label={`词条品质：${entry.grade === null ? '未分级' : gradeNames[entry.grade]}`}
-                        >
-                          {entry.grade === null ? '未分级' : gradeNames[entry.grade]}
-                        </span>
-                        <span>{entry.name}</span>
-                      </span>
+                      <ForgeEntryName entry={entry} />
                       <small>{entry.locked ? '已锁定 · 刷新时保留' : '可刷新'}</small>
                     </span>
                     <strong>{formatPetStat(entry.name, entry.value, true)}</strong>

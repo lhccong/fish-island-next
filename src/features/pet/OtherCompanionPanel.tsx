@@ -1,11 +1,14 @@
 import { useCallback, type RefObject } from 'react';
-import type { PetPort } from '@/domain/pet';
+import { ChevronRight } from 'lucide-react';
+import { equipmentSlots, type PetPort } from '@/domain/pet';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
 import { CompanionSummary } from './CompanionSummary';
 import { PanelDialog } from './PanelDialog';
 import { formatPetStat } from './format-stat';
 import { ItemIcon } from './ItemIcon';
+import { EquipmentAffixes } from './EquipmentAffixes';
+import equipmentStyles from './EquipmentAffixes.module.css';
 import styles from './Panels.module.css';
 
 export function OtherCompanionPanel({
@@ -35,7 +38,7 @@ export function OtherCompanionPanel({
         {(pet) =>
           pet ? (
             <>
-              <CompanionSummary pet={pet} />
+              <CompanionSummary pet={pet} service={service} />
               <div className={styles.columns}>
                 <section className={styles.section}>
                   <h3>能力属性</h3>
@@ -54,14 +57,26 @@ export function OtherCompanionPanel({
                   <div className={styles.stack}>
                     {pet.equipment.length ? (
                       pet.equipment.map(({ slot, item }) => (
-                        <div className={styles.card} key={slot}>
-                          <div className={styles.itemHeading}>
-                            <ItemIcon url={item.icon} name={item.name} level={item.level} />
-                            <span>
-                              {item.name} +{item.level}
-                            </span>
-                          </div>
-                        </div>
+                        <EquipmentAffixes
+                          key={slot}
+                          service={service}
+                          petId={pet.id}
+                          slot={slot}
+                          item={item}
+                          trigger={
+                            <button
+                              type="button"
+                              className={equipmentStyles.equipmentRow}
+                              aria-label={`查看${item.name}词条`}
+                            >
+                              <ItemIcon url={item.icon} name={item.name} level={item.level} />
+                              <span>
+                                {equipmentSlots[slot] || slot} · {item.name}
+                              </span>
+                              <ChevronRight size={16} aria-hidden="true" />
+                            </button>
+                          }
+                        />
                       ))
                     ) : (
                       <p className={styles.muted}>尚未穿戴装备。</p>

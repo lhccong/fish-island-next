@@ -103,6 +103,7 @@ export function decodeGomokuEvent(raw: unknown): GomokuEvent | null {
     const opponentId = id(data.playerId);
     if (!/^\d{1,20}$/.test(opponentId)) return null;
     const opponent = profile(object(data.playerInfo), '岛友');
+    const requestId = data.requestId;
     return {
       type: 'joined',
       roomId,
@@ -111,6 +112,7 @@ export function decodeGomokuEvent(raw: unknown): GomokuEvent | null {
       opponentName: opponent.name,
       opponentAvatar: opponent.avatar,
       ...capability,
+      ...(typeof requestId === 'string' && validRoomId(requestId) ? { requestId } : {}),
     };
   }
   if (frame.type === 'moveChess') {
@@ -123,16 +125,21 @@ export function decodeGomokuEvent(raw: unknown): GomokuEvent | null {
   return data ? decodeWatchEvent(frame.type, roomId, data) : null;
 }
 export function encodeGomokuCommand(command: GomokuCommand): unknown {
-  const frame = (type: string, content: unknown, userId: string | number = -1) => ({
+  const frame = (
+    type: string,
+    content: unknown,
+    userId: string | number = -1,
+    watchRequestId?: string,
+  ) => ({
     type: 2,
     userId,
-    data: { type, content },
+    data: { type, content, ...(watchRequestId ? { watchRequestId } : {}) },
   });
   switch (command.type) {
     case 'create':
       return frame('createChessRoom', { gameType: 'normal', spectatable: true });
     case 'join':
-      return frame('joinRoom', command.roomId);
+      return frame('joinRoom', command.roomId, -1, command.watchRequestId);
     case 'watch':
       return frame('watchChess', { roomId: command.roomId, requestId: command.requestId });
     case 'leave':

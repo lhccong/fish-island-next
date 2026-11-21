@@ -184,6 +184,7 @@ export function UserCardDialog({
                     <SenderTitle
                       titleId={card.titleId ?? target.titleId}
                       level={card.level ?? target.level}
+                      preview
                     />
                   )}
                   {card.profile && <p className={styles.profile}>{card.profile}</p>}

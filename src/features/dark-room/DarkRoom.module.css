@@ -1,0 +1,48 @@
+.game {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  background: var(--color-canvas);
+}
+
+.frame {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+}
+
+.frame[data-ready='false'] {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  visibility: hidden;
+}
+
+.game > [data-loading-indicator='region'],
+.error {
+  flex: 1;
+}
+
+.error {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: var(--color-danger);
+}
+
+.error p,
+.storageError {
+  margin: 0;
+}
+
+.storageError {
+  padding: 8px 16px;
+  color: var(--color-danger);
+}

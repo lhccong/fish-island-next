@@ -36,3 +36,11 @@
     flex-shrink: 0;
   }
 }
+.windowNotice {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--color-muted);
+}

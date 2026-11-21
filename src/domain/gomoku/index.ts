@@ -4,6 +4,7 @@ export {
   emptyBoard,
   opposite,
   placeStone,
+  supportsSpectators,
   validPoint,
   validRoomId,
   winningLine,

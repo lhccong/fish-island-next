@@ -5,6 +5,7 @@ repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 site_dirs=(
   '/thome/1panel/1panel/www/sites/new.yucoder.cn/index'
   '/thome/1panel/1panel/www/sites/app.yucoder.cn/index/new'
+  '/thome/1panel/1panel/www/sites/yucoder.cn/index/new'
 )
 
 cd "$repo_dir"

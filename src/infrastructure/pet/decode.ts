@@ -6,6 +6,7 @@ import type {
   BattleRound,
   PetPage,
   AutoFeed,
+  EquipmentForge,
   ForgeDetail,
 } from '@/domain/pet';
 
@@ -181,10 +182,15 @@ export function autoFeed(value: unknown): AutoFeed {
 export function forge(value: unknown): ForgeDetail {
   const data = record(value);
   return {
-    level: number(data.equipLevel),
+    ...equipmentForge(data),
     cost: number(data.nextUpgradeCost),
     chance: number(data.successRate),
     max: data.maxLevel === true,
+  };
+}
+export function equipmentForge(data: Record<string, unknown>): EquipmentForge {
+  return {
+    level: number(data.equipLevel),
     entries: [1, 2, 3, 4].flatMap((n) => {
       if (!data[`entry${n}`]) return [];
       const e = record(data[`entry${n}`]);

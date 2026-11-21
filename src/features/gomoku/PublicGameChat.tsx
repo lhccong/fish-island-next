@@ -1,12 +1,17 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { GomokuSocialPort, PublicGameMessage } from '@/domain/gomoku';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './Gomoku.module.css';
 
-export function PublicGameChat({ port }: { port: GomokuSocialPort }) {
+export function PublicGameChat({
+  port,
+  renderInvitation,
+}: {
+  port: GomokuSocialPort;
+  renderInvitation: (roomId: string) => ReactNode;
+}) {
   const [messages, setMessages] = useState<PublicGameMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [pending, setPending] = useState(false);
@@ -71,13 +76,7 @@ export function PublicGameChat({ port }: { port: GomokuSocialPort }) {
                 return (
                   <li key={message.id}>
                     <strong>{message.sender}</strong>
-                    {invite ? (
-                      <Link to={`/game/piece?roomId=${encodeURIComponent(invite[1]!)}&mode=online`}>
-                        邀请你加入五子棋房间 {invite[1]}
-                      </Link>
-                    ) : (
-                      message.content
-                    )}
+                    {invite ? renderInvitation(invite[1]!) : message.content}
                   </li>
                 );
               })}

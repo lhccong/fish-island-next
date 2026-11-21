@@ -1,6 +1,7 @@
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { usePetPages } from './use-pet-pages';
 import { useCallback, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { equipmentSlots, type Companion, type PetPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
 import { usePetOperation } from './resource';
@@ -9,7 +10,9 @@ import { ConfirmAction } from './ConfirmAction';
 import { ItemIcon } from './ItemIcon';
 import { ItemPurchase } from './ItemPurchase';
 import { InventoryGrid } from './InventoryGrid';
+import { EquipmentAffixes } from './EquipmentAffixes';
 import { formatPetStat } from './format-stat';
+import equipmentStyles from './EquipmentAffixes.module.css';
 import styles from './Panels.module.css';
 
 export function ItemsPanel({
@@ -103,16 +106,29 @@ export function ItemsPanel({
           <div className={styles.grid}>
             {pet.equipment.map(({ slot, item }) => (
               <div className={`${styles.card} ${styles.equippedCard}`} key={slot}>
-                <div className={styles.itemHeading}>
-                  <ItemIcon url={item.icon} name={item.name} level={item.level} />
-                  <div>
-                    <small>
-                      {equipmentSlots[slot] || slot} · 品质 {item.rarity}
-                    </small>
-                    <strong>{item.name}</strong>
-                    <small>强化 +{item.level}</small>
-                  </div>
-                </div>
+                <EquipmentAffixes
+                  service={service}
+                  petId={pet.id}
+                  slot={slot}
+                  item={item}
+                  trigger={
+                    <button
+                      type="button"
+                      className={`${equipmentStyles.equipmentRow} ${styles.itemHeading}`}
+                      aria-label={`查看${item.name}词条`}
+                    >
+                      <ItemIcon url={item.icon} name={item.name} level={item.level} />
+                      <span>
+                        <small>
+                          {equipmentSlots[slot] || slot} · 品质 {item.rarity}
+                        </small>
+                        <strong>{item.name}</strong>
+                        <small>强化 +{item.level}</small>
+                      </span>
+                      <ChevronRight size={16} aria-hidden="true" />
+                    </button>
+                  }
+                />
                 <Button
                   variant="secondary"
                   disabled={operation.pending}

@@ -12,3 +12,4 @@ export { RemarksProvider } from './RemarksProvider';
 export { UserCardProvider } from './UserCardProvider';
 export { ChatWindowProvider } from './ChatWindowProvider';
 export { useChatWindow } from './chat-window-context';
+export { GameInvitation } from './GameInvitation';

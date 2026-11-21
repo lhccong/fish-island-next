@@ -33,6 +33,7 @@ it('uses only trusted HTTPS image entries and never accepts message URLs or prot
     if (id === 25) continue;
     const asset = titleAsset(String(id), undefined)!;
     expect(asset.remote).toBe(true);
+    expect(asset.personal).toBe(![16, 17, 18].includes(id));
     expect(new URL(asset.src).origin).toBe('https://oss.cqbo.com');
   }
   for (const id of ['toString', '__proto__', '999', 'https://untrusted.test/a.svg'])

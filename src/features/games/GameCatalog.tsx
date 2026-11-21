@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { WindowLauncher } from '@/shared/ui/WindowLauncher';
-import { Sparkles, Sprout, Sun, ChartCandlestick, Grid3X3 } from 'lucide-react';
+import { Sparkles, Sprout, Sun, ChartCandlestick, Grid3X3, Flame } from 'lucide-react';
 import styles from './GameCatalog.module.css';
 import { RecentGames, type CatalogGame } from './RecentGames';
 import { DrawEntry } from './DrawEntry';
@@ -8,6 +8,7 @@ import { LandlordsEntry } from './LandlordsEntry';
 import { UndercoverEntry } from './UndercoverEntry';
 export function GameCatalog({
   onPlay,
+  onDarkRoom,
   onStock,
   onFarm,
   onGomoku,
@@ -17,6 +18,7 @@ export function GameCatalog({
   onWindow,
 }: {
   onPlay: () => void;
+  onDarkRoom: () => void;
   onStock: () => void;
   onFarm: () => void;
   onGomoku: () => void;
@@ -36,6 +38,7 @@ export function GameCatalog({
     return {
       farm: read('farm'),
       life: read('life'),
+      'dark-room': read('dark-room'),
       stock: read('stock'),
       gomoku: read('gomoku'),
       undercover: read('undercover'),
@@ -56,6 +59,7 @@ export function GameCatalog({
     ({
       farm: onFarm,
       life: onPlay,
+      'dark-room': onDarkRoom,
       stock: onStock,
       gomoku: onGomoku,
       undercover: onUndercover,
@@ -79,6 +83,37 @@ export function GameCatalog({
           <span>发现另一种可能</span>
         </div>
         <div className={styles.cards}>
+          <div className={styles.entry}>
+            <button
+              type="button"
+              className={styles.stockCard}
+              onClick={() => playGame('dark-room')}
+              aria-label="打开小黑屋模拟器"
+            >
+              <div className={styles.stockArt} aria-hidden="true">
+                <span>A DARK ROOM</span>
+                <h3>
+                  点燃火堆，
+                  <br />
+                  走出黑暗。
+                </h3>
+                <Flame size={100} strokeWidth={1} />
+                <p>探索 · 生存 · 建造</p>
+              </div>
+              <div className={styles.stockCaption}>
+                <div>
+                  <span>单人文字冒险 · 本机存档</span>
+                  <h3>小黑屋模拟器</h3>
+                  <p>从一间小屋出发，探索荒野</p>
+                </div>
+              </div>
+            </button>
+            <WindowLauncher
+              className={styles.windowLauncher ?? ''}
+              label="独立窗口打开小黑屋模拟器"
+              onClick={() => openWindow('dark-room')}
+            />
+          </div>
           <LandlordsEntry
             onPlay={() => playGame('landlords')}
             onWindow={() => openWindow('landlords')}

@@ -3,7 +3,7 @@ import { expect, type Locator, type Page, type WebSocketRoute } from '@playwrigh
 export interface GameCommand {
   type: number;
   userId?: string | number;
-  data?: { type: string; content: unknown };
+  data?: { type: string; content: unknown; watchRequestId?: string };
 }
 export async function setupGomoku(
   page: Page,

@@ -10,11 +10,12 @@ import {
   Feather,
   Pencil,
 } from 'lucide-react';
-import type { Companion } from '@/domain/pet';
+import type { Companion, PetPort } from '@/domain/pet';
 import { boundedPercent, equipmentSlots } from '@/domain/pet';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { PetSprite } from './PetSprite';
 import { ItemIcon } from './ItemIcon';
+import { EquipmentAffixes } from './EquipmentAffixes';
 import { formatPetStat } from './format-stat';
 import styles from './CompanionSummary.module.css';
 
@@ -29,10 +30,12 @@ const slots = [
 
 export function CompanionSummary({
   pet,
+  service,
   onOpen,
   compact = false,
 }: {
   pet: Companion;
+  service: PetPort;
   onOpen?: (panel: 'care' | 'bag') => void;
   compact?: boolean;
 }) {
@@ -74,6 +77,21 @@ export function CompanionSummary({
             (entry) => entry.slot === id || (id === 'wing' && entry.slot === 'wings'),
           )?.item;
           const label = `${equipmentSlots[id]}：${item ? item.name : '未装备'}`;
+          if (item)
+            return (
+              <EquipmentAffixes
+                key={id}
+                service={service}
+                petId={pet.id}
+                slot={id}
+                item={item}
+                trigger={
+                  <button type="button" className={styles.slot} aria-label={label} title={label}>
+                    <ItemIcon url={item.icon} name={item.name} level={item.level} />
+                  </button>
+                }
+              />
+            );
           return (
             <button
               key={id}
@@ -84,11 +102,7 @@ export function CompanionSummary({
               title={label}
               onClick={() => onOpen?.('bag')}
             >
-              {item ? (
-                <ItemIcon url={item.icon} name={item.name} level={item.level} />
-              ) : (
-                <Icon size={24} aria-hidden="true" />
-              )}
+              <Icon size={24} aria-hidden="true" />
             </button>
           );
         })}

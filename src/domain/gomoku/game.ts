@@ -64,6 +64,7 @@ export type GomokuEvent =
       opponentName: string;
       opponentAvatar?: string | null;
       spectatable?: true;
+      requestId?: string;
     }
   | { type: 'move'; roomId: string; move: Move }
   | {
@@ -80,7 +81,7 @@ export type GomokuEvent =
   | { type: 'error'; message: string };
 export type GomokuCommand =
   | { type: 'create' }
-  | { type: 'join'; roomId: string }
+  | { type: 'join'; roomId: string; watchRequestId?: string }
   | { type: 'watch'; roomId: string; requestId: string }
   | { type: 'leave'; roomId: string }
   | { type: 'move'; roomId: string; opponentId: string; move: Move };
@@ -96,6 +97,9 @@ export interface GomokuPort {
 }
 export function validRoomId(value: string) {
   return /^[a-z0-9_-]{1,64}$/i.test(value);
+}
+export function supportsSpectators(roomId: string) {
+  return roomId.startsWith('g-') && validRoomId(roomId);
 }
 export interface PublicGameMessage {
   id: string;

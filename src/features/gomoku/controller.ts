@@ -2,8 +2,10 @@ import { createStore } from 'zustand/vanilla';
 import {
   chooseMove,
   placeStone,
+  supportsSpectators,
   validRoomId,
   type ConnectionStatus,
+  type GomokuCommand,
   type GomokuEvent,
   type GomokuPort,
   type Move,
@@ -12,6 +14,8 @@ import {
 } from '@/domain/gomoku';
 import { initialGameState, playMove, replayWatchSnapshot, type GameState } from './game-state';
 
+type RoomAction = 'create' | 'join' | 'invite' | 'watch';
+
 export function createGomokuController(port: GomokuPort) {
   const store = createStore<GameState>(() => initialGameState(port.status()));
   let operation: ReturnType<typeof setTimeout> | undefined;
@@ -19,9 +23,18 @@ export function createGomokuController(port: GomokuPort) {
   let reminder: ReturnType<typeof setTimeout> | undefined;
   let release: (() => void) | undefined;
   let accountId = '';
-  let watchRequest = 0;
-  const clear = () => {
+  let roomRequest = 0;
+  let pendingWatch: string | undefined;
+  const clearOperation = () => {
     clearTimeout(operation);
+    pendingWatch = undefined;
+  };
+  const failOperation = (error: string) => {
+    clearOperation();
+    store.setState({ phase: 'lobby', error });
+  };
+  const clear = () => {
+    clearOperation();
     clearTimeout(ai);
     clearTimeout(reminder);
   };
@@ -30,7 +43,10 @@ export function createGomokuController(port: GomokuPort) {
     store.setState({ phase: 'interrupted', error, thinking: false, notice: '' });
   };
   const releaseRoom = (s: GameState) => {
-    if (s.roomId && (s.spectatable || s.mode === 'spectator'))
+    if (
+      s.roomId &&
+      (s.spectatable || pendingWatch || (s.mode === 'spectator' && s.phase !== 'lobby'))
+    )
       port.send({ type: 'leave', roomId: s.roomId });
   };
   const remind = () => {
@@ -69,18 +85,18 @@ export function createGomokuController(port: GomokuPort) {
   const receiveWatch = (s: GameState, event: GomokuEvent) => {
     if (!('roomId' in event) || event.roomId !== s.roomId) return;
     if (event.type === 'watched' || event.type === 'watchError') {
-      if (s.phase !== 'loading-watch' || event.requestId !== String(watchRequest)) return;
-      clearTimeout(operation);
+      if (event.requestId !== pendingWatch) return;
       if (event.type === 'watchError') {
-        store.setState({ phase: 'lobby', error: event.message });
+        failOperation(event.message);
         return;
       }
-      const snapshot = replayWatchSnapshot(s, event);
+      const snapshot = replayWatchSnapshot({ ...s, mode: 'spectator' }, event);
       if (!snapshot) {
-        releaseRoom(s);
-        store.setState({ phase: 'lobby', error: '棋谱校验失败，请重新观战。' });
+        port.send({ type: 'leave', roomId: s.roomId });
+        failOperation('棋谱校验失败，请重新观战。');
         return;
       }
+      clearOperation();
       store.setState(snapshot);
     } else if (event.type === 'watchMove' && s.phase === 'playing') {
       if (event.number <= s.moves.length) return;
@@ -96,21 +112,18 @@ export function createGomokuController(port: GomokuPort) {
   };
   const receive = (event: GomokuEvent) => {
     const s = store.getState();
-    if (s.mode === 'spectator') {
+    if (s.mode === 'spectator' || event.type === 'watched' || event.type === 'watchError') {
       receiveWatch(s, event);
       return;
     }
     if (s.mode !== 'online') return;
     if (event.type === 'error') {
-      if (s.phase === 'creating' || s.phase === 'joining') {
-        clearTimeout(operation);
-        store.setState({ phase: 'lobby', error: event.message });
-      }
+      if (s.phase === 'creating' || s.phase === 'joining') failOperation(event.message);
       return;
     }
     if (event.type === 'created') {
       if (s.phase !== 'creating') return;
-      clearTimeout(operation);
+      clearOperation();
       store.setState({
         phase: 'waiting',
         roomId: event.roomId,
@@ -119,7 +132,8 @@ export function createGomokuController(port: GomokuPort) {
       });
     } else if (event.type === 'joined') {
       if (!['joining', 'waiting'].includes(s.phase) || event.roomId !== s.roomId) return;
-      clearTimeout(operation);
+      if (s.phase === 'joining' && event.requestId && event.requestId !== pendingWatch) return;
+      clearOperation();
       if (event.opponentId === accountId) {
         interrupt('不能和自己的账号对局，请使用另一个账号加入。');
         return;
@@ -155,12 +169,10 @@ export function createGomokuController(port: GomokuPort) {
     if (value === 'closed' || value === 'unauthorized') {
       clear();
       store.setState(initialGameState(value), true);
-    } else if (value !== 'connected' && s.mode === 'spectator') {
-      const error = '观战连接已中断，恢复连接后可重新观战。';
-      if (s.phase === 'loading-watch') {
-        clearTimeout(operation);
-        store.setState({ phase: 'lobby', error });
-      } else if (s.phase === 'playing') interrupt(error);
+    } else if (value !== 'connected' && pendingWatch) {
+      failOperation('进入房间时连接中断，恢复连接后可重试。');
+    } else if (value !== 'connected' && s.mode === 'spectator' && s.phase === 'playing') {
+      interrupt('观战连接已中断，恢复连接后可重新观战。');
     } else if (
       value !== 'connected' &&
       s.mode === 'online' &&
@@ -168,69 +180,53 @@ export function createGomokuController(port: GomokuPort) {
     )
       interrupt('连接已中断，当前棋局无法恢复。连接恢复后请重新建房。');
   };
-  const startOnline = (roomId?: string) => {
+  const openRoom = (action: RoomAction, input = '') => {
     const s = store.getState();
+    const roomId = input.trim();
     if (!['lobby', 'finished', 'interrupted'].includes(s.phase)) return;
+    if (action !== 'create' && !validRoomId(roomId)) {
+      store.setState({ error: '请输入有效的房间号。' });
+      return;
+    }
+    const watching = action === 'watch';
+    if (watching && !supportsSpectators(roomId)) {
+      store.setState({
+        ...(s.phase === 'lobby' ? { roomId } : {}),
+        error: '该房间使用旧版协议。请棋手更新后重新创建房间，再打开邀请链接。',
+      });
+      return;
+    }
     if (port.status() !== 'connected') {
       store.setState({ error: '尚未连接，请等待连接恢复后重试。' });
       return;
     }
-    if (roomId !== undefined && !validRoomId(roomId.trim())) {
-      store.setState({ error: '请输入有效的房间号。' });
-      return;
-    }
     clear();
-    releaseRoom(s);
+    if (!watching || s.roomId !== roomId || s.mode !== 'spectator') releaseRoom(s);
+    const requestId =
+      watching || (action === 'invite' && supportsSpectators(roomId))
+        ? String(++roomRequest)
+        : undefined;
+    pendingWatch = requestId;
+    const phase = action === 'create' ? 'creating' : watching ? 'loading-watch' : 'joining';
     store.setState(
-      {
-        ...initialGameState(s.connection),
-        phase: roomId === undefined ? 'creating' : 'joining',
-        roomId: roomId?.trim() ?? '',
-      },
+      { ...initialGameState(s.connection), phase, roomId, mode: watching ? 'spectator' : 'online' },
       true,
     );
-    if (
-      !port.send(
-        roomId === undefined ? { type: 'create' } : { type: 'join', roomId: roomId.trim() },
-      )
-    ) {
-      interrupt('发送失败，请检查连接后重新建房。');
+    const command: GomokuCommand =
+      action === 'create'
+        ? { type: 'create' }
+        : watching && requestId
+          ? { type: 'watch', roomId, requestId }
+          : { type: 'join', roomId, ...(requestId ? { watchRequestId: requestId } : {}) };
+    if (!port.send(command)) {
+      if (watching) failOperation('未能发送观战请求，请检查连接后重试。');
+      else interrupt('发送失败，请检查连接后重试。');
       return;
     }
-    // A response can arrive synchronously in an adapter. Do not replace a confirmed state.
-    if (['creating', 'joining'].includes(store.getState().phase))
+    if (store.getState().phase === phase)
       operation = setTimeout(() => {
-        store.setState({
-          phase: 'lobby',
-          error: '房间请求超时，请重试。迟到的响应不会自动开始对局。',
-        });
-      }, 12000);
-  };
-  const watch = (input: string) => {
-    const s = store.getState();
-    const roomId = input.trim();
-    if (!['lobby', 'finished', 'interrupted'].includes(s.phase)) return;
-    if (port.status() !== 'connected' || !validRoomId(roomId)) {
-      store.setState({
-        error: !validRoomId(roomId) ? '请输入有效的房间号。' : '尚未连接，请稍后重试。',
-      });
-      return;
-    }
-    clear();
-    if (s.roomId !== roomId || s.mode !== 'spectator') releaseRoom(s);
-    const requestId = String(++watchRequest);
-    store.setState(
-      { ...initialGameState(s.connection), mode: 'spectator', phase: 'loading-watch', roomId },
-      true,
-    );
-    if (!port.send({ type: 'watch', roomId, requestId })) {
-      store.setState({ phase: 'lobby', error: '未能发送观战请求，请检查连接后重试。' });
-      return;
-    }
-    if (store.getState().phase === 'loading-watch')
-      operation = setTimeout(() => {
-        releaseRoom(store.getState());
-        store.setState({ phase: 'lobby', error: '观战请求超时，请重试。' });
+        if (pendingWatch) port.send({ type: 'leave', roomId });
+        failOperation(watching ? '观战请求超时，请重试。' : '房间请求超时，请重试。');
       }, 12000);
   };
   return {
@@ -243,9 +239,10 @@ export function createGomokuController(port: GomokuPort) {
       accountId = userId;
       if (!release) release = port.subscribe(receive, connection);
     },
-    create: () => startOnline(),
-    join: (roomId: string) => startOnline(roomId),
-    watch,
+    create: () => openRoom('create'),
+    join: (roomId: string) => openRoom('join', roomId),
+    enter: (roomId: string) => openRoom('invite', roomId),
+    watch: (roomId: string) => openRoom('watch', roomId),
     single(color: Stone) {
       clear();
       releaseRoom(store.getState());
@@ -282,8 +279,8 @@ export function createGomokuController(port: GomokuPort) {
       return true;
     },
     leave() {
-      clear();
       releaseRoom(store.getState());
+      clear();
       store.setState(initialGameState(port.status()), true);
     },
     reset() {

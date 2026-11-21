@@ -48,7 +48,10 @@ for (const skin of builtinSkins)
             expect(Math.abs(box.width - firstRow[0].width)).toBeLessThan(1);
             expect(Math.abs(box.height - firstRow[0].height)).toBeLessThan(1);
           }
-          expect(firstRow.at(-1)!.x + firstRow.at(-1)!.width).toBeGreaterThan(width - 60);
+          const workspace = await page.locator('main').boundingBox();
+          expect(firstRow.at(-1)!.x + firstRow.at(-1)!.width).toBeGreaterThan(
+            workspace!.x + workspace!.width - 60,
+          );
         } else {
           for (let i = 1; i < boxes.length; i++)
             expect(boxes[i].y).toBeGreaterThan(boxes[i - 1].y + boxes[i - 1].height);

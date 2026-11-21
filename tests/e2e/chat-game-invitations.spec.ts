@@ -27,8 +27,9 @@ for (const skin of builtinSkins)
       await expect(button).toBeVisible();
       await expect(page.getByText('中国象棋暂未接入', { exact: true })).toBeVisible();
       await expect(page.getByText('[invite/unknown]6[/invite]', { exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: '观战五子棋房间 Room-1' })).toBeDisabled();
       for (const name of [
-        '进入五子棋房间 Room-1',
+        '加入五子棋房间 Room-1',
         '进入你画我猜房间 draw_2',
         '进入斗地主房间 table_3',
       ]) {
@@ -64,7 +65,6 @@ for (const skin of builtinSkins)
       expect(fixture.stats().historyRequests).toBe(before.historyRequests);
 
       for (const [name, url] of [
-        ['进入五子棋房间 Room-1', '/game/piece?roomId=Room-1&mode=online'],
         ['进入你画我猜房间 draw_2', '/game/draw/draw_2'],
         ['进入斗地主房间 table_3', '/game/landlords/table_3'],
       ]) {

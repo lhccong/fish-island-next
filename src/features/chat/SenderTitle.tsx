@@ -7,24 +7,31 @@ function TitleImage({
   src,
   name,
   remote,
+  personal,
   width,
   height,
+  preview,
 }: {
   src: string;
   name: string;
   remote: boolean;
+  personal?: boolean;
   width: number;
   height: number;
+  preview: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   return (
     <span
       className={styles.badge}
       data-title-source={remote ? 'image' : 'svg'}
+      data-title-shine={
+        personal && status === 'ready' ? (preview ? 'preview' : 'interactive') : undefined
+      }
       title={name}
       style={{ width, height }}
     >
-      {failed ? (
+      {status === 'failed' ? (
         <span className={styles.fallback}>{name}</span>
       ) : remote ? (
         <img
@@ -35,7 +42,8 @@ function TitleImage({
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          onError={() => setFailed(true)}
+          onLoad={personal ? () => setStatus('ready') : undefined}
+          onError={() => setStatus('failed')}
         />
       ) : (
         <svg
@@ -52,7 +60,7 @@ function TitleImage({
             y={-12}
             width={width + 24}
             height={height + 24}
-            onError={() => setFailed(true)}
+            onError={() => setStatus('failed')}
           />
         </svg>
       )}
@@ -63,12 +71,14 @@ function TitleImage({
 export function SenderTitle({
   titleId,
   level,
+  preview = false,
 }: {
   titleId: string | undefined;
   level: number | undefined;
+  preview?: boolean;
 }) {
   const asset = titleAsset(titleId, level);
   const name = senderTitle(titleId, level);
   if (!asset) return <span className={styles.unknown}>{name}</span>;
-  return <TitleImage key={asset.src} {...asset} />;
+  return <TitleImage key={asset.src} {...asset} preview={preview} />;
 }

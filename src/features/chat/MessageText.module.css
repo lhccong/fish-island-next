@@ -32,6 +32,15 @@
 .invitationTitle svg {
   flex-shrink: 0;
 }
+
+.invitationActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+}
+
 .roomId {
   color: var(--color-muted);
   font-size: 0.75rem;

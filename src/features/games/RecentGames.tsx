@@ -6,14 +6,16 @@ import {
   ScanFace,
   Pencil,
   Spade,
+  Flame,
 } from 'lucide-react';
 import styles from './GameCatalog.module.css';
 
 export type CatalogGame =
-  'farm' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords';
+  'farm' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords' | 'dark-room';
 const catalogGames = [
   'farm',
   'life',
+  'dark-room',
   'stock',
   'gomoku',
   'undercover',
@@ -42,6 +44,7 @@ export function RecentGames({
               const Icon = {
                 farm: Sprout,
                 life: RotateCcw,
+                'dark-room': Flame,
                 stock: ChartCandlestick,
                 gomoku: Grid3X3,
                 undercover: ScanFace,
@@ -63,6 +66,7 @@ export function RecentGames({
                       {
                         farm: '摸鱼农场',
                         life: '人生重开模拟器',
+                        'dark-room': '小黑屋模拟器',
                         stock: '摸鱼股市',
                         gomoku: '五子棋',
                         undercover: '谁是卧底',

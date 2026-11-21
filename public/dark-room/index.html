@@ -1,0 +1,74 @@
+<!doctype html>
+<!-- A Dark Room 1.4, doublespeak games and contributors. Source and MPL-2.0 notice in vendor/. -->
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'"
+    />
+    <title>小黑屋模拟器</title>
+    <link rel="license" href="vendor/LICENSE.md" />
+    <link rel="stylesheet" href="vendor/css/main.css" />
+    <link rel="stylesheet" href="vendor/css/room.css" />
+    <link rel="stylesheet" href="vendor/css/outside.css" />
+    <link rel="stylesheet" href="vendor/css/path.css" />
+    <link rel="stylesheet" href="vendor/css/world.css" />
+    <link rel="stylesheet" href="vendor/css/ship.css" />
+    <link rel="stylesheet" href="vendor/css/space.css" />
+    <link rel="stylesheet" href="vendor/css/fabricator.css" />
+    <link rel="stylesheet" href="embed.css" />
+    <script defer src="vendor/lib/jquery.min.js"></script>
+    <script defer src="vendor/lib/jquery.color-2.1.2.min.js"></script>
+    <script defer src="vendor/lib/jquery.event.move.js"></script>
+    <script defer src="vendor/lib/jquery.event.swipe.js"></script>
+    <script defer src="vendor/lib/base64.js"></script>
+    <script defer src="vendor/lib/translate.js"></script>
+    <script defer src="vendor/lang/zh_cn/strings.js"></script>
+    <script defer src="vendor/script/Button.js"></script>
+    <script defer src="vendor/script/audioLibrary.js"></script>
+    <script defer src="vendor/script/audio.js"></script>
+    <script defer src="vendor/script/engine.js"></script>
+    <script defer src="vendor/script/state_manager.js"></script>
+    <script defer src="vendor/script/header.js"></script>
+    <script defer src="vendor/script/notifications.js"></script>
+    <script defer src="vendor/script/events.js"></script>
+    <script defer src="vendor/script/room.js"></script>
+    <script defer src="vendor/script/outside.js"></script>
+    <script defer src="vendor/script/world.js"></script>
+    <script defer src="vendor/script/path.js"></script>
+    <script defer src="vendor/script/ship.js"></script>
+    <script defer src="vendor/script/space.js"></script>
+    <script defer src="vendor/script/fabricator.js"></script>
+    <script defer src="vendor/script/prestige.js"></script>
+    <script defer src="vendor/script/scoring.js"></script>
+    <script defer src="vendor/script/events/global.js"></script>
+    <script defer src="vendor/script/events/room.js"></script>
+    <script defer src="vendor/script/events/outside.js"></script>
+    <script defer src="vendor/script/events/encounters.js"></script>
+    <script defer src="vendor/script/events/setpieces.js"></script>
+    <script defer src="vendor/script/events/marketing.js"></script>
+    <script defer src="vendor/script/events/executioner.js"></script>
+    <script defer src="embed-ui.js"></script>
+    <script defer src="embed.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="content">
+        <div id="outerSlider">
+          <div id="main">
+            <div id="header" role="group" aria-label="地点"></div>
+          </div>
+        </div>
+      </div>
+      <div id="game-settings" role="group" aria-label="游戏设置">
+        <button type="button" id="save">存档</button>
+        <button type="button" id="restart">重开</button>
+        <button type="button" class="hyper">加速</button>
+        <button type="button" class="volume">音效</button>
+      </div>
+      <div id="saveNotify" aria-hidden="true">已保存</div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,550 @@
+:root {
+  color-scheme: light;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  scrollbar-color: var(--color-scrollbar) transparent;
+  scrollbar-gutter: stable;
+}
+
+:root[data-color-mode='dark'] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body,
+body .tooltip,
+textarea {
+  font:
+    calc(14px * var(--ui-font-scale, 1)) / 1.6 'Segoe UI',
+    'Microsoft YaHei',
+    sans-serif;
+}
+
+body {
+  height: auto;
+  min-height: 100%;
+}
+
+div#wrapper {
+  display: grid;
+  grid-template-columns: minmax(150px, 240px) minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 1180px;
+  padding: 24px max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+}
+
+div#content {
+  grid-area: 1 / 2;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+div#outerSlider,
+div#locationSlider {
+  position: relative;
+  inset: auto !important;
+}
+
+div#outerSlider > div,
+div.location {
+  display: none;
+  float: none;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+#wrapper[data-view='roomPanel'] #roomPanel,
+#wrapper[data-view='outsidePanel'] #outsidePanel,
+#wrapper[data-view='pathPanel'] #pathPanel,
+#wrapper[data-view='fabricatorPanel'] #fabricatorPanel,
+#wrapper[data-view='shipPanel'] #shipPanel,
+#wrapper[data-view='worldPanel'] #worldPanel,
+#wrapper[data-view='spacePanel'] #spacePanel {
+  display: block;
+}
+
+#wrapper:not([data-view='worldPanel'], [data-view='spacePanel']) #main {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(144px, 28%);
+  gap: 16px;
+}
+
+div#header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+  min-width: 0;
+  height: auto;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+button,
+div.button,
+div.headerButton,
+div.headerButton:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  max-width: 100%;
+  width: auto !important;
+  margin: 0;
+  padding: 4px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: calc(13px * var(--ui-font-scale, 1));
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover,
+div.button:not(.disabled):hover,
+div.headerButton:not(.selected):hover,
+[role='button']:focus-visible {
+  background: var(--color-hover);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+
+div.headerButton.selected,
+div.headerButton.selected:hover {
+  border-color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  text-decoration: none;
+}
+
+#lightButton:not(.disabled),
+#stokeButton:not(.disabled) {
+  border-color: transparent;
+  background: var(--color-action);
+  color: var(--color-on-accent);
+}
+
+#lightButton:not(.disabled):hover,
+#stokeButton:not(.disabled):hover {
+  background: var(--color-action-hover);
+}
+
+div.button.disabled,
+div.button.disabled:hover {
+  border-color: var(--color-border);
+  color: var(--color-muted);
+}
+
+div.button div.cooldown {
+  position: absolute;
+  inset: auto auto 0 0;
+  z-index: 0;
+  height: 3px;
+  background: var(--color-accent-text);
+}
+
+div#notifications {
+  position: static;
+  grid-area: 1 / 1;
+  width: auto;
+  height: auto;
+  max-height: min(360px, 65vh);
+  padding: 8px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  color: var(--color-muted);
+  scrollbar-gutter: stable;
+}
+
+div#notifyGradient {
+  display: none;
+}
+
+#game-settings {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.import-error {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+div#saveNotify {
+  background: var(--color-surface);
+  color: var(--color-text);
+  pointer-events: none;
+}
+
+div#buildBtns,
+div#craftBtns,
+div#buyBtns,
+div#storesContainer,
+div#workers,
+div#village,
+div#perks,
+div#blueprints,
+div#outfitting {
+  position: static;
+  width: auto;
+}
+
+#storesContainer:empty {
+  display: none;
+}
+
+div#buildBtns,
+div#craftBtns,
+div#buyBtns,
+div#fabricateButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  margin-block: 16px;
+}
+
+div#buildBtns::before,
+div#craftBtns::before,
+div#buyBtns::before,
+div#fabricateButtons::before {
+  flex-basis: 100%;
+}
+
+div#stores,
+div#weapons,
+div#village,
+div#perks,
+div#blueprints,
+div#outfitting {
+  position: relative;
+  width: auto;
+  margin-block: 12px 18px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+div#stores::before,
+div#weapons::before,
+div#village::before,
+div#perks::before,
+div#blueprints::before,
+div#outfitting::before,
+div#population,
+div#bagspace {
+  padding-inline: 4px;
+  background: var(--color-surface);
+  color: var(--color-muted);
+}
+
+.workerRow,
+div.outfitRow,
+.storeRow {
+  display: flow-root;
+  margin-inline: 0;
+}
+
+.workerRow > .row_val,
+div.outfitRow > .row_val {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0;
+}
+
+.upBtn,
+.dnBtn,
+.upManyBtn,
+.dnManyBtn {
+  position: relative;
+  inset: auto;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.upBtn::before,
+.upManyBtn::before {
+  bottom: 8px;
+  border-bottom-color: var(--color-text);
+}
+
+.dnBtn::before,
+.dnManyBtn::before {
+  top: 8px;
+  border-top-color: var(--color-text);
+}
+
+.upBtn::after,
+.dnBtn::after,
+.upManyBtn::after,
+.dnManyBtn::after {
+  display: none;
+}
+
+.upManyBtn::before,
+.dnManyBtn::before {
+  border-width: 7px;
+}
+
+div.tooltip,
+#dropMenu {
+  max-width: min(160px, 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-panel);
+}
+
+div.tooltip {
+  pointer-events: none;
+}
+
+:focus-visible > div.tooltip {
+  display: block;
+}
+
+.eventPanel {
+  position: fixed;
+  inset: min(10dvh, 80px) auto auto 50%;
+  width: min(480px, calc(100% - 32px)) !important;
+  max-height: 80dvh;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  padding: 16px 24px 16px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow:
+    var(--shadow-panel),
+    0 0 0 100vmax var(--color-overlay);
+  transform: translateX(-50%);
+}
+
+.eventPanel::before,
+.eventPanel::after,
+.eventTitle::after {
+  display: none;
+}
+
+.eventTitle {
+  position: static;
+  margin-bottom: 8px;
+}
+
+#description {
+  min-height: 0;
+}
+
+#description:has(.fighter) {
+  min-height: 110px;
+}
+
+#description textarea {
+  min-height: 96px;
+  height: 144px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-size: 16px;
+}
+
+#buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#buttons > .button {
+  margin: 0;
+}
+
+#worldOuter {
+  width: max-content;
+  max-width: 100%;
+}
+
+#map,
+#bagspace-world {
+  max-width: 100%;
+  border-color: var(--color-border);
+  color: var(--color-muted);
+}
+
+#bagspace-world {
+  width: 100%;
+  height: auto;
+  min-height: 62px;
+  margin-block-start: 0;
+  overflow: visible;
+}
+
+#backpackSummary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  border-bottom: 1px solid var(--color-border);
+  padding: 6px 8px;
+}
+
+#backpackSummary > div {
+  position: static;
+  background: transparent;
+}
+
+#bagspace-world > div {
+  display: flow-root;
+}
+
+#map .landmark,
+#map .player {
+  color: var(--color-text);
+}
+
+#map .player {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+div#outerSlider > #spacePanel {
+  position: relative !important;
+  top: 0;
+  height: min(600px, 55dvh);
+  min-height: 280px;
+  overflow: hidden;
+}
+
+#wrapper[data-view='spacePanel'] #outerSlider > .directions {
+  display: flex;
+}
+
+#theEnd,
+.outroContainer {
+  margin-inline: 0;
+  width: auto;
+}
+
+.directions {
+  display: flex;
+  gap: 8px;
+  margin-block: 12px;
+}
+
+.directions button {
+  min-width: 44px;
+  touch-action: none;
+}
+
+.map-overview {
+  display: none;
+}
+
+.map-overview[aria-pressed='true'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+@media (max-width: 760px) {
+  div#wrapper {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px max(20px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  div#content {
+    grid-area: 1 / 1;
+  }
+
+  #wrapper:not([data-view='worldPanel'], [data-view='spacePanel']) #main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  div#notifications {
+    grid-area: 2 / 1;
+    height: auto;
+    max-height: 200px;
+    padding-inline: 4px 20px;
+  }
+
+  .eventPanel {
+    padding-inline-end: 20px;
+  }
+
+  #map {
+    font-size: min(16px, 4.1vw);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  #wrapper[data-map-overview='true'] #map {
+    font-size: min(16px, 2.25vw);
+  }
+
+  .map-overview {
+    display: inline-flex;
+  }
+}
+
+:root[data-mobile='true'],
+:root[data-mobile='true'] * {
+  scrollbar-width: none;
+}
+
+:root[data-mobile='true'] :is(button, div.button, div.headerButton) {
+  min-height: 44px;
+  font-size: calc(14px * var(--ui-font-scale, 1));
+}
+
+:root[data-mobile='true'] :is(.upBtn, .dnBtn, .upManyBtn, .dnManyBtn) {
+  width: 44px;
+  height: 44px;
+}
+
+:root[data-mobile='true'] :is(.upBtn, .upManyBtn)::before {
+  bottom: 18px;
+}
+
+:root[data-mobile='true'] :is(.dnBtn, .dnManyBtn)::before {
+  top: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}

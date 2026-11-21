@@ -96,9 +96,13 @@
 .slot:nth-of-type(even) {
   grid-column: 3;
 }
-.slot:hover {
+.slot:not(:disabled):hover,
+.slot[aria-expanded='true'] {
   border-color: var(--color-accent-text);
   background: var(--color-accent-soft);
+}
+.slot:disabled {
+  cursor: default;
 }
 .slot > span {
   border-radius: 2px;

@@ -9,6 +9,13 @@
   min-width: 0;
   padding: 4px 0 16px 4px;
 }
+.content[data-fill='true'] {
+  height: 100%;
+  padding-bottom: 4px;
+}
+.content[data-fill='true'] > [data-loading-indicator='region'] {
+  height: 100%;
+}
 .dock {
   position: fixed;
   z-index: 59;
