@@ -31,6 +31,13 @@ const DiscoveryPage = lazy(() =>
 const PetPage = lazy(() =>
   import('@/app/pages/PetPage').then((module) => ({ default: module.PetPage })),
 );
+const PetCardsDemoPage = import.meta.env.DEV
+  ? lazy(() =>
+      import('@/app/pages/PetCardsDemoPage').then((module) => ({
+        default: module.PetCardsDemoPage,
+      })),
+    )
+  : null;
 const ReaderPage = lazy(() =>
   Promise.all([import('@/app/pages/ReaderPage'), import('@/app/components/GlobalReader')]).then(
     ([module]) => ({ default: module.ReaderPage }),
@@ -195,6 +202,7 @@ export function AppRoutes() {
                 </RequireAuth>
               }
             />
+            {PetCardsDemoPage && <Route path="/pet/cards-demo" element={<PetCardsDemoPage />} />}
             <Route
               path="/point/tournament"
               element={<Navigate to="/pet?challenge=tournament" replace />}

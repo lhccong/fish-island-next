@@ -1,7 +1,7 @@
 import { useLocation, useSearchParams } from 'react-router';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
-import { petService } from '@/app/config/pet';
+import { petCardCollection, petService } from '@/app/config/pet';
 import { useAuth } from '@/features/auth';
 import { PetWorkspace } from '@/features/pet';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -16,7 +16,7 @@ export function PetPage() {
   const shortcut =
     challenge === 'tower' || challenge === 'boss' || challenge === 'tournament'
       ? challenge
-      : panel === 'supplies' || panel === 'bag'
+      : panel === 'supplies' || panel === 'bag' || panel === 'cards'
         ? panel
         : null;
   if (session.status !== 'authenticated') return null;
@@ -40,6 +40,7 @@ export function PetPage() {
             <PetWorkspace
               key={session.user.id}
               service={petService}
+              cardCollection={petCardCollection}
               onLotterySettled={refreshUser}
               userId={session.user.id}
               points={

@@ -1,6 +1,32 @@
 import type { TreasurePort } from './treasure';
 export { treasureSites } from './treasure';
 export type { TreasureSiteId, TreasureState, TreasurePort } from './treasure';
+export type { PetCardBattleAction, PetCardBattleEffect } from './card-battle';
+export {
+  dailyPetPackLimit,
+  emptyPetCards,
+  getPetCard,
+  petCardGrades,
+  petCardIds,
+  petCardPacks,
+  petCardStatEntries,
+  petCards,
+  petCardsDay,
+  petPackSize,
+  petShowcaseLimit,
+  remainingPetPacks,
+  summarizePetShowcase,
+  updatePetCards,
+} from './cards';
+export type {
+  PetCardId,
+  PetCardPackKind,
+  PetCardPull,
+  PetCardResult,
+  PetCardsAction,
+  PetCardsPort,
+  PetCardsProgress,
+} from './cards';
 
 export interface PetItem {
   code: string;

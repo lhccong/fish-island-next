@@ -11,8 +11,9 @@ import {
   Settings2,
   Hammer,
   Gift,
+  GalleryVerticalEnd,
 } from 'lucide-react';
-import type { PetPort } from '@/domain/pet';
+import type { PetCardsPort, PetPort } from '@/domain/pet';
 import { usePetOperation, usePetResource } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { CampAdventure } from './CampAdventure';
@@ -29,6 +30,7 @@ import { AutoFeedPanel } from './AutoFeedPanel';
 import { ForgePanel } from './ForgePanel';
 import { SupplyPanel } from './SupplyPanel';
 import { ChallengeEntrances } from './ChallengeEntrances';
+import { PetCardsDialog } from './PetCardsDialog';
 import styles from './PetWorkspace.module.css';
 
 const panels = [
@@ -56,19 +58,25 @@ const panels = [
     icon: Gift,
     description: '转动九宫格，抽取装备与道具。',
   },
+  { id: 'cards', title: '宠物卡包', icon: GalleryVerticalEnd, description: '拆包与展示宠物卡片。' },
 ] as const;
 type PanelId = (typeof panels)[number]['id'];
 type ChallengeMode = 'rank' | 'tower' | 'boss' | 'tournament';
-type Shortcut = { key: string; target: Exclude<ChallengeMode, 'rank'> | 'supplies' | 'bag' };
+type Shortcut = {
+  key: string;
+  target: Exclude<ChallengeMode, 'rank'> | 'supplies' | 'bag' | 'cards';
+};
 
 export function PetWorkspace({
   service,
+  cardCollection,
   userId,
   shortcut = null,
   points,
   onLotterySettled,
 }: {
   service: PetPort;
+  cardCollection: PetCardsPort;
   userId: string;
   shortcut?: Shortcut | null;
   points?: number | undefined;
@@ -86,7 +94,8 @@ export function PetWorkspace({
   const selectedPanel = selection?.key === shortcut?.key ? selection : null;
   const shortcutMode =
     target === 'boss' || target === 'tower' || target === 'tournament' ? target : null;
-  const shortcutPanel = target === 'supplies' || target === 'bag' ? target : 'challenge';
+  const shortcutPanel =
+    target === 'supplies' || target === 'bag' || target === 'cards' ? target : 'challenge';
   const panel = selectedPanel ? selectedPanel.panel : target ? shortcutPanel : null;
   const challengeMode = selectedPanel?.mode ?? shortcutMode ?? 'rank';
   const [inventoryRevision, setInventoryRevision] = useState(0);
@@ -105,6 +114,14 @@ export function PetWorkspace({
     onChange();
     setInventoryRevision((value) => value + 1);
   }
+  function closePanel() {
+    if (selected && !returnFocusRef.current?.isConnected)
+      returnFocusRef.current =
+        navigationRef.current?.querySelector<HTMLButtonElement>(
+          `[aria-label="${selected.title}"]`,
+        ) ?? null;
+    setSelection({ key: shortcut?.key, panel: null, mode: 'rank' });
+  }
   return (
     <section aria-label="伙伴营地" className={styles.scroll}>
       <div className={styles.workspace}>
@@ -120,7 +137,7 @@ export function PetWorkspace({
                 variant="secondary"
                 className={styles.tool}
                 aria-label={title}
-                disabled={!pet}
+                disabled={!pet && id !== 'cards'}
                 onClick={() => openPanel(id)}
               >
                 <Icon size={18} aria-hidden="true" />
@@ -190,7 +207,15 @@ export function PetWorkspace({
         </div>
       </div>
       <PageFooterOutlet />
-      {selected && pet && (
+      {panel === 'cards' && (
+        <PetCardsDialog
+          port={cardCollection}
+          userId={userId}
+          onClose={closePanel}
+          returnFocusRef={returnFocusRef}
+        />
+      )}
+      {selected && panel !== 'cards' && pet && (
         <PanelDialog
           title={
             panel === 'challenge' && challengeMode === 'tournament' ? '武道大会' : selected.title
@@ -200,14 +225,7 @@ export function PetWorkspace({
               ? '查看排位，直接挑战更高名次。'
               : selected.description
           }
-          onClose={() => {
-            if (!returnFocusRef.current?.isConnected)
-              returnFocusRef.current =
-                navigationRef.current?.querySelector<HTMLButtonElement>(
-                  `[aria-label="${selected.title}"]`,
-                ) ?? null;
-            setSelection({ key: shortcut?.key, panel: null, mode: 'rank' });
-          }}
+          onClose={closePanel}
           appearance="pixel"
           followVisualViewport={panel === 'shop'}
           returnFocusRef={returnFocusRef}

@@ -3,6 +3,16 @@
   --color-pet-battle-haze: #e5efc8;
   --color-pet-battle-ink: #334943;
   --color-pet-battle-hp: #31804a;
+  --color-pet-card-metal: #4394cc;
+  --color-pet-card-glint: #d8f7ff;
+  --color-pet-card-night: #111722;
+  --color-pet-card-ink: #f4f6fa;
+  --color-pet-card-ink-muted: #d9dfeb;
+  --color-pet-card-spectrum:
+    var(--color-pet-enhance-rose), var(--color-pet-enhance-gold), var(--color-pet-enhance-green),
+    var(--color-pet-enhance-blue), var(--color-pet-enhance-violet);
+  --color-pet-card-warm-paper: #ffb09b;
+  --color-pet-card-warm-shade: #f7cfb8;
   --color-pet-enhance-silver: #a8b4c4;
   --color-pet-enhance-gold: #ffc44d;
   --color-pet-enhance-violet: #b07ce8;
@@ -44,6 +54,10 @@
   --color-pet-battle-haze: #364650;
   --color-pet-battle-ink: #a0b9ad;
   --color-pet-battle-hp: #7bc891;
+  --color-pet-card-metal: #5daad9;
+  --color-pet-card-glint: #b9ebff;
+  --color-pet-card-warm-paper: #62302d;
+  --color-pet-card-warm-shade: #4d2b2a;
   --color-pet-header-blue: #255c94;
   --color-pet-header-green: #396d45;
   --color-pet-header-amber: #8b5315;

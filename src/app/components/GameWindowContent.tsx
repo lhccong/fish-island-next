@@ -2,7 +2,7 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { lazy, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { farmService } from '@/app/config/farm';
-import { petService } from '@/app/config/pet';
+import { petCardCollection, petService } from '@/app/config/pet';
 import { stockService } from '@/app/config/stock';
 import { useAuth } from '@/features/auth';
 import { Button } from '@/shared/ui/Button';
@@ -69,6 +69,7 @@ export function GameWindowContent({ game, onEscape }: { game: GameId; onEscape: 
       <PetWorkspace
         key={session.user.id}
         service={petService}
+        cardCollection={petCardCollection}
         userId={session.user.id}
         points={
           session.user.points === undefined
