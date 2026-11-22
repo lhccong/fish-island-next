@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ReceivedMessage } from '@/domain/chat';
+import { BigFishSprite } from './BigFishSprite';
 import { MemberAvatar } from './MemberAvatar';
 import { useChatRealtime } from './realtime-context';
 import styles from './MessageStream.module.css';
@@ -28,9 +29,9 @@ export function MessageAvatar({
   return (
     <button
       type="button"
-      className={styles.senderAvatar}
+      className={message.bigFish ? styles.bigFishAvatar : styles.senderAvatar}
       data-message-avatar="true"
-      aria-label={`@${message.senderName}`}
+      aria-label={message.bigFish ? `通过头像 @${message.senderName}` : `@${message.senderName}`}
       aria-description="单击提及，双击戳一戳"
       title="单击提及，双击戳一戳"
       onBlur={cancel}
@@ -54,16 +55,20 @@ export function MessageAvatar({
         }
       }}
     >
-      <MemberAvatar
-        showFrame={showFrame}
-        key={`${message.senderId}:${message.senderAvatar ?? ''}`}
-        member={{
-          id: message.senderId,
-          name: message.senderName,
-          avatar: message.senderAvatar ?? null,
-          avatarFrameUrl: message.senderAvatarFrame,
-        }}
-      />
+      {message.bigFish ? (
+        <BigFishSprite />
+      ) : (
+        <MemberAvatar
+          showFrame={showFrame}
+          key={`${message.senderId}:${message.senderAvatar ?? ''}`}
+          member={{
+            id: message.senderId,
+            name: message.senderName,
+            avatar: message.senderAvatar ?? null,
+            avatarFrameUrl: message.senderAvatarFrame,
+          }}
+        />
+      )}
     </button>
   );
 }

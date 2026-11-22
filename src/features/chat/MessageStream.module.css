@@ -76,7 +76,11 @@
   flex: none;
   width: 44px;
   min-height: 44px;
+  padding: 0;
+  border: 0;
   border-radius: var(--radius-control);
+  background: transparent;
+  cursor: pointer;
   touch-action: manipulation;
 }
 
@@ -86,6 +90,11 @@
 
 .row .bigFishAvatar:hover {
   background: var(--color-hover);
+}
+
+.row .bigFishAvatar:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
 }
 
 .row .bigFishName {

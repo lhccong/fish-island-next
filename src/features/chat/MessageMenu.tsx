@@ -73,19 +73,15 @@ export function MessageMenu({
     }
   };
   const items: MessageAction[] = [
-    ...(!message.bigFish
-      ? [
-          {
-            label: '戳一戳',
-            icon: <Hand size={16} aria-hidden="true" />,
-            disabled: !user,
-            onSelect: () => {
-              if (user && !controller.sender.poke(message.senderId, message.senderName, user))
-                draft.notify('戳一戳未提交，请处理待发送消息后重试', 'error');
-            },
-          },
-        ]
-      : []),
+    {
+      label: '戳一戳',
+      icon: <Hand size={16} aria-hidden="true" />,
+      disabled: !user,
+      onSelect: () => {
+        if (user && !controller.sender.poke(message.senderId, message.senderName, user))
+          draft.notify('戳一戳未提交，请处理待发送消息后重试', 'error');
+      },
+    },
     ...(!self && !message.bigFish
       ? [
           {
@@ -172,7 +168,7 @@ export function MessageMenu({
       icon: <AtSign size={16} aria-hidden="true" />,
       onSelect: () => prepare(() => draft.mention(message.senderName)),
     },
-    ...(reward || message.bigFish
+    ...(reward
       ? []
       : [
           {

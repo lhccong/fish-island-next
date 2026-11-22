@@ -16,7 +16,6 @@ import { useChatRealtime } from './realtime-context';
 import { MessageAvatar } from './MessageAvatar';
 import { MessageContent } from './MessageContent';
 import { MessageMenu } from './MessageMenu';
-import { BigFishSprite } from './BigFishSprite';
 import { BigFishEmoticon } from './BigFishEmoticon';
 import styles from './MessageStream.module.css';
 import type { ChatPresentation } from './chat-presentation';
@@ -93,16 +92,8 @@ export const MessageRow = memo(function MessageRow({
     draft.mention('大肥鱼');
     composerRef.current?.focus({ preventScroll: true });
   };
-  const fishAvatar = message.bigFish && (
-    <Button
-      variant="inline"
-      className={styles.bigFishAvatar}
-      aria-label="通过头像 @大肥鱼"
-      title="@大肥鱼"
-      onClick={mentionBigFish}
-    >
-      <BigFishSprite />
-    </Button>
+  const avatar = (message.bigFish || showAvatars) && (
+    <MessageAvatar message={message} showFrame={showAvatarFrames} />
   );
   const bubble = (
     <div
@@ -129,7 +120,7 @@ export const MessageRow = memo(function MessageRow({
         '消息已撤回'
       ) : message.bigFish ? (
         <>
-          {fishInWorksheet && fishAvatar}
+          {fishInWorksheet && avatar}
           <div className={styles.bigFishDialogue}>
             <span className={fishInWorksheet ? styles.bubble : undefined}>{message.content}</span>
             <BigFishEmoticon
@@ -164,10 +155,7 @@ export const MessageRow = memo(function MessageRow({
           {rowNumber}
         </span>
       )}
-      {presentation === 'conversation' && fishAvatar}
-      {!message.bigFish && showAvatars && (
-        <MessageAvatar message={message} showFrame={showAvatarFrames} />
-      )}
+      {!fishInWorksheet && avatar}
       <div className={styles.messageBody}>
         <div className={styles.meta}>
           <div className={styles.identity}>
