@@ -1,3 +1,8 @@
+import type { DailyPointTasks } from './daily-point-tasks';
+
+export { dailyPointTaskIds } from './daily-point-tasks';
+export type { DailyPointTask, DailyPointTaskId, DailyPointTasks } from './daily-point-tasks';
+
 export interface SignDay {
   day: number;
   date: string;
@@ -22,6 +27,7 @@ export interface SignResult {
   nextDayBonus: number;
 }
 export interface SignInPort {
+  tasks(signal: AbortSignal): Promise<DailyPointTasks>;
   month(year: number, month: number, signal: AbortSignal): Promise<SignMonth>;
   status(signal: AbortSignal): Promise<boolean>;
   sign(signal: AbortSignal): Promise<SignResult>;

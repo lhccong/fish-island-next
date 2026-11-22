@@ -11,7 +11,7 @@ export default defineConfig({
     url: 'http://127.0.0.1:4211',
     reuseExistingServer: false,
   },
-  testMatch: '**/sign-in.spec.ts',
+  testMatch: ['**/sign-in.spec.ts', '**/daily-point-tasks.spec.ts'],
   outputDir: 'test-results-sign-in',
   projects: [{ name: 'sign-in-chromium', use: { browserName: 'chromium' } }],
 });

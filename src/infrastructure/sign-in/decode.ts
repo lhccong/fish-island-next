@@ -1,4 +1,9 @@
-import type { SignMonth, SignResult } from '@/domain/sign-in';
+import {
+  dailyPointTaskIds,
+  type DailyPointTasks,
+  type SignMonth,
+  type SignResult,
+} from '@/domain/sign-in';
 
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -9,6 +14,9 @@ function number(value: unknown): number {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0)
     throw new Error('签到服务返回的数值异常');
   return value;
+}
+function long(value: unknown): number {
+  return number(typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value);
 }
 function boolean(value: unknown): boolean {
   if (typeof value !== 'boolean') throw new Error('签到服务返回的状态异常');
@@ -21,6 +29,35 @@ export function decodeResult(raw: unknown): SignResult {
     bonusPoints: number(value.bonusPoints),
     nextDayBonus: number(value.nextDayBonus),
   };
+}
+
+export function decodeDailyPointTasks(raw: unknown): DailyPointTasks {
+  const value = record(raw);
+  const serverNow = long(value.serverNow);
+  const refreshAt = long(value.refreshAt);
+  if (refreshAt <= serverNow || !Array.isArray(value.tasks)) throw new Error('积分任务数据异常');
+  const seen = new Set<string>();
+  const tasks: DailyPointTasks['tasks'] = [];
+  for (const rawTask of value.tasks as unknown[]) {
+    const task = record(rawTask);
+    if (typeof task.id !== 'string') throw new Error('积分任务编号异常');
+    const id = dailyPointTaskIds.find((id) => id === task.id);
+    if (!id) continue;
+    const { state, detail } = task;
+    const progress = task.progress === null ? null : number(task.progress);
+    const goal = task.goal === null ? null : number(task.goal);
+    if (
+      seen.has(id) ||
+      (state !== 'ready' && state !== 'waiting' && state !== 'done' && state !== 'conditional') ||
+      (detail !== null && typeof detail !== 'string') ||
+      (goal === null ? progress !== null : goal === 0 || progress === null || progress > goal)
+    ) {
+      throw new Error('积分任务状态异常');
+    }
+    seen.add(id);
+    tasks.push({ id, state, progress, goal, earned: long(task.earned), detail });
+  }
+  return { serverNow, refreshAt, tasks };
 }
 export function decodeMonth(raw: unknown): SignMonth {
   const value = record(raw);

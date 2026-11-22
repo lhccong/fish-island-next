@@ -1,6 +1,6 @@
 import { AuthError, type SessionToken } from '@/domain/auth';
 import type { SignInPort } from '@/domain/sign-in';
-import { decodeMonth, decodeResult, record } from './decode';
+import { decodeDailyPointTasks, decodeMonth, decodeResult, record } from './decode';
 
 export function createSignInClient(
   baseUrl: string,
@@ -34,6 +34,9 @@ export function createSignInClient(
     }
   }
   return {
+    async tasks(signal) {
+      return decodeDailyPointTasks(await request('sign/tasks', signal));
+    },
     async month(year, month, signal) {
       const value = decodeMonth(await request(`sign/month?year=${year}&month=${month}`, signal));
       if (value.year !== year || value.month !== month) throw new Error('签到月份不匹配，请重试');

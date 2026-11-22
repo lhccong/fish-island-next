@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useLocation, useSearchParams } from 'react-router';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { petService } from '@/app/config/pet';
@@ -10,6 +10,15 @@ import styles from './GamesPage.module.css';
 export function PetPage() {
   const { session, refreshUser } = useAuth();
   const [params] = useSearchParams();
+  const { key } = useLocation();
+  const challenge = params.get('challenge');
+  const panel = params.get('panel');
+  const shortcut =
+    challenge === 'tower' || challenge === 'boss' || challenge === 'tournament'
+      ? challenge
+      : panel === 'supplies' || panel === 'bag'
+        ? panel
+        : null;
   if (session.status !== 'authenticated') return null;
   return (
     <WorkspaceLayout
@@ -38,7 +47,7 @@ export function PetPage() {
                   ? undefined
                   : session.user.points - (session.user.usedPoints ?? 0)
               }
-              openTournament={params.get('challenge') === 'tournament'}
+              shortcut={shortcut ? { key, target: shortcut } : null}
             />
           </ScrollArea>
         ),

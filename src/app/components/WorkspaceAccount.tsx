@@ -22,6 +22,7 @@ import type { AccountTool } from '@/features/account-tools';
 import { accountTools, blacklist } from '@/app/config/account-tools';
 import { useWorkTimeVisibility, AccountToolPanel } from '@/features/account-tools';
 import styles from './AccountTools.module.css';
+import { useDailyPointTaskNavigation } from './use-daily-point-task-navigation';
 
 export function WorkspaceAccount() {
   const { session, logout, notify } = useAuth();
@@ -39,6 +40,7 @@ export function WorkspaceAccount() {
   };
   const location = useLocation();
   const navigate = useNavigate();
+  const navigateToTask = useDailyPointTaskNavigation();
   return (
     <div ref={wrapper}>
       <AccountControl
@@ -77,10 +79,18 @@ export function WorkspaceAccount() {
             onSelect: () => setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
           },
         ]}
-        accountActions={
+        accountActions={(closeProfile) =>
           session.status === 'authenticated' ? (
             <Suspense>
-              <SignInLauncher key={session.user.id} port={signInPort} />
+              <SignInLauncher
+                key={session.user.id}
+                port={signInPort}
+                onNavigate={(task) => {
+                  closeProfile();
+                  if (task === 'redeem_code') open('redeem');
+                  else navigateToTask(task);
+                }}
+              />
             </Suspense>
           ) : null
         }

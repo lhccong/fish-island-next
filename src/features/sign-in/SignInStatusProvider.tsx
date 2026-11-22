@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { SignInPort } from '@/domain/sign-in';
-import { SignInStatusContext } from './sign-in-status-context';
+import { SignInStatusContext, type SignInView } from './sign-in-status-context';
 
 const dayKey = () => new Date().toDateString();
 
@@ -19,6 +19,7 @@ export function SignInStatusProvider({
     signed: boolean | null;
   } | null>(null);
   const request = useRef<AbortController | null>(null);
+  const [selection, setSelection] = useState<{ accountId: string; view: SignInView } | null>(null);
   const report = useCallback(
     (signed: boolean) => {
       request.current?.abort();
@@ -67,7 +68,14 @@ export function SignInStatusProvider({
   const todaySigned =
     snapshot?.accountId === accountId && snapshot.day === dayKey() ? snapshot.signed : null;
   return (
-    <SignInStatusContext.Provider value={{ todaySigned, report }}>
+    <SignInStatusContext.Provider
+      value={{
+        todaySigned,
+        report,
+        view: selection?.accountId === accountId ? selection.view : 'calendar',
+        selectView: (view) => setSelection({ accountId, view }),
+      }}
+    >
       {children}
     </SignInStatusContext.Provider>
   );

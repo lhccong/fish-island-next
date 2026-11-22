@@ -20,7 +20,7 @@ export function AccountDialog({
 }: {
   user: AuthUser;
   onLogout: () => void;
-  accountActions?: ReactNode;
+  accountActions?: ((closeProfile: () => void) => ReactNode) | undefined;
   menuItems?: readonly DropdownMenuItem[] | undefined;
 }) {
   const { pending } = useAuth();
@@ -29,6 +29,14 @@ export function AccountDialog({
   const [open, setOpen] = useState(false);
   const [framesOpen, setFramesOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  function setProfileOpen(value: boolean) {
+    if (pending === 'profile') return;
+    setOpen(value);
+    if (!value) {
+      setEditing(false);
+      setSaved(false);
+    }
+  }
   return (
     <>
       <DropdownMenu
@@ -96,14 +104,7 @@ export function AccountDialog({
         showCloseAction={false}
         dismissLabel="关闭个人资料"
         open={open}
-        onOpenChange={(value) => {
-          if (pending === 'profile') return;
-          setOpen(value);
-          if (!value) {
-            setEditing(false);
-            setSaved(false);
-          }
-        }}
+        onOpenChange={setProfileOpen}
       >
         {editing ? (
           <ProfileEditor
@@ -148,7 +149,7 @@ export function AccountDialog({
               </p>
             )}
             <div className={styles.actions}>
-              {accountActions}
+              {accountActions?.(() => setProfileOpen(false))}
               <Button
                 variant="secondary"
                 className={styles.logout}

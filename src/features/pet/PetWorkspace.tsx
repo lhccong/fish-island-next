@@ -58,25 +58,37 @@ const panels = [
   },
 ] as const;
 type PanelId = (typeof panels)[number]['id'];
+type ChallengeMode = 'rank' | 'tower' | 'boss' | 'tournament';
+type Shortcut = { key: string; target: Exclude<ChallengeMode, 'rank'> | 'supplies' | 'bag' };
 
 export function PetWorkspace({
   service,
   userId,
-  openTournament = false,
+  shortcut = null,
   points,
   onLotterySettled,
 }: {
   service: PetPort;
   userId: string;
-  openTournament?: boolean;
+  shortcut?: Shortcut | null;
   points?: number | undefined;
   onLotterySettled?: ((signal: AbortSignal) => Promise<unknown>) | undefined;
 }) {
   const load = useCallback((signal: AbortSignal) => service.mine(signal), [service]);
   const resource = usePetResource(load);
   const pet = resource.data ?? null;
-  const [panel, setPanel] = useState<PanelId | null>(openTournament ? 'challenge' : null);
-  const [challengeMode, setChallengeMode] = useState(openTournament ? 'tournament' : 'rank');
+  const [selection, setSelection] = useState<{
+    key: string | undefined;
+    panel: PanelId | null;
+    mode: ChallengeMode;
+  } | null>(null);
+  const target = shortcut?.target;
+  const selectedPanel = selection?.key === shortcut?.key ? selection : null;
+  const shortcutMode =
+    target === 'boss' || target === 'tower' || target === 'tournament' ? target : null;
+  const shortcutPanel = target === 'supplies' || target === 'bag' ? target : 'challenge';
+  const panel = selectedPanel ? selectedPanel.panel : target ? shortcutPanel : null;
+  const challengeMode = selectedPanel?.mode ?? shortcutMode ?? 'rank';
   const [inventoryRevision, setInventoryRevision] = useState(0);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const navigationRef = useRef<HTMLElement | null>(null);
@@ -84,11 +96,10 @@ export function PetWorkspace({
   const selected = panels.find((item) => item.id === panel);
   const busy = operation.pending || resource.state.status === 'loading';
   const onChange = resource.reload;
-  function openPanel(id: PanelId) {
+  function openPanel(id: PanelId, mode: ChallengeMode = 'rank') {
     returnFocusRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (id === 'challenge') setChallengeMode('rank');
-    setPanel(id);
+    setSelection({ key: shortcut?.key, panel: id, mode });
   }
   function inventoryChanged() {
     onChange();
@@ -156,13 +167,7 @@ export function PetWorkspace({
           </section>
           <div className={styles.adventure}>
             <CampAdventure pet={pet} service={service} onSettled={onLotterySettled} />
-            <ChallengeEntrances
-              disabled={!pet}
-              onSelect={(mode) => {
-                openPanel('challenge');
-                setChallengeMode(mode);
-              }}
-            />
+            <ChallengeEntrances disabled={!pet} onSelect={(mode) => openPanel('challenge', mode)} />
             <p className={styles.footnote}>营地散步 · 不消耗积分，不产生收益</p>
           </div>
           <aside className={styles.inventory} aria-label="营地行囊">
@@ -201,7 +206,7 @@ export function PetWorkspace({
                 navigationRef.current?.querySelector<HTMLButtonElement>(
                   `[aria-label="${selected.title}"]`,
                 ) ?? null;
-            setPanel(null);
+            setSelection({ key: shortcut?.key, panel: null, mode: 'rank' });
           }}
           appearance="pixel"
           followVisualViewport={panel === 'shop'}
@@ -219,6 +224,7 @@ export function PetWorkspace({
           )}
           {panel === 'challenge' && challengeMode !== 'tournament' && (
             <ChallengePanel
+              key={challengeMode}
               service={service}
               pet={pet}
               userId={userId}

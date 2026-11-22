@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from 'react';
 import { Calendar, CalendarCheck } from 'lucide-react';
-import type { SignInPort } from '@/domain/sign-in';
+import type { DailyPointTaskId, SignInPort } from '@/domain/sign-in';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
@@ -13,11 +13,13 @@ const SignInPanel = lazy(() =>
 
 export function SignInLauncher({
   port,
+  onNavigate,
   navigationClassName,
   navigationLabel,
   navigationPresentation = 'default',
 }: {
   port: SignInPort;
+  onNavigate: (task: DailyPointTaskId) => void;
   navigationClassName?: string;
   navigationLabel?: string | undefined;
   navigationPresentation?: 'default' | 'classic';
@@ -67,7 +69,13 @@ export function SignInLauncher({
     >
       {open && (
         <Suspense fallback={<LoadingIndicator>正在打开签到…</LoadingIndicator>}>
-          <SignInPanel port={port} />
+          <SignInPanel
+            port={port}
+            onNavigate={(task) => {
+              setOpen(false);
+              onNavigate(task);
+            }}
+          />
         </Suspense>
       )}
     </Dialog>

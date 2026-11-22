@@ -1,15 +1,18 @@
 import { useRef } from 'react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { AvatarFramesPanel, useAuth } from '@/features/auth';
 import { PointsShop } from '@/features/points-shop';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { DiscoveryNavigation } from '@/app/components/DiscoveryNavigation';
 import { pointsShop } from '@/app/config/points-shop';
+import { accountTools, blacklist } from '@/app/config/account-tools';
+import { AccountToolPanel } from '@/features/account-tools';
 import styles from './GamesPage.module.css';
 
 export function PointsShopPage() {
   const { session, refreshUser } = useAuth();
-  const focus = useRef<HTMLElement | null>(null);
+  const focus = useRef<HTMLHeadingElement | null>(null);
+  const [params, setParams] = useSearchParams();
   if (session.status !== 'authenticated') return null;
   return (
     <WorkspaceLayout
@@ -18,27 +21,46 @@ export function PointsShopPage() {
         sidebar: <DiscoveryNavigation />,
         header: (
           <div className={styles.header}>
-            <h1>店铺</h1>
+            <h1 ref={focus} tabIndex={-1}>
+              店铺
+            </h1>
           </div>
         ),
         contentScroll: false,
         content: (
-          <PointsShop
-            key={session.user.id}
-            service={pointsShop}
-            points={session.user.points}
-            usedPoints={session.user.usedPoints}
-            onPurchased={refreshUser}
-            frames={
-              <AvatarFramesPanel
+          <>
+            <PointsShop
+              key={session.user.id}
+              service={pointsShop}
+              points={session.user.points}
+              usedPoints={session.user.usedPoints}
+              onPurchased={refreshUser}
+              frames={
+                <AvatarFramesPanel
+                  user={session.user}
+                  embedded
+                  returnFocusRef={focus}
+                  onClose={() => {}}
+                />
+              }
+              support={<Link to="/rank/reward">前往支持</Link>}
+            />
+            {params.get('tool') === 'redeem' && (
+              <AccountToolPanel
+                tool="redeem"
+                port={accountTools}
+                blacklist={blacklist}
                 user={session.user}
-                embedded
                 returnFocusRef={focus}
-                onClose={() => {}}
+                onClose={() => {
+                  const next = new URLSearchParams(params);
+                  next.delete('tool');
+                  setParams(next, { replace: true });
+                }}
+                onReset={() => {}}
               />
-            }
-            support={<Link to="/rank/reward">前往支持</Link>}
-          />
+            )}
+          </>
         ),
       }}
     />

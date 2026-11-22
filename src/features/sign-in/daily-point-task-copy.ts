@@ -1,0 +1,46 @@
+import {
+  CalendarCheck,
+  CalendarDays,
+  Castle,
+  Ghost,
+  Gift,
+  HandCoins,
+  HeartHandshake,
+  MessagesSquare,
+  PackageOpen,
+  PawPrint,
+  PenLine,
+  Shovel,
+  Sprout,
+  ThumbsUp,
+  Ticket,
+  Trophy,
+  Wheat,
+  type LucideIcon,
+} from 'lucide-react';
+import type { DailyPointTaskId } from '@/domain/sign-in';
+
+export const dailyPointTaskCopy: Record<
+  DailyPointTaskId,
+  { name: string; hint: string; icon: LucideIcon }
+> = {
+  sign_in: { name: '每日签到', hint: '领取当天签到积分', icon: CalendarCheck },
+  speak: { name: '聊天室发言', hint: '每条符合条件的消息奖励 1 积分', icon: MessagesSquare },
+  moments_publish: { name: '发布动态', hint: '当天首次发布奖励 5 积分', icon: PenLine },
+  moments_like: { name: '点赞动态', hint: '每次符合条件的点赞奖励 1 积分', icon: ThumbsUp },
+  pet_treasure: { name: '营地挖宝', hint: '每次可得 1–10 积分', icon: Shovel },
+  free_draw: { name: '每日免费抽奖', hint: '当天首抽免费，部分奖品可折算积分', icon: Gift },
+  tower_climb: { name: '宠物爬塔', hint: '通关新楼层获得积分', icon: Castle },
+  farm_harvest: { name: '农场收获', hint: '收获作物按结算获得积分', icon: Wheat },
+  farm_steal: { name: '农场偷菜', hint: '好友有可偷作物时可获得积分', icon: Sprout },
+  item_decompose: { name: '分解物品', hint: '分解可回收的伙伴物品获得积分', icon: PackageOpen },
+  pet_daily: { name: '伙伴每日产出', hint: '已领养的伙伴每日自动产出积分', icon: PawPrint },
+  tournament_rank: { name: '武道大会', hint: '按结算名次发放排行奖励', icon: Trophy },
+  red_packet_grab: { name: '领取红包', hint: '聊天室有人发红包时可领取', icon: HandCoins },
+  lucky_bag_win: { name: '参与福袋', hint: '参与聊天室福袋，中奖后获得积分', icon: Gift },
+  moments_reward: { name: '收到动态打赏', hint: '岛友打赏你的动态时获得积分', icon: HandCoins },
+  sign_in_makeup: { name: '补签', hint: '消耗 20 积分补签并领取对应签到奖励', icon: CalendarDays },
+  redeem_code: { name: '积分兑换码', hint: '使用有效的积分兑换码领取奖励', icon: Ticket },
+  sponsor: { name: '赞助回馈', hint: '符合条件的赞助到账后发放积分', icon: HeartHandshake },
+  BOSS_KILL: { name: '宠物 Boss', hint: '击败 Boss 后按参与和排名结算', icon: Ghost },
+};

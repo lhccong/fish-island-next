@@ -10,7 +10,7 @@ export function AccountControl({
   menuItems,
 }: {
   onLogin: () => void;
-  accountActions?: ReactNode;
+  accountActions?: (closeProfile: () => void) => ReactNode;
   menuItems?: readonly DropdownMenuItem[];
 }) {
   const { session, pending, logout, notify } = useAuth();
