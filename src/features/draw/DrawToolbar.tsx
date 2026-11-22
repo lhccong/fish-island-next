@@ -1,16 +1,8 @@
 import { Pencil, Eraser, Undo2, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
-import { Select } from '@/shared/ui/Select';
 import { Slider } from '@/shared/ui/Slider';
+import { DrawPaintPicker } from './DrawPaintPicker';
 import styles from './Draw.module.css';
-const paints = [
-  ['ink', '墨黑'],
-  ['red', '朱红'],
-  ['blue', '海蓝'],
-  ['green', '草绿'],
-  ['gold', '金黄'],
-  ['purple', '紫色'],
-] as const;
 export function DrawToolbar({
   paint,
   eraser,
@@ -59,12 +51,7 @@ export function DrawToolbar({
         </Button>
       </div>
       <div className={styles.brush}>
-        <Select
-          label="画笔颜色"
-          value={paint}
-          onValueChange={onPaint}
-          options={paints.map((p) => ({ value: p[0], label: p[1] }))}
-        />
+        <DrawPaintPicker paint={paint} onPaint={onPaint} />
         <Slider label="笔触粗细" min={2} max={20} value={size} onValueChange={onSize} />
       </div>
     </div>

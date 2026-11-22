@@ -6,6 +6,7 @@ export async function drawFixture(page: Page) {
   const firstLoad = new Promise<void>((resolve) => {
     releaseFirstLoad = resolve;
   });
+  let nextSave: Promise<void> | undefined;
   const state = {
     empty: true,
     fail: false,
@@ -13,6 +14,8 @@ export async function drawFixture(page: Page) {
     saveFail: false,
     delay: 200,
     calls: 0,
+    saveRequests: 0,
+    messagesSent: [] as string[],
     saves: [] as string[],
     activeSaves: 0,
     maxSaves: 0,
@@ -87,8 +90,12 @@ export async function drawFixture(page: Page) {
     }
     if (path === 'room/remove') state.empty = true;
     if (path === 'data/save') {
+      state.saveRequests++;
       state.activeSaves++;
       state.maxSaves = Math.max(state.maxSaves, state.activeSaves);
+      const pending = nextSave;
+      nextSave = undefined;
+      await pending;
       await new Promise((resolve) => setTimeout(resolve, 100));
       state.activeSaves--;
       if (state.saveFail) return route.fulfill({ status: 503, json: {} });
@@ -98,17 +105,30 @@ export async function drawFixture(page: Page) {
     if (path === 'guess') {
       const body = route.request().postDataJSON();
       expect(body.messageWrapper.message.roomId).toBe(state.room.roomId);
-      const correct = body.guessWord === '苹果';
-      const guess = {
-        userId: '123',
-        userName: '合成画家',
-        guessWord: body.guessWord,
-        isCorrect: correct,
-        guessTime: new Date().toISOString(),
-      };
-      state.guesses.push(guess);
-      data = guess;
-      if (correct) state.room.participants[0]!.score = 10;
+      state.messagesSent.push(body.messageWrapper.message.content);
+      const player = state.room.participants[0]!;
+      if (
+        !state.room.drawData ||
+        state.room.currentDrawerId === player.userId ||
+        player.hasGuessedCorrectly
+      ) {
+        data = null;
+      } else {
+        const correct = body.guessWord === '苹果';
+        const guess = {
+          userId: player.userId,
+          userName: player.userName,
+          guessWord: body.guessWord,
+          isCorrect: correct,
+          guessTime: new Date().toISOString(),
+        };
+        state.guesses.push(guess);
+        data = guess;
+        if (correct) {
+          player.score = 10;
+          player.hasGuessedCorrectly = true;
+        }
+      }
     }
     return route.fulfill({ json: { code: 0, data } });
   });
@@ -116,6 +136,13 @@ export async function drawFixture(page: Page) {
     state,
     connection,
     releaseFirstLoad,
+    holdNextSave: () => {
+      let release = () => {};
+      nextSave = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      return release;
+    },
     refresh: () => connection.emit({ type: 'refreshDraw', data: 'synthetic-draw' }),
   };
 }
@@ -160,12 +187,41 @@ export async function assertDrawLayout(page: Page, width: number) {
     for (const button of await page.locator('[data-view] button:visible').all())
       expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   }
-  const toolbar = page.getByRole('group', { name: '画布工具' });
-  if (await toolbar.isVisible()) {
-    const layout = await toolbar.evaluate((element) => ({
-      bottom: element.getBoundingClientRect().bottom,
-      canvasTop: element.parentElement!.querySelector('canvas')!.getBoundingClientRect().top,
-    }));
-    expect(layout.bottom).toBeLessThanOrEqual(layout.canvasTop);
+  const board = page.getByRole('region', { name: '绘画区', exact: true });
+  if (await board.isVisible()) {
+    const layout = await board.evaluate((element) => {
+      const game = element.parentElement!.parentElement!;
+      const bounds = (container: Element, selector: string) =>
+        container.querySelector(selector)?.getBoundingClientRect().toJSON() as DOMRect | undefined;
+      return {
+        game: game.getBoundingClientRect().toJSON() as DOMRect,
+        board: element.getBoundingClientRect().toJSON() as DOMRect,
+        canvas: bounds(element, 'canvas')!,
+        tools: bounds(element, '[aria-label="画布工具"]'),
+        round: bounds(element, '[aria-label="本轮信息与操作"]')!,
+        players: bounds(game, '[aria-label="玩家与分数"]')!,
+        activity: bounds(game, '[aria-label="聊天与猜词记录"]')!,
+        guesses: bounds(game, '[aria-label="聊天与猜词记录"] [aria-label="猜词记录"]')!,
+      };
+    });
+    expect(layout.round.bottom).toBeLessThanOrEqual(layout.canvas.top);
+    expect(layout.guesses.bottom).toBeLessThanOrEqual(layout.activity.bottom);
+    if (layout.tools) {
+      expect(layout.tools.bottom).toBeLessThanOrEqual(layout.canvas.top);
+      if (layout.board.width >= 620) {
+        expect(layout.tools.right).toBeLessThanOrEqual(layout.round.left + 1);
+        expect(Math.abs(layout.tools.top - layout.round.top)).toBeLessThanOrEqual(1);
+      } else {
+        expect(layout.round.bottom).toBeLessThanOrEqual(layout.tools.top + 1);
+      }
+    }
+    if (layout.game.width > 800) {
+      expect(layout.players.left).toBeGreaterThanOrEqual(layout.board.right);
+      expect(Math.abs(layout.players.top - layout.board.top)).toBeLessThanOrEqual(1);
+      expect(layout.activity.top).toBeGreaterThanOrEqual(layout.players.bottom);
+    } else {
+      expect(layout.activity.top).toBeGreaterThanOrEqual(layout.board.bottom);
+      expect(layout.players.top).toBeGreaterThanOrEqual(layout.activity.bottom);
+    }
   }
 }

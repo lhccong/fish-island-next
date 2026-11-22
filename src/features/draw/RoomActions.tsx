@@ -92,7 +92,7 @@ export function RoomActions({
         }
         description={
           saving
-            ? '画作尚未同步，退出后未保存的绘画将丢失。房主退出可能关闭房间。'
+            ? '退出后未保存的绘画将丢失。房主退出可能关闭房间。'
             : '房主退出可能关闭房间，当前操作以服务端确认为准。'
         }
         open={confirm !== null}

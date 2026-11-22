@@ -169,6 +169,7 @@ describe('绘画旧协议边界', () => {
     expect(message).toHaveBeenCalledWith(
       expect.objectContaining({ roomId: 'r1', content: '猜猜看' }),
     );
+    expect(refresh).toHaveBeenCalledTimes(1);
     channel.receive({
       type: 'draw',
       data: {

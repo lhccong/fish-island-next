@@ -3,38 +3,39 @@ import { useState } from 'react';
 import type { DrawPort, DrawIdentity } from '@/domain/draw';
 import { Button } from '@/shared/ui/Button';
 import styles from './Draw.module.css';
-export function GuessComposer({
+export function RoomComposer({
   service,
   roomId,
   user,
   getSignal,
-  disabled,
+  canGuess,
+  unavailable,
   onSent,
 }: {
   service: DrawPort;
   roomId: string;
   user: DrawIdentity;
   getSignal: () => AbortSignal;
-  disabled: boolean;
-  onSent: () => void;
+  canGuess: boolean;
+  unavailable: string;
+  onSent: (content: string, guessed: boolean) => void;
 }) {
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
   async function send() {
-    if (busy || !draft.trim() || disabled) return;
+    const content = draft.trim();
+    if (busy || !content || unavailable) return;
     const signal = getSignal();
     setBusy(true);
     setError('');
     try {
-      const result = await service.guess(roomId, draft.trim(), user, signal);
+      const result = await service.guess(roomId, content, user, signal);
       if (signal.aborted) return;
       setDraft('');
-      setFeedback(
-        result?.correct ? '猜对了！' : result ? '还没猜中，再试试' : '已发送，请留意房间提示',
-      );
-      onSent();
+      setFeedback(result?.correct ? '猜对了！' : result ? '还没猜中，再试试' : '');
+      onSent(content, result !== null);
     } catch (e) {
       if (!signal.aborted) setError(e instanceof Error ? e.message : '发送失败，请重试');
     } finally {
@@ -49,21 +50,20 @@ export function GuessComposer({
         void send();
       }}
     >
-      <label htmlFor={`guess-${roomId}`}>猜一猜画的是什么</label>
       <div className={styles.guessInput}>
         <input
-          id={`guess-${roomId}`}
+          aria-label={canGuess ? '猜一猜画的是什么' : '房间聊天'}
           value={draft}
           maxLength={50}
-          disabled={disabled || busy}
-          placeholder="输入你的答案"
+          disabled={Boolean(unavailable) || busy}
+          placeholder={unavailable || (canGuess ? '输入你的猜测' : '输入聊天内容')}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && e.nativeEvent.isComposing) e.preventDefault();
           }}
         />
-        <Button type="submit" disabled={disabled || busy || !draft.trim()}>
-          {busy ? <LoadingIndicator compact>{'提交中…'}</LoadingIndicator> : '提交猜词'}
+        <Button type="submit" disabled={Boolean(unavailable) || busy || !draft.trim()}>
+          {busy ? <LoadingIndicator compact>发送中…</LoadingIndicator> : canGuess ? '猜词' : '发送'}
         </Button>
       </div>
       {feedback && <p role="status">{feedback}</p>}

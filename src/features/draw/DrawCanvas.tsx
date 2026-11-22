@@ -2,6 +2,7 @@ import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import type { DrawPort } from '@/domain/draw';
 import { Button } from '@/shared/ui/Button';
+import { defaultDrawPaint } from './DrawPaintPicker';
 import { DrawToolbar } from './DrawToolbar';
 
 import styles from './Draw.module.css';
@@ -21,31 +22,28 @@ export function DrawCanvas({
   onPending: (pending: boolean) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const [paint, setPaint] = useState('ink');
+  const [paint, setPaint] = useState(defaultDrawPaint);
   const [eraser, setEraser] = useState(false);
   const [size, setSize] = useState(5);
-  const [sync, setSync] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [dirty, setDirty] = useState(false);
   const [error, setError] = useState('');
   const point = useRef<{ x: number; y: number } | null>(null);
   const history = useRef<ImageData[]>([]);
-  const queue = useRef('');
-  const busy = useRef(false);
-
-  const edited = useRef(false);
+  const revision = useRef(0);
+  const saving = useRef(false);
   const lastSaved = useRef('');
   const abort = useRef(new AbortController());
-  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     abort.current = controller;
     return () => {
       controller.abort();
-      if (debounce.current) clearTimeout(debounce.current);
       onPending(false);
     };
   }, [onPending]);
   useEffect(() => {
-    if (editable && edited.current) return;
+    if (editable && revision.current) return;
     const context = canvas.current?.getContext('2d');
     if (!context) return;
     if (!image) {
@@ -56,7 +54,7 @@ export function DrawCanvas({
     let cancelled = false;
     const bitmap = new Image();
     bitmap.onload = () => {
-      if (!cancelled && !(editable && edited.current)) {
+      if (!cancelled && !(editable && revision.current)) {
         context.clearRect(0, 0, 900, 600);
         context.drawImage(bitmap, 0, 0, 900, 600);
       }
@@ -70,39 +68,40 @@ export function DrawCanvas({
     };
   }, [image, editable]);
   async function save() {
-    if (busy.current || !queue.current || abort.current.signal.aborted) return;
-    busy.current = true;
-    const snapshot = queue.current;
-    queue.current = '';
-    setSync('正在同步画作…');
+    const { signal } = abort.current;
+    if (!editable || !dirty || point.current || !canvas.current || saving.current || signal.aborted)
+      return;
+
+    const savedRevision = revision.current;
+    const snapshot = canvas.current.toDataURL('image/png');
+    saving.current = true;
+    setSaveStatus('saving');
     setError('');
     try {
-      await service.save(roomId, snapshot, abort.current.signal);
-      if (abort.current.signal.aborted) return;
+      await service.save(roomId, snapshot, signal);
+      if (signal.aborted) return;
       lastSaved.current = snapshot;
-
-      setSync('画作已同步');
+      if (revision.current === savedRevision) {
+        setDirty(false);
+        setSaveStatus('saved');
+        onPending(false);
+      } else {
+        setSaveStatus('idle');
+      }
       onSaved();
-      if (!queue.current) onPending(false);
     } catch (e) {
-      if (abort.current.signal.aborted) return;
-      if (!queue.current) queue.current = snapshot;
-      setSync('');
-      setError(e instanceof Error ? e.message : '画作同步失败，请重试');
-      busy.current = false;
-      return;
+      if (signal.aborted) return;
+      setSaveStatus('idle');
+      setError(e instanceof Error ? e.message : '画作保存失败，请重试');
+    } finally {
+      saving.current = false;
     }
-    busy.current = false;
-    if (queue.current) void save();
   }
-  function publish() {
-    if (canvas.current) {
-      edited.current = true;
-      onPending(true);
-      queue.current = canvas.current.toDataURL('image/png');
-      if (debounce.current) clearTimeout(debounce.current);
-      debounce.current = setTimeout(() => void save(), 600);
-    }
+  function markEdited() {
+    revision.current++;
+    setDirty(true);
+    setSaveStatus((status) => (status === 'saved' ? 'idle' : status));
+    onPending(true);
   }
   function coordinates(e: PointerEvent<HTMLCanvasElement>) {
     const r = e.currentTarget.getBoundingClientRect();
@@ -115,9 +114,7 @@ export function DrawCanvas({
     const context = canvas.current?.getContext('2d');
     if (!context || !point.current) return;
     context.globalCompositeOperation = eraser ? 'destination-out' : 'source-over';
-    context.strokeStyle = getComputedStyle(canvas.current!)
-      .getPropertyValue(`--color-draw-${paint}`)
-      .trim();
+    context.strokeStyle = paint;
     context.lineWidth = eraser ? size * 4 : size;
     context.lineCap = 'round';
     context.lineJoin = 'round';
@@ -135,17 +132,14 @@ export function DrawCanvas({
     history.current = [...history.current.slice(-9), context.getImageData(0, 0, 900, 600)];
     e.currentTarget.setPointerCapture(e.pointerId);
     point.current = coordinates(e);
-    onPending(true);
-    edited.current = true;
+    markEdited();
     stroke(point.current);
   }
   function finish() {
-    if (!point.current) return;
     point.current = null;
-    publish();
   }
   return (
-    <section className={styles.painting} aria-label="绘画区">
+    <>
       {editable && (
         <DrawToolbar
           paint={paint}
@@ -158,7 +152,7 @@ export function DrawCanvas({
             const previous = history.current.pop();
             if (previous) {
               canvas.current?.getContext('2d')?.putImageData(previous, 0, 0);
-              publish();
+              markEdited();
             }
           }}
           onClear={() => {
@@ -166,7 +160,7 @@ export function DrawCanvas({
             if (c) {
               history.current = [...history.current.slice(-9), c.getImageData(0, 0, 900, 600)];
               c.clearRect(0, 0, 900, 600);
-              publish();
+              markEdited();
             }
           }}
         />
@@ -189,23 +183,22 @@ export function DrawCanvas({
       </div>
       {editable && (
         <div className={styles.canvasFeedback}>
-          <div role="status">
-            {sync === '正在同步画作…' ? (
-              <LoadingIndicator compact>{sync}</LoadingIndicator>
+          <div className={styles.canvasStatus}>
+            {saveStatus === 'saving' ? (
+              <LoadingIndicator compact>正在保存画作…</LoadingIndicator>
+            ) : error ? (
+              <span role="alert">{error}</span>
             ) : (
-              sync || '落笔后自动同步'
+              <span role="status">
+                {dirty ? '有未保存的修改' : saveStatus === 'saved' ? '画作已保存' : ''}
+              </span>
             )}
           </div>
-          {error && (
-            <div role="alert">
-              {error}
-              <Button variant="secondary" onClick={() => void save()}>
-                重试同步画作
-              </Button>
-            </div>
-          )}
+          <Button disabled={!dirty || saveStatus === 'saving'} onClick={() => void save()}>
+            保存
+          </Button>
         </div>
       )}
-    </section>
+    </>
   );
 }

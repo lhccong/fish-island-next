@@ -61,7 +61,7 @@
 
 ## 你画我猜（ADR-066）
 
-入口：游戏 → 你画我猜 → 创建房间、画布工具。源码：src/features/draw/CreateRoom.tsx、DrawCanvas.tsx、RoomActions.tsx。人数/轮数/词库/绘画方式/颜色统一使用 shared/ui/Select，笔触复用 Slider，操作与确认复用 Button/Dialog，正文采用 reserved ScrollArea；不引入原生 select、系统 color 面板或 alert/confirm/prompt。整改状态：新迁移界面已统一；验收与限制见 [你画我猜验收](draw-migration.md)。
+入口：游戏 → 你画我猜 → 创建房间、画布工具。源码：src/features/draw/CreateRoom.tsx、DrawToolbar.tsx、DrawPaintPicker.tsx、RoomActions.tsx。人数、轮数、词库、绘画方式和预设颜料使用 shared/ui/Select，自定义颜料使用共享 Popover 内的文本输入，笔触复用 Slider，操作与确认复用 Button/Dialog，正文采用 reserved ScrollArea。验收与限制见 [你画我猜验收](draw-migration.md)。
 
 ## 斗地主迁移（ADR-067）
 

@@ -14,6 +14,7 @@ export function DrawPage() {
       mobileHeader="back-only"
       slots={{
         sidebar: <DiscoveryNavigation />,
+        status: roomId ? null : undefined,
         header: (
           <div className={styles.header}>
             <h1>你画我猜</h1>

@@ -44,6 +44,7 @@ export function createDrawChannel() {
             content,
           };
           messages.forEach((listener) => listener(message));
+          return;
         } else if (frame.type !== 'refreshRoom' && frame.type !== 'gameStart') return;
         listeners.forEach((listener) => listener(roomId));
       } catch {

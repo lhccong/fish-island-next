@@ -5,11 +5,9 @@ import { RefreshCw, LayoutGrid } from 'lucide-react';
 import type { DrawPort, DrawRealtimePort, DrawIdentity, DrawSettings } from '@/domain/draw';
 import { Button } from '@/shared/ui/Button';
 
-import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { RoomDirectory } from './RoomDirectory';
 import { CreateRoom } from './CreateRoom';
 import { DrawCanvas } from './DrawCanvas';
-import { GuessComposer } from './GuessComposer';
 import { RoomActions } from './RoomActions';
 import { RoomActivity } from './RoomActivity';
 import { RoundClock } from './RoundClock';
@@ -85,9 +83,9 @@ export function DrawWorkspace({
       </div>
     );
   const room = data.room;
-  const member = room?.players.some((p) => p.id === user.id);
+  const player = room?.players.find((p) => p.id === user.id);
 
-  const drawing = room?.drawerId === user.id && room.status === 'PLAYING' && member;
+  const drawing = room?.drawerId === user.id && room.status === 'PLAYING' && Boolean(player);
   return (
     <div className={styles.workspace} data-view={roomId ? 'room' : 'lobby'}>
       <div className={styles.top}>
@@ -144,114 +142,111 @@ export function DrawWorkspace({
         </div>
       )}
       {room && (
-        <>
-          <div className={styles.round}>
-            <div className={styles.roundInfo}>
-              <span>
-                {room.status === 'ENDED' ? '本局结束' : `第 ${room.round || 0} / ${room.rounds} 轮`}
-              </span>
-              <strong>
-                {room.status === 'WAITING'
-                  ? '等待玩家就位'
-                  : drawing
-                    ? `你的题目：${room.word || '等待题目'}`
-                    : room.status === 'ENDED'
-                      ? `答案：${room.word || '本局已结束'}`
-                      : `提示：${room.hint || '看画猜词'}`}
-              </strong>
-              <span>
-                {room.status === 'PLAYING'
-                  ? `${room.drawerName || '画家'} 正在绘画`
-                  : room.status === 'ENDED'
-                    ? '本局得分已结算'
-                    : '至少两人即可开始'}
-              </span>
-            </div>
-            <div className={styles.roundControls}>
-              <RoundClock endTime={room.status === 'PLAYING' ? room.endTime : 0} />
-              <RoomActions
-                room={room}
-                userId={user.id}
-                admin={user.role === 'admin'}
-                busy={busy}
-                saving={saving}
-                error={error}
-                onAction={action}
-              />
-            </div>
-          </div>
-          <div className={styles.game}>
-            <DrawCanvas
-              key={`${room.id}:${room.round}:${room.drawerId}`}
-              service={service}
-              roomId={room.id}
-              image={room.image}
-              editable={Boolean(drawing)}
-              onSaved={data.refresh}
-              onPending={setSaving}
-            />
-            <aside className={styles.side}>
-              <section className={styles.panel}>
-                <h3>
-                  玩家 · {room.count}/{room.maxPlayers}
-                </h3>
-                <ul className={styles.players}>
-                  {room.players.map((p) => (
-                    <li
-                      key={p.id}
-                      data-drawing={p.id === room.drawerId && room.status === 'PLAYING'}
-                    >
-                      <span className={styles.playerIdentity}>
-                        <UserAvatar name={p.name} src={p.avatar} />
-                        <span>
-                          {p.name}
-                          <small>
-                            {p.id === room.drawerId && room.status === 'PLAYING'
-                              ? '绘画中'
-                              : p.correct
-                                ? '已猜中'
-                                : p.id === room.creatorId
-                                  ? '房主'
-                                  : '猜词中'}
-                          </small>
-                        </span>
-                      </span>
-                      <strong>{p.score} 分</strong>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-              <section className={`${styles.panel} ${styles.guesses}`}>
-                <h3>猜词记录</h3>
-                <div className={styles.records}>
-                  <ScrollArea label="猜词记录" gutter="reserved">
-                    <div className={styles.recordContent}>
-                      {data.guesses.length ? (
-                        data.guesses.map((g) => (
-                          <p key={g.id}>
-                            <span>{g.name}</span> {g.correct ? '猜对了！' : g.word}
-                          </p>
-                        ))
-                      ) : (
-                        <p>还没有人猜词，看看画布上的线索。</p>
-                      )}
-                    </div>
-                  </ScrollArea>
+        <div className={styles.game}>
+          <div className={styles.board}>
+            <section className={styles.painting} aria-label="绘画区" data-editable={drawing}>
+              <div className={styles.round} role="group" aria-label="本轮信息与操作">
+                <div className={styles.roundInfo}>
+                  <span>
+                    {room.status === 'ENDED'
+                      ? '本局结束'
+                      : `第 ${room.round || 0} / ${room.rounds} 轮`}
+                  </span>
+                  <strong>
+                    {room.status === 'WAITING'
+                      ? '等待玩家就位'
+                      : drawing
+                        ? `你的题目：${room.word || '等待题目'}`
+                        : room.status === 'ENDED'
+                          ? `答案：${room.word || '本局已结束'}`
+                          : `提示：${room.hint || '看画猜词'}`}
+                  </strong>
+                  <span>
+                    {room.status === 'PLAYING'
+                      ? `${room.drawerName || '画家'} 正在绘画`
+                      : room.status === 'ENDED'
+                        ? '本局得分已结算'
+                        : '至少两人即可开始'}
+                  </span>
                 </div>
-                <GuessComposer
-                  key={room.id}
-                  service={service}
-                  roomId={room.id}
-                  user={user}
-                  getSignal={() => controller.current.signal}
-                  disabled={!member || room.status !== 'PLAYING' || busy}
-                  onSent={data.refresh}
-                />
-              </section>
-              <RoomActivity key={room.id} realtime={realtime} roomId={room.id} />
-            </aside>
+                <div className={styles.roundControls}>
+                  <RoundClock endTime={room.status === 'PLAYING' ? room.endTime : 0} />
+                  <RoomActions
+                    room={room}
+                    userId={user.id}
+                    admin={user.role === 'admin'}
+                    busy={busy}
+                    saving={saving}
+                    error={error}
+                    onAction={action}
+                  />
+                </div>
+              </div>
+              <DrawCanvas
+                key={`${room.id}:${room.round}:${room.drawerId}`}
+                service={service}
+                roomId={room.id}
+                image={room.image}
+                editable={Boolean(drawing)}
+                onSaved={data.refresh}
+                onPending={setSaving}
+              />
+            </section>
           </div>
-        </>
+          <aside className={styles.side}>
+            <section className={`${styles.panel} ${styles.playerPanel}`} aria-label="玩家与分数">
+              <h3>
+                玩家 · {room.count}/{room.maxPlayers}
+              </h3>
+              <ul className={styles.players}>
+                {room.players.map((p) => (
+                  <li key={p.id} data-drawing={p.id === room.drawerId && room.status === 'PLAYING'}>
+                    <span className={styles.playerIdentity}>
+                      <UserAvatar name={p.name} src={p.avatar} />
+                      <span>
+                        {p.name}
+                        <small>
+                          {p.id === room.drawerId && room.status === 'PLAYING'
+                            ? '绘画中'
+                            : p.correct
+                              ? '已猜中'
+                              : p.id === room.creatorId
+                                ? '房主'
+                                : '猜词中'}
+                        </small>
+                      </span>
+                    </span>
+                    <strong>{p.score} 分</strong>
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <RoomActivity
+              key={room.id}
+              service={service}
+              realtime={realtime}
+              roomId={room.id}
+              user={user}
+              guesses={data.guesses}
+              getSignal={() => controller.current.signal}
+              canGuess={Boolean(
+                room.status === 'PLAYING' && room.image && !drawing && !player?.correct,
+              )}
+              unavailable={
+                !player
+                  ? '加入房间后可发言'
+                  : room.status === 'WAITING'
+                    ? '游戏开始后可发言'
+                    : room.status === 'ENDED'
+                      ? '本局已结束'
+                      : busy
+                        ? '正在处理房间操作'
+                        : ''
+              }
+              onGuess={data.refresh}
+            />
+          </aside>
+        </div>
       )}
     </div>
   );
