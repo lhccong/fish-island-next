@@ -1,6 +1,7 @@
 import { Diamond, Footprints, Sparkle, Sparkles, Swords } from 'lucide-react';
 import { getPetCard, petCardGrades, petCardStatEntries, type PetCardId } from '@/domain/pet';
 import { petCardArt } from './card-art';
+import { usePetCardCatalog } from './catalog-context';
 import { describePetCardBattleEffect } from './card-battle-copy';
 import styles from './PetCards.module.css';
 
@@ -10,7 +11,7 @@ const battleActions = {
 };
 
 export function PetCardFace({ id, compact = false }: { id: PetCardId; compact?: boolean }) {
-  const card = getPetCard(id);
+  const card = getPetCard(id, usePetCardCatalog());
   const GradeIcon = card.grade === 'shiny' ? Sparkles : Diamond;
   const action = card.grade === 'common' ? battleActions[card.battle.action] : null;
   const effect = card.battle.kind === 'effect' ? card.battle : null;

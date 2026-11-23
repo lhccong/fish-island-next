@@ -1,15 +1,20 @@
 import type { Table } from 'dexie';
 import {
-  emptyPetCards,
+  demoPetCardCatalog,
   petCardsDay,
+  restorePetCardsProgress,
   updatePetCards,
+  type LegacyPetCardsProgress,
   type PetCardsPort,
   type PetCardsProgress,
 } from '@/domain/pet';
 
-type SavedProgress = { id: string; progress: PetCardsProgress };
+type SavedProgress = { id: string; progress: PetCardsProgress | LegacyPetCardsProgress };
 
-export function createBrowserPetCards(scope: string): PetCardsPort {
+export function createBrowserPetCards(
+  scope: string,
+  loadCatalog: PetCardsPort['catalog'] = () => Promise.resolve(demoPetCardCatalog),
+): PetCardsPort {
   let connection: ReturnType<typeof connect> | undefined;
   const collection = () => (connection ??= connect());
 
@@ -18,6 +23,7 @@ export function createBrowserPetCards(scope: string): PetCardsPort {
   }
 
   return {
+    catalog: loadCatalog,
     watch(userId, receive, fail) {
       let active = true;
       let unsubscribe: (() => void) | undefined;
@@ -26,7 +32,7 @@ export function createBrowserPetCards(scope: string): PetCardsPort {
           if (!active) return;
           const subscription = liveQuery(async () => {
             const saved = await albums.get(key(userId));
-            return saved?.progress ?? emptyPetCards();
+            return restorePetCardsProgress(saved?.progress);
           }).subscribe({
             next: receive,
             error: () => {
@@ -49,12 +55,18 @@ export function createBrowserPetCards(scope: string): PetCardsPort {
         unsubscribe?.();
       };
     },
-    async update(userId, action) {
+    async update(userId, action, catalog) {
       const { albums } = await collection();
       const id = key(userId);
       return albums.db.transaction('rw', albums, async () => {
         const saved = await albums.get(id);
-        const progress = updatePetCards(saved?.progress ?? emptyPetCards(), action, petCardsDay());
+        const progress = updatePetCards(
+          restorePetCardsProgress(saved?.progress),
+          action,
+          petCardsDay(),
+          Math.random,
+          catalog,
+        );
         await albums.put({ id, progress });
         return progress;
       });
@@ -66,6 +78,8 @@ async function connect() {
   const { default: Dexie, liveQuery } = await import('dexie');
   const database = new Dexie('fish-island-pet-cards');
   database.version(1).stores({ albums: 'id' });
+  // Close pre-inventory clients before the new format is written.
+  database.version(2).stores({ albums: 'id' });
   const albums: Table<SavedProgress, string> = database.table('albums');
   return { albums, liveQuery };
 }

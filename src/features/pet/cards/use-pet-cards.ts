@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   petCardsDay,
+  type PetCardCatalog,
   type PetCardsAction,
   type PetCardsPort,
   type PetCardsProgress,
@@ -9,7 +10,7 @@ import {
 type Snapshot =
   { status: 'loading' } | { status: 'error' } | { status: 'ready'; progress: PetCardsProgress };
 
-export function usePetCards(port: PetCardsPort, userId: string) {
+export function usePetCards(port: PetCardsPort, userId: string, catalog: PetCardCatalog) {
   const [snapshot, setSnapshot] = useState<Snapshot>({ status: 'loading' });
   const [attempt, setAttempt] = useState(0);
   const [day, setDay] = useState(petCardsDay);
@@ -46,7 +47,7 @@ export function usePetCards(port: PetCardsPort, userId: string) {
     setError('');
     setPending(true);
     try {
-      await port.update(userId, action);
+      await port.update(userId, action, catalog);
       return true;
     } catch (cause) {
       setError(

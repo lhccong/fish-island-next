@@ -233,6 +233,10 @@
   grid-column: 1;
 }
 @media (min-width: 761px) {
+  .shell[data-navigation-layout='rail'][data-sidebar-hidden='true'][data-content-centered='true']
+    .workspace {
+    grid-column: 2 / -1;
+  }
   .shell[data-desktop-header-hidden='true'] .header {
     display: none;
   }

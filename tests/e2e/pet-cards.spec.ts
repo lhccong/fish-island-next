@@ -2,13 +2,16 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import {
   activate,
-  assertCardAbilities,
+  assertCollectionSlots,
   assertEqualCardHeights,
+  assertPackStock,
   assertShowcaseEffect,
   choosePetCardPack,
+  flipThirdCard,
   verifyKingdomsPack,
 } from './pet-cards-flow';
 import { setupPet } from './pet-fixture';
+import { setupPetCardCatalog } from './pet-card-catalog-fixture';
 
 async function assertLayout(viewport: Locator) {
   const layout = await viewport.evaluate((element) => {
@@ -60,7 +63,8 @@ for (const skin of builtinSkins)
       test(`pet cards ${skin.id} ${mode} ${width}`, async ({ page }, info) => {
         const mobile = width <= 760;
         await page.setViewportSize({ width, height: mobile ? 844 : 960 });
-        const camp = await setupPet(page, skin.id, mode);
+        await setupPet(page, skin.id, mode, 'admin');
+        const catalogRequests = await setupPetCardCatalog(page);
         await page.evaluate(() => {
           Math.random = () => 0;
           const open = IDBFactory.prototype.open;
@@ -100,6 +104,7 @@ for (const skin of builtinSkins)
         const viewport = dialog.getByRole('region', { name: '宠物卡包内容' });
         const button = (name: string) => dialog.getByRole('button', { name, exact: true });
         const showcase = dialog.getByRole('region', { name: '宠物卡片展示柜' });
+        const collection = dialog.getByRole('region', { name: '我的卡片' });
         await expect(dialog.getByRole('status')).toContainText('正在读取宠物卡包');
         await expect
           .poll(() =>
@@ -112,22 +117,27 @@ for (const skin of builtinSkins)
           .toBe(true);
         await expect(dialog.getByText(/今日可领 2 \/ 2/)).toBeVisible();
         expect(await assertLayout(viewport)).toBe(mobile ? 20 : 24);
-        if (
-          skin.id === 'pixel-island' &&
-          ((mode === 'dark' && width === 375) || (mode === 'light' && width === 1440))
-        ) {
-          await dialog.screenshot({ path: info.outputPath('sealed-pack.png') });
-        }
         await activate(button('展示柜'), mobile);
         await expect(dialog.getByText('开包收藏第一张宠物卡。')).toBeVisible();
+        await assertCollectionSlots(collection, 0);
         await activate(button('开卡包'), mobile);
         await activate(button('领取卡包'), mobile);
         await expect(dialog.getByRole('alert')).toContainText('保存试玩进度失败');
         await expect(dialog.getByText(/今日可领 2 \/ 2/)).toBeVisible();
         await activate(button('领取卡包'), mobile);
         await expect(dialog.getByText(/今日可领 1 \/ 2/)).toBeVisible();
+        await assertPackStock(dialog, 1);
+        await activate(button('领取卡包'), mobile);
+        await assertPackStock(dialog, 2);
+        if (
+          skin.id === 'pixel-island' &&
+          ((mode === 'dark' && width === 375) || (mode === 'light' && width === 1440))
+        ) {
+          await dialog.screenshot({ path: info.outputPath('sealed-pack.png') });
+        }
         await activate(button('拆开卡包'), mobile);
         await expect(button('翻开下一张')).toBeEnabled();
+        await flipThirdCard(page, dialog, mobile);
         if (mobile) await button('翻开下一张').tap();
         else {
           await button('翻开下一张').focus();
@@ -136,7 +146,7 @@ for (const skin of builtinSkins)
         }
         await expect(dialog.getByText('新收藏', { exact: true })).toHaveCount(1);
         if (mode === 'dark') {
-          for (let index = 1; index < 5; index++) await activate(button('翻开下一张'), mobile);
+          for (let index = 2; index < 5; index++) await activate(button('翻开下一张'), mobile);
         } else {
           await activate(button('全部翻开'), mobile);
         }
@@ -173,7 +183,10 @@ for (const skin of builtinSkins)
           });
         expect(backgrounds.passive).toBe(backgrounds.stats);
         expect(backgrounds.passive).not.toBe('rgb(255, 255, 255)');
-        await assertEqualCardHeights(dialog.getByRole('region', { name: '开卡结果' }), 5);
+        await assertEqualCardHeights(
+          dialog.getByRole('region', { name: '开卡结果' }).locator('[data-grade]'),
+          5,
+        );
         expect(await assertLayout(viewport)).toBe(mobile ? 20 : 24);
         if (
           skin.id === 'pixel-island' &&
@@ -184,34 +197,22 @@ for (const skin of builtinSkins)
         await activate(button('完成开包'), mobile);
         await activate(button('展示柜'), mobile);
         await expect(showcase).toContainText('0 / 3');
-        const collection = dialog.getByRole('region', { name: '我的卡片' });
-        await assertEqualCardHeights(collection, 50);
-        await assertCardAbilities(collection);
-        const atlases = await collection
-          .locator('[data-grade] [aria-hidden="true"][style]')
-          .evaluateAll((tiles) => tiles.map((tile) => getComputedStyle(tile).backgroundImage));
-        expect(new Set(atlases).size).toBe(5);
-        for (const atlas of new Set(atlases))
-          expect(atlases.filter((image) => image === atlas)).toHaveLength(10);
-        const metallicColors = await collection
-          .locator('[data-grade="legendary"], [data-grade="shiny"]')
-          .evaluateAll((cards) =>
-            cards.map((card) => getComputedStyle(card).getPropertyValue('--card-metal').trim()),
-          );
-        expect(new Set(metallicColors).size).toBe(2);
-        const shinyRims = await collection
-          .locator('[data-grade="shiny"]')
-          .evaluateAll((cards) => cards.map((card) => getComputedStyle(card).backgroundImage));
-        expect(shinyRims).toHaveLength(10);
-        for (const rim of shinyRims) expect(rim).toContain('conic-gradient');
+        await assertCollectionSlots(collection, 2);
+        const slots = collection.getByRole('list').first().locator(':scope > li');
+        await expect(slots.nth(0)).toContainText('拾贝萝卜');
+        await expect(slots.nth(0)).toContainText('对战动作');
+        await expect(slots.nth(8)).toContainText('极光灵狐');
+        await expect(slots.nth(8).locator('[data-grade="shiny"]')).toHaveCSS(
+          'background-image',
+          /conic-gradient/,
+        );
+        await expect(collection.getByText('潮汐小蟹', { exact: true })).toHaveCount(0);
         if (
           skin.id === 'pixel-island' &&
           ((mode === 'light' && width === 1440) || (mode === 'dark' && width === 375))
         ) {
-          await collection.getByText('星轨蝶灵', { exact: true }).evaluate((label) => {
-            label.closest('[data-grade]')?.scrollIntoView({ block: 'center' });
-          });
-          await dialog.screenshot({ path: info.outputPath('equal-height-cards.png') });
+          await slots.nth(0).evaluate((slot) => slot.scrollIntoView({ block: 'start' }));
+          await dialog.screenshot({ path: info.outputPath('collection-slots.png') });
           await viewport.evaluate((element) => {
             element.scrollTop = 0;
           });
@@ -242,23 +243,15 @@ for (const skin of builtinSkins)
         await activate(button('展示柜'), mobile);
         await expect(showcase).toContainText('极光灵狐');
         await activate(button('开卡包'), mobile);
-        await activate(button('领取卡包'), mobile);
         await expect(dialog.getByText(/今日可领 0 \/ 2/)).toBeVisible();
+        await assertPackStock(dialog, 1);
         await activate(button('拆开卡包'), mobile);
         await activate(button('全部翻开'), mobile);
         await expect(dialog.getByText('重复卡已分解，获得 25 试玩积分')).toBeAttached();
         await activate(button('完成开包'), mobile);
         await expect(button('今日已领完')).toBeDisabled();
         await expect(dialog.getByText(/试玩积分 40/)).toBeVisible();
-        if (!mobile) {
-          const picker = dialog.getByRole('combobox', { name: '选择卡包' });
-          await picker.focus();
-          await page.keyboard.press('Space');
-          await expect(page.getByRole('option', { name: '三国群英', exact: true })).toBeVisible();
-          await page.keyboard.press('Escape');
-          await expect(picker).toBeFocused();
-        }
-        await choosePetCardPack(page, dialog, '三国群英', mobile);
+        await choosePetCardPack(dialog, '三国群英', mobile);
         await expect(dialog.getByRole('heading', { name: '三国群英', exact: true })).toBeVisible();
         await expect(button('今日已领完')).toBeDisabled();
         const reset = button('恢复初始状态');
@@ -273,12 +266,14 @@ for (const skin of builtinSkins)
         await expect(dialog.getByText('已恢复试玩初始状态。')).toBeVisible();
         await expect(reset).toBeFocused();
         await expect(dialog.getByText(/今日可领 2 \/ 2/)).toBeVisible();
+        await assertPackStock(dialog, 0);
         await expect(dialog.getByText(/收藏 0 \/ 50/)).toBeVisible();
         await expect(dialog.getByText(/试玩积分 0/)).toBeVisible();
         await expect(dialog.getByText('首包必有闪耀卡')).toBeVisible();
         await activate(button('展示柜'), mobile);
         await expect(showcase).toContainText('0 / 3');
         await expect(dialog.getByText('开包收藏第一张宠物卡。')).toBeVisible();
+        await assertCollectionSlots(collection, 0);
         const captureKingdoms =
           skin.id === 'pixel-island' &&
           ((mode === 'light' && width === 1440) || (mode === 'dark' && width === 375));
@@ -288,7 +283,7 @@ for (const skin of builtinSkins)
           mobile,
           captureKingdoms ? info.outputPath('three-kingdoms-cards.png') : undefined,
         );
-        expect(camp.requests.filter((request) => request.includes('card'))).toEqual([]);
+        expect(catalogRequests.length).toBeGreaterThanOrEqual(2);
         if (mobile) {
           await scrollByTouch(page, viewport);
           await expect.poll(() => viewport.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);

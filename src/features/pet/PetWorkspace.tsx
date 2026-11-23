@@ -76,7 +76,7 @@ export function PetWorkspace({
   onLotterySettled,
 }: {
   service: PetPort;
-  cardCollection: PetCardsPort;
+  cardCollection: PetCardsPort | null;
   userId: string;
   shortcut?: Shortcut | null;
   points?: number | undefined;
@@ -96,7 +96,8 @@ export function PetWorkspace({
     target === 'boss' || target === 'tower' || target === 'tournament' ? target : null;
   const shortcutPanel =
     target === 'supplies' || target === 'bag' || target === 'cards' ? target : 'challenge';
-  const panel = selectedPanel ? selectedPanel.panel : target ? shortcutPanel : null;
+  const requestedPanel = selectedPanel ? selectedPanel.panel : target ? shortcutPanel : null;
+  const panel = requestedPanel === 'cards' && !cardCollection ? null : requestedPanel;
   const challengeMode = selectedPanel?.mode ?? shortcutMode ?? 'rank';
   const [inventoryRevision, setInventoryRevision] = useState(0);
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -131,19 +132,21 @@ export function PetWorkspace({
             伙伴营地
           </h1>
           <nav ref={navigationRef} className={styles.tools} aria-label="伙伴功能">
-            {panels.map(({ id, title, icon: Icon }) => (
-              <Button
-                key={id}
-                variant="secondary"
-                className={styles.tool}
-                aria-label={title}
-                disabled={!pet && id !== 'cards'}
-                onClick={() => openPanel(id)}
-              >
-                <Icon size={18} aria-hidden="true" />
-                <span>{title}</span>
-              </Button>
-            ))}
+            {panels
+              .filter(({ id }) => id !== 'cards' || cardCollection)
+              .map(({ id, title, icon: Icon }) => (
+                <Button
+                  key={id}
+                  variant="secondary"
+                  className={styles.tool}
+                  aria-label={title}
+                  disabled={!pet && id !== 'cards'}
+                  onClick={() => openPanel(id)}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  <span>{title}</span>
+                </Button>
+              ))}
           </nav>
         </header>
         <div className={styles.dashboard}>
@@ -207,7 +210,7 @@ export function PetWorkspace({
         </div>
       </div>
       <PageFooterOutlet />
-      {panel === 'cards' && (
+      {panel === 'cards' && cardCollection && (
         <PetCardsDialog
           port={cardCollection}
           userId={userId}

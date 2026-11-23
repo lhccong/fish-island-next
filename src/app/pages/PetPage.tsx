@@ -40,7 +40,7 @@ export function PetPage() {
             <PetWorkspace
               key={session.user.id}
               service={petService}
-              cardCollection={petCardCollection}
+              cardCollection={session.user.role === 'admin' ? petCardCollection : null}
               onLotterySettled={refreshUser}
               userId={session.user.id}
               points={

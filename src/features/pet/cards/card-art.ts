@@ -1,3 +1,6 @@
+import type { PetCardImage } from '@/domain/pet';
+import { cardAtlasCrop } from '@/shared/ui/CardAtlasImage';
+
 const cardAtlases: readonly { file: string; portrait?: boolean }[] = [
   { file: 'card-art.jpg' },
   { file: 'card-art-coral-reef.jpg' },
@@ -11,14 +14,21 @@ const cardAtlases: readonly { file: string; portrait?: boolean }[] = [
   { file: 'card-art-three-kingdoms-taoyuan.jpg', portrait: true },
 ];
 
-export function petCardArt(art: number) {
-  const atlas = cardAtlases[Math.floor(art / 10)];
-  const tile = art % 10;
+export function petCardArt(art: number | PetCardImage) {
+  const local = typeof art === 'number';
+  const atlas = local ? cardAtlases[Math.floor(art / 10)] : undefined;
+  const { tile, url, portrait } = local
+    ? {
+        tile: art % 10,
+        url: `/assets/pet/${atlas?.file ?? 'card-art.jpg'}`,
+        portrait: !!atlas?.portrait,
+      }
+    : art;
   // Keep the top edge of each 4:5 portrait in the square card window.
-  const secondRow = atlas?.portrait ? '83.333%' : '100%';
+  const { width, height, x, y } = cardAtlasCrop(tile, portrait);
   return {
-    backgroundImage: `url('/assets/pet/${atlas?.file ?? 'card-art.jpg'}')`,
-    backgroundPosition: `${(tile % 5) * 25}% ${tile < 5 ? '0%' : secondRow}`,
-    backgroundSize: atlas?.portrait ? '500% 250%' : '500% 200%',
+    backgroundImage: `url(${JSON.stringify(url)})`,
+    backgroundPosition: `${(x / (width - 100)) * 100}% ${(y / (height - 100)) * 100}%`,
+    backgroundSize: `${width}% ${height}%`,
   };
 }

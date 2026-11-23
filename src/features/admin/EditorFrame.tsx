@@ -17,6 +17,7 @@ export function EditorFrame({
   onClose,
   onSaved,
   returnFocusRef,
+  bodyClassName = '',
   submitLabel = '保存',
   size = 'default',
 }: EditorProps & {
@@ -25,6 +26,7 @@ export function EditorFrame({
   onSubmit: (signal: AbortSignal) => Promise<void>;
   submitLabel?: string;
   size?: 'default' | 'report';
+  bodyClassName?: string;
 }) {
   const mutation = useAdminMutation();
   return (
@@ -48,7 +50,11 @@ export function EditorFrame({
           void mutation.run(onSubmit, onSaved);
         }}
       >
-        <ScrollArea label={`${title}表单`} gutter="reserved" className={styles.body ?? ''}>
+        <ScrollArea
+          label={`${title}表单`}
+          gutter="reserved"
+          className={`${styles.body} ${bodyClassName}`}
+        >
           <fieldset disabled={mutation.pending} className={styles.grid}>
             {children}
           </fieldset>

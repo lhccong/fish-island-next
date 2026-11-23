@@ -1,14 +1,19 @@
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
+import { apiBaseUrl } from '@/app/config/api';
 import { PetCardsDemo } from '@/features/pet';
-import { createBrowserPetCards } from '@/infrastructure/pet';
+import { createBrowserPetCards, createPetCardCatalogLoader } from '@/infrastructure/pet';
 import styles from './PetCardsDemoPage.module.css';
 
-const previewCollection = createBrowserPetCards('guest-preview');
+const previewCollection = createBrowserPetCards(
+  'guest-preview',
+  createPetCardCatalogLoader(apiBaseUrl),
+);
 
 export function PetCardsDemoPage() {
   return (
     <WorkspaceLayout
       hideSidebar
+      centerContent
       mobileHeader="back-only"
       slots={{
         header: null,

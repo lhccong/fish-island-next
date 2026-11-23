@@ -42,8 +42,38 @@
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
 }
-.packPicker {
-  width: 144px;
+.packCarousel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.packCarousel > .packArrow {
+  flex: none;
+  min-inline-size: 36px;
+  padding-inline: 7px;
+}
+.packSelection {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-width: 0;
+  min-height: 36px;
+  width: 112px;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.packSelection span {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.packSelection[data-swipe-enabled='true'],
+.packStage[data-swipe-enabled='true'] {
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
 }
 .counters {
   gap: 8px 16px;
@@ -258,7 +288,6 @@
   gap: 8px;
 }
 .resultHeading > span,
-.uncollected,
 .emptyFeedback {
   color: var(--color-muted);
   font-size: 0.8125rem;
@@ -306,14 +335,13 @@
   grid-template-rows: subgrid;
   min-width: 0;
 }
-.collectionSlot > :last-child {
-  align-self: start;
-}
 .collectionActions {
   display: flex;
   flex-wrap: wrap;
+  align-self: start;
   gap: 6px;
 }
+.collectionPlaceholder,
 .emptyShelf,
 .cardBack {
   display: grid;
@@ -323,13 +351,21 @@
   background: var(--color-canvas);
   color: var(--color-muted);
 }
+.collectionPlaceholder,
 .emptyShelf {
-  min-height: 112px;
   border: 1px dashed var(--color-border);
   border-radius: var(--radius-control);
   font-size: 0.8125rem;
 }
+.collectionPlaceholder {
+  min-block-size: 15rem;
+}
+.emptyShelf {
+  min-height: 112px;
+}
 .cardBack {
+  min-height: 44px;
+  width: 100%;
   aspect-ratio: 0.72;
   border: 2px solid var(--color-pet-card-metal);
   border-radius: 10px;
@@ -339,6 +375,17 @@
     var(--color-canvas);
   color: var(--color-accent-text);
   box-shadow: inset 0 0 0 2px var(--color-pet-card-glint);
+  cursor: pointer;
+}
+.cardBack:hover:not(:disabled) {
+  border-color: var(--color-accent-text);
+}
+.cardBack:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.cardBack:disabled {
+  cursor: default;
 }
 .cardFace {
   --card-grade: var(--color-muted);
@@ -691,6 +738,13 @@
   .toolbar {
     gap: 8px;
   }
+  .tabs,
+  .packCarousel {
+    width: 100%;
+  }
+  .packSelection {
+    flex: 1 1 auto;
+  }
   .packStage {
     flex-direction: column;
     gap: 12px;
@@ -727,8 +781,8 @@
   }
 }
 @media (max-width: 760px) {
-  .packPicker {
-    width: 100%;
+  .packCarousel > .packArrow {
+    min-inline-size: 44px;
   }
   .dialog {
     width: calc(100% - 20px);

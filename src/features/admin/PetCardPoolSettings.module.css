@@ -1,0 +1,186 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-block-end: 8px;
+}
+.editorBody {
+  --scroll-area-reserved-gutter: 24px;
+}
+.toolbar > :first-child {
+  flex: 1 1 210px;
+  max-width: 400px;
+}
+.actions,
+.fileRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.actions {
+  margin-inline-start: auto;
+  justify-content: flex-end;
+}
+.help,
+.notice {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.8125rem;
+}
+.help {
+  color: var(--color-muted);
+}
+.notice {
+  color: var(--color-accent-text);
+}
+.cardList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cardRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 4px;
+  min-width: 0;
+  border-block-start: 1px solid var(--color-border);
+  overflow-wrap: anywhere;
+}
+.cardIdentity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.thumbnail {
+  inline-size: 56px;
+}
+.cardName {
+  display: grid;
+  min-width: 0;
+}
+.cardName span,
+.membership {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+.grade {
+  --grade-color: var(--color-muted);
+  justify-self: start;
+  padding: 2px 8px;
+  border: 1px solid color-mix(in srgb, var(--grade-color) 36%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--grade-color) 12%, var(--color-surface));
+  color: color-mix(in srgb, var(--grade-color) 42%, var(--color-text));
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.grade[data-card-grade='fine'] {
+  --grade-color: var(--color-life-rare);
+}
+.grade[data-card-grade='epic'] {
+  --grade-color: var(--color-life-epic);
+}
+.grade[data-card-grade='legendary'] {
+  --grade-color: var(--color-life-legendary);
+}
+.grade[data-card-grade='shiny'] {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(115deg, var(--color-pet-card-spectrum)) border-box;
+  color: var(--color-text);
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+.group,
+.optionRows {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.group {
+  padding-block-start: 8px;
+  border-block-start: 1px solid var(--color-border);
+}
+.group h3,
+.group p {
+  margin: 0;
+}
+.group h3 {
+  font-size: 0.875rem;
+}
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 60px;
+  border: 1px solid var(--color-border);
+  background: var(--color-canvas);
+  border-radius: var(--radius-control);
+}
+.preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.preview img:not([data-loaded='true']) {
+  position: absolute;
+  visibility: hidden;
+}
+.atlasGrid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: repeat(2, minmax(0, 1fr)) / repeat(5, minmax(0, 1fr));
+  pointer-events: none;
+}
+.atlasGrid span {
+  box-shadow:
+    inset 0 0 0 3px var(--color-accent),
+    inset 0 0 0 4px var(--color-surface);
+}
+@media (max-width: 760px) {
+  .editorBody {
+    --scroll-area-reserved-gutter: 20px;
+  }
+  .toolbar > :first-child {
+    max-width: none;
+    flex-basis: 100%;
+  }
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .cardRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .thumbnail {
+    inline-size: 48px;
+  }
+  .grade {
+    justify-self: end;
+  }
+  .cardRow button {
+    justify-self: end;
+  }
+}

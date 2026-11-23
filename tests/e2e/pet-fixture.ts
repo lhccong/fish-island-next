@@ -8,7 +8,7 @@ import {
 } from './pet-challenges-fixture';
 
 const portrait = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130"><ellipse cx="60" cy="116" rx="32" ry="8" fill="#274d3a" opacity=".15"/><path d="M29 66 23 22q22 2 29 22 14-13 31-8L105 8q10 29-7 52 18 44-15 55H42Q14 104 29 66" fill="#e4be79" stroke="#775c3a" stroke-width="3"/><path d="M49 90q15-16 28 0v20H49" fill="#fff1cd"/><circle cx="45" cy="68" r="4" fill="#293d36"/><circle cx="79" cy="68" r="4" fill="#293d36"/><path d="m56 80 5 4 6-4M29 24l8 27M102 14 90 43" fill="none" stroke="#775c3a" stroke-width="3"/><path d="M53 41q-10-23 7-32 16 14 7 29" fill="#689f68" stroke="#446b48" stroke-width="3"/></svg>`;
-export async function setupPet(page: Page, skin: string, mode: string) {
+export async function setupPet(page: Page, skin: string, mode: string, role = 'user') {
   await page.routeWebSocket(/\/ws\//, (socket) => socket.onMessage(() => {}));
   const activity = createActivityFixture();
   const treasure = createTreasureFixture();
@@ -98,7 +98,7 @@ export async function setupPet(page: Page, skin: string, mode: string) {
       data = {
         id: '123',
         userName: '合成岛友',
-        userRole: 'user',
+        userRole: role,
         userAvatar: '',
         saTokenInfo: { tokenName: 'synthetic-session', tokenValue: 'synthetic-value' },
       };

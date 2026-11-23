@@ -13,6 +13,7 @@ export function WorkspaceLayout({
   slots,
   sidebarLabel,
   hideSidebar = false,
+  centerContent = false,
   mobileNavigation,
   sidebarVariant,
   sidebarPosition = 'left',
@@ -24,6 +25,7 @@ export function WorkspaceLayout({
   slots: Omit<WorkspaceShellSlots, 'navigation'>;
   sidebarLabel?: string;
   hideSidebar?: boolean;
+  centerContent?: boolean;
   mobileNavigation?: 'tabs' | 'hidden';
   sidebarVariant?: 'default' | 'chat';
   sidebarPosition?: 'left' | 'right';
@@ -79,11 +81,12 @@ export function WorkspaceLayout({
         (skinId === 'moyu-island' && !adminPage && pathname !== '/admin' && pathname !== '/chat')
       }
       centerContent={
-        skinId === 'moyu-island' &&
-        pathname !== '/' &&
-        pathname !== '/chat' &&
-        !adminPage &&
-        pathname !== '/admin'
+        centerContent ||
+        (skinId === 'moyu-island' &&
+          pathname !== '/' &&
+          pathname !== '/chat' &&
+          !adminPage &&
+          pathname !== '/admin')
       }
       {...(sidebarVariant ? { sidebarVariant } : {})}
       sidebarPosition={sidebarPosition}

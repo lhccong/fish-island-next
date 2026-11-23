@@ -1,7 +1,6 @@
 import { GalleryVerticalEnd } from 'lucide-react';
 import {
   getPetCard,
-  petCards,
   petCardStatEntries,
   petShowcaseLimit,
   summarizePetShowcase,
@@ -9,6 +8,7 @@ import {
 } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
 import { describePetCardBattleEffect } from './card-battle-copy';
+import { usePetCardCatalog } from './catalog-context';
 import { PetCardFace } from './PetCardFace';
 import styles from './PetCards.module.css';
 
@@ -27,10 +27,11 @@ export function PetCardShowcase({
   onDisplay: (id: PetCardId, displayed: boolean) => void;
   onReplay: (id: PetCardId) => void;
 }) {
+  const catalog = usePetCardCatalog();
   const vacant = petShowcaseLimit - showcased.length;
-  const stats = summarizePetShowcase(showcased);
+  const stats = summarizePetShowcase(showcased, catalog);
   const effects = showcased.flatMap((id) => {
-    const battle = getPetCard(id).battle;
+    const battle = getPetCard(id, catalog).battle;
     return battle.kind === 'effect' ? [{ id, effect: battle }] : [];
   });
   return (
@@ -90,34 +91,40 @@ export function PetCardShowcase({
         {owned.length === 0 && <p className={styles.emptyFeedback}>开包收藏第一张宠物卡。</p>}
         <ul className={styles.collectionGrid}>
           {cardIds.map((id) => {
-            const collected = owned.includes(id);
+            if (!owned.includes(id)) {
+              return (
+                <li key={id} className={styles.collectionSlot}>
+                  <div className={styles.collectionPlaceholder}>
+                    <GalleryVerticalEnd size={22} aria-hidden="true" />
+                    <span>未收藏</span>
+                  </div>
+                </li>
+              );
+            }
+            const card = getPetCard(id, catalog);
             const displayed = showcased.includes(id);
             return (
               <li key={id} className={styles.collectionSlot}>
                 <PetCardFace id={id} />
-                {collected ? (
-                  <div className={styles.collectionActions}>
+                <div className={styles.collectionActions}>
+                  <Button
+                    variant="secondary"
+                    disabled={pending || (!displayed && !vacant)}
+                    aria-label={`${displayed ? '撤下' : '上架'}${card.name}`}
+                    onClick={() => onDisplay(id, displayed)}
+                  >
+                    {displayed ? '撤下' : '上架'}
+                  </Button>
+                  {card.grade === 'shiny' && (
                     <Button
                       variant="secondary"
-                      disabled={pending || (!displayed && !vacant)}
-                      aria-label={`${displayed ? '撤下' : '上架'}${petCards[id].name}`}
-                      onClick={() => onDisplay(id, displayed)}
+                      aria-label={`重看${card.name}特效`}
+                      onClick={() => onReplay(id)}
                     >
-                      {displayed ? '撤下' : '上架'}
+                      看特效
                     </Button>
-                    {petCards[id].grade === 'shiny' && (
-                      <Button
-                        variant="secondary"
-                        aria-label={`重看${petCards[id].name}特效`}
-                        onClick={() => onReplay(id)}
-                      >
-                        看特效
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <span className={styles.uncollected}>未收藏</span>
-                )}
+                  )}
+                </div>
               </li>
             );
           })}

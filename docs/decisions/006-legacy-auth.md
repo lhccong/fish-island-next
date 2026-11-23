@@ -13,6 +13,8 @@
 
 domain/auth 定义 AuthPort、SessionVault 与领域模型；infrastructure/auth 完成 DTO、HTTP、浏览器持久化；features/auth 管理独立 Zustand 会话和表现；app 注入服务与装配路由，不允许业务组件直接访问 localStorage 或后端 DTO。
 
+开发环境配置 Vite 本地 API 代理时，app 从当前页面 origin 构造服务地址。登录请求、凭证命名空间和其他 API 共享该地址，由 Vite 转发至配置的后端。这样同一开发配置可从不同主机名或端口打开，避免带凭证的登录请求发往另一 Vite 实例。无代理的开发环境与部署构建沿用显式 API 地址。验证至少覆盖两个不同的本地 Vite origin 及其登录接口响应。
+
 确认旧 Sa-Token 协议后保存 token，不保存账号密码或整份个人资料。凭证按后端地址命名空间隔离；勾选保持登录写 localStorage，否则写 sessionStorage。旧项目不同源存储不会自动共享。跨标签页变化重新校验；并发请求使用序号与取消信号，旧请求不得覆盖新登录/退出结果。StrictMode 重挂载复用恢复请求。
 
 认证失败清除本机凭证并回到游客；恢复的网络错误保留凭证。退出始终清理本机信息，若服务器注销失败明确提示“已退出本机，但未能确认服务器注销”，不声称远端 token 已撤销。前端守卫仅影响导航，后端继续决定权限。

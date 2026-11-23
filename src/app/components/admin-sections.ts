@@ -8,5 +8,6 @@ export const adminSections: readonly { id: AdminSection; label: string; path: st
   { id: 'tags', label: '标签管理', path: '/admin/tags' },
   { id: 'word', label: '词库管理', path: '/admin/word/library' },
   { id: 'equipment', label: '装备管理', path: '/admin/game/itemTemplates' },
+  { id: 'pet-cards', label: '卡池配置', path: '/admin/pet-cards' },
   { id: 'report', label: '举报管理', path: '/admin/report' },
 ];
