@@ -13,6 +13,8 @@ import {
 import { setupPet } from './pet-fixture';
 import { setupPetCardCatalog } from './pet-card-catalog-fixture';
 
+test.use({ hasTouch: true });
+
 async function assertLayout(viewport: Locator) {
   const layout = await viewport.evaluate((element) => {
     const css = getComputedStyle(element);

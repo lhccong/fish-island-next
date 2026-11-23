@@ -9,6 +9,8 @@ import {
 } from './pet-card-catalog-fixture';
 import { activate } from './pet-cards-flow';
 
+test.use({ hasTouch: true });
+
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark'])
     for (const width of [1440, 375, 390]) {

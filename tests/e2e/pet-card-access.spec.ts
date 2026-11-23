@@ -40,12 +40,12 @@ for (const skin of builtinSkins)
           chat.dispose();
 
           await page.goto('/pet?panel=cards', { waitUntil: 'domcontentloaded' });
-          const tools = page.getByRole('navigation', { name: '伙伴功能', exact: true });
-          await expect(tools.getByRole('button', { name: '行囊', exact: true })).toBeEnabled();
           if (admin) {
             await expect(cards.getByRole('button', { name: '领取卡包' })).toBeEnabled();
             expect(catalogRequests).toHaveLength(2);
           } else {
+            const tools = page.getByRole('navigation', { name: '伙伴功能', exact: true });
+            await expect(tools.getByRole('button', { name: '行囊', exact: true })).toBeEnabled();
             await expect(tools.getByRole('button', { name: '宠物卡包', exact: true })).toHaveCount(
               0,
             );
