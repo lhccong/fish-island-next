@@ -7,3 +7,4 @@ export { TagList } from './TagList';
 export { WordList } from './WordList';
 export { EquipmentList } from './EquipmentList';
 export { ReportList } from './ReportList';
+export { PetCardPoolSettings } from './PetCardPoolSettings';

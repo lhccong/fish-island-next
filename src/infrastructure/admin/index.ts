@@ -2,6 +2,7 @@ import { AuthError, type SessionToken } from '@/domain/auth';
 import type { AdminPort, AdminCollection, AdminEntities } from '@/domain/admin';
 import { isAssignableTitle } from '@/domain/admin';
 import { record, text, number, user, title, tag, word, equipment, report } from './decode';
+import { createAdminPetCards } from './pet-cards';
 
 const paths = {
   user: 'user',
@@ -36,10 +37,10 @@ export function createAdminClient(
         credentials: 'include',
         headers: {
           [token.name]: token.value,
-          ...(body ? { 'Content-Type': 'application/json' } : {}),
+          ...(body && !(body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}),
         },
         signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
-        ...(body ? { body: JSON.stringify(body) } : {}),
+        ...(body ? { body: body instanceof FormData ? body : JSON.stringify(body) } : {}),
       });
       if (response.status === 401) throw new AuthError('unauthorized', '登录已过期，请重新登录');
       if (response.status === 403) {
@@ -76,6 +77,7 @@ export function createAdminClient(
       throw new Error('服务器未确认操作成功，请刷新核对后再试');
   }
   return {
+    petCards: createAdminPetCards(request, baseUrl),
     publishBroadcast: (content, signal) => mutate('admin/broadcast/publish', signal, { content }),
     async getBigFishEnabled(signal) {
       const enabled = await request('admin/big-fish/settings', signal, undefined, 'GET');

@@ -1,6 +1,54 @@
 import type { TreasurePort } from './treasure';
 export { treasureSites } from './treasure';
 export type { TreasureSiteId, TreasureState, TreasurePort } from './treasure';
+export { petCardActions, petCardRecoveryEffect } from './card-battle';
+export type { PetCardBattleAction, PetCardBattleEffect } from './card-battle';
+export { defaultPetCardWeights, petCardGradeIds, petCardStatLabels } from './catalog';
+export type {
+  PetCardAtlasDefinition,
+  PetCardCatalog,
+  PetCardDefinition,
+  PetCardGrade,
+  PetCardId,
+  PetCardImage,
+  PetCardPack,
+  PetCardPackKind,
+  PetCardPoolDefinition,
+} from './catalog';
+export {
+  readPetCardAtlas,
+  readPetCardAtlases,
+  readPetCardCatalog,
+  readPetCardPage,
+  readPetCardPools,
+} from './catalog-data';
+export {
+  dailyPetPackLimit,
+  demoPetCardCatalog,
+  emptyPetCards,
+  getPetCard,
+  petCardGrades,
+  petCardIds,
+  petCardPacks,
+  petCardStatEntries,
+  petCards,
+  petCardsDay,
+  petPackSize,
+  petShowcaseLimit,
+  remainingPetPacks,
+  restorePetCardsProgress,
+  summarizePetShowcase,
+  unopenedPetPacks,
+  updatePetCards,
+} from './cards';
+export type {
+  LegacyPetCardsProgress,
+  PetCardPull,
+  PetCardResult,
+  PetCardsAction,
+  PetCardsPort,
+  PetCardsProgress,
+} from './cards';
 
 export interface PetItem {
   code: string;

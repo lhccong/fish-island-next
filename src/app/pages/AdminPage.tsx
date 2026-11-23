@@ -9,6 +9,7 @@ import {
   TagList,
   WordList,
   EquipmentList,
+  PetCardPoolSettings,
   ReportList,
 } from '@/features/admin';
 import { useAuth } from '@/features/auth';
@@ -59,6 +60,8 @@ export function AdminPage({ section }: { section: AdminSection | 'overview' }) {
               <WordList port={adminPort} />
             ) : section === 'equipment' ? (
               <EquipmentList port={adminPort} />
+            ) : section === 'pet-cards' ? (
+              <PetCardPoolSettings port={adminPort.petCards} />
             ) : (
               <ReportList port={adminPort} />
             )}

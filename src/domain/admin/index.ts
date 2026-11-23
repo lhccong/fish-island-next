@@ -1,6 +1,24 @@
+import type {
+  PetCardAtlasDefinition,
+  PetCardDefinition,
+  PetCardPoolDefinition,
+} from '@/domain/pet';
+
 export type AdminSection =
-  'data' | 'user' | 'title' | 'tags' | 'word' | 'equipment' | 'report' | 'broadcast' | 'big-fish';
-export type AdminCollection = Exclude<AdminSection, 'data' | 'broadcast' | 'big-fish'>;
+  | 'data'
+  | 'user'
+  | 'title'
+  | 'tags'
+  | 'word'
+  | 'equipment'
+  | 'report'
+  | 'broadcast'
+  | 'big-fish'
+  | 'pet-cards';
+export type AdminCollection = Exclude<
+  AdminSection,
+  'data' | 'broadcast' | 'big-fish' | 'pet-cards'
+>;
 export function isAssignableTitle(id: string): boolean {
   return /^[1-9]\d*$/.test(id) && !(Number(id) >= 2 && Number(id) <= 10);
 }
@@ -96,7 +114,24 @@ export interface AdminTrend {
   date: string;
   count: number;
 }
+export interface AdminPetCardPort {
+  pools(signal: AbortSignal): Promise<PetCardPoolDefinition[]>;
+  atlases(signal: AbortSignal): Promise<PetCardAtlasDefinition[]>;
+  cards(
+    page: number,
+    pool: string,
+    query: string,
+    signal: AbortSignal,
+  ): Promise<AdminPage<PetCardDefinition>>;
+  savePool(value: PetCardPoolDefinition, signal: AbortSignal): Promise<void>;
+  saveCard(value: PetCardDefinition, signal: AbortSignal): Promise<void>;
+  uploadAtlas(
+    value: { name: string; portrait: boolean; file: File },
+    signal: AbortSignal,
+  ): Promise<PetCardAtlasDefinition>;
+}
 export interface AdminPort {
+  petCards: AdminPetCardPort;
   publishBroadcast(content: string, signal: AbortSignal): Promise<void>;
   getBigFishEnabled(signal: AbortSignal): Promise<boolean>;
   saveBigFishEnabled(enabled: boolean, signal: AbortSignal): Promise<void>;
