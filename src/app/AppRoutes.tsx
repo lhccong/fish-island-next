@@ -21,6 +21,7 @@ const ForumPage = lazy(() =>
 const PointsShopPage = lazy(() =>
   import('@/app/pages/PointsShopPage').then((m) => ({ default: m.PointsShopPage })),
 );
+const AchievementsPage = lazy(() => import('@/app/pages/AchievementsPage'));
 const AdminPage = lazy(() =>
   import('@/app/pages/AdminPage').then((m) => ({ default: m.AdminPage })),
 );
@@ -110,6 +111,14 @@ export function AppRoutes() {
           <Routes location={displayLocation}>
             <Route path="/" element={<HotBoardPage />} />
             <Route path="/discover" element={<DiscoveryPage />} />
+            <Route
+              path="/discover/achievements"
+              element={
+                <RequireAuth>
+                  <AchievementsPage />
+                </RequireAuth>
+              }
+            />
             <Route path="/post/*" element={<ForumPage />} />
             <Route
               path="/admin"

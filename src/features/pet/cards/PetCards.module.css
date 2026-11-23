@@ -91,16 +91,15 @@
 }
 .scroll {
   --scroll-area-reserved-gutter: 24px;
-  height: min(490px, 62dvh);
 }
 .stageFrame {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 min(490px, 62dvh);
   min-height: 0;
 }
 .stageFrame .scroll {
-  max-height: 100%;
+  height: auto;
 }
 .body {
   min-width: 0;
@@ -288,9 +287,28 @@
   gap: 8px;
 }
 .resultHeading > span,
+.collectionHeadingActions > span,
 .emptyFeedback {
   color: var(--color-muted);
   font-size: 0.8125rem;
+}
+.collectionHeadingActions,
+.batchFeedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.collectionHeadingActions {
+  justify-content: flex-end;
+}
+.batchSelector {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px 4px;
+  padding-inline-start: 4px;
+  color: var(--color-text);
+  font-size: 0.875rem;
 }
 .drawGrid,
 .shelfGrid,
@@ -340,6 +358,33 @@
   flex-wrap: wrap;
   align-self: start;
   gap: 6px;
+}
+.collectionActions .collectionAction {
+  flex: none;
+  flex-direction: column;
+  inline-size: 44px;
+  min-block-size: 44px;
+  padding: 3px 0;
+  border: 0;
+  gap: 3px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.collectionActions .collectionAction[data-showcased='true']:not(:disabled),
+.collectionActions .collectionAction:hover:not(:disabled) {
+  background: transparent;
+  color: var(--color-accent-text);
+}
+.collectionActions .collectionAction:disabled {
+  color: var(--color-muted);
+}
+.collectionActionIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 .collectionPlaceholder,
 .emptyShelf,
@@ -501,6 +546,28 @@
 }
 .cardFace[data-compact='true'] .artSpace {
   aspect-ratio: 1.24;
+}
+.cardStars {
+  --card-star-size: 0.75rem;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  gap: 3px;
+  max-width: 100%;
+  margin-bottom: 3px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-night) 88%, transparent);
+  color: var(--color-pet-enhance-gold);
+}
+.cardStars svg {
+  width: var(--card-star-size);
+  height: var(--card-star-size);
+  min-width: 0;
+}
+.cardFace[data-compact='true'] .cardStars {
+  --card-star-size: 0.625rem;
+  gap: 2px;
 }
 .rarity {
   display: flex;
@@ -794,9 +861,51 @@
   }
   .scroll {
     --scroll-area-reserved-gutter: 20px;
-    height: min(470px, 57dvh);
+  }
+  .stageFrame {
+    flex-basis: min(470px, 57dvh);
   }
   .footer {
     gap: 6px;
   }
+}
+.materials {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.history,
+.historyPulls {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.history > li {
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--color-border);
+  overflow-wrap: anywhere;
+}
+
+.history time {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.historyPulls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 8px;
+}
+
+.actions > p {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  text-align: end;
 }

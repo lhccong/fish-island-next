@@ -9,6 +9,33 @@ type RevealActions = {
   flipAll: (() => void) | undefined;
 };
 
+export function PetPackRevealActions({
+  pending,
+  actionRef,
+  reveal,
+}: {
+  pending: boolean;
+  actionRef: Ref<HTMLButtonElement>;
+  reveal: RevealActions;
+}) {
+  return (
+    <>
+      {reveal.flipAll && (
+        <Button variant="secondary" disabled={pending} onClick={reveal.flipAll}>
+          全部翻开
+        </Button>
+      )}
+      <Button ref={actionRef} onClick={reveal.advance} disabled={pending || reveal.opening}>
+        {pending || reveal.opening ? (
+          <LoadingIndicator compact>{reveal.opening ? reveal.label : '正在保存…'}</LoadingIndicator>
+        ) : (
+          reveal.label
+        )}
+      </Button>
+    </>
+  );
+}
+
 export function PetPackActions({
   canClaim,
   hasStock,
@@ -27,24 +54,7 @@ export function PetPackActions({
   onOpen: () => void;
 }) {
   if (reveal)
-    return (
-      <>
-        {reveal.flipAll && (
-          <Button variant="secondary" disabled={pending} onClick={reveal.flipAll}>
-            全部翻开
-          </Button>
-        )}
-        <Button ref={actionRef} onClick={reveal.advance} disabled={pending || reveal.opening}>
-          {pending || reveal.opening ? (
-            <LoadingIndicator compact>
-              {reveal.opening ? reveal.label : '正在保存…'}
-            </LoadingIndicator>
-          ) : (
-            reveal.label
-          )}
-        </Button>
-      </>
-    );
+    return <PetPackRevealActions pending={pending} actionRef={actionRef} reveal={reveal} />;
   return (
     <>
       <Button

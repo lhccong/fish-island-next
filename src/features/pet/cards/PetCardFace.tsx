@@ -1,5 +1,11 @@
-import { Diamond, Footprints, Sparkle, Sparkles, Swords } from 'lucide-react';
-import { getPetCard, petCardGrades, petCardStatEntries, type PetCardId } from '@/domain/pet';
+import { Diamond, Footprints, Sparkle, Sparkles, Star, Swords } from 'lucide-react';
+import {
+  getPetCard,
+  petCardGrades,
+  petCardStarStats,
+  petCardStatEntries,
+  type PetCardId,
+} from '@/domain/pet';
 import { petCardArt } from './card-art';
 import { usePetCardCatalog } from './catalog-context';
 import { describePetCardBattleEffect } from './card-battle-copy';
@@ -10,8 +16,17 @@ const battleActions = {
   dodge: { label: '闪避', Icon: Footprints },
 };
 
-export function PetCardFace({ id, compact = false }: { id: PetCardId; compact?: boolean }) {
+export function PetCardFace({
+  id,
+  compact = false,
+  stars,
+}: {
+  id: PetCardId;
+  compact?: boolean;
+  stars?: number | undefined;
+}) {
   const card = getPetCard(id, usePetCardCatalog());
+  const stats = petCardStarStats(card.stats, stars ?? 1);
   const GradeIcon = card.grade === 'shiny' ? Sparkles : Diamond;
   const action = card.grade === 'common' ? battleActions[card.battle.action] : null;
   const effect = card.battle.kind === 'effect' ? card.battle : null;
@@ -20,15 +35,23 @@ export function PetCardFace({ id, compact = false }: { id: PetCardId; compact?: 
       <div className={styles.cardArt} style={petCardArt(card.art)} aria-hidden="true" />
       <div className={styles.cardHeader}>
         <strong>{card.name}</strong>
-        <span className={styles.health} aria-label={`生命 +${card.stats.health}`}>
-          <small>HP</small> +{card.stats.health}
+        <span className={styles.health} aria-label={`生命 +${stats.health}`}>
+          <small>HP</small> +{stats.health}
         </span>
       </div>
       <div className={styles.artSpace} aria-hidden="true">
         {card.grade === 'shiny' && <Sparkle className={styles.foilStar} size={17} />}
       </div>
+      {!!stars && (
+        <div className={styles.cardStars} data-card-stars aria-hidden="true">
+          {Array.from({ length: stars }, (_, index) => (
+            <Star key={index} fill="currentColor" strokeWidth={1.5} />
+          ))}
+        </div>
+      )}
       <div className={styles.rarity}>
         <GradeIcon size={11} aria-hidden="true" /> {petCardGrades[card.grade].name}
+        {stars && ` · ${stars} 星`}
       </div>
       {!compact && (
         <div className={styles.cardAbilities}>
@@ -53,7 +76,7 @@ export function PetCardFace({ id, compact = false }: { id: PetCardId; compact?: 
             className={`${styles.cardStats} ${styles.faceStats}`}
             aria-label={`${card.name}基础属性`}
           >
-            {petCardStatEntries(card.stats)
+            {petCardStatEntries(stats)
               .filter(({ stat }) => stat !== 'health')
               .map(({ stat, label, value }) => (
                 <li key={stat}>

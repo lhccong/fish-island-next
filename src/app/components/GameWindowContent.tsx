@@ -69,14 +69,14 @@ export function GameWindowContent({ game, onEscape }: { game: GameId; onEscape: 
       <PetWorkspace
         key={session.user.id}
         service={petService}
-        cardCollection={session.user.role === 'admin' ? petCardCollection : null}
+        cardCollection={petCardCollection}
         userId={session.user.id}
         points={
           session.user.points === undefined
             ? undefined
             : session.user.points - (session.user.usedPoints ?? 0)
         }
-        onLotterySettled={refreshUser}
+        onBalanceChanged={refreshUser}
       />
     );
   return (

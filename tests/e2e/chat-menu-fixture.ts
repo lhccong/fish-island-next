@@ -12,6 +12,7 @@ export async function setupChatMenu(
   role = 'user',
   prepare?: () => Promise<void>,
   waitForHistory = true,
+  userId = '123',
 ) {
   let socket!: WebSocketRoute;
   let connections = 0;
@@ -50,7 +51,7 @@ export async function setupChatMenu(
       json: {
         code: 0,
         data: {
-          id: '123',
+          id: userId,
           userName: '本人合成',
           userRole: role,
           saTokenInfo: { tokenName: 'synthetic-session', tokenValue: 'synthetic-value' },

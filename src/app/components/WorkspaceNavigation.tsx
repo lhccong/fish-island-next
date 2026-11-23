@@ -8,6 +8,7 @@ import {
   Store,
   Info,
   Wrench,
+  Trophy,
 } from 'lucide-react';
 import { Link, matchPath, NavLink, useLocation } from 'react-router';
 import type { ReactNode } from 'react';
@@ -112,6 +113,7 @@ export function WorkspaceNavigation({
               { to: '/pet', name: '宠物', icon: Heart },
               { to: '/discover/games', name: '游戏', icon: Gamepad2 },
               { to: '/utils/avatar-frames', name: '商店', icon: Store },
+              { to: '/discover/achievements', name: '成就', icon: Trophy },
               { to: '/rank/reward', name: '关于', icon: Info },
             ].map(({ to, name, icon: Icon }) => (
               <NavLink key={to} to={to} className={styles.item ?? ''}>

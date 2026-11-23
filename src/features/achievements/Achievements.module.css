@@ -1,0 +1,136 @@
+.center {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding-inline-start: var(--space-4);
+  color: var(--color-text);
+}
+
+.scroll {
+  --scroll-area-reserved-gutter: 24px;
+
+  flex: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-4) 4px;
+}
+
+.card {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  overflow-wrap: anywhere;
+}
+
+.cardHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.badge {
+  display: grid;
+  flex: 0 0 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.cardHeading h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cardHeading p {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.tracks {
+  display: grid;
+  gap: 0;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 4px var(--space-2);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.8125rem;
+}
+
+.track > :nth-child(2),
+.reward {
+  color: var(--color-muted);
+}
+
+.reward {
+  grid-column: 1 / -1;
+}
+
+.reward[data-ready='true'] {
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) max(var(--space-3), env(safe-area-inset-bottom)) 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer strong {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.footer p {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.footer p[data-error='true'],
+.state [role='alert'] {
+  color: var(--color-danger);
+}
+
+.footer button {
+  flex-shrink: 0;
+}
+
+.state {
+  padding: var(--space-4) 4px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .scroll {
+    --scroll-area-reserved-gutter: 20px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

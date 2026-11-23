@@ -13,7 +13,7 @@ import {
   Gift,
   GalleryVerticalEnd,
 } from 'lucide-react';
-import type { PetCardsPort, PetPort } from '@/domain/pet';
+import type { PetCardPlayPort, PetPort } from '@/domain/pet';
 import { usePetOperation, usePetResource } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { CampAdventure } from './CampAdventure';
@@ -73,14 +73,14 @@ export function PetWorkspace({
   userId,
   shortcut = null,
   points,
-  onLotterySettled,
+  onBalanceChanged,
 }: {
   service: PetPort;
-  cardCollection: PetCardsPort | null;
+  cardCollection: PetCardPlayPort;
   userId: string;
   shortcut?: Shortcut | null;
   points?: number | undefined;
-  onLotterySettled?: ((signal: AbortSignal) => Promise<unknown>) | undefined;
+  onBalanceChanged?: ((signal: AbortSignal) => Promise<unknown>) | undefined;
 }) {
   const load = useCallback((signal: AbortSignal) => service.mine(signal), [service]);
   const resource = usePetResource(load);
@@ -96,14 +96,14 @@ export function PetWorkspace({
     target === 'boss' || target === 'tower' || target === 'tournament' ? target : null;
   const shortcutPanel =
     target === 'supplies' || target === 'bag' || target === 'cards' ? target : 'challenge';
-  const requestedPanel = selectedPanel ? selectedPanel.panel : target ? shortcutPanel : null;
-  const panel = requestedPanel === 'cards' && !cardCollection ? null : requestedPanel;
+  const panel = selectedPanel ? selectedPanel.panel : target ? shortcutPanel : null;
   const challengeMode = selectedPanel?.mode ?? shortcutMode ?? 'rank';
   const [inventoryRevision, setInventoryRevision] = useState(0);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const navigationRef = useRef<HTMLElement | null>(null);
   const operation = usePetOperation();
   const selected = panels.find((item) => item.id === panel);
+  const toolbarPanels = panels.filter(({ id }) => id !== 'cards' || userId === '1');
   const busy = operation.pending || resource.state.status === 'loading';
   const onChange = resource.reload;
   function openPanel(id: PanelId, mode: ChallengeMode = 'rank') {
@@ -132,21 +132,19 @@ export function PetWorkspace({
             伙伴营地
           </h1>
           <nav ref={navigationRef} className={styles.tools} aria-label="伙伴功能">
-            {panels
-              .filter(({ id }) => id !== 'cards' || cardCollection)
-              .map(({ id, title, icon: Icon }) => (
-                <Button
-                  key={id}
-                  variant="secondary"
-                  className={styles.tool}
-                  aria-label={title}
-                  disabled={!pet && id !== 'cards'}
-                  onClick={() => openPanel(id)}
-                >
-                  <Icon size={18} aria-hidden="true" />
-                  <span>{title}</span>
-                </Button>
-              ))}
+            {toolbarPanels.map(({ id, title, icon: Icon }) => (
+              <Button
+                key={id}
+                variant="secondary"
+                className={styles.tool}
+                aria-label={title}
+                disabled={!pet && id !== 'cards'}
+                onClick={() => openPanel(id)}
+              >
+                <Icon size={18} aria-hidden="true" />
+                <span>{title}</span>
+              </Button>
+            ))}
           </nav>
         </header>
         <div className={styles.dashboard}>
@@ -186,7 +184,7 @@ export function PetWorkspace({
             />
           </section>
           <div className={styles.adventure}>
-            <CampAdventure pet={pet} service={service} onSettled={onLotterySettled} />
+            <CampAdventure pet={pet} service={service} onSettled={onBalanceChanged} />
             <ChallengeEntrances disabled={!pet} onSelect={(mode) => openPanel('challenge', mode)} />
             <p className={styles.footnote}>营地散步 · 不消耗积分，不产生收益</p>
           </div>
@@ -210,10 +208,10 @@ export function PetWorkspace({
         </div>
       </div>
       <PageFooterOutlet />
-      {panel === 'cards' && cardCollection && (
+      {panel === 'cards' && (
         <PetCardsDialog
           port={cardCollection}
-          userId={userId}
+          onPurchased={onBalanceChanged}
           onClose={closePanel}
           returnFocusRef={returnFocusRef}
         />
@@ -262,7 +260,7 @@ export function PetWorkspace({
               service={service}
               onChange={async (signal) => {
                 inventoryChanged();
-                await onLotterySettled?.(signal);
+                await onBalanceChanged?.(signal);
               }}
               points={points}
             />

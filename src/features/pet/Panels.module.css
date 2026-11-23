@@ -70,7 +70,13 @@
   font-size: 1.125rem;
 }
 .confirmation > .confirmScroll {
+  --scroll-area-reserved-gutter: 24px;
   height: auto;
+}
+@media (max-width: 760px) {
+  .confirmation > .confirmScroll {
+    --scroll-area-reserved-gutter: 20px;
+  }
 }
 .confirmScroll [data-radix-scroll-area-viewport] {
   max-height: min(10rem, 35dvh);

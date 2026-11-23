@@ -12,6 +12,7 @@ import {
   type PetCardStats,
 } from './catalog';
 import { forestCards } from './forest-cards';
+import { petCardStarStats, type PetCardOwned } from './card-play';
 import { islandStarterCards } from './island-starter-cards';
 import { kingdomsShuCards } from './kingdoms-shu-cards';
 import { kingdomsTaoyuanCards } from './kingdoms-taoyuan-cards';
@@ -80,18 +81,23 @@ export function petCardStatEntries(stats: PetCardStats) {
   });
 }
 
-export function summarizePetShowcase(ids: readonly PetCardId[], catalog = demoPetCardCatalog) {
+export function summarizePetShowcase(
+  ids: readonly PetCardId[],
+  catalog = demoPetCardCatalog,
+  collection?: ReadonlyMap<PetCardId, PetCardOwned>,
+) {
   const stats: PetCardStats = {};
   for (const id of ids) {
     const card = getPetCard(id, catalog);
-    for (const { stat, value } of petCardStatEntries(card.stats)) {
+    const stars = collection?.get(id)?.stars ?? 1;
+    for (const { stat, value } of petCardStatEntries(petCardStarStats(card.stats, stars))) {
       stats[stat] = (stats[stat] ?? 0) + value;
     }
   }
   return stats;
 }
 
-export type PetCardPull = { id: PetCardId; points: number };
+export type PetCardPull = { id: PetCardId; points: number; duplicate?: boolean };
 export type PetCardResult = { id: number; pack: PetCardPackKind; cards: PetCardPull[] };
 
 export interface PetCardsProgress {

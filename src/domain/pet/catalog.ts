@@ -29,6 +29,7 @@ export type PetCard = {
 export interface PetCardPack {
   id: PetCardPackKind;
   name: string;
+  unitPrice: number;
   cover: PetCardId;
   ids: PetCardId[];
   gradePools: { weight: number; ids: PetCardId[] }[];
@@ -45,6 +46,7 @@ export interface PetCardCatalog {
 export interface PetCardPoolDefinition {
   id: string;
   name: string;
+  unitPrice: number;
   weights: Record<PetCardGrade, number>;
   coverId: string | null;
   sortOrder: number;
@@ -78,12 +80,13 @@ export const defaultPetCardWeights = Object.fromEntries(
 export function createPetCardCatalog(
   cards: PetCardCatalog['cards'],
   pools: readonly (Pick<PetCardPoolDefinition, 'id' | 'name' | 'coverId' | 'weights'> & {
+    unitPrice?: number;
     ids: PetCardId[];
   })[],
 ): PetCardCatalog {
   const packs = Object.create(null) as Record<PetCardPackKind, PetCardPack>;
   const packIds = [];
-  for (const { id, name, coverId, weights, ids } of pools) {
+  for (const { id, name, coverId, weights, ids, unitPrice = defaultPetCardPrice(id) } of pools) {
     const buckets = petCardGradeIds.map((grade) => ({
       weight: weights[grade],
       ids: ids.filter((cardId) => cards[cardId]?.grade === grade),
@@ -95,6 +98,7 @@ export function createPetCardCatalog(
     packs[id] = {
       id,
       name,
+      unitPrice,
       cover,
       ids,
       gradePools,
@@ -104,4 +108,8 @@ export function createPetCardCatalog(
     packIds.push(id);
   }
   return { cards, packs, packIds };
+}
+
+export function defaultPetCardPrice(id: string) {
+  return id === 'island' ? 50 : 100;
 }

@@ -23,6 +23,7 @@ export const fixtureAtlases = assets.map((file, index) => ({
 export const fixturePools = Object.entries(petCardPacks).map(([id, pack], sortOrder) => ({
   id,
   name: pack.name,
+  unitPrice: pack.unitPrice,
   coverId: pack.cover,
   weights: defaultPetCardWeights,
   sortOrder,

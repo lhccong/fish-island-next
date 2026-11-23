@@ -1,5 +1,6 @@
 import {
   createPetCardCatalog,
+  defaultPetCardPrice,
   petCardGradeIds,
   petCardStatLabels,
   type PetCard,
@@ -123,13 +124,16 @@ export function readPetCardDefinition(value: unknown): PetCardDefinition {
 export function readPetCardPool(value: unknown): PetCardPoolDefinition {
   const pool = record(value);
   const weights = record(pool.weights);
+  const id = string(pool.id, code);
   return {
-    id: string(pool.id, code),
+    id,
     name: string(pool.name),
     weights: Object.fromEntries(
       petCardGradeIds.map((grade) => [grade, integer(weights[grade], 0, 10000)]),
     ) as PetCardPoolDefinition['weights'],
     coverId: pool.coverId == null ? null : string(pool.coverId, code),
+    unitPrice:
+      pool.unitPrice == null ? defaultPetCardPrice(id) : integer(pool.unitPrice, 1, 1000000),
     sortOrder: integer(pool.sortOrder),
     version: integer(pool.version, 1),
   };

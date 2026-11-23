@@ -6,6 +6,7 @@ import {
   ShoppingBag,
   MessagesSquare,
   Wrench,
+  Trophy,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
@@ -45,6 +46,10 @@ export function DiscoveryNavigation({
       <NavLink to="/utils/avatar-frames">
         <ShoppingBag size={19} aria-hidden="true" />
         店铺
+      </NavLink>
+      <NavLink to="/discover/achievements">
+        <Trophy size={19} aria-hidden="true" />
+        成就
       </NavLink>
       <NavLink to={defaultToolPath}>
         <Wrench size={19} aria-hidden="true" />

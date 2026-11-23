@@ -1,5 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
@@ -13,12 +13,14 @@ export function ConfirmAction({
   action,
   onSuccess,
   disabled = false,
+  children,
 }: {
   label: string;
   description: string;
   action: (signal: AbortSignal) => Promise<void>;
   onSuccess: () => void;
   disabled?: boolean;
+  children?: (pending: boolean) => ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const operation = usePetOperation();
@@ -45,6 +47,7 @@ export function ConfirmAction({
         <p className={styles.confirmText} aria-hidden="true">
           {description}
         </p>
+        {children?.(operation.pending)}
       </ScrollArea>
       <OperationNotice notice={operation.notice?.error ? operation.notice : null} />
       <div className={styles.actions}>
@@ -52,7 +55,7 @@ export function ConfirmAction({
           取消
         </Button>
         <Button
-          disabled={operation.pending}
+          disabled={operation.pending || disabled}
           onClick={() =>
             void operation.run(action, '操作成功', () => {
               setOpen(false);

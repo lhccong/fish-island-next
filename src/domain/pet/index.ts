@@ -280,3 +280,18 @@ export function companionBattleHealth(pet: Pick<Companion, 'level' | 'stats'>) {
 export function campPosition(x: number, y: number) {
   return { x: Math.max(16, Math.min(84, x)), y: Math.max(32, Math.min(80, y)) };
 }
+export {
+  petBatchPackLimit,
+  petCardBulkUpgradeQuote,
+  petCardRequiredLevel,
+  petCardStarStats,
+} from './card-play';
+export type {
+  PetCardBatchResult,
+  PetCardHistoryPage,
+  PetCardOpening,
+  PetCardOwned,
+  PetCardPlayAction,
+  PetCardPlayPort,
+  PetCardPlayState,
+} from './card-play';

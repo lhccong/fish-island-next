@@ -177,10 +177,24 @@ for (const skin of builtinSkins)
         await activate(page.getByRole('option', { name: '海岛初遇', exact: true }), mobile);
         await activate(page.getByRole('button', { name: '配置此池' }), mobile);
         const pool = page.getByRole('dialog', { name: '配置卡池' });
+        await expect(pool.getByText(/海岛初遇首包保底一张闪耀卡/)).toBeVisible();
         await pool.getByLabel('普通权重').fill('55');
+        await pool.getByLabel('单包价格（积分）').fill('80');
         await activate(pool.getByRole('button', { name: '保存', exact: true }), mobile);
         await expect(pool).toBeHidden();
-        expect(savedPool).toMatchObject({ id: 'island', version: 1, weights: { common: 55 } });
+        expect(savedPool).toMatchObject({
+          id: 'island',
+          version: 1,
+          unitPrice: 80,
+          weights: { common: 55 },
+        });
+        await activate(picker, mobile);
+        await activate(page.getByRole('option', { name: '三国群英', exact: true }), mobile);
+        await activate(page.getByRole('button', { name: '配置此池' }), mobile);
+        await expect(pool.getByLabel('卡池名称')).toHaveValue('三国群英');
+        await expect(pool.getByText(/首包保底/)).toHaveCount(0);
+        await activate(pool.getByRole('button', { name: '关闭配置卡池', exact: true }), mobile);
+        await expect(pool).toBeHidden();
         expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
           width,
         );

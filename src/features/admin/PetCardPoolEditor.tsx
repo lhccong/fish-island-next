@@ -21,6 +21,7 @@ export function PetCardPoolEditor({
         id: '',
         name: '',
         sortOrder: 100,
+        unitPrice: 100,
         coverId: null,
         weights: defaultPetCardWeights,
         version: null,
@@ -52,6 +53,15 @@ export function PetCardPoolEditor({
           onChange={(e) => edit({ name: e.target.value })}
         />
         <Field
+          label="单包价格（积分）"
+          value={value.unitPrice}
+          type="number"
+          min={1}
+          max={1000000}
+          required
+          onChange={(e) => edit({ unitPrice: Number(e.target.value) })}
+        />
+        <Field
           label="排序"
           value={value.sortOrder}
           type="number"
@@ -70,7 +80,8 @@ export function PetCardPoolEditor({
       <section className={styles.group} aria-label="品质权重">
         <h3>品质权重</h3>
         <p className={styles.help}>
-          权重为 0 的品质不参与普通抽取。有闪耀卡时，首包仍保底一张闪耀卡。
+          权重为 0 的品质不参与普通抽取。
+          {value.id === 'island' && '海岛初遇首包保底一张闪耀卡。'}
         </p>
         <div className={styles.fields}>
           {petCardGradeIds.map((grade) => (

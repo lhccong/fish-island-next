@@ -1,0 +1,285 @@
+import { expect, test } from '@playwright/test';
+import { builtinSkins } from '../../src/skins/builtin';
+
+test.setTimeout(60_000);
+
+const tracks = [
+  { id: 1, label: '武器', level: 3, next: 4, claimedTiers: 0, claimablePoints: 300 },
+  { id: 2, label: '手套', level: 1, next: 2, claimedTiers: 0, claimablePoints: 100 },
+  { id: 3, label: '鞋子', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
+  { id: 4, label: '头盔', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
+  { id: 7, label: '项链', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
+  { id: 8, label: '翅膀', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
+].map((track) => ({ ...track, enabled: track.id !== 8 }));
+
+const achievements = [
+  {
+    id: 'farm-level',
+    name: '岛田丰章',
+    label: '农场等级',
+    icon: 'wheat',
+    interval: 10,
+    points: 200,
+    tracks: [{ id: 0, label: null, level: 21, next: 30, claimedTiers: 0, claimablePoints: 400 }],
+  },
+  {
+    id: 'card-level',
+    name: '百匣寻星',
+    label: '抽卡等级',
+    icon: 'cards',
+    interval: 1,
+    points: 200,
+    tracks: [{ id: 0, label: null, level: 3, next: 4, claimedTiers: 0, claimablePoints: 400 }],
+  },
+  {
+    id: 'equipment-level',
+    name: '百炼铸星',
+    label: '装备强化',
+    icon: 'forge',
+    interval: 1,
+    points: 100,
+    tracks,
+  },
+  {
+    id: 'pet-level',
+    name: '共赴山海',
+    label: '宠物等级',
+    icon: 'companion',
+    interval: 10,
+    points: 500,
+    tracks: [{ id: 0, label: null, level: 20, next: 30, claimedTiers: 0, claimablePoints: 1000 }],
+  },
+].map((item) => ({
+  ...item,
+  tracks: item.tracks.map((track) => ({ enabled: true, ...track })),
+}));
+
+for (const width of [1440, 375, 390]) {
+  test.describe(`${width}px`, () => {
+    const mobile = width <= 760;
+    test.use({
+      viewport: { width, height: 680 },
+      hasTouch: mobile,
+      isMobile: mobile,
+      reducedMotion: 'reduce',
+    });
+
+    for (const skin of builtinSkins) {
+      for (const mode of ['light', 'dark']) {
+        test(`${skin.id} ${mode} · 成就状态和领取`, async ({ page }, info) => {
+          await page.addInitScript(
+            ({ skin, mode }) => {
+              localStorage.setItem('fish-island:skin', skin);
+              localStorage.setItem('fish-island:color-mode', mode);
+            },
+            { skin: skin.id, mode },
+          );
+          await page.routeWebSocket(/\/ws\//, () => {});
+          const user = {
+            id: '123',
+            userName: '成就测试',
+            userRole: 'user',
+            points: 5000,
+            usedPoints: 0,
+          };
+          await page.route('**/api/**', (route) => route.fulfill({ json: { code: 0, data: [] } }));
+          await page.route('**/api/user/**', (route) =>
+            route.fulfill({
+              json: {
+                code: 0,
+                data: {
+                  ...user,
+                  saTokenInfo: { tokenName: 'test-session', tokenValue: 'test-value' },
+                },
+              },
+            }),
+          );
+          let catalogState: 'failure' | 'empty' | 'ready' = 'failure';
+          let listRequests = 0;
+          let claims = 0;
+          let release!: () => void;
+          let releaseClaim!: () => void;
+          const loading = new Promise<void>((resolve) => {
+            release = resolve;
+          });
+          const claiming = new Promise<void>((resolve) => {
+            releaseClaim = resolve;
+          });
+          await page.route('**/api/user/achievements', async (route) => {
+            listRequests++;
+            if (catalogState === 'failure') {
+              await loading;
+              return route.fulfill({ status: 503 });
+            }
+            return route.fulfill({
+              json: {
+                code: 0,
+                data: {
+                  awardedPoints: 0,
+                  achievements: catalogState === 'empty' ? [] : achievements,
+                },
+              },
+            });
+          });
+          await page.route('**/api/user/achievements/claim', async (route) => {
+            expect(route.request().method()).toBe('POST');
+            expect(route.request().postData()).toBeNull();
+            if (++claims === 1) {
+              await claiming;
+              return route.fulfill({ status: 503 });
+            }
+            user.usedPoints = -2200;
+            return route.fulfill({
+              json: {
+                code: 0,
+                data: {
+                  awardedPoints: 2200,
+                  achievements: achievements.map((item) => ({
+                    ...item,
+                    tracks: item.tracks.map((track) => ({
+                      ...track,
+                      claimedTiers: track.claimablePoints / item.points,
+                      claimablePoints: 0,
+                    })),
+                  })),
+                },
+              },
+            });
+          });
+
+          await page.goto('/user/login', { waitUntil: 'domcontentloaded' });
+          await page.getByRole('textbox', { name: '账号或邮箱', exact: true }).fill('test-account');
+          await page.getByLabel('密码', { exact: true }).fill('test-password');
+          await page.getByRole('button', { name: '登录', exact: true }).click();
+          await expect(page).not.toHaveURL(/\/user\/login/);
+          await page.goto('/', { waitUntil: 'domcontentloaded' });
+          await expect(page.locator('html')).toHaveAttribute('data-skin', skin.id);
+          await expect(page.locator('html')).toHaveAttribute('data-color-mode', mode);
+          if (mobile) await page.getByRole('link', { name: '发现', exact: true }).tap();
+          else if (skin.id !== 'moyu-island')
+            await page.getByRole('link', { name: '鱼小圈', exact: true }).click();
+          const entry = page
+            .getByRole('link', { name: '成就', exact: true })
+            .filter({ visible: true });
+          await (mobile ? entry.tap() : entry.click());
+          await expect(page.getByRole('status').filter({ hasText: '正在读取成就…' })).toBeVisible();
+          release();
+          await expect(page.getByRole('alert')).toContainText('成就服务暂不可用');
+          catalogState = 'empty';
+          const retry = page.getByRole('button', { name: '重试', exact: true });
+          await (mobile ? retry.tap() : retry.click());
+          await expect(page.getByText('暂无成就', { exact: true })).toBeVisible();
+          catalogState = 'ready';
+          await page.reload({ waitUntil: 'domcontentloaded' });
+          const list = page.getByRole('region', { name: '成就列表' });
+          await expect(list.getByRole('heading', { name: '岛田丰章' })).toBeVisible();
+          const equipment = list.locator('article').filter({ hasText: '百炼铸星' });
+          await expect(equipment.getByRole('listitem')).toHaveCount(6);
+          await expect(equipment.getByRole('listitem').filter({ hasText: '项链' })).toContainText(
+            '下一档 1 级',
+          );
+          await expect(equipment.getByRole('listitem').filter({ hasText: '翅膀' })).toContainText(
+            '强化暂未开放',
+          );
+          await expect(list.locator('article svg')).toHaveCount(4);
+          expect(
+            await list
+              .locator('article svg path')
+              .evaluateAll((paths) => new Set(paths.map((path) => path.getAttribute('d'))).size),
+          ).toBe(4);
+          expect(await list.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+          expect(
+            await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+          ).toBe(true);
+          expect(await list.evaluate((node) => getComputedStyle(node).paddingInlineEnd)).toBe(
+            mobile ? '20px' : '24px',
+          );
+          await expect(page.getByText('可领取 2,200 积分', { exact: true })).toBeVisible();
+
+          const scrollbar = list.locator('..').locator('[data-orientation="vertical"]');
+          if (mobile) {
+            await expect(scrollbar).toHaveCSS('visibility', 'hidden');
+            const area = (await list.boundingBox())!;
+            const touch = await page.context().newCDPSession(page);
+            const x = area.x + area.width / 2;
+            const y = area.y + area.height - 24;
+            try {
+              await touch.send('Input.dispatchTouchEvent', {
+                type: 'touchStart',
+                touchPoints: [{ x, y }],
+              });
+              for (let step = 1; step <= 6; step++) {
+                await touch.send('Input.dispatchTouchEvent', {
+                  type: 'touchMove',
+                  touchPoints: [{ x, y: y - step * 65 }],
+                });
+              }
+              // End a deliberate drag without flinging the content into the next tap.
+              await new Promise((resolve) => setTimeout(resolve, 150));
+              await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+              await expect.poll(() => list.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+            } finally {
+              await touch.detach();
+            }
+            await expect(list.getByRole('heading', { name: '共赴山海' })).toBeInViewport();
+          } else {
+            await page.setViewportSize({ width, height: 460 });
+            await list.focus();
+            await expect(scrollbar).toBeVisible();
+            await expect(scrollbar).toHaveCSS('opacity', '1');
+            await list.press('End');
+            await expect.poll(() => list.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+            await page.setViewportSize({ width, height: 680 });
+          }
+
+          const claim = page.getByRole('button', { name: '一键领取', exact: true });
+          if (mobile) {
+            expect((await claim.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+            await claim.tap();
+          } else {
+            expect((await claim.boundingBox())?.height).toBe(32);
+            const normal = await claim.evaluate((node) => getComputedStyle(node).backgroundColor);
+            await claim.hover();
+            await expect
+              .poll(() => claim.evaluate((node) => getComputedStyle(node).backgroundColor))
+              .not.toBe(normal);
+            await claim.focus();
+            await expect(claim).toBeFocused();
+            await claim.press('Enter');
+          }
+          await expect(page.getByRole('status').filter({ hasText: '领取中…' })).toBeVisible();
+          await expect(claim).toBeDisabled();
+          releaseClaim();
+          await expect(page.getByRole('alert')).toContainText('成就服务暂不可用');
+          await expect(page.getByText('可领取 2,200 积分', { exact: true })).toBeVisible();
+          await (mobile ? claim.tap() : claim.click());
+          await expect(
+            page.getByRole('status').filter({ hasText: '已领取 2,200 积分' }),
+          ).toBeVisible();
+          await expect(claim).toBeDisabled();
+          expect(claims).toBe(2);
+          if (
+            skin.id === 'pixel-island' &&
+            ((mode === 'dark' && width === 390) || (mode === 'light' && width === 1440))
+          ) {
+            await page.screenshot({ path: info.outputPath('achievements.png') });
+          }
+          if (skin.id === 'pixel-island' && mode === 'light' && width === 1440) {
+            const requests = listRequests;
+            await page.getByRole('button', { name: '切换主题' }).click();
+            const appearance = page.getByRole('dialog', { name: '主题模式' });
+            await appearance.getByRole('button', { name: '暗夜模式' }).click();
+            await appearance.getByRole('button', { name: '摸鱼岛', exact: true }).click();
+            await appearance.getByRole('button', { name: '关闭主题弹窗' }).click();
+            await expect(page.locator('html')).toHaveAttribute('data-skin', 'moyu-island');
+            await expect(page.locator('html')).toHaveAttribute('data-color-mode', 'dark');
+            await expect(
+              page.getByRole('status').filter({ hasText: '已领取 2,200 积分' }),
+            ).toBeVisible();
+            expect(listRequests).toBe(requests);
+          }
+        });
+      }
+    }
+  });
+}
