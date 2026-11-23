@@ -38,7 +38,7 @@ export function usePictureInPicture(host: HTMLElement, onError: (message: string
     try {
       openingRef.current = true;
       const pip = await api!.requestWindow({ width: 460, height: 600 });
-      if (!mountedRef.current) {
+      if (!mountedRef.current || host.parentElement !== document.body) {
         pip.close();
         return;
       }

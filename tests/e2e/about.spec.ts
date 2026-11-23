@@ -48,6 +48,7 @@ for (const skin of builtinSkins) {
         '游戏',
         '阅读',
         '店铺',
+        '工具',
         '关于',
       ]);
       const aboutLink = nav.getByRole('link', { name: '关于', exact: true });
@@ -77,7 +78,13 @@ for (const skin of builtinSkins) {
       finishImage = undefined;
       await page.getByRole('button', { name: '重新加载二维码' }).click();
       await expect(page.getByText('正在加载QQ群二维码…')).toBeVisible();
-      await expect.poll(() => finishImage !== undefined).toBe(true);
+      await expect
+        .poll(() => {
+          if (!finishImage) return false;
+          finishImage();
+          return true;
+        })
+        .toBe(true);
       await expect(page.getByText('正在加载QQ群二维码…')).toBeHidden();
       expect(
         await page
@@ -87,7 +94,8 @@ for (const skin of builtinSkins) {
       const copy = page.getByRole('button', { name: '复制', exact: true });
       if (isMobile) await copy.tap();
       else await copy.click();
-      await expect(page.getByRole('button', { name: '复制中…' })).toBeDisabled();
+      const copying = page.getByRole('status').filter({ hasText: '复制中…' });
+      await expect(page.getByRole('button').filter({ has: copying })).toBeDisabled();
       await page.screenshot({ path: info.outputPath('copy-pending.png') });
       await page.evaluate(() => (window as unknown as { releaseCopy: () => void }).releaseCopy());
       await expect(page.getByRole('status')).toContainText('QQ群号已复制');

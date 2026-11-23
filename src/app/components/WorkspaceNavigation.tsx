@@ -7,11 +7,13 @@ import {
   Gamepad2,
   Store,
   Info,
+  Wrench,
 } from 'lucide-react';
-import { Link, NavLink, useLocation } from 'react-router';
+import { Link, matchPath, NavLink, useLocation } from 'react-router';
 import type { ReactNode } from 'react';
 import { ThemePicker, useWebsiteSettingsStore } from '@/features/appearance';
 import type { ShellId } from '@/shells/contracts';
+import { defaultToolPath, tools } from '@/app/config/tools';
 import { WpsChrome } from './WpsChrome';
 import { WpsOfficeTools } from './WpsOfficeTools';
 import styles from './WorkspaceNavigation.module.css';
@@ -119,6 +121,22 @@ export function WorkspaceNavigation({
             ))}
           </div>
         )}
+        <Link
+          to={defaultToolPath}
+          className={`${styles.item} ${styles.desktopEntry}`}
+          aria-label="工具"
+          title="工具"
+          aria-current={
+            tools.some(({ path }) => matchPath(path, location.pathname)) ? 'page' : undefined
+          }
+        >
+          {shellId === 'pixel-island' ? (
+            <PixelIcon name="toolbox" />
+          ) : (
+            <Wrench size={23} aria-hidden="true" />
+          )}
+          <span>工具</span>
+        </Link>
         <WorkspaceSignIn
           presentation={shellId === 'moyu-island' ? 'classic' : 'default'}
           className={styles.item ?? ''}

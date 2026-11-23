@@ -7,6 +7,8 @@ import { RequireAuth } from '@/app/components/RequireAuth';
 import { RequireAdmin } from '@/app/components/RequireAdmin';
 import { adminSections } from '@/app/components/admin-sections';
 import { PageLoading } from '@/app/components/PageLoading';
+import { ToolsRoute } from '@/app/pages/ToolsRoute';
+import { defaultToolPath, tools } from '@/app/config/tools';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
@@ -129,6 +131,10 @@ export function AppRoutes() {
               />
             ))}
             <Route path="/avatarFrames" element={<Navigate to="/utils/avatar-frames" replace />} />
+            <Route path="/utils" element={<Navigate to={defaultToolPath} replace />} />
+            {tools.map((tool) => (
+              <Route key={tool.path} path={tool.path} element={<ToolsRoute tool={tool} />} />
+            ))}
             <Route
               path="/utils/avatar-frames"
               element={

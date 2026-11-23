@@ -1,7 +1,7 @@
 import styles from './PixelIcon.module.css';
 
 export type PixelIconName =
-  'flame' | 'message' | 'palm' | 'garden' | 'cat' | 'gamepad' | 'book' | 'link';
+  'flame' | 'message' | 'palm' | 'garden' | 'cat' | 'gamepad' | 'book' | 'link' | 'toolbox';
 
 export function PixelIcon({ name, size = 28 }: { name: PixelIconName; size?: 28 | 32 }) {
   return (
@@ -38,6 +38,14 @@ export function PixelIcon({ name, size = 28 }: { name: PixelIconName; size?: 28 
           <path className={styles.paper} d="M9 11h10v2h2v8h-2v2H9v-2H7v-8h2z" />
           <path className={styles.ink} d="M9 13h2v4H9zm8 0h2v4h-2zm-5 6h4v2h-4z" />
           <path className={styles.wood} d="M12 7h4v4h-4zM9 23h10v2H9z" />
+        </>
+      ) : name === 'toolbox' ? (
+        <>
+          <path className={styles.ink} d="M8 3h12v5h5v2h2v15H1V10h2V8h5zm3 3v2h6V6z" />
+          <path className={styles.wood} d="M3 16h22v7H3z" />
+          <path className={styles.detail} d="M5 10h18v2h2v3H3v-3h2z" />
+          <path className={styles.gold} d="M11 13h6v6h-6z" />
+          <path className={styles.ink} d="M13 15h2v2h-2z" />
         </>
       ) : name === 'gamepad' ? (
         <>

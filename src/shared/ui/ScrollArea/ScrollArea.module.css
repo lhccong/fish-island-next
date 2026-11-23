@@ -71,6 +71,7 @@
   }
   .root:hover .scrollbar,
   .root:focus-within .scrollbar,
+  .root[data-scrollbar-persistent] .scrollbar,
   .scrollbar[data-state='visible']:active {
     opacity: 1;
   }

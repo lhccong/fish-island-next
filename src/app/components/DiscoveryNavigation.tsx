@@ -1,6 +1,15 @@
-import { Aperture, Gamepad2, BookOpen, PawPrint, ShoppingBag, MessagesSquare } from 'lucide-react';
+import {
+  Aperture,
+  Gamepad2,
+  BookOpen,
+  PawPrint,
+  ShoppingBag,
+  MessagesSquare,
+  Wrench,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
+import { defaultToolPath } from '@/app/config/tools';
 import styles from './DiscoveryNavigation.module.css';
 import { AboutMenu } from './AboutMenu';
 import { AdminEntry } from './AdminEntry';
@@ -36,6 +45,10 @@ export function DiscoveryNavigation({
       <NavLink to="/utils/avatar-frames">
         <ShoppingBag size={19} aria-hidden="true" />
         店铺
+      </NavLink>
+      <NavLink to={defaultToolPath}>
+        <Wrench size={19} aria-hidden="true" />
+        工具
       </NavLink>
       <AboutMenu />
       <AdminEntry />

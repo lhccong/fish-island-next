@@ -14,8 +14,11 @@ for (const mode of ['light', 'dark'])
     );
     const nav = page.getByRole('navigation', { name: '主要功能', exact: true });
     await expect(nav.getByRole('link', { name: '玩法', exact: true })).toHaveCount(0);
-    await expect(nav.getByRole('link', { name: '工具', exact: true })).toHaveCount(0);
     if (!mobile) {
+      await expect(nav.getByRole('link', { name: '工具', exact: true })).toHaveAttribute(
+        'href',
+        '/utils/json',
+      );
       await nav.getByRole('link', { name: '关于', exact: true }).click();
       await expect(page).toHaveURL(/\/rank\/reward$/);
     } else await page.goto('/rank/reward');
@@ -27,6 +30,7 @@ for (const mode of ['light', 'dark'])
       '/pet',
       '/discover/games',
       '/utils/avatar-frames',
+      '/utils/json',
       '/moments/fish-circle',
       '/rank/reward',
     ]) {

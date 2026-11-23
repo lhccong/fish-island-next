@@ -1,4 +1,22 @@
 :root {
+  --color-reader-word-workspace: #e6e6e6;
+  --color-reader-word-paper: #ffffff;
+  --color-reader-word-paper-border: #dbdbdb;
+  --color-reader-word-ink: #333333;
+  --color-reader-word-chrome: #f1f1f1;
+  --color-reader-word-status: #f3f3f3;
+  --color-reader-word-title: #2a579a;
+  --color-reader-word-title-text: #ffffff;
+  --color-reader-word-tab-active: #245489;
+  --color-reader-word-line: #d2d2d2;
+  --color-reader-word-rule: #b2b2b2;
+  --color-reader-word-controls: #333333;
+  --color-reader-word-group-label: #595959;
+  --color-reader-word-selected: #c4c4c4;
+  --color-reader-word-paste: #a16914;
+  --color-reader-word-marker: #946300;
+  --color-reader-word-scrollbar: #898989;
+  --shadow-reader-word-paper: 0 0 4px #0002;
   --color-reader-default-paper: #f5f5f5;
   --color-reader-default-ink: #333333;
   --color-reader-night-paper: #1a1a1a;
@@ -25,6 +43,24 @@
   --color-reader-lemon-cream-ink: #6a4e36;
 }
 :root[data-color-mode='dark'] {
+  --color-reader-word-workspace: var(--color-canvas);
+  --color-reader-word-paper: var(--color-surface);
+  --color-reader-word-paper-border: var(--color-border);
+  --color-reader-word-ink: var(--color-text);
+  --color-reader-word-chrome: var(--color-sidebar);
+  --color-reader-word-status: var(--color-sidebar);
+  --color-reader-word-title: #263b5b;
+  --color-reader-word-title-text: #edf3ff;
+  --color-reader-word-tab-active: #a3c6f6;
+  --color-reader-word-line: var(--color-border);
+  --color-reader-word-rule: var(--color-muted);
+  --color-reader-word-controls: var(--color-text);
+  --color-reader-word-group-label: var(--color-muted);
+  --color-reader-word-selected: var(--color-hover);
+  --color-reader-word-paste: #f0c777;
+  --color-reader-word-marker: #e5cb76;
+  --color-reader-word-scrollbar: var(--color-muted);
+  --shadow-reader-word-paper: 0 0 4px #0005;
   --color-reader-default-paper: #191a1c;
   --color-reader-default-ink: #dddddd;
   --color-reader-night-paper: #191a1c;

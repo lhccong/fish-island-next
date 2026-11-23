@@ -263,6 +263,11 @@
   opacity: 0.45;
   cursor: default;
 }
+.toolbar .wordEntry {
+  min-height: 32px;
+  padding-inline: var(--space-3);
+  white-space: nowrap;
+}
 .readerTitle .drag {
   flex: 1;
   justify-content: flex-start;
@@ -327,9 +332,6 @@
     animation: none;
   }
 }
-.bodyScroll {
-  height: 100%;
-}
 .prose {
   padding: var(--space-5);
   overflow-wrap: anywhere;
@@ -365,6 +367,9 @@
 }
 .findBar button {
   padding-inline: var(--space-2);
+}
+.reader > [data-word-hidden='true'] {
+  display: none;
 }
 .reader > .actions {
   padding: var(--space-2);
@@ -520,5 +525,8 @@
   }
   .toolbar button {
     min-width: 40px;
+  }
+  .toolbar .wordEntry {
+    min-height: 44px;
   }
 }

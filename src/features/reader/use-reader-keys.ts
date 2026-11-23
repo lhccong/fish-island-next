@@ -11,8 +11,10 @@ export function useReaderKeys(
     const keydown = (event: KeyboardEvent) => {
       const settings = controller.getState().settings;
       const target = event.target as HTMLElement | null;
+      const wordWindow = target?.closest('[data-reader-word-window]');
       if (
         event.isComposing ||
+        (wordWindow && event.code === 'Escape') ||
         target?.closest(
           'input,textarea,[contenteditable="true"],[role="dialog"],[role="listbox"],[role="menu"]',
         ) ||

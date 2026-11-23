@@ -9,6 +9,7 @@ interface ScrollAreaProps {
   gutter?: 'overlay' | 'reserved';
   viewportRef?: Ref<HTMLDivElement>;
   fillContent?: boolean;
+  persistentScrollbar?: boolean;
 }
 
 export function ScrollArea({
@@ -18,6 +19,7 @@ export function ScrollArea({
   gutter = 'overlay',
   viewportRef,
   fillContent = false,
+  persistentScrollbar = false,
 }: ScrollAreaProps) {
   return (
     <Primitive.Root
@@ -25,6 +27,7 @@ export function ScrollArea({
       scrollHideDelay={650}
       data-gutter={gutter}
       data-fill-content={fillContent}
+      data-scrollbar-persistent={persistentScrollbar || undefined}
       className={`${styles.root} ${className}`}
     >
       <Primitive.Viewport

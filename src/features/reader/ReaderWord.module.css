@@ -1,0 +1,220 @@
+.window {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: var(--color-reader-word-workspace);
+  color: var(--color-text);
+}
+
+.reader[data-word-mode='true'] {
+  --word-window-gutter: 15px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 1;
+  background: var(--color-reader-word-workspace);
+  color: var(--color-reader-word-ink);
+  font:
+    1rem/1.8 'Segoe UI',
+    'Microsoft YaHei',
+    system-ui,
+    sans-serif;
+  letter-spacing: normal;
+}
+
+.body {
+  --scroll-area-reserved-gutter: 24px;
+  --color-scrollbar: var(--color-reader-word-scrollbar);
+  padding-inline: var(--space-2) var(--word-window-gutter);
+}
+
+.sheet {
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+  padding-block: 40px var(--space-6);
+}
+
+.reader .page {
+  width: min(100%, 900px);
+  padding: 114px clamp(24px, 5vw, 48px) 48px;
+  border: 1px solid var(--color-reader-word-paper-border);
+  background: var(--color-reader-word-paper);
+  box-shadow: var(--shadow-reader-word-paper);
+  color: var(--color-reader-word-ink);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.reader .page h2 {
+  margin: 0 0 30px;
+  padding-block: 30px 46px;
+  border-bottom: 1px dashed var(--color-reader-word-rule);
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.43;
+}
+
+.reader .page p {
+  text-align: justify;
+  text-indent: 2em;
+  margin: 0 0 1em;
+}
+
+.reader .page p:not([data-paragraph]) {
+  text-align: center;
+  text-indent: 0;
+}
+
+.pageEnd {
+  margin-top: var(--space-6);
+  font-size: 0.8125rem;
+}
+
+.pageEnd a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.reader .footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  justify-content: normal;
+  gap: var(--space-2);
+  margin-inline-end: var(--word-window-gutter);
+  padding: 0 var(--space-2);
+  border-top-color: var(--color-reader-word-line);
+  background: var(--color-reader-word-status);
+}
+
+.status,
+.view,
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.reader .footer .status span,
+.reader .footer .view span {
+  color: var(--color-reader-word-controls);
+  font-size: 0.875rem;
+}
+
+.view {
+  justify-self: end;
+  gap: var(--space-3);
+  color: var(--color-reader-word-controls);
+}
+
+.viewIcon {
+  display: grid;
+  align-self: stretch;
+  place-items: center;
+  padding-inline: var(--space-3);
+  background: var(--color-reader-word-selected);
+}
+
+.zoomTrack {
+  position: relative;
+  width: clamp(30px, 6.5vw, 125px);
+  height: 1px;
+  background: var(--color-reader-word-group-label);
+}
+
+.zoomTrack::before {
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  height: 13px;
+  transform: translateY(-50%);
+  background: var(--color-reader-word-group-label);
+  content: '';
+}
+
+.navigation {
+  justify-content: center;
+  gap: clamp(24px, 6vw, 105px);
+}
+
+.navigation button {
+  border-color: transparent;
+  background: transparent;
+}
+
+@media (max-width: 960px) {
+  .view > .viewIcon,
+  .view > svg:first-child,
+  .view > svg:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .reader[data-word-mode='true'] {
+    --word-window-gutter: 0px;
+  }
+
+  .body {
+    --scroll-area-reserved-gutter: 20px;
+    padding-inline-start: max(var(--scroll-area-reserved-gutter), env(safe-area-inset-left));
+  }
+
+  .sheet {
+    padding-block: var(--space-3);
+  }
+
+  .reader .page {
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+
+  .reader .page h2 {
+    margin-bottom: var(--space-4);
+    padding-block: var(--space-3) var(--space-4);
+    font-size: 1.25rem;
+  }
+
+  .pageEnd a {
+    min-height: 44px;
+  }
+
+  .reader .footer {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-1) var(--space-4) max(var(--space-1), env(safe-area-inset-bottom));
+  }
+
+  .footer .status,
+  .footer .view {
+    display: none;
+  }
+
+  .navigation {
+    gap: var(--space-2);
+  }
+
+  .navigation button {
+    border-color: var(--color-border);
+    background: var(--color-surface);
+  }
+}
