@@ -9,6 +9,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Link, NavLink, useLocation } from 'react-router';
+import type { ReactNode } from 'react';
 import { ThemePicker, useWebsiteSettingsStore } from '@/features/appearance';
 import type { ShellId } from '@/shells/contracts';
 import { WpsChrome } from './WpsChrome';
@@ -20,7 +21,13 @@ import { PixelIcon } from '@/shared/ui/PixelIcon';
 import { AdminEntry } from './AdminEntry';
 import { WorkspaceSignIn } from './WorkspaceSignIn';
 
-export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId }) {
+export function WorkspaceNavigation({
+  shellId = 'wechat',
+  ribbonAction,
+}: {
+  shellId?: ShellId;
+  ribbonAction?: ReactNode;
+}) {
   const location = useLocation();
   const siteName = useWebsiteSettingsStore((state) => state.identity.name);
   return (
@@ -35,6 +42,9 @@ export function WorkspaceNavigation({ shellId = 'wechat' }: { shellId?: ShellId 
       <div className={styles.account}>
         <WorkspaceAccount />
       </div>
+      {shellId === 'wps' && ribbonAction && (
+        <div className={styles.ribbonAction}>{ribbonAction}</div>
+      )}
       <nav className={styles.items} aria-label="主要功能">
         <NavLink to="/" end className={styles.item ?? ''} aria-label="热榜">
           {shellId === 'pixel-island' ? (

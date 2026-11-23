@@ -74,15 +74,38 @@ for (const skin of builtinSkins)
       await expect(launcher).toHaveAttribute('title', '2 个福袋可参与');
       const bounds = (await launcher.boundingBox())!,
         badgeBounds = (await badge.boundingBox())!;
-      const messageBounds = (await messages.boundingBox())!;
-      expect(bounds.x - messageBounds.x).toBeGreaterThanOrEqual(4);
-      expect(bounds.x - messageBounds.x).toBeLessThanOrEqual(16);
-      expect(bounds.y + bounds.height).toBeLessThanOrEqual(messageBounds.y + 1);
+      const inRibbon = skin.id === 'wps' && !mobile;
+      const topContent = skin.id === 'wps' ? composer : messages;
+      const workspace = page.locator('main#main-content');
+      expect((await topContent.boundingBox())!.y - (await workspace.boundingBox())!.y).toBeLessThan(
+        2,
+      );
+      if (inRibbon) {
+        const office = page.getByRole('img', { name: /WPS 办公工具外观示意/ });
+        const officeBounds = (await office.boundingBox())!;
+        const account = (await page.getByRole('button', { name: '用户菜单' }).boundingBox())!;
+        expect(bounds.x).toBeGreaterThanOrEqual(account.x + account.width);
+        expect(bounds.x + bounds.width).toBeLessThanOrEqual(officeBounds.x);
+        expect(bounds.y).toBeGreaterThanOrEqual(officeBounds.y);
+        expect(bounds.y + bounds.height).toBeLessThanOrEqual(officeBounds.y + officeBounds.height);
+      } else {
+        const header = page.locator('header').filter({ has: launcher });
+        await expect(header.getByRole('button', { name: '群聊详情' })).toBeInViewport();
+        const details = (await header.getByRole('button', { name: '群聊详情' }).boundingBox())!;
+        expect(Math.abs(bounds.y - details.y)).toBeLessThan(1);
+        if (mobile && skin.id !== 'moyu-island') {
+          const title = header.getByRole('heading', { level: 1 });
+          expect(await title.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+        }
+      }
       expect(bounds.width).toBeGreaterThanOrEqual(44);
       expect(bounds.height).toBeGreaterThanOrEqual(44);
       expect(badgeBounds.x).toBeGreaterThanOrEqual(bounds.x);
       expect(badgeBounds.x + badgeBounds.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
-      await launcher.focus();
+      await launcher.press('Tab');
+      await page.keyboard.press('Shift+Tab');
+      await expect(launcher).toBeFocused();
+      await expect(launcher).toHaveCSS('outline-style', 'solid');
       await page.screenshot({ path: info.outputPath('available-badge.png') });
       const before = reads;
       fixture.push('102', '普通聊天消息');

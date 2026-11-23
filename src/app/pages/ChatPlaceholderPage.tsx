@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { MessageCircle, MoreHorizontal, PanelLeftOpen, PanelRightOpen } from 'lucide-react';
+import { useRef, useState, useSyncExternalStore } from 'react';
+import { MoreHorizontal, PanelLeftOpen, PanelRightOpen } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { WorkspaceLayout } from '@/app/components/WorkspaceLayout';
 import { chatRealtime, chatPreferences, chatListPreferences } from '@/app/config/chat';
@@ -13,21 +13,34 @@ import { IslandSidebarProvider } from '@/app/components/IslandSidebarProvider';
 import { ClassicCircleSidebar } from '@/app/components/ClassicCircleSidebar';
 import { islandPreferences } from '@/app/config/my-island';
 import {
+  ActiveLuckyBagsLauncher,
   ChatWorkspace,
   ChatListProvider,
   useLocalGroupName,
   ChatMembersProvider,
   ChatOnlineUsers,
   MobileOnlineUsers,
+  useChatWindow,
 } from '@/features/chat';
 import styles from './ChatPlaceholderPage.module.css';
 import { ChatMusicTool } from '@/app/components/MusicSession';
 import { CirclePositionPicker } from '@/app/components/CirclePositionPicker';
 
+const desktopQuery = '(min-width: 761px)';
+function subscribeDesktop(onChange: () => void) {
+  const media = window.matchMedia(desktopQuery);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
+}
+
 export function ChatPlaceholderPage({ active }: { active: boolean }) {
   const { session } = useAuth();
   const skinId = useAppearanceStore((state) => state.skinId);
   const presentation = skinId === 'wps' ? 'worksheet' : 'conversation';
+  const desktop = useSyncExternalStore(subscribeDesktop, () => matchMedia(desktopQuery).matches);
+  const { mode } = useChatWindow();
+  const [ribbonTarget, setRibbonTarget] = useState<HTMLDivElement | null>(null);
+  const showRibbonAction = active && mode === 'inline' && presentation === 'worksheet' && desktop;
   const { groupName, saveGroupName } = useLocalGroupName(chatPreferences);
   const [membersOpen, setMembersOpen] = useState(false);
   const circleCollapsed = useChatPanelStore((state) => state.circleCollapsed);
@@ -64,6 +77,7 @@ export function ChatPlaceholderPage({ active }: { active: boolean }) {
                 presentation === 'worksheet' || (skinId === 'moyu-island' && circleCollapsed)
               }
               hideDesktopHeader={presentation === 'worksheet'}
+              ribbonAction={showRibbonAction && <div ref={setRibbonTarget} />}
               slots={{
                 contentScroll: false,
                 sidebar: (
@@ -109,13 +123,12 @@ export function ChatPlaceholderPage({ active }: { active: boolean }) {
                           )}
                         </Button>
                       )}
-                      <h1 title={groupName} aria-label={groupName}>
-                        {skinId === 'moyu-island' ? (
-                          <MessageCircle size={18} aria-hidden="true" />
-                        ) : (
-                          groupName
-                        )}
-                      </h1>
+                      {active && mode === 'inline' && (
+                        <ActiveLuckyBagsLauncher
+                          triggerContainer={showRibbonAction ? ribbonTarget : null}
+                        />
+                      )}
+                      <h1 title={groupName}>{groupName}</h1>
                     </div>
                     <div className={styles.headerActions}>
                       {skinId === 'moyu-island' && (

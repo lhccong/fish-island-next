@@ -5,6 +5,7 @@ import { ExternalLink, MessageCircle, Sheet } from 'lucide-react';
 import { FloatingWindow } from '@/shared/ui/FloatingWindow';
 import { Button } from '@/shared/ui/Button';
 import { Select } from '@/shared/ui/Select';
+import { ActiveLuckyBagsLauncher } from './ActiveLuckyBagsLauncher';
 import type { ChatPresentation } from './chat-presentation';
 import styles from './ChatWindow.module.css';
 
@@ -95,6 +96,7 @@ export function ChatWindow({
           returnFocusRef={resumeRef}
           headerAction={
             <div className={styles.headerActions}>
+              <ActiveLuckyBagsLauncher />
               <div className={styles.modeSelect}>
                 <Select
                   label="小窗显示模式"

@@ -1,4 +1,5 @@
 export { ChatWorkspace } from './ChatWorkspace';
+export { ActiveLuckyBagsLauncher } from './ActiveLuckyBagsLauncher';
 export { ChatMusicProvider } from './ChatMusicProvider';
 export { ChatReportProvider } from './ChatReportProvider';
 export { ChatListProvider } from './ChatListProvider';

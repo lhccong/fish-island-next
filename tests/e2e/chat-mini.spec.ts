@@ -89,7 +89,9 @@ for (const skin of builtinSkins)
       await mini.screenshot({ path: info.outputPath('mini-error.png') });
       await retry.click();
       await expect(mini.getByText('暂无消息，连接后将在这里接收新消息')).toBeVisible();
-      const bags = mini.getByRole('button', { name: '进行中的福袋', exact: true });
+      const bags = mini
+        .locator('header')
+        .getByRole('button', { name: '进行中的福袋', exact: true });
       if (hasTouch) await bags.tap();
       else await bags.press('Enter');
       const bagList = mini.getByRole('dialog', { name: '进行中的福袋', exact: true });

@@ -21,6 +21,7 @@ export function WorkspaceLayout({
   hideDesktopHeader = false,
   mobileHeader = 'full',
   headerAction,
+  ribbonAction,
 }: {
   slots: Omit<WorkspaceShellSlots, 'navigation'>;
   sidebarLabel?: string;
@@ -33,6 +34,7 @@ export function WorkspaceLayout({
   hideDesktopHeader?: boolean;
   mobileHeader?: 'full' | 'back-only';
   headerAction?: ReactNode;
+  ribbonAction?: ReactNode;
 }) {
   const skinId = useAppearanceStore((state) => state.skinId);
   const { pathname } = useLocation();
@@ -129,7 +131,7 @@ export function WorkspaceLayout({
             )}
           </div>
         ),
-        navigation: <WorkspaceNavigation shellId={shellId} />,
+        navigation: <WorkspaceNavigation shellId={shellId} ribbonAction={ribbonAction} />,
       }}
     />
   );

@@ -199,6 +199,12 @@
 .navigation[data-shell='wps'] .account {
   grid-column: 1;
 }
+.ribbonAction {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+  padding-inline: 8px;
+}
 .navigation[data-shell='wps'] .items {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -316,6 +322,9 @@
   }
 }
 @media (max-width: 760px) {
+  .ribbonAction {
+    display: none;
+  }
   .navigation,
   .navigation[data-shell='wps'] {
     display: grid;

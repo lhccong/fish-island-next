@@ -127,7 +127,17 @@
   }
   .header {
     min-height: 56px;
-    padding: 4px 12px;
+    gap: 0;
+    padding: 4px 2px 4px 0;
+  }
+  .header h1 {
+    font-size: 0.875rem;
+  }
+  .headerTitle {
+    gap: 4px;
+  }
+  .headerActions {
+    gap: 0;
   }
 }
 .islandSidebar {
@@ -136,14 +146,13 @@
 }
 .header[data-classic='true'] {
   min-height: 44px;
-  padding: 0 8px;
+  padding: 0 8px 0 0;
 }
 .header[data-classic='true'] h1 {
-  display: flex;
-  align-items: center;
-  color: var(--color-accent-text);
-  font-size: 0.875rem;
-  font-weight: 500;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
 }
 @media (max-width: 760px) {
   .header[data-classic='true'] {
@@ -152,7 +161,7 @@
     padding: 0;
     background: transparent;
   }
-  .header[data-classic='true'] h1 {
-    font-size: 0.875rem;
+  .header[data-classic='true'] .headerActions {
+    gap: 2px;
   }
 }

@@ -7,9 +7,15 @@ import { scrollChatUp } from './chat-scroll-actions';
 test.setTimeout(90000);
 
 async function enterWindow(page: Page, classic: boolean) {
-  const entry = page.getByRole('button', { name: '小窗模式', exact: true });
-  if (classic || !(await entry.isVisible()))
-    await page.getByRole('button', { name: '更多聊天工具', exact: true }).click();
+  const inline = page.locator('[data-floating="false"]');
+  await expect(inline.getByRole('textbox', { name: '消息草稿', exact: true })).toBeVisible();
+  const entry = inline.getByRole('button', { name: '小窗模式', exact: true });
+  const more = inline.getByRole('button', { name: '更多聊天工具', exact: true });
+  if (
+    classic ||
+    ((await more.isVisible()) && (await more.getAttribute('aria-expanded')) === 'false')
+  )
+    await more.click();
   if (classic) await page.getByRole('menuitem', { name: '小窗模式', exact: true }).click();
   else await entry.click();
   await expect(page).toHaveURL('/');
@@ -91,7 +97,19 @@ for (const skin of builtinSkins)
         const select = page.getByRole('combobox', { name: '小窗显示模式', exact: true });
         const columns = page.getByLabel('消息工作表列', { exact: true });
         await expect(columns).toBeVisible();
-        await expect(page.getByRole('dialog', { name: /\.xlsx — Excel$/ })).toBeVisible();
+        const window = page.getByRole('dialog', { name: /\.xlsx — Excel$/ });
+        const launcher = window.locator('header').getByRole('button', { name: '进行中的福袋' });
+        await expect(launcher).toBeInViewport();
+        const launcherBounds = (await launcher.boundingBox())!;
+        const selectBounds = (await select.boundingBox())!;
+        expect(launcherBounds.y).toBe(selectBounds.y);
+        expect(launcherBounds.x + launcherBounds.width).toBeLessThanOrEqual(selectBounds.x);
+        if (page.viewportSize()!.width <= 760) await launcher.tap();
+        else await launcher.press('Enter');
+        const bags = page.getByRole('dialog', { name: '进行中的福袋', exact: true });
+        await expect(bags.getByText(/暂无进行中的福袋/)).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(launcher).toBeFocused();
         const loading = page.getByRole('status').filter({ hasText: '正在加载历史消息…' });
         const retry = page.getByRole('button', { name: '重试历史消息', exact: true });
         await expect(async () => {
