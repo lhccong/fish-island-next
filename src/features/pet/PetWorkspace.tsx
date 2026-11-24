@@ -103,7 +103,6 @@ export function PetWorkspace({
   const navigationRef = useRef<HTMLElement | null>(null);
   const operation = usePetOperation();
   const selected = panels.find((item) => item.id === panel);
-  const toolbarPanels = panels.filter(({ id }) => id !== 'cards' || userId === '1');
   const busy = operation.pending || resource.state.status === 'loading';
   const onChange = resource.reload;
   function openPanel(id: PanelId, mode: ChallengeMode = 'rank') {
@@ -132,7 +131,7 @@ export function PetWorkspace({
             伙伴营地
           </h1>
           <nav ref={navigationRef} className={styles.tools} aria-label="伙伴功能">
-            {toolbarPanels.map(({ id, title, icon: Icon }) => (
+            {panels.map(({ id, title, icon: Icon }) => (
               <Button
                 key={id}
                 variant="secondary"

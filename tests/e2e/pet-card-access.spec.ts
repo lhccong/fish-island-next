@@ -54,19 +54,11 @@ for (const skin of builtinSkins)
         const mobile = width <= 760;
         await page.setViewportSize({ width, height: 844 });
         let fixture: Awaited<ReturnType<typeof setupPetCardPlay>> | undefined;
-        const chat = await setupChatMenu(
-          page,
-          skin.id,
-          mode,
-          'user',
-          async () => {
-            await shortcutFixture(page);
-            await setupPetCardCatalog(page);
-            fixture = await setupPetCardPlay(page);
-          },
-          true,
-          '1',
-        );
+        const chat = await setupChatMenu(page, skin.id, mode, 'user', async () => {
+          await shortcutFixture(page);
+          await setupPetCardCatalog(page);
+          fixture = await setupPetCardPlay(page);
+        });
         await activate(
           page
             .getByRole('button', { name: '打开宠物悬浮窗', exact: true })
@@ -74,7 +66,15 @@ for (const skin of builtinSkins)
           mobile,
         );
         const pet = page.getByRole('dialog', { name: '伙伴营地', exact: true });
-        await activate(pet.getByRole('button', { name: '宠物卡包', exact: true }), mobile);
+        const windowToolbar = pet.getByRole('navigation', { name: '伙伴功能' });
+        await expect(windowToolbar).toBeVisible();
+        expect(await windowToolbar.evaluate((nav) => nav.scrollWidth <= nav.clientWidth)).toBe(
+          true,
+        );
+        await activate(
+          windowToolbar.getByRole('button', { name: '宠物卡包', exact: true }),
+          mobile,
+        );
         const cards = page.getByRole('dialog', { name: '宠物卡包', exact: true });
         const button = (name: string | RegExp) =>
           cards.getByRole('button', { name, exact: typeof name === 'string' });
@@ -281,7 +281,17 @@ for (const skin of builtinSkins)
         await expect(cards).toBeHidden();
 
         fixture!.prepareLastLevel();
-        await activate(page.getByRole('button', { name: '宠物卡包', exact: true }), mobile);
+        const toolbar = page.getByRole('navigation', { name: '伙伴功能' });
+        await expect(toolbar).toBeVisible();
+        expect(await toolbar.evaluate((nav) => nav.scrollWidth <= nav.clientWidth)).toBe(true);
+        const openCards = toolbar.getByRole('button', { name: '宠物卡包', exact: true });
+        if (mobile) {
+          expect((await openCards.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+          await activate(openCards, true);
+        } else {
+          await openCards.focus();
+          await page.keyboard.press('Enter');
+        }
         await expect(cards.getByText('抽卡等级 Lv.59')).toBeVisible();
         await expect(cards.getByText('距升级 1 包')).toBeVisible();
         await activate(button('拆开卡包'), mobile);
