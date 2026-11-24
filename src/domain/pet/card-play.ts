@@ -1,4 +1,26 @@
-import type { PetCardCatalog, PetCardId, PetCardStats } from './catalog';
+import type {
+  PetCardCatalog,
+  PetCardGrade,
+  PetCardId,
+  PetCardImage,
+  PetCardStats,
+} from './catalog';
+
+export interface CollectedPetCard {
+  id: PetCardId;
+  name: string;
+  grade: PetCardGrade;
+  stars: number;
+  art: PetCardImage;
+}
+
+export interface PetCardCollectionPort {
+  collection(
+    userId: string,
+    page: number,
+    signal: AbortSignal,
+  ): Promise<{ items: CollectedPetCard[]; total: number }>;
+}
 
 export interface PetCardOwned {
   cardId: PetCardId;

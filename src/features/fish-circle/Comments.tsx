@@ -15,6 +15,17 @@ import { applyCommentLikes } from './comment-ranking';
 import type { CommentTarget } from './comment-target';
 import { useCommentTarget } from './use-comment-target';
 import styles from './Comments.module.css';
+
+function collectReplies(comment: Comment): Comment[] {
+  const replies: Comment[] = [];
+  const pending = comment.children.slice().reverse();
+  for (let next = pending.pop(); next; next = pending.pop()) {
+    replies.push(next);
+    for (const child of next.children.slice().reverse()) pending.push(child);
+  }
+  return replies;
+}
+
 interface Props {
   target?: CommentTarget | null;
   composerOpen: boolean;
@@ -41,27 +52,24 @@ export function Comments({
     (p: number, signal: AbortSignal) => service.comments(momentId, p, signal),
     [service, momentId],
   );
-  const {
-    result,
-    refresh: reload,
-    loadMore,
-    loadingMore,
-    error: pageError,
-    hasMore,
-  } = usePage(load);
+  const { result, refresh: reload, loadMore, loadingMore, error, hasMore } = usePage(load);
   const [likes, setLikes] = useState<ReadonlyMap<string, boolean>>(new Map());
   const comments = useMemo(
     () => (result.status === 'ready' ? applyCommentLikes(result.data.items, likes) : []),
     [result, likes],
+  );
+  const threads = useMemo(
+    () => comments.map((comment) => ({ comment, replies: collectReplies(comment) })),
+    [comments],
   );
   function refresh() {
     setLikes(new Map());
     reload();
   }
   const [expanded, setExpanded] = useState(!!target);
-  const visibleComments = expanded ? comments : comments.slice(0, 3);
-  const [replyOverrides, setReplyOverrides] = useState<ReadonlyMap<string, boolean>>(new Map());
-  const [reply, setReply] = useState<Comment | null>(null);
+  const visibleThreads = expanded ? threads : threads.slice(0, 3);
+  const [threadOverrides, setThreadOverrides] = useState<ReadonlyMap<string, boolean>>(new Map());
+  const [reply, setReply] = useState<{ comment: Comment; rootId: string } | null>(null);
   const operation = useOperation();
   const like = useOperation();
   const [notice, setNotice] = useState('');
@@ -88,21 +96,21 @@ export function Comments({
     ready: result.status === 'ready',
     hasMore,
     loadingMore,
-    error: pageError,
+    error,
     loadMore,
   });
-  function commentCount(c: Comment): number {
-    return 1 + c.children.reduce((n, child) => n + commentCount(child), 0);
+  function setThreadOpen(rootId: string, open: boolean) {
+    setThreadOverrides((old) => new Map(old).set(rootId, open));
   }
   async function setLiked(id: string, liked: boolean) {
     const ok = await like.run((signal) => service.setCommentLiked(id, liked, signal));
     if (ok) setLikes((previous) => new Map(previous).set(id, liked));
   }
-  function renderComment(c: Comment, ancestors: string[] = []) {
+  function renderComment(c: Comment, rootId: string, replies?: Comment[]) {
     const highlighted = anchor.match?.status === 'found' && anchor.match.id === c.id;
     const repliesOpen =
-      replyOverrides.get(c.id) ??
-      (anchor.match?.status === 'found' && anchor.match.ancestors.includes(c.id));
+      threadOverrides.get(rootId) ??
+      (anchor.match?.status === 'found' && anchor.match.ancestors[0] === rootId);
     return (
       <li
         key={c.id}
@@ -130,12 +138,8 @@ export function Comments({
                 onClick={(event) => {
                   replyElement.current = event.currentTarget.closest('li');
                   onStartReply();
-                  setReply(c);
-                  setReplyOverrides((old) => {
-                    const next = new Map(old);
-                    for (const id of [...ancestors, c.id]) next.set(id, true);
-                    return next;
-                  });
+                  setReply({ comment: c, rootId });
+                  setThreadOpen(rootId, true);
                 }}
               >
                 回复
@@ -150,7 +154,7 @@ export function Comments({
                       .then((ok) => {
                         if (ok) {
                           setNotice('评论已删除');
-                          onCountChange(-commentCount(c));
+                          onCountChange(-1 - (replies ?? collectReplies(c)).length);
                           refresh();
                         }
                       });
@@ -159,7 +163,7 @@ export function Comments({
                   删除评论
                 </button>
               )}
-              {canManage && ancestors.length === 0 && (
+              {canManage && c.id === rootId && (
                 <button
                   type="button"
                   disabled={operation.pending}
@@ -184,25 +188,19 @@ export function Comments({
             )}
           </div>
         </div>
-        {c.children.length > 0 && (
+        {!!replies?.length && (
           <div className={styles.thread}>
-            <button
-              className={styles.more}
-              type="button"
+            <Button
+              className={styles.threadToggle || ''}
+              variant="inline"
               aria-expanded={repliesOpen}
-              onClick={() =>
-                setReplyOverrides((old) => {
-                  const next = new Map(old);
-                  next.set(c.id, !repliesOpen);
-                  return next;
-                })
-              }
+              onClick={() => setThreadOpen(rootId, !repliesOpen)}
             >
-              {repliesOpen ? '收起回复' : `查看 ${c.children.length} 条回复`}
-            </button>
+              {repliesOpen ? '收起回复' : `查看 ${replies.length} 条回复`}
+            </Button>
             {repliesOpen && (
               <ul className={styles.replies}>
-                {c.children.map((child) => renderComment(child, [...ancestors, c.id]))}
+                {replies.map((child) => renderComment(child, rootId))}
               </ul>
             )}
           </div>
@@ -222,9 +220,10 @@ export function Comments({
         <CommentComposer
           service={service}
           momentId={momentId}
-          reply={reply}
+          reply={reply?.comment ?? null}
           onCancelReply={() => setReply(null)}
           onSent={() => {
+            if (reply) setThreadOpen(reply.rootId, true);
             setReply(null);
             onCountChange(1);
             setNotice('评论成功');
@@ -261,7 +260,9 @@ export function Comments({
             <>
               {result.data.items.length ? (
                 <ul className={styles.commentList}>
-                  {visibleComments.map((c) => renderComment(c))}
+                  {visibleThreads.map(({ comment, replies }) =>
+                    renderComment(comment, comment.id, replies),
+                  )}
                 </ul>
               ) : (
                 <p>暂无评论，来聊两句吧</p>
@@ -281,7 +282,7 @@ export function Comments({
                 label="评论"
                 hasMore={hasMore}
                 loading={loadingMore}
-                error={pageError}
+                error={error}
                 onLoadMore={loadMore}
               />
             </>

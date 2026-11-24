@@ -4,7 +4,13 @@ import { shortcutFixture } from './chat-game-shortcuts-fixture';
 import { setupChatMenu } from './chat-menu-fixture';
 import { setupPetCardCatalog } from './pet-card-catalog-fixture';
 import { setupPetCardPlay } from './pet-card-play-fixture';
-import { activate, assertPackStock, choosePetCardPack } from './pet-cards-flow';
+import {
+  activate,
+  assertPackStock,
+  choosePetCardPack,
+  verifyCollectionFilters,
+  verifyPairedPackCovers,
+} from './pet-cards-flow';
 
 test.use({ hasTouch: true, reducedMotion: 'reduce' });
 test.setTimeout(90_000);
@@ -81,6 +87,7 @@ for (const skin of builtinSkins)
 
         await page.goto('/pet?panel=cards', { waitUntil: 'domcontentloaded' });
         await expect(button(/免费领一包/)).toBeEnabled({ timeout: 15000 });
+        await verifyPairedPackCovers(cards, mobile);
         await expect(cards.getByText('首包必有闪耀卡')).toBeVisible();
         await activate(button('我的收藏'), mobile);
         await expect(cards.getByText('开包收藏第一张宠物卡。')).toBeVisible();
@@ -167,6 +174,10 @@ for (const skin of builtinSkins)
           collection.getByRole('listitem').filter({ has: page.getByText(name, { exact: true }) });
         const radish = item('拾贝萝卜');
         const fox = item('极光灵狐');
+        await verifyCollectionFilters(page, collection, mobile);
+        if (skin.id === 'wechat' && (width === 375 || width === 1440)) {
+          await cards.screenshot({ path: info.outputPath('collection-filters.png') });
+        }
         const stars = radish.locator('[data-card-stars] svg');
         const displayedStars = displayCase.locator('[data-card-stars] svg');
         await expect(stars).toHaveCount(1);

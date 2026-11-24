@@ -20,6 +20,19 @@ for (const skin of builtinSkins)
       await theme.click();
       await page.getByRole('button', { name: '网站设置', exact: true }).click();
       const dialog = page.getByRole('dialog', { name: '网站设置', exact: true });
+      const classic = skin.id === 'moyu-island';
+      const mobile = page.viewportSize()!.width <= 760;
+      if (classic) {
+        const position = dialog.getByRole('combobox', { name: '电脑端菜单位置' });
+        const side = page.getByRole('option', { name: '侧边菜单' });
+        if (mobile) {
+          await position.tap();
+          await side.tap();
+        } else {
+          await position.click();
+          await side.click();
+        }
+      }
       await dialog.getByRole('combobox', { name: '界面字号' }).click();
       await page.getByRole('option', { name: '特大（120%）' }).click();
       await dialog.getByRole('button', { name: '保存', exact: true }).click();
@@ -40,5 +53,22 @@ for (const skin of builtinSkins)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
+      if (classic) {
+        const shell = page.locator('[data-navigation-layout="side"]').filter({ visible: true });
+        const rail = shell.getByRole('complementary', { name: '应用导航', exact: true });
+        if (mobile) await expect(rail).toBeHidden();
+        else {
+          await expect(shell.locator('#classic-circle-sidebar')).toBeVisible();
+          const main = (await shell.locator('#main-content').boundingBox())!;
+          const menu = (await rail.boundingBox())!;
+          expect(main.x).toBeGreaterThan(menu.x + menu.width);
+          const about = rail.getByRole('link', { name: '关于', exact: true });
+          await about.click();
+          await expect(page).toHaveURL(/\/rank\/reward$/);
+          await expect(about).toHaveAttribute('aria-current', 'page');
+          await rail.getByRole('link', { name: '聊天', exact: true }).click();
+          await expect(draft).toHaveText('字号调整前的草稿');
+        }
+      }
     });
   }

@@ -287,7 +287,9 @@ export {
   petCardStarStats,
 } from './card-play';
 export type {
+  CollectedPetCard,
   PetCardBatchResult,
+  PetCardCollectionPort,
   PetCardHistoryPage,
   PetCardOpening,
   PetCardOwned,

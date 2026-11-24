@@ -11,6 +11,17 @@ export const fontScaleOptions = [
 ] as const;
 type FontScale = (typeof fontScaleOptions)[number]['value'];
 
+export const defaultMenuPosition = 'top';
+export const menuPositionOptions = [
+  { value: defaultMenuPosition, label: '顶部菜单' },
+  { value: 'side', label: '侧边菜单' },
+] as const;
+type MenuPosition = (typeof menuPositionOptions)[number]['value'];
+
+export function isMenuPosition(value: unknown): value is MenuPosition {
+  return menuPositionOptions.some((option) => option.value === value);
+}
+
 export interface TabIdentity {
   name: string;
   icon: string;
@@ -59,12 +70,14 @@ export function isFontScale(value: unknown): value is FontScale {
 interface WebsitePreferences {
   identity: TabIdentity;
   fontScale: FontScale;
+  menuPosition: MenuPosition;
 }
 
 function readPreferences(): WebsitePreferences {
   const defaults: WebsitePreferences = {
     identity: defaultTabIdentity,
     fontScale: defaultFontScale,
+    menuPosition: defaultMenuPosition,
   };
   try {
     const stored: unknown = JSON.parse(localStorage.getItem(tabIdentityStorageKey) ?? 'null');
@@ -75,6 +88,10 @@ function readPreferences(): WebsitePreferences {
         'fontScale' in stored && isFontScale(stored.fontScale)
           ? stored.fontScale
           : defaultFontScale,
+      menuPosition:
+        'menuPosition' in stored && isMenuPosition(stored.menuPosition)
+          ? stored.menuPosition
+          : defaultMenuPosition,
     };
   } catch {
     return defaults;
@@ -82,17 +99,20 @@ function readPreferences(): WebsitePreferences {
 }
 
 interface WebsiteSettingsState extends WebsitePreferences {
-  save: (identity: TabIdentity, fontScale: FontScale) => void;
+  save: (preferences: WebsitePreferences) => void;
 }
 
 export const useWebsiteSettingsStore = create<WebsiteSettingsState>((set) => ({
   ...readPreferences(),
-  save: (value, fontScale) => {
+  save: ({ identity: value, fontScale, menuPosition }) => {
     const identity = normalizeTabIdentity(value);
     if (!identity)
       throw new Error('请输入 1～60 字的网站名称和有效的 HTTPS 图标地址，或选择本地图片。');
     try {
-      localStorage.setItem(tabIdentityStorageKey, JSON.stringify({ ...identity, fontScale }));
+      localStorage.setItem(
+        tabIdentityStorageKey,
+        JSON.stringify({ ...identity, fontScale, menuPosition }),
+      );
     } catch {
       throw new Error('本地保存失败，请检查浏览器存储权限或释放空间后重试。');
     }
@@ -102,6 +122,7 @@ export const useWebsiteSettingsStore = create<WebsiteSettingsState>((set) => ({
           ? state.identity
           : identity,
       fontScale,
+      menuPosition,
     }));
   },
 }));

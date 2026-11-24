@@ -1,4 +1,4 @@
-import type { WorkspaceShellSlots } from '@/shells/contracts';
+import type { WorkspaceNavigationLayout, WorkspaceShellSlots } from '@/shells/contracts';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import styles from './WechatShell.module.css';
 import { PixelIslandScene } from './PixelIslandScene';
@@ -21,7 +21,7 @@ export function WechatShell({
 }: {
   slots: WorkspaceShellSlots;
   sidebarLabel?: string;
-  navigationLayout?: 'rail' | 'ribbon' | 'topbar';
+  navigationLayout?: WorkspaceNavigationLayout;
   hideSidebar?: boolean;
   centerContent?: boolean;
   mobileNavigation?: 'tabs' | 'hidden';

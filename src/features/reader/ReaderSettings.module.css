@@ -50,7 +50,7 @@
   font-weight: 600;
 }
 .tabs button:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: -3px;
   border-radius: var(--radius-control);
 }

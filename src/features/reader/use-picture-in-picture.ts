@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { trackFocusInput } from '@/shared/ui/FocusOutline';
 
 interface DocumentPip {
   requestWindow: (options: { width: number; height: number }) => Promise<Window>;
@@ -69,11 +70,13 @@ export function usePictureInPicture(host: HTMLElement, onError: (message: string
       pip.document.title = '摸鱼阅读';
       host.setAttribute('data-pip', 'true');
       pip.document.body.append(host);
+      const stopTrackingFocus = trackFocusInput(pip.document);
       const observer = new MutationObserver(sync);
       observer.observe(document.documentElement, { attributes: true });
       observer.observe(document.head, { childList: true, subtree: true, characterData: true });
       const restore = () => {
         observer.disconnect();
+        stopTrackingFocus();
         host.removeAttribute('data-pip');
         if (document.body.isConnected) document.body.append(host);
         windowRef.current = null;
@@ -82,6 +85,7 @@ export function usePictureInPicture(host: HTMLElement, onError: (message: string
       };
       cleanupRef.current = () => {
         observer.disconnect();
+        stopTrackingFocus();
         pip.removeEventListener('pagehide', restore);
       };
       pip.addEventListener('pagehide', restore, { once: true });

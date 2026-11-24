@@ -138,6 +138,12 @@ body {
   margin: 0;
   min-width: 320px;
 }
+body[data-pointer-input] {
+  --focus-outline-style: none;
+}
+:where(body[data-pointer-input] :focus) {
+  outline: none;
+}
 button,
 input,
 textarea {
@@ -150,7 +156,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--color-accent);
+  outline: 3px var(--focus-outline-style, solid) var(--color-accent);
   outline-offset: 4px;
 }
 @media (prefers-reduced-motion: reduce) {

@@ -60,7 +60,7 @@ export function ReaderPageControls({
       </div>
     );
   return (
-    <div className={styles.pageControls}>
+    <div className={`${styles.pageControls} ${styles.chapterNavigation}`}>
       {previous}
       <span>
         {current} / {total}

@@ -49,11 +49,15 @@ for (const skin of builtinSkins)
           .documentPictureInPicture.window;
         const element = pip.document.querySelector('[aria-label="阅读器"]')!;
         const bounds = element.getBoundingClientRect();
-        const footer = [...element.querySelectorAll('button')]
+        const header = element.querySelector('header')!.getBoundingClientRect();
+        const navigation = [...element.querySelectorAll('button')]
           .find((button) => button.textContent === '下一章')!
           .parentElement!.getBoundingClientRect();
+        const chapter = element.querySelector('[tabindex="-1"]')!.getBoundingClientRect();
         return {
-          footerGap: Math.abs(bounds.bottom - footer.bottom),
+          headerGap: Math.abs(navigation.top - header.bottom),
+          chapterGap: Math.abs(chapter.top - navigation.bottom),
+          contentHeight: bounds.bottom - chapter.top,
           skin: pip.document.documentElement.dataset.skin,
           mode: pip.document.documentElement.dataset.colorMode,
           background: pip.getComputedStyle(element).backgroundColor,
@@ -63,8 +67,22 @@ for (const skin of builtinSkins)
       expect(pipState.skin).toBe(skin.id);
       expect(pipState.mode).toBe(mode);
       expect(pipState.width).toBe(true);
-      expect(pipState.footerGap).toBeLessThanOrEqual(2);
+      expect(pipState.headerGap).toBeLessThanOrEqual(2);
+      expect(pipState.chapterGap).toBeLessThanOrEqual(2);
+      expect(pipState.contentHeight).toBeGreaterThan(0);
       expect(pipState.background).toBe(mode === 'dark' ? 'rgb(25, 26, 28)' : 'rgb(245, 245, 245)');
+      const focusOutline = await page.evaluate(() => {
+        const pip = (window as unknown as { documentPictureInPicture: { window: Window } })
+          .documentPictureInPicture.window;
+        const viewport = pip.document.querySelector<HTMLElement>('[aria-label="章节正文"]')!;
+        const outline = () =>
+          pip.getComputedStyle(viewport).getPropertyValue('--focus-outline-style').trim();
+        viewport.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+        const afterPointer = outline();
+        viewport.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+        return { afterPointer, afterKeyboard: outline() };
+      });
+      expect(focusOutline).toEqual({ afterPointer: 'none', afterKeyboard: '' });
       await page.evaluate(() => {
         const pip = (window as unknown as { documentPictureInPicture: { window: Window } })
           .documentPictureInPicture.window;

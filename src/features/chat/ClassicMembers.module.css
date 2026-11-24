@@ -142,3 +142,8 @@
     display: none;
   }
 }
+@container classic-chat (max-width: 520px) {
+  .members {
+    display: none;
+  }
+}

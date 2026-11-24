@@ -1,7 +1,13 @@
 import { useState, type ReactNode } from 'react';
 import type { AuthUser } from '@/domain/auth';
 import type { UserCardPort } from '@/domain/account-tools';
-import { UserCardContext, type RenderFollowList, type UserCardTarget } from './user-card-context';
+import {
+  UserCardContext,
+  type RenderCardCollection,
+  type RenderFollowList,
+  type UserCardDestination,
+  type UserCardTarget,
+} from './user-card-context';
 import { UserCardDialog } from './UserCardDialog';
 
 export function UserCardProvider({
@@ -10,12 +16,14 @@ export function UserCardProvider({
   user,
   onVisit,
   renderFollowList,
+  renderCardCollection,
 }: {
   children: ReactNode;
   port: UserCardPort;
   user: AuthUser | undefined;
-  onVisit: (kind: 'pet' | 'farm' | 'moments', id: string) => void;
+  onVisit: (kind: UserCardDestination, id: string) => void;
   renderFollowList: RenderFollowList;
+  renderCardCollection: RenderCardCollection;
 }) {
   const [target, setTarget] = useState<UserCardTarget | null>(null);
   return (
@@ -30,6 +38,7 @@ export function UserCardProvider({
           onClose={() => setTarget(null)}
           onVisit={onVisit}
           renderFollowList={renderFollowList}
+          renderCardCollection={renderCardCollection}
         />
       )}
     </UserCardContext.Provider>

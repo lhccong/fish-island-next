@@ -50,7 +50,7 @@
   background: var(--color-accent);
 }
 .primary:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 3px;
 }
 .disabled {
@@ -359,7 +359,7 @@
   border-color: var(--color-border);
 }
 .lifeModes button:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 3px;
 }
 .lifeModes .cultivationMode {
@@ -699,7 +699,7 @@
   color: var(--color-accent-text);
 }
 .talent:focus-visible {
-  outline: 3px solid var(--color-accent);
+  outline: 3px var(--focus-outline-style, solid) var(--color-accent);
   outline-offset: 3px;
 }
 .propertyGrid {
@@ -745,7 +745,7 @@
   text-align: center;
 }
 .allocateGrid input:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent);
   outline-offset: 1px;
 }
 .actions {
@@ -770,7 +770,7 @@
   background: var(--color-accent-soft);
 }
 .randomButton:focus-visible {
-  outline: 3px solid var(--color-accent);
+  outline: 3px var(--focus-outline-style, solid) var(--color-accent);
   outline-offset: 3px;
 }
 .good {
@@ -835,7 +835,7 @@
   background: var(--color-accent-soft);
 }
 .celebrityOption > input:focus-visible + .celebrityCard {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 3px;
 }
 .celebrityCard {
@@ -1102,7 +1102,7 @@
   color: var(--color-on-accent);
 }
 .playbackModes input:focus-visible + span {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 2px;
 }
 .playbackModes:disabled {
@@ -1130,7 +1130,7 @@
   cursor: pointer;
 }
 .backButton:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent);
   outline-offset: 4px;
 }
 .collectionStats {
@@ -1250,7 +1250,7 @@
   font-weight: 600;
 }
 .achievementFilters input:focus-visible + span {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 2px;
 }
 .achievementSearch {

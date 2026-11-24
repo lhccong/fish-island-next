@@ -20,7 +20,7 @@
   transform: translateY(1px);
 }
 .supportButton:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 4px;
 }
 .dialogShell.dialogShell {
@@ -195,7 +195,7 @@
     outline: none;
   }
   .supportButton.supportButton:focus-visible {
-    outline: 2px solid var(--color-accent-text);
+    outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
     outline-offset: 2px;
   }
   .intro {

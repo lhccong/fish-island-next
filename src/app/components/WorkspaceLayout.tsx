@@ -1,5 +1,5 @@
-import { useAppearanceStore } from '@/features/appearance';
-import type { ShellId, WorkspaceShellSlots } from '@/shells/contracts';
+import { useAppearanceStore, useWebsiteSettingsStore } from '@/features/appearance';
+import type { ShellId, WorkspaceNavigationLayout, WorkspaceShellSlots } from '@/shells/contracts';
 import { WechatShell } from '@/shells/wechat';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
 import { Link, useLocation } from 'react-router';
@@ -37,6 +37,9 @@ export function WorkspaceLayout({
   ribbonAction?: ReactNode;
 }) {
   const skinId = useAppearanceStore((state) => state.skinId);
+  const sideMenu = useWebsiteSettingsStore(
+    (state) => skinId === 'moyu-island' && state.menuPosition === 'side',
+  );
   const { pathname } = useLocation();
   const gamePage = pathname.startsWith('/game/');
   const adminPage = pathname.startsWith('/admin/');
@@ -68,12 +71,18 @@ export function WorkspaceLayout({
           ? 'pixel-island'
           : 'wechat';
   const mobileNavigationMode = mobileNavigation ?? (mobileRoot ? 'tabs' : 'hidden');
+  const navigationLayout: WorkspaceNavigationLayout =
+    shellId === 'moyu-island'
+      ? sideMenu
+        ? 'side'
+        : 'topbar'
+      : shellId === 'wps'
+        ? 'ribbon'
+        : 'rail';
   return (
     <WechatShell
       {...(sidebarLabel ? { sidebarLabel } : {})}
-      navigationLayout={
-        shellId === 'moyu-island' ? 'topbar' : shellId === 'wps' ? 'ribbon' : 'rail'
-      }
+      navigationLayout={navigationLayout}
       presentation={
         shellId === 'moyu-island' ? 'classic' : shellId === 'pixel-island' ? 'island' : 'default'
       }
@@ -131,7 +140,13 @@ export function WorkspaceLayout({
             )}
           </div>
         ),
-        navigation: <WorkspaceNavigation shellId={shellId} ribbonAction={ribbonAction} />,
+        navigation: (
+          <WorkspaceNavigation
+            shellId={shellId}
+            layout={navigationLayout}
+            ribbonAction={ribbonAction}
+          />
+        ),
       }}
     />
   );

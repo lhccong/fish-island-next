@@ -141,24 +141,53 @@
   text-align: center;
 }
 .packStage {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 300px);
   justify-content: center;
-  gap: clamp(22px, 7cqw, 72px);
-  min-height: min(434px, 56dvh);
-  padding: 24px 12px;
+  gap: clamp(8px, 2.5cqw, 24px);
+}
+.packStage[data-paired='true'] {
+  grid-template-columns: repeat(2, minmax(0, 300px));
+}
+.packTile {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: clamp(12px, 3cqw, 28px) clamp(6px, 2cqw, 16px) 12px;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-panel);
-  background:
-    radial-gradient(ellipse at 38% 50%, var(--color-accent-soft), transparent 65%),
-    var(--color-canvas);
+  background: var(--color-canvas);
+}
+.packTile:has(.packChoice:enabled:hover) {
+  border-color: var(--color-accent-text);
+}
+.packChoice::after {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-panel);
+  content: '';
+}
+.packInfo .packChoice:focus-visible {
+  outline: none;
+}
+.packChoice:focus-visible::after {
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
+  outline-offset: 2px;
+}
+.packStage[data-paired='true'] .packTile[data-selected='true'] {
+  border-color: var(--color-accent-text);
+  background: color-mix(in srgb, var(--color-accent-soft) 45%, var(--color-canvas));
 }
 .pack {
   position: relative;
-  flex: 0 0 auto;
-  width: 176px;
+  align-self: center;
+  width: min(92%, 152px);
   color: var(--color-text);
   perspective: 850px;
-  rotate: -6deg;
+  rotate: -4deg;
 }
 .pack[data-pack='kingdoms'] {
   --color-pet-card-metal: var(--color-life-legendary);
@@ -192,8 +221,9 @@
     var(--shadow-panel);
 }
 .packWrapper > strong {
-  font-size: 1.35rem;
-  letter-spacing: 0.06em;
+  font-size: 1.125rem;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 .packMark,
 .packLabel,
@@ -210,20 +240,39 @@
   outline: 1px solid var(--color-pet-card-metal);
   box-shadow: 0 0 0 2px var(--color-pet-card-glint);
 }
+.packInfo {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  min-height: 88px;
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
 .packInfo h3,
 .resultHeading h3 {
   margin: 0;
   font-size: 1rem;
 }
-.packInfo h3 {
-  font-size: clamp(1.35rem, 5cqw, 2.125rem);
+.packInfo h3 button {
+  max-width: 100%;
+}
+.packInfo [aria-pressed='true'] {
+  border-color: var(--color-accent-text);
+  color: var(--color-accent-text);
+}
+.packInfo svg {
+  flex-shrink: 0;
 }
 .packInfo p {
-  margin: 6px 0 0;
+  margin: 0;
   color: var(--color-muted);
+  font-size: 0.8125rem;
 }
 .packInfo .firstPack {
-  color: var(--color-life-legendary);
+  justify-content: center;
+  color: var(--color-text);
   font-weight: 600;
 }
 .tornSpark {
@@ -301,6 +350,13 @@
 }
 .collectionHeadingActions {
   justify-content: flex-end;
+}
+.collectionFilters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 320px;
+  margin-block-end: 12px;
 }
 .batchSelector {
   display: grid;
@@ -426,7 +482,7 @@
   border-color: var(--color-accent-text);
 }
 .cardBack:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 2px;
 }
 .cardBack:disabled {
@@ -812,13 +868,8 @@
   .packSelection {
     flex: 1 1 auto;
   }
-  .packStage {
-    flex-direction: column;
-    gap: 12px;
-    padding-block: 16px;
-  }
   .pack {
-    width: 132px;
+    width: min(92%, 122px);
   }
   .packWrapper {
     padding: 8px 8px;
@@ -829,9 +880,6 @@
   }
   .packWrapper > strong {
     font-size: 1rem;
-  }
-  .packInfo {
-    text-align: center;
   }
   .drawGrid,
   .collectionGrid {

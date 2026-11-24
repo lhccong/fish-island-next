@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 export type ShellId = 'wechat' | 'feishu' | 'dingtalk' | 'wps' | 'pixel-island' | 'moyu-island';
+export type WorkspaceNavigationLayout = 'rail' | 'ribbon' | 'topbar' | 'side';
 
 export interface ChatShellSlots {
   navigation: ReactNode;

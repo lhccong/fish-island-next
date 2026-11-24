@@ -85,11 +85,11 @@ export function PetCardPlayExperience({
   const showcased = collected.filter((id) => collection.get(id)?.showcased);
   const move: MovePack | undefined =
     multiple && !result && !opening && !pending && !playingShiny
-      ? (direction) => {
+      ? (direction, preserveScroll) => {
           const ids = catalog.packIds;
           setSelected(ids[(ids.indexOf(pack.id) + direction + ids.length) % ids.length]!);
           clearNotice();
-          if (viewport.current) viewport.current.scrollTop = 0;
+          if (!preserveScroll && viewport.current) viewport.current.scrollTop = 0;
         }
       : undefined;
 

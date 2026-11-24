@@ -77,7 +77,7 @@
   cursor: grabbing;
 }
 .orb:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 3px;
 }
 .orb[data-collapsed='true']:focus-visible {

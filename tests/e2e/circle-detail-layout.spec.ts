@@ -41,10 +41,16 @@ for (const skin of builtinSkins)
       state.commentFailure = false;
       state.pages.length = 0;
       await comments.getByRole('button', { name: '重试评论' }).click();
+      const thread = comments.locator('[data-comment-id="3017"]');
+      const replies = thread.locator('ul > li[data-comment-id]');
+      const replyIds = () =>
+        replies.evaluateAll((rows) => rows.map((row) => row.getAttribute('data-comment-id')));
       const target = comments.locator('[data-comment-target="true"]');
       await expect(target).toHaveAttribute('data-comment-id', '5000');
       await expect(target).toBeFocused();
       await expect(target).toBeInViewport();
+      await expect.poll(replyIds).toEqual(['4000', '5000']);
+      await expect(target.getByText('通知岛友 回复 回复岛友', { exact: true })).toBeVisible();
       expect(state.pages).toEqual([1, 2]);
       const assertLayout = async () => {
         const left = (await post.boundingBox())!;
@@ -104,7 +110,9 @@ for (const skin of builtinSkins)
       await target.getByRole('button', { name: '回复 通知岛友', exact: true }).focus();
       await expect(target).toBeInViewport();
       await page.screenshot({ path: info.outputPath('columns-and-comments.png') });
-      await target.getByRole('button', { name: '回复 通知岛友', exact: true }).click();
+      const replyButton = target.getByRole('button', { name: '回复 通知岛友', exact: true });
+      if (mobile) await replyButton.click();
+      else await replyButton.press('Enter');
       const editor = comments.getByRole('textbox', { name: '评论内容' });
       await expect(editor).toBeFocused();
       await editor.fill('切换宽度后仍保留的回复草稿');
@@ -166,13 +174,34 @@ for (const skin of builtinSkins)
       await expect(comments.getByRole('status').filter({ hasText: '评论成功' })).toBeVisible();
       expect(feed.replyParent).toBe('5000');
       expect(feed.replyUser).toBe('999');
-      const sent = target.locator('[data-comment-id="6000"]');
+      const sent = thread.locator('[data-comment-id="6000"]');
       await expect(sent.getByText('切换宽度后仍保留的回复草稿', { exact: true })).toBeVisible();
+      await expect(sent.getByText('合成岛友 回复 通知岛友', { exact: true })).toBeVisible();
       await expect(sent.getByRole('button', { name: '置顶评论', exact: true })).toHaveCount(0);
-      await target.getByRole('button', { name: '收起回复', exact: true }).click();
+      await expect.poll(replyIds).toEqual(['4000', '5000', '6000']);
+      const positions = await replies.evaluateAll((rows) =>
+        rows.map((row) => row.getBoundingClientRect().x),
+      );
+      expect(new Set(positions).size).toBe(1);
+      const toggle = thread.getByRole('button', { name: '收起回复', exact: true });
+      await expect(toggle).toHaveCSS('min-height', mobile ? '44px' : '32px');
+      const threadRequests = state.commentRequests;
+      if (mobile) await toggle.click();
+      else await toggle.press('Enter');
       await expect(sent).toHaveCount(0);
-      await target.getByRole('button', { name: '查看 1 条回复', exact: true }).click();
+      const reopen = thread.getByRole('button', { name: '查看 3 条回复', exact: true });
+      await expect(reopen).toHaveAttribute('aria-expanded', 'false');
+      if (mobile) await reopen.click();
+      else {
+        await expect(reopen).toBeFocused();
+        await reopen.press('Enter');
+      }
       await expect(sent).toBeVisible();
+      expect(state.commentRequests).toBe(threadRequests);
+      await noOverflow(page);
+      await sent.scrollIntoViewIfNeeded();
+      await expect(sent).toBeInViewport();
+      await page.screenshot({ path: info.outputPath('flat-replies.png') });
       await expect(editor).toHaveValue('');
       await detail.getByRole('button', { name: '返回鱼小圈' }).click();
       state.detailFailure = true;

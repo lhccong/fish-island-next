@@ -1,16 +1,7 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { useCallback, useLayoutEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  EyeOff,
-  List,
-  Maximize2,
-  Minimize2,
-  PictureInPicture2,
-  RefreshCw,
-  Settings,
-  X,
-} from 'lucide-react';
+import { EyeOff, X } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import type { ReaderController } from './controller';
 import { useReader } from './use-reader';
@@ -25,6 +16,7 @@ import { useReaderKeys } from './use-reader-keys';
 import { useReaderWordMode } from './use-reader-word-mode';
 import { useReaderChapter } from './use-reader-chapter';
 import { ReaderWordHeader } from './ReaderWordHeader';
+import { ReaderToolbar } from './ReaderToolbar';
 import styles from './Reader.module.css';
 import wordStyles from './ReaderWord.module.css';
 
@@ -46,6 +38,10 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
   );
   const [notice, setNotice] = useState('');
   const [maximized, setMaximized] = useState(false);
+  const chapterKey = book && `${book.id}:${book.lastReadChapter}`;
+  const [findOpen, setFindOpen] = useState(false);
+  const findTrigger = useRef<HTMLButtonElement>(null);
+  const chapterFrame = useRef<HTMLDivElement>(null);
   const geometry = useReaderWindow();
   const onError = setNotice;
   const pip = usePictureInPicture(host, onError);
@@ -61,6 +57,20 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
     document.body.append(host);
     return () => host.remove();
   }, [host]);
+  useLayoutEffect(() => {
+    const frame = chapterFrame.current;
+    if (status === 'ready' && frame?.ownerDocument.activeElement === frame)
+      viewportRef.current?.focus({ preventScroll: true });
+  }, [chapterKey, status, viewportRef]);
+  const focusChapter = useCallback(() => chapterFrame.current?.focus({ preventScroll: true }), []);
+  const jump = useCallback(
+    (index: number) => {
+      setFindOpen(false);
+      focusChapter();
+      void controller.getState().jump(index);
+    },
+    [controller, focusChapter],
+  );
   const chapters = book?.chapters.filter((chapter) => !chapter.isVolume) ?? [];
   const position = chapters.findIndex((chapter) => chapter.index === book?.lastReadChapter);
   const change = useCallback(
@@ -71,9 +81,9 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
       const chapters = active?.chapters.filter((chapter) => !chapter.isVolume) ?? [];
       const position = chapters.findIndex((chapter) => chapter.index === active?.lastReadChapter);
       const next = chapters[position + offset];
-      if (next) void state.jump(next.index);
+      if (next) jump(next.index);
     },
-    [controller],
+    [controller, jump],
   );
   const hide = useCallback(() => {
     pip.exit();
@@ -93,6 +103,20 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
     pip.exit();
     setDialog(value);
     window.focus();
+  };
+  const navigation = (
+    <ReaderPageControls
+      position={position}
+      total={chapters.length}
+      loading={status === 'loading'}
+      wordMode={wordMode}
+      characters={characters}
+      onChange={change}
+    />
+  );
+  const closeFind = () => {
+    setFindOpen(false);
+    findTrigger.current?.focus({ preventScroll: true });
   };
   return (
     <>
@@ -151,7 +175,7 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
             {wordMode && (
               <ReaderWordHeader exitRef={exitRef} onExit={() => changeWordMode(false)} />
             )}
-            <div className={styles.readerTitle} data-word-hidden={wordMode}>
+            <header className={styles.readerHeader} data-word-hidden={wordMode}>
               <button
                 className={styles.drag}
                 aria-label="拖动阅读窗口"
@@ -161,69 +185,42 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
                 }}
                 onPointerUp={geometry.save}
               >
-                {settings.study ? '工作文档' : book.title}
+                <span>{settings.study ? '工作文档' : book.title}</span>
               </button>
-              <button aria-label="紧急隐藏" onClick={hide}>
-                <EyeOff size={18} />
-              </button>
-              <button aria-label="关闭阅读器" onClick={() => controller.getState().close()}>
-                <X size={18} />
-              </button>
-            </div>
-            <div className={styles.toolbar} data-word-hidden={wordMode}>
-              <button aria-label="章节目录" onClick={() => openDialog('contents')}>
-                <List size={18} />
-              </button>
-              <button
-                aria-label="刷新阅读内容"
-                disabled={status === 'loading'}
-                onClick={() => void controller.getState().refresh()}
-              >
-                <RefreshCw size={18} />
-              </button>
-              <button aria-label="阅读器设置" onClick={() => openDialog('settings')}>
-                <Settings size={18} />
-              </button>
-              <button
-                aria-label={pip.active ? '退出画中画' : '画中画'}
-                title={pip.supported ? '画中画' : '当前浏览器不支持文档画中画，点击查看说明'}
-                onClick={() => void pip.toggle()}
-              >
-                <PictureInPicture2 size={18} />
-              </button>
-              {!pip.active && (
-                <Button
-                  ref={entryRef}
-                  className={styles.wordEntry}
-                  variant="secondary"
-                  onClick={() => {
-                    pip.exit();
-                    changeWordMode(true);
-                  }}
-                >
-                  Word模式
-                </Button>
-              )}
-              <button
-                aria-label="背景点击穿透"
-                aria-pressed={settings.clickThrough}
-                onClick={() =>
+              <ReaderToolbar
+                wordEntryRef={entryRef}
+                findTrigger={findTrigger}
+                findOpen={findOpen && status === 'ready'}
+                canFind={status === 'ready' && paragraphs.length > 0}
+                loading={status === 'loading'}
+                clickThrough={settings.clickThrough}
+                pip={pip}
+                maximized={maximized}
+                onEnterWord={() => changeWordMode(true)}
+                onOpenDialog={openDialog}
+                onToggleFind={() => setFindOpen(!findOpen)}
+                onRefresh={() => {
+                  setFindOpen(false);
+                  focusChapter();
+                  void controller.getState().refresh();
+                }}
+                onToggleClickThrough={() =>
                   controller
                     .getState()
                     .configure({ ...settings, clickThrough: !settings.clickThrough })
                 }
-              >
-                穿透
-              </button>
-              <button aria-label="切换全屏" onClick={() => setMaximized(!maximized)}>
-                {maximized ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-              </button>
-            </div>
-            {!wordMode && settings.study && (
-              <div className={styles.documentRibbon}>
-                文件 · 开始 · 插入 · 布局 · 审阅 <span>文档编辑预览</span>
+                onToggleMaximized={() => setMaximized(!maximized)}
+              />
+              <div className={styles.windowActions}>
+                <button aria-label="紧急隐藏" onClick={hide}>
+                  <EyeOff size={18} />
+                </button>
+                <button aria-label="关闭阅读器" onClick={() => controller.getState().close()}>
+                  <X size={18} />
+                </button>
               </div>
-            )}
+            </header>
+            {!wordMode && navigation}
             {!wordMode && notice && (
               <div role="status" className={styles.notice}>
                 {notice}
@@ -232,36 +229,40 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
                 </button>
               </div>
             )}
-            {status === 'loading' ? (
-              <div className={styles.readerState}>
-                <LoadingIndicator>正在加载章节…</LoadingIndicator>
-              </div>
-            ) : status === 'error' ? (
-              <div role="alert" className={styles.readerState}>
-                <p>{error}</p>
-                <Button onClick={() => void controller.getState().retry()}>重试章节</Button>
-              </div>
-            ) : (
-              <ReaderBody
-                key={`${book.id}:${book.lastReadChapter}`}
-                controller={controller}
-                book={book}
-                settings={settings}
-                enabled={!dialog}
-                onError={onError}
-                viewportRef={viewportRef}
-                wordMode={wordMode}
-                paragraphs={paragraphs}
-              />
-            )}
-            <ReaderPageControls
-              position={position}
-              total={chapters.length}
-              loading={status === 'loading'}
-              wordMode={wordMode}
-              characters={characters}
-              onChange={change}
-            />
+            <div className={styles.chapterFrame} ref={chapterFrame} tabIndex={-1}>
+              {status === 'loading' ? (
+                <div className={styles.readerState}>
+                  <LoadingIndicator>正在加载章节…</LoadingIndicator>
+                </div>
+              ) : status === 'error' ? (
+                <div role="alert" className={styles.readerState}>
+                  <p>{error}</p>
+                  <Button
+                    onClick={() => {
+                      focusChapter();
+                      void controller.getState().retry();
+                    }}
+                  >
+                    重试章节
+                  </Button>
+                </div>
+              ) : (
+                <ReaderBody
+                  key={chapterKey}
+                  controller={controller}
+                  book={book}
+                  settings={settings}
+                  enabled={!dialog}
+                  onError={onError}
+                  viewportRef={viewportRef}
+                  wordMode={wordMode}
+                  paragraphs={paragraphs}
+                  findOpen={findOpen}
+                  onCloseFind={closeFind}
+                />
+              )}
+            </div>
+            {wordMode && navigation}
             <button
               className={styles.resize}
               data-word-hidden={wordMode}
@@ -282,7 +283,12 @@ export function ReaderSurface({ controller }: { controller: ReaderController }) 
         <ReaderSettingsPanel controller={controller} onClose={() => setDialog(null)} />
       )}
       {dialog === 'contents' && (
-        <ReaderContents controller={controller} book={book} onClose={() => setDialog(null)} />
+        <ReaderContents
+          controller={controller}
+          book={book}
+          onJump={jump}
+          onClose={() => setDialog(null)}
+        />
       )}
     </>
   );

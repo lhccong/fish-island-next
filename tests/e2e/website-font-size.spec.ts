@@ -16,6 +16,12 @@ for (const skin of builtinSkins)
         ({ skinId, colorMode }) => {
           localStorage.setItem('fish-island:skin', skinId);
           localStorage.setItem('fish-island:color-mode', colorMode);
+          if (skinId !== 'moyu-island' && !localStorage.getItem('fish-island:tab-identity')) {
+            localStorage.setItem(
+              'fish-island:tab-identity',
+              JSON.stringify({ menuPosition: 'side' }),
+            );
+          }
         },
         { skinId: skin.id, colorMode: mode },
       );
@@ -58,6 +64,12 @@ for (const skin of builtinSkins)
       const viewport = dialog.getByRole('region', { name: '网站设置内容' });
       const close = dialog.getByRole('button', { name: '关闭网站设置' });
       const mobile = page.viewportSize()!.width <= 760;
+      const classic = skin.id === 'moyu-island';
+      const menuPosition = dialog.getByRole('combobox', { name: '电脑端菜单位置' });
+      const appNavigation = page.getByRole('complementary', { name: '应用导航', exact: true });
+      const shell = page.locator('[data-navigation-layout]').filter({ visible: true });
+      const defaultLayout = classic ? 'topbar' : skin.id === 'wps' ? 'ribbon' : 'rail';
+      await expect(shell).toHaveAttribute('data-navigation-layout', defaultLayout);
       const openChoices = () => (mobile ? size.tap() : size.press('Enter'));
       const standardOption = choices.getByRole('option', { name: '标准（100%）' });
       const largeOption = choices.getByRole('option', { name: '特大（120%）' });
@@ -75,6 +87,22 @@ for (const skin of builtinSkins)
         await page.keyboard.press('Enter');
       }
       await expect(size).toHaveText('特大（120%）');
+      if (classic) {
+        await expect(menuPosition).toHaveText('顶部菜单');
+        if (mobile) await menuPosition.tap();
+        else await menuPosition.press('Enter');
+        const sideOption = page.getByRole('option', { name: '侧边菜单' });
+        await expect(sideOption).toBeVisible();
+        if (mobile) await sideOption.tap();
+        else {
+          await page.keyboard.press('End');
+          await expect(sideOption).toBeFocused();
+          await page.keyboard.press('Enter');
+        }
+        await expect(menuPosition).toBeFocused();
+        await expect(menuPosition).toHaveText('侧边菜单');
+        await expect(shell).toHaveAttribute('data-navigation-layout', 'topbar');
+      } else await expect(menuPosition).toHaveCount(0);
       await expect(root).toHaveCSS('font-size', '16px');
       await save.click();
       await expect(dialog.getByRole('status')).toHaveText('已保存到此浏览器');
@@ -82,6 +110,27 @@ for (const skin of builtinSkins)
       expect(await readSize()).toBeCloseTo(initialSize * 1.2);
       await expect(save).toHaveCSS('min-height', mobile ? '44px' : '32px');
       await page.screenshot({ path: info.outputPath('large-interface.png') });
+      if (classic) {
+        await close.click();
+        const hot = appNavigation.getByRole('link', { name: '热榜', exact: true });
+        const chat = appNavigation.getByRole('link', { name: '聊天', exact: true });
+        const rail = (await appNavigation.boundingBox())!;
+        const hotBox = (await hot.boundingBox())!;
+        const chatBox = (await chat.boundingBox())!;
+        await expect(hot).toHaveAttribute('aria-current', 'page');
+        if (mobile) {
+          expect(rail.width).toBe(page.viewportSize()!.width);
+          expect(rail.y + rail.height).toBe(page.viewportSize()!.height);
+          expect(hotBox.y).toBe(chatBox.y);
+        } else {
+          expect(rail).toMatchObject({ x: 0, y: 0, height: page.viewportSize()!.height });
+          expect(hotBox.x).toBe(chatBox.x);
+          expect(hotBox.y).toBeLessThan(chatBox.y);
+          const main = (await page.locator('#main-content').boundingBox())!;
+          expect(main.x).toBeGreaterThanOrEqual(rail.width);
+        }
+        await page.screenshot({ path: info.outputPath('side-menu.png'), scale: 'css' });
+      }
 
       for (const state of ['empty', 'error', 'loading']) {
         background = state;
@@ -93,9 +142,14 @@ for (const skin of builtinSkins)
               ? page.getByRole('button', { name: '重试', exact: true })
               : page.getByText('正在获取各平台热榜…', { exact: true });
         await expect(feedback).toBeVisible();
+        await expect(shell).toHaveAttribute(
+          'data-navigation-layout',
+          classic ? 'side' : defaultLayout,
+        );
         await openSettings(page);
         await expect(root).toHaveCSS('font-size', '19.2px');
         await expect(size).toHaveText('特大（120%）');
+        if (classic) await expect(menuPosition).toHaveText('侧边菜单');
         const layout = await viewport.evaluate((el) => {
           const fields = el.firstElementChild!.firstElementChild!;
           return {
@@ -149,8 +203,10 @@ for (const skin of builtinSkins)
       await save.click();
       await expect(dialog.getByRole('alert')).toContainText('本地保存失败');
       await expect(root).toHaveCSS('font-size', '19.2px');
+      if (classic) await expect(shell).toHaveAttribute('data-navigation-layout', 'side');
       await save.click();
       await expect(root).toHaveCSS('font-size', '16px');
+      await expect(shell).toHaveAttribute('data-navigation-layout', defaultLayout);
       await close.click();
       await expect(page.getByRole('button', { name: '切换主题', exact: true })).toBeFocused();
       await pendingHotList?.abort();

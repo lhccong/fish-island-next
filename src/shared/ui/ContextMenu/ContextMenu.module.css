@@ -29,7 +29,7 @@
 }
 .item[data-highlighted] {
   background: var(--color-accent-soft);
-  outline: 1px solid var(--color-accent-text);
+  outline: 1px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: -1px;
 }
 .item[data-tone='danger'] {

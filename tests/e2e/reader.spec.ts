@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
-import { setup } from './fish-circle-fixture';
 
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
@@ -102,12 +101,7 @@ for (const skin of builtinSkins)
           },
         });
       });
-      await setup(page);
-      const discovery =
-        page.viewportSize()!.width <= 760
-          ? page.getByRole('navigation', { name: '发现菜单' }).filter({ visible: true })
-          : page.getByRole('complementary', { name: '鱼小圈导航', exact: true });
-      await discovery.getByRole('link', { name: '阅读', exact: true }).click();
+      await page.goto('/reader');
       await expect(page).toHaveURL('/reader');
       await expect(page.getByRole('heading', { name: '书架还是空的' })).toBeVisible();
       await page.screenshot({ path: testInfo.outputPath('empty.png') });
@@ -164,6 +158,7 @@ for (const skin of builtinSkins)
       await settings.getByRole('button', { name: '关闭阅读设置', exact: true }).click();
       await expect(reader).toBeVisible();
       await expect(reader.getByRole('button', { name: '阅读器设置' })).toBeFocused();
+      await reader.getByRole('button', { name: '搜索当前章节', exact: true }).click();
       await reader.getByRole('textbox', { name: '当前章节搜索' }).fill('第30段');
       await expect(reader.getByText('1 处', { exact: true })).toBeVisible();
       await reader.getByRole('button', { name: '下处', exact: true }).click();
@@ -175,13 +170,19 @@ for (const skin of builtinSkins)
       const requestsBefore = contentRequests;
       await reader.getByRole('button', { name: '紧急隐藏' }).click();
       await expect(reader).toHaveCount(0);
-      await page.getByRole('button', { name: '切换主题', exact: true }).click();
+      const mobile = page.viewportSize()!.width <= 760;
+      if (mobile) await page.getByRole('link', { name: '返回发现', exact: true }).click();
+      const themePicker = page.getByRole('button', { name: '切换主题', exact: true });
+      if (mobile) await themePicker.press('Enter');
+      else await themePicker.click();
       const appearance = page.getByRole('dialog', { name: '主题模式' });
       await appearance
         .getByRole('button', { name: skin.id === 'wps' ? '微信绿' : 'WPS 表格', exact: true })
         .click();
       await appearance.getByRole('button', { name: skin.name, exact: true }).click();
       await appearance.getByRole('button', { name: '关闭', exact: true }).click();
+      if (mobile)
+        await page.getByRole('main').getByRole('link', { name: '阅读', exact: true }).click();
       await page.getByRole('button', { name: '恢复阅读窗口', exact: true }).click();
       await expect(reader.getByText('起点正文', { exact: true })).toBeAttached();
       expect(contentRequests).toBe(requestsBefore);

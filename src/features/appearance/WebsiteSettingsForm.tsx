@@ -3,13 +3,17 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Select } from '@/shared/ui/Select';
+import { useAppearanceStore } from './model/appearance-store';
 import {
   defaultFontScale,
+  defaultMenuPosition,
   defaultTabIdentity,
   fontScaleOptions,
   isFontScale,
+  isMenuPosition,
   isPresetTabIcon,
   isTabIcon,
+  menuPositionOptions,
   normalizeTabIdentity,
   tabIdentityPresets,
   useWebsiteSettingsStore,
@@ -18,12 +22,15 @@ import { checkTabImage, readTabImage } from './tab-image';
 import styles from './WebsiteSettings.module.css';
 
 export function WebsiteSettingsForm() {
+  const classic = useAppearanceStore((state) => state.skinId === 'moyu-island');
   const saved = useWebsiteSettingsStore((state) => state.identity);
   const savedFontScale = useWebsiteSettingsStore((state) => state.fontScale);
+  const savedMenuPosition = useWebsiteSettingsStore((state) => state.menuPosition);
   const save = useWebsiteSettingsStore((state) => state.save);
   const [name, setName] = useState(saved.name);
   const [icon, setIcon] = useState(saved.icon);
   const [fontScale, setFontScale] = useState(savedFontScale);
+  const [menuPosition, setMenuPosition] = useState(savedMenuPosition);
   const [previewFailed, setPreviewFailed] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
@@ -61,7 +68,7 @@ export function WebsiteSettingsForm() {
             await checkTabImage(identity.icon, operation.current?.signal);
           }
           if (operation.current?.signal.aborted) return;
-          save(identity, fontScale);
+          save({ identity, fontScale, menuPosition: classic ? menuPosition : savedMenuPosition });
           setName(identity.name);
           setIcon(identity.icon);
           setFeedback('已保存到此浏览器');
@@ -89,6 +96,23 @@ export function WebsiteSettingsForm() {
               }}
             />
           </div>
+          {classic && (
+            <div className={styles.field}>
+              <span>电脑端菜单位置</span>
+              <Select
+                label="电脑端菜单位置"
+                value={menuPosition}
+                options={menuPositionOptions}
+                disabled={busy}
+                onValueChange={(value) => {
+                  if (!isMenuPosition(value)) return;
+                  setMenuPosition(value);
+                  setFeedback('');
+                  setError('');
+                }}
+              />
+            </div>
+          )}
           <label className={styles.field}>
             <span>网站名称</span>
             <input
@@ -197,6 +221,7 @@ export function WebsiteSettingsForm() {
             setName(defaultTabIdentity.name);
             updateIcon(defaultTabIdentity.icon);
             setFontScale(defaultFontScale);
+            if (classic) setMenuPosition(defaultMenuPosition);
           }}
         >
           恢复默认

@@ -6,14 +6,30 @@ import type { AuthUser } from '@/domain/auth';
 import type { FollowListTarget } from '@/domain/account-tools';
 import { FollowList } from '@/features/account-tools';
 import { accountTools } from '@/app/config/account-tools';
-import { petService } from '@/app/config/pet';
+import { petCardCollection, petService } from '@/app/config/pet';
 import { Dialog } from '@/shared/ui/Dialog';
+const UserPetCardCollection = lazy(() =>
+  import('@/features/pet').then((m) => ({ default: m.UserPetCardCollection })),
+);
 const OtherCompanionPanel = lazy(() =>
   import('@/features/pet').then((m) => ({ default: m.OtherCompanionPanel })),
 );
 
 function renderFollowList(target: FollowListTarget, onBack: () => void) {
   return <FollowList port={accountTools} kind={target.kind} owner={target} onBack={onBack} />;
+}
+
+function renderCardCollection(target: { id: string; name: string }, onBack: () => void) {
+  return (
+    <Suspense fallback={<LoadingIndicator>正在读取卡片收藏…</LoadingIndicator>}>
+      <UserPetCardCollection
+        port={petCardCollection}
+        userId={target.id}
+        name={target.name}
+        onBack={onBack}
+      />
+    </Suspense>
+  );
 }
 
 export function ChatUserCards({
@@ -45,6 +61,7 @@ export function ChatUserCards({
       port={accountTools}
       onVisit={onVisit}
       renderFollowList={renderFollowList}
+      renderCardCollection={renderCardCollection}
     >
       {children}
       {pet && (

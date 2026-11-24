@@ -50,7 +50,7 @@
   border-color: var(--color-muted);
 }
 .button:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 2px;
 }
 @media (max-width: 760px) {

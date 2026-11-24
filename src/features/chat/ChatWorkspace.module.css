@@ -370,7 +370,7 @@
   background: var(--color-canvas);
 }
 .composer[data-presentation='worksheet'] .editorSlot:focus-within {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: -1px;
 }
 .formulaIcon {
@@ -487,7 +487,7 @@
   }
   .editorSlot:focus-within {
     border-radius: var(--radius-control);
-    outline: 2px solid var(--color-accent-text);
+    outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
     outline-offset: -2px;
   }
   .tools {
@@ -557,7 +557,7 @@
   }
   .editorSlot:focus-within {
     border-radius: var(--radius-control);
-    outline: 2px solid var(--color-accent-text);
+    outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
     outline-offset: -2px;
   }
   .tools {
@@ -794,7 +794,7 @@
     padding: 0 12px;
   }
   .workspace[data-decoration='classic'] .editorSlot:focus-within {
-    outline: 2px solid var(--color-accent-text);
+    outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
     outline-offset: 2px;
   }
   .workspace[data-decoration='classic'] .actions {
@@ -810,5 +810,17 @@
   .workspace[data-decoration='classic'] .shortcutHint,
   .workspace[data-decoration='classic'] .composerFooter {
     display: none;
+  }
+}
+@container classic-chat (max-width: 520px) {
+  .workspace[data-decoration='classic'] .inputRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 8px;
+  }
+  .workspace[data-decoration='classic'] .tools {
+    grid-column: 1 / -1;
+  }
+  .workspace[data-decoration='classic'] .composerFeedback:not(:empty) {
+    grid-row: 3;
   }
 }

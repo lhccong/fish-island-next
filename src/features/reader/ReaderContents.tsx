@@ -9,10 +9,12 @@ import styles from './Reader.module.css';
 export function ReaderContents({
   controller,
   book,
+  onJump,
   onClose,
 }: {
   controller: ReaderController;
   book: Book;
+  onJump: (index: number) => void;
   onClose: () => void;
 }) {
   const [query, setQuery] = useState('');
@@ -71,7 +73,7 @@ export function ReaderContents({
               disabled={chapter.isVolume}
               aria-current={chapter.index === book.lastReadChapter ? 'true' : undefined}
               onClick={() => {
-                void controller.getState().jump(chapter.index);
+                onJump(chapter.index);
                 onClose();
               }}
             >

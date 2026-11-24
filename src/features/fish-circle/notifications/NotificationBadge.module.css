@@ -16,3 +16,9 @@
   line-height: 1;
   pointer-events: none;
 }
+.badge[data-placement='inline'] {
+  position: static;
+  flex: none;
+  margin-inline-start: auto;
+  padding-inline: 3px;
+}

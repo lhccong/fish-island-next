@@ -97,12 +97,14 @@ export async function setupDetailLayout(page: Page) {
                             id: '4000',
                             userId: '888',
                             userName: '回复岛友',
+                            replyUserName: `岛友${number}`,
                             content: '父级回复',
                             children: [
                               {
                                 id: '5000',
                                 userId: '999',
                                 userName: '通知岛友',
+                                replyUserName: '回复岛友',
                                 content: state.target,
                                 createTime: '2026-11-12 10:00:00',
                                 children: feed.comment

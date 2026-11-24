@@ -11,6 +11,7 @@ test('restores valid preferences and rejects unsafe or corrupt configuration', a
     await import('./website-settings-store');
   expect(useWebsiteSettingsStore.getState().identity.name).toBe('工作台');
   expect(useWebsiteSettingsStore.getState().fontScale).toBe('100');
+  expect(useWebsiteSettingsStore.getState().menuPosition).toBe('top');
   expect(normalizeTabIdentity({ name: ' 搜索 ', icon: '/tab-icons/baidu.ico' })).toEqual({
     name: '搜索',
     icon: '/tab-icons/baidu.ico',
@@ -35,12 +36,18 @@ test('restores valid preferences and rejects unsafe or corrupt configuration', a
 test('upgrades the saved default icon while restoring the name and font scale', async () => {
   vi.stubGlobal('localStorage', {
     getItem: () =>
-      JSON.stringify({ name: '工作台', icon: '/favicon.ico?v=moyudao', fontScale: '110' }),
+      JSON.stringify({
+        name: '工作台',
+        icon: '/favicon.ico?v=moyudao',
+        fontScale: '110',
+        menuPosition: 'side',
+      }),
   });
   const { defaultTabIdentity, useWebsiteSettingsStore } = await import('./website-settings-store');
   expect(useWebsiteSettingsStore.getState()).toMatchObject({
     identity: { name: '工作台', icon: defaultTabIdentity.icon },
     fontScale: '110',
+    menuPosition: 'side',
   });
 });
 
@@ -61,22 +68,29 @@ test('storage failure preserves applied preferences and retry saves them togethe
   } = await import('./website-settings-store');
   expect(store.getState().identity).toEqual(defaultTabIdentity);
   const identity = { name: '文档', icon: 'https://example.com/icon.png' };
-  expect(() => store.getState().save(identity, '120')).toThrow('本地保存失败');
+  const preferences = { identity, fontScale: '120', menuPosition: 'side' } as const;
+  expect(() => store.getState().save(preferences)).toThrow('本地保存失败');
   expect(store.getState().identity).toEqual(defaultTabIdentity);
   expect(store.getState().fontScale).toBe('100');
+  expect(store.getState().menuPosition).toBe('top');
   fail = false;
-  store.getState().save(identity, '120');
+  store.getState().save(preferences);
   expect(store.getState().identity).toEqual(identity);
   expect(store.getState().fontScale).toBe('120');
+  expect(store.getState().menuPosition).toBe('side');
   expect([...entries.entries()]).toEqual([
-    [tabIdentityStorageKey, JSON.stringify({ ...identity, fontScale: '120' })],
+    [
+      tabIdentityStorageKey,
+      JSON.stringify({ ...identity, fontScale: '120', menuPosition: 'side' }),
+    ],
   ]);
   const appliedIdentity = store.getState().identity;
-  store.getState().save(identity, '110');
+  store.getState().save({ ...preferences, fontScale: '110' });
   expect(store.getState().identity).toBe(appliedIdentity);
-  store.getState().save(defaultTabIdentity, '100');
+  store.getState().save({ identity: defaultTabIdentity, fontScale: '100', menuPosition: 'top' });
   expect(store.getState().identity).toEqual(defaultTabIdentity);
   expect(store.getState().fontScale).toBe('100');
+  expect(store.getState().menuPosition).toBe('top');
 });
 
 test.each([
@@ -86,7 +100,10 @@ test.each([
   [120, '100'],
   ['150', '100'],
 ])('restores saved font scale %s as %s', async (fontScale, expected) => {
-  vi.stubGlobal('localStorage', { getItem: () => JSON.stringify({ fontScale }) });
+  vi.stubGlobal('localStorage', {
+    getItem: () => JSON.stringify({ fontScale, menuPosition: 'unsupported' }),
+  });
   const { useWebsiteSettingsStore } = await import('./website-settings-store');
   expect(useWebsiteSettingsStore.getState().fontScale).toBe(expected);
+  expect(useWebsiteSettingsStore.getState().menuPosition).toBe('top');
 });

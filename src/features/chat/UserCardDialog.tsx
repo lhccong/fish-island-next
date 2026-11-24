@@ -1,6 +1,5 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Bug, Sprout, Aperture } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
 import type { FollowKind, UserCardPort } from '@/domain/account-tools';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -9,11 +8,17 @@ import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import { useChatRealtime } from './realtime-context';
 import { useRemark, useRemarks } from './remarks-context';
-import type { RenderFollowList, UserCardTarget } from './user-card-context';
+import type {
+  RenderCardCollection,
+  RenderFollowList,
+  UserCardDestination,
+  UserCardTarget,
+} from './user-card-context';
 import { useUserCardResource } from './use-user-card';
 import { UserCardMedia } from './UserCardMedia';
 import { UserCardModeration } from './UserCardModeration';
 import { UserCardCounts } from './UserCardCounts';
+import { UserCardLinks } from './UserCardLinks';
 import { SenderTitle } from './SenderTitle';
 import styles from './UserCard.module.css';
 
@@ -24,13 +29,15 @@ export function UserCardDialog({
   onClose,
   onVisit,
   renderFollowList,
+  renderCardCollection,
 }: {
   target: UserCardTarget;
   user: AuthUser;
   port: UserCardPort;
   onClose: () => void;
-  onVisit: (kind: 'pet' | 'farm' | 'moments', id: string) => void;
+  onVisit: (kind: UserCardDestination, id: string) => void;
   renderFollowList: RenderFollowList;
+  renderCardCollection: RenderCardCollection;
 }) {
   const self = user.id === target.id;
   const resource = useUserCardResource(port, target.id, self);
@@ -44,7 +51,7 @@ export function UserCardDialog({
     blacklist.read(user.id).some((v) => v.id === target.id),
   );
   const [confirmBlock, setConfirmBlock] = useState(false);
-  const [list, setList] = useState<FollowKind | null>(null);
+  const [list, setList] = useState<FollowKind | 'collection' | null>(null);
   const listTrigger = useRef<HTMLButtonElement | null>(null);
   const name = card?.name || target.name;
   useEffect(() => {
@@ -204,44 +211,17 @@ export function UserCardDialog({
                       </div>
                     )}
                   </dl>
-                  <div className={styles.links}>
-                    <Button
-                      variant="secondary"
-                      className={card.cover ? styles.iconAction : undefined}
-                      aria-label="宠物"
-                      title="查看宠物"
-                      onClick={() => onVisit('pet', target.id)}
-                    >
-                      <Bug size={17} aria-hidden="true" />
-                      {!card.cover && '宠物'}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      className={card.cover ? styles.iconAction : undefined}
-                      aria-label="农场"
-                      title="查看农场"
-                      onClick={() => {
-                        onClose();
-                        onVisit('farm', target.id);
-                      }}
-                    >
-                      <Sprout size={17} aria-hidden="true" />
-                      {!card.cover && '农场'}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      className={card.cover ? styles.iconAction : undefined}
-                      aria-label="动态"
-                      title="查看动态"
-                      onClick={() => {
-                        onClose();
-                        onVisit('moments', target.id);
-                      }}
-                    >
-                      <Aperture size={17} aria-hidden="true" />
-                      {!card.cover && '动态'}
-                    </Button>
-                  </div>
+                  <UserCardLinks
+                    iconOnly={!!card.cover}
+                    onVisit={(kind) => {
+                      if (kind !== 'pet') onClose();
+                      onVisit(kind, target.id);
+                    }}
+                    onCollection={(trigger) => {
+                      listTrigger.current = trigger;
+                      setList('collection');
+                    }}
+                  />
                   {user.role === 'admin' && !self && (
                     <UserCardModeration port={port} id={target.id} />
                   )}
@@ -293,7 +273,9 @@ export function UserCardDialog({
           </Button>
         </div>
       </div>
-      {list && renderFollowList({ id: target.id, name, kind: list }, () => setList(null))}
+      {list === 'collection'
+        ? renderCardCollection({ id: target.id, name }, () => setList(null))
+        : list && renderFollowList({ id: target.id, name, kind: list }, () => setList(null))}
     </Dialog>
   );
 }

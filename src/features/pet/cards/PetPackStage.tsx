@@ -1,9 +1,8 @@
-import { Disc3, PawPrint, ScrollText, Sparkles } from 'lucide-react';
-import { getPetCard, petPackSize, type PetCardPack, type PetCardResult } from '@/domain/pet';
-import { petCardArt } from './card-art';
-import { usePetCardCatalog } from './catalog-context';
+import { Disc3, PawPrint, ScrollText } from 'lucide-react';
+import { petPackSize, type PetCardPack, type PetCardResult } from '@/domain/pet';
 import { PetCardFace } from './PetCardFace';
-import { usePackSwipe, type MovePack } from './use-pack-swipe';
+import { PetPackCovers } from './PetPackCovers';
+import type { MovePack } from './use-pack-swipe';
 import styles from './PetCards.module.css';
 
 const cardPositions = Array.from({ length: petPackSize }, (_, index) => index);
@@ -27,53 +26,14 @@ export function PetPackStage({
   revealDisabled: boolean;
   onReveal: (position: number, keyboard: boolean) => void;
 }) {
-  const catalog = usePetCardCatalog();
-  const swipe = usePackSwipe(move);
-  const PackIcon = pack.id === 'kingdoms' ? ScrollText : PawPrint;
   if (!result || opening) {
-    return (
-      <div
-        className={styles.packStage}
-        role="region"
-        aria-label="卡包封面"
-        data-swipe-enabled={!!move}
-        {...swipe}
-      >
-        <div className={styles.pack} data-pack={pack.id} data-opening={opening} aria-hidden="true">
-          <div className={styles.packSeal} />
-          <div className={styles.packWrapper}>
-            <span className={styles.packMark}>
-              <PackIcon size={13} /> 鱼岛伙伴
-            </span>
-            <strong>{pack.name}</strong>
-            <span
-              className={styles.packIllustration}
-              style={petCardArt(getPetCard(pack.cover, catalog).art)}
-            />
-            <span className={styles.packLabel}>
-              <Sparkles size={13} /> {petPackSize} 张卡片
-            </span>
-          </div>
-          <Sparkles className={styles.tornSpark} size={32} />
-        </div>
-        <div className={styles.packInfo}>
-          <h3>{pack.name}</h3>
-          <p>
-            每包抽 {petPackSize} 张，共收录 {pack.ids.length} 张。
-          </p>
-          {firstPack && pack.shinyIds.length > 0 && (
-            <p className={styles.firstPack}>
-              <Sparkles size={15} aria-hidden="true" /> 首包必有闪耀卡
-            </p>
-          )}
-        </div>
-      </div>
-    );
+    return <PetPackCovers pack={pack} opening={opening} firstPack={firstPack} move={move} />;
   }
 
   const earned = result.cards.reduce((sum, pull) => sum + pull.points, 0);
   const materials = result.cards.filter((pull) => pull.duplicate).length;
   const complete = revealed.length === petPackSize;
+  const PackIcon = pack.id === 'kingdoms' ? ScrollText : PawPrint;
   return (
     <section className={styles.results} aria-label="开卡结果">
       <div className={styles.resultHeading}>

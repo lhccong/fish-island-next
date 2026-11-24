@@ -9,11 +9,13 @@ import {
   choosePetCardPack,
   flipThirdCard,
   verifyKingdomsPack,
+  verifyPackCoverSwipe,
+  verifyPairedPackCovers,
 } from './pet-cards-flow';
-import { setupPet } from './pet-fixture';
 import { setupPetCardCatalog } from './pet-card-catalog-fixture';
 
 test.use({ hasTouch: true });
+test.setTimeout(60_000);
 
 async function assertLayout(viewport: Locator) {
   const layout = await viewport.evaluate((element) => {
@@ -65,10 +67,19 @@ for (const skin of builtinSkins)
       test(`pet cards ${skin.id} ${mode} ${width}`, async ({ page }, info) => {
         const mobile = width <= 760;
         await page.setViewportSize({ width, height: mobile ? 844 : 960 });
-        await setupPet(page, skin.id, mode, 'admin');
         const catalogRequests = await setupPetCardCatalog(page);
-        await page.evaluate(() => {
+        await page.addInitScript(
+          ({ skinId, mode }) => {
+            localStorage.setItem('fish-island:skin', skinId);
+            localStorage.setItem('fish-island:color-mode', mode);
+          },
+          { skinId: skin.id, mode },
+        );
+        await page.addInitScript(() => {
           Math.random = () => 0;
+          if (window.location.pathname !== '/pet/cards-demo') return;
+          if (sessionStorage.getItem('pet-card-test-initialized')) return;
+          sessionStorage.setItem('pet-card-test-initialized', '1');
           const open = IDBFactory.prototype.open;
           const success = Object.getOwnPropertyDescriptor(IDBRequest.prototype, 'onsuccess');
           let holdFirstLoad = true;
@@ -100,9 +111,8 @@ for (const skin of builtinSkins)
             return put.apply(this, args);
           };
         });
-        const entry = page.getByRole('button', { name: '宠物卡包', exact: true });
-        await activate(entry, mobile);
-        const dialog = page.getByRole('dialog', { name: '宠物卡包试玩' });
+        await page.goto('/pet/cards-demo', { waitUntil: 'domcontentloaded' });
+        const dialog = page.getByRole('region', { name: '宠物卡包试玩', exact: true });
         const viewport = dialog.getByRole('region', { name: '宠物卡包内容' });
         const button = (name: string) => dialog.getByRole('button', { name, exact: true });
         const showcase = dialog.getByRole('region', { name: '宠物卡片展示柜' });
@@ -118,6 +128,7 @@ for (const skin of builtinSkins)
           )
           .toBe(true);
         await expect(dialog.getByText(/今日可领 2 \/ 2/)).toBeVisible();
+        await verifyPairedPackCovers(dialog, mobile);
         expect(await assertLayout(viewport)).toBe(mobile ? 20 : 24);
         await activate(button('展示柜'), mobile);
         await expect(dialog.getByText('开包收藏第一张宠物卡。')).toBeVisible();
@@ -233,15 +244,7 @@ for (const skin of builtinSkins)
         await expect(showcase).toContainText('极光灵狐');
         await assertShowcaseEffect(showcase);
         expect(await assertLayout(viewport)).toBe(mobile ? 20 : 24);
-        if (mobile) await activate(button('关闭宠物卡包'), true);
-        else await page.keyboard.press('Escape');
-        await expect(dialog).toBeHidden();
-        await expect(entry).toBeFocused();
         await page.reload({ waitUntil: 'domcontentloaded' });
-        await page.evaluate(() => {
-          Math.random = () => 0;
-        });
-        await activate(entry, mobile);
         await activate(button('展示柜'), mobile);
         await expect(showcase).toContainText('极光灵狐');
         await activate(button('开卡包'), mobile);
@@ -280,7 +283,6 @@ for (const skin of builtinSkins)
           skin.id === 'pixel-island' &&
           ((mode === 'light' && width === 1440) || (mode === 'dark' && width === 375));
         await verifyKingdomsPack(
-          page,
           dialog,
           mobile,
           captureKingdoms ? info.outputPath('three-kingdoms-cards.png') : undefined,
@@ -290,6 +292,8 @@ for (const skin of builtinSkins)
           await scrollByTouch(page, viewport);
           await expect.poll(() => viewport.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
           await expect(track).toHaveCSS('visibility', 'hidden');
+          await button('开卡包').press('Enter');
+          await verifyPackCoverSwipe(page, dialog);
         }
       });
     }

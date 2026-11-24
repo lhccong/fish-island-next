@@ -32,7 +32,7 @@
 }
 .form textarea:focus {
   border-color: var(--color-accent);
-  outline: 3px solid var(--color-accent-soft);
+  outline: 3px var(--focus-outline-style, solid) var(--color-accent-soft);
   outline-offset: 0;
 }
 .form button:not(.action) {
@@ -118,7 +118,7 @@
 }
 .location:focus-within {
   border-color: var(--color-accent);
-  outline: 3px solid var(--color-accent-soft);
+  outline: 3px var(--focus-outline-style, solid) var(--color-accent-soft);
 }
 .location input {
   width: 100%;

@@ -55,11 +55,14 @@
   min-width: 0;
   padding-inline-start: 36px;
 }
-.replies .thread {
-  padding-inline-start: 12px;
+.comment .thread > .threadToggle {
+  min-height: 32px;
+  font-size: 0.8125rem;
+  -webkit-tap-highlight-color: transparent;
 }
-.replies .replies .thread {
-  padding-inline-start: 0;
+.comment .thread > .threadToggle:active {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .content {
   min-width: 0;
@@ -73,7 +76,7 @@
   scroll-margin-block: 20px;
 }
 .comment[data-comment-target='true']:focus {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 2px;
 }
 .targetLabel {
@@ -184,7 +187,7 @@
   color: var(--color-circle-author);
 }
 .actionMeta button:focus-visible {
-  outline: 2px solid var(--color-accent-text);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
   outline-offset: 0;
 }
 .actionMeta button:disabled {
@@ -242,7 +245,8 @@
   .thread {
     padding-inline-start: 32px;
   }
-  .replies .thread {
-    padding-inline-start: 8px;
+  .comment .thread > .threadToggle {
+    min-height: 44px;
+    font-size: 0.875rem;
   }
 }

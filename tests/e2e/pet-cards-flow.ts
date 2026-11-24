@@ -42,6 +42,58 @@ export async function assertPackStock(dialog: Locator, count: number) {
   await expect(dialog.getByRole('group', { name: '切换卡包' })).toContainText(`待拆 ${count} 包`);
 }
 
+export async function verifyPairedPackCovers(dialog: Locator, mobile: boolean) {
+  const covers = dialog.getByRole('region', { name: '卡包封面' });
+  const island = covers.getByRole('button', { name: '海岛初遇', exact: true });
+  const kingdoms = covers.getByRole('button', { name: '三国群英', exact: true });
+  const tiles = covers.getByRole('article');
+  await expect(tiles).toHaveCount(2);
+  for (const tile of await tiles.all()) await expect(tile).toBeInViewport({ ratio: 0.98 });
+  const first = (await tiles.nth(0).boundingBox())!;
+  const second = (await tiles.nth(1).boundingBox())!;
+  expect(first.x + first.width).toBeLessThan(second.x);
+  expect(first.y).toBe(second.y);
+  expect(
+    await covers.evaluate((element) => element.scrollWidth - element.clientWidth),
+  ).toBeLessThanOrEqual(1);
+  await expect(island).toHaveAttribute('aria-pressed', 'true');
+  if (mobile) {
+    expect((await kingdoms.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await tiles.nth(1).tap({ position: { x: 10, y: 10 } });
+  } else {
+    await kingdoms.press('Enter');
+    await expect(kingdoms).toBeFocused();
+  }
+  await expect(kingdoms).toHaveAttribute('aria-pressed', 'true');
+  await expect(dialog.getByRole('group', { name: '切换卡包' })).toContainText('三国群英');
+  if (mobile) await tiles.nth(0).tap({ position: { x: 10, y: 10 } });
+  else await tiles.nth(0).click({ position: { x: 10, y: 10 } });
+  await expect(island).toHaveAttribute('aria-pressed', 'true');
+}
+
+export async function verifyCollectionFilters(page: Page, collection: Locator, mobile: boolean) {
+  if (!mobile) {
+    const seriesFilter = collection.getByRole('combobox', { name: '卡片系列' });
+    await seriesFilter.press('Enter');
+    await expect(page.getByRole('listbox', { name: '卡片系列' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(seriesFilter).toBeFocused();
+  }
+  const chooseFilter = async (label: string, value: string) => {
+    const trigger = collection.getByRole('combobox', { name: label });
+    await activate(trigger, mobile);
+    await activate(page.getByRole('option', { name: value, exact: true }), mobile);
+    await expect(trigger).toContainText(value);
+  };
+  await chooseFilter('卡片品质', '闪耀');
+  await expect(collection.getByText('极光灵狐', { exact: true })).toBeVisible();
+  await expect(collection.getByText('拾贝萝卜', { exact: true })).toHaveCount(0);
+  await chooseFilter('卡片系列', '三国群英');
+  await expect(collection.getByRole('status')).toHaveText('没有符合筛选条件的卡片。');
+  await chooseFilter('卡片系列', '全部系列');
+  await chooseFilter('卡片品质', '全部品质');
+}
+
 export async function flipThirdCard(page: Page, dialog: Locator, mobile: boolean) {
   const third = dialog.getByRole('button', { name: '翻开第 3 张卡' });
   if (mobile) await third.tap();
@@ -55,7 +107,7 @@ export async function flipThirdCard(page: Page, dialog: Locator, mobile: boolean
   await expect(dialog.getByText(/试玩积分 5/)).toBeVisible();
 }
 
-async function swipePackCover(page: Page, dialog: Locator) {
+export async function verifyPackCoverSwipe(page: Page, dialog: Locator) {
   const cover = dialog.getByRole('region', { name: '卡包封面' });
   const box = await cover.boundingBox();
   if (!box) throw new Error('Missing card pack cover');
@@ -74,10 +126,13 @@ async function swipePackCover(page: Page, dialog: Locator) {
   } finally {
     await cdp.detach();
   }
+  await expect(cover.getByRole('button', { name: '三国群英', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 }
 
 export async function verifyKingdomsPack(
-  page: Page,
   dialog: Locator,
   mobile: boolean,
   screenshotPath?: string,
@@ -93,8 +148,10 @@ export async function verifyKingdomsPack(
   await activate(button('领取卡包'), mobile);
   await assertPackStock(dialog, 1);
   if (mobile) {
-    await swipePackCover(page, dialog);
-    await expect(dialog.getByRole('heading', { name: '三国群英', exact: true })).toBeVisible();
+    await activate(
+      dialog.getByRole('region', { name: '卡包封面' }).getByRole('button', { name: '三国群英' }),
+      true,
+    );
   } else {
     await choosePetCardPack(dialog, '三国群英', mobile);
   }

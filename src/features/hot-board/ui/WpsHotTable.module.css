@@ -88,7 +88,7 @@
   font-size: 0.8125rem;
 }
 .search:focus-within {
-  outline: 2px solid var(--color-accent);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent);
   outline-offset: 1px;
 }
 .search input:focus,

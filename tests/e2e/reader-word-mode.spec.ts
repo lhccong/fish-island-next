@@ -1,30 +1,7 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 
-async function scrollChapter(page: Page, viewport: Locator, touch: boolean) {
-  const bounds = (await viewport.boundingBox())!;
-  const x = Math.round(bounds.x + bounds.width / 2);
-  const y = Math.round(bounds.y + bounds.height * 0.85);
-  if (!touch) {
-    await page.mouse.move(x, y);
-    await page.mouse.wheel(0, 560);
-    return;
-  }
-  const session = await page.context().newCDPSession(page);
-  try {
-    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-    for (const fraction of [0.1, 0.25, 0.4, 0.55, 0.7])
-      await session.send('Input.dispatchTouchEvent', {
-        type: 'touchMove',
-        touchPoints: [{ x, y: Math.round(y - bounds.height * fraction) }],
-      });
-    // Let the finger come to rest before releasing so the next tap is not consumed by a fling.
-    await new Promise((resolve) => setTimeout(resolve, 180));
-    await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  } finally {
-    await session.detach();
-  }
-}
+import { scrollChapter } from './reader-scroll-fixture';
 
 function readingPosition(viewport: Locator) {
   return viewport.evaluate((element) => {
@@ -94,16 +71,17 @@ for (const skin of builtinSkins)
         }
       });
 
-      await page.goto('/discover', { waitUntil: 'domcontentloaded' });
+      await page.goto('/reader', { waitUntil: 'domcontentloaded' });
       await expect(page.locator('html')).toHaveAttribute('data-skin', skin.id);
       await expect(page.locator('html')).toHaveAttribute('data-color-mode', mode);
-      await press(page.getByRole('main').getByRole('link', { name: '阅读', exact: true }));
-      await expect(page).toHaveURL('/reader');
       await press(page.getByRole('button', { name: '继续阅读', exact: true }));
       const reader = page.getByRole('region', { name: '阅读器', exact: true });
       const entry = reader.getByRole('button', { name: 'Word模式', exact: true });
       await expect(reader.getByRole('button', { name: '工作伪装' })).toHaveCount(0);
       const search = reader.getByRole('textbox', { name: '当前章节搜索' });
+      await press(reader.getByRole('button', { name: '搜索当前章节', exact: true }));
+      await expect(search).toBeFocused();
+      await expect(search).toHaveCSS('outline-style', 'none');
       await search.fill('验收');
       await search.blur();
       const normalViewport = reader.getByRole('region', { name: '章节正文', exact: true });
@@ -118,6 +96,7 @@ for (const skin of builtinSkins)
       const next = word.getByRole('button', { name: '下一章', exact: true });
       const viewport = word.getByRole('region', { name: '章节正文', exact: true });
       await expect(exit).toBeFocused();
+      await expect(exit).toHaveCSS('outline-style', 'none');
       await expect(word.getByRole('heading', { name: '第一章' })).toBeAttached();
       await expect(word.getByRole('link', { name: 'QQ阅读首页' })).toHaveAttribute(
         'href',
@@ -127,6 +106,18 @@ for (const skin of builtinSkins)
       await expect(previous).toBeDisabled();
       expect(requests).toEqual([]);
       expect(Math.abs((await readingPosition(viewport)) - originalPosition)).toBeLessThan(4);
+
+      await page.keyboard.press('Tab');
+      await expect(viewport).toBeFocused();
+      await expect(viewport).toHaveCSS('outline-style', 'solid');
+      await press(viewport);
+      await expect(viewport).toBeFocused();
+      await expect(viewport).toHaveCSS('outline-style', 'none');
+      const scrollTop = () => viewport.evaluate((element) => element.scrollTop);
+      const beforeKeyScroll = await scrollTop();
+      await page.keyboard.press('ArrowDown');
+      await expect.poll(scrollTop).toBeGreaterThan(beforeKeyScroll);
+      await expect(viewport).toHaveCSS('outline-style', 'solid');
 
       const measurement = await viewport.evaluate((element) => {
         const page = element.querySelector('h2')!.parentElement!;
@@ -167,8 +158,10 @@ for (const skin of builtinSkins)
 
       await scrollChapter(page, viewport, touch);
       await expect.poll(() => readingPosition(viewport)).toBeGreaterThan(originalPosition + 1);
-      if (process.env.READER_WORD_SCREENSHOTS && skin.id === 'moyu-island')
+      if (process.env.READER_WORD_SCREENSHOTS && skin.id === 'moyu-island') {
+        await press(viewport);
         await page.screenshot({ path: testInfo.outputPath('word-mode.png') });
+      }
       const wordPosition = await readingPosition(viewport);
       if (touch) await press(exit);
       else await page.keyboard.press('Escape');
@@ -183,11 +176,17 @@ for (const skin of builtinSkins)
       await expect(word.getByRole('status')).toContainText('正在加载章节');
       await expect(next).toBeDisabled();
       await expect(exit).toBeVisible();
+      await expect(word.locator('[tabindex="-1"]')).toHaveCSS(
+        'outline-style',
+        touch ? 'none' : 'solid',
+      );
       release();
       await expect(word.getByRole('alert')).toContainText('503');
       await press(word.getByRole('button', { name: '重试章节' }));
       await expect(word.getByRole('heading', { name: '第二章' })).toBeVisible();
       await expect(viewport.getByText('第二章正文')).toBeVisible();
+      await expect(viewport).toBeFocused();
+      await expect(viewport).toHaveCSS('outline-style', 'none');
       await expect.poll(() => viewport.evaluate((element) => element.scrollTop)).toBe(0);
       expect(requests).toEqual([2, 2]);
       await press(next);
@@ -242,7 +241,7 @@ test('1920px 桌面按照旧版截图排列标题栏、功能区、纸面和状�
   const word = page.getByRole('dialog', { name: 'Word模式', exact: true });
   const heading = word.getByRole('heading', { name: '第一卷 远山 第一章 晨光' });
   await expect(heading).toBeVisible();
-  const header = await word.locator('header').boundingBox();
+  const header = await word.locator('header:visible').boundingBox();
   expect(header).toMatchObject({ x: 0, y: 0, width: 1905, height: 185 });
   const pageBox = await heading.locator('..').boundingBox();
   expect(pageBox).toMatchObject({ y: 225, width: 900 });

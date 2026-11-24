@@ -167,13 +167,13 @@ for (const skin of builtinSkins)
       else await viewport.hover();
       await page.screenshot({ path: info.outputPath('comment-highlight.png') });
       await detail
-        .locator('[data-comment-id="4000"]')
+        .locator('[data-comment-id="3020"]')
         .getByRole('button', { name: '收起回复', exact: true })
         .click();
       await expect(highlighted).toBeHidden();
       await detail
-        .locator('[data-comment-id="4000"]')
-        .getByRole('button', { name: '查看 1 条回复', exact: true })
+        .locator('[data-comment-id="3020"]')
+        .getByRole('button', { name: '查看 2 条回复', exact: true })
         .click();
       await expect(highlighted).toBeVisible();
       await detail.getByRole('button', { name: '返回鱼小圈' }).click();

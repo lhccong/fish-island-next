@@ -110,12 +110,12 @@ export function PetCardsExperience({
   const multiple = catalog.packIds.length > 1;
   const movePack: MovePack | undefined =
     multiple && !result && !pending && !opening && !playingShiny
-      ? (direction) => {
+      ? (direction, preserveScroll) => {
           const { packIds } = catalog;
           const index = packIds.indexOf(kind);
           setSelection(packIds[(index + direction + packIds.length) % packIds.length]!);
           clearError();
-          if (viewport.current) viewport.current.scrollTop = 0;
+          if (!preserveScroll && viewport.current) viewport.current.scrollTop = 0;
         }
       : undefined;
 

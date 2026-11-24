@@ -11,7 +11,7 @@
   display: none;
 }
 @media (min-width: 761px) {
-  .navigation[data-shell='moyu-island'] {
+  .navigation[data-layout='topbar'] {
     position: relative;
     flex-direction: row;
     gap: 12px;
@@ -19,10 +19,11 @@
     height: 52px;
     border-bottom: 1px solid var(--color-border);
   }
-  .navigation[data-shell='moyu-island'] .classicBrand {
+  .navigation[data-layout='topbar'] .classicBrand,
+  .navigation[data-layout='side'] .classicBrand {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     flex-shrink: 0;
     color: var(--color-text);
     font-size: 1rem;
@@ -41,19 +42,19 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .navigation[data-shell='moyu-island'] .items,
-  .navigation[data-shell='moyu-island'] .classicLinks {
+  .navigation[data-layout='topbar'] .items,
+  .navigation[data-layout='topbar'] .classicLinks {
     display: flex;
     flex-direction: row;
     gap: 8px;
     width: auto;
     min-width: 0;
   }
-  .navigation[data-shell='moyu-island'] .items {
+  .navigation[data-layout='topbar'] .items {
     flex: 1;
     overflow-x: auto;
   }
-  .navigation[data-shell='moyu-island'] .item {
+  .navigation[data-layout='topbar'] .item {
     flex-direction: row;
     flex-shrink: 0;
     gap: 8px;
@@ -62,18 +63,18 @@
     font-size: 0.875rem;
     white-space: nowrap;
   }
-  .navigation[data-shell='moyu-island'] .item > span:not([aria-label]) {
+  .navigation[data-layout='topbar'] .item > span:not([aria-label]) {
     display: inline;
   }
-  .navigation[data-shell='moyu-island'] .item svg {
+  .navigation[data-layout='topbar'] .item svg {
     width: 16px;
     height: 16px;
   }
-  .navigation[data-shell='moyu-island'] .account {
+  .navigation[data-layout='topbar'] .account {
     order: 2;
     margin-right: 48px;
   }
-  .navigation[data-shell='moyu-island'] .item[data-sign-in-entry] {
+  .navigation[data-layout='topbar'] .item[data-sign-in-entry] {
     position: absolute;
     top: 4px;
     right: 64px;
@@ -85,7 +86,7 @@
     background: transparent;
     isolation: isolate;
   }
-  .navigation[data-shell='moyu-island'] .item[data-sign-in-entry]::before {
+  .navigation[data-layout='topbar'] .item[data-sign-in-entry]::before {
     content: '';
     position: absolute;
     z-index: -1;
@@ -94,19 +95,106 @@
     background: var(--color-action);
     box-shadow: 0 2px 6px color-mix(in srgb, var(--color-action) 30%, transparent);
   }
-  .navigation[data-shell='moyu-island'] .item[data-sign-in-entry]:hover::before {
+  .navigation[data-layout='topbar'] .item[data-sign-in-entry]:hover::before {
     background: var(--color-action-hover);
   }
-  .navigation[data-shell='moyu-island'] .item[data-sign-in-entry] svg {
+  .navigation[data-layout='topbar'] .item[data-sign-in-entry] svg {
     width: 18px;
     height: 18px;
   }
-  .navigation[data-shell='moyu-island'] .bottom {
+  .navigation[data-layout='topbar'] .bottom {
     order: 3;
     margin: 0;
   }
-  .navigation[data-shell='moyu-island'] .mobileEntry {
+  .navigation[data-layout='topbar'] .mobileEntry {
     display: none;
+  }
+  .navigation[data-layout='side'] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    row-gap: var(--space-2);
+    padding: var(--space-3) 0;
+  }
+  .navigation[data-layout='side'] .classicBrand {
+    grid-column: 1 / -1;
+    min-height: 44px;
+    margin-inline: var(--space-2);
+    padding-inline: var(--space-2);
+  }
+  .navigation[data-layout='side'] .items,
+  .navigation[data-layout='side'] .classicLinks {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .navigation[data-layout='side'] .items {
+    grid-column: 1 / -1;
+    align-self: stretch;
+    min-height: 0;
+    overflow: auto;
+    padding: var(--space-1) var(--space-2);
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar) transparent;
+  }
+  .navigation[data-layout='side'] .classicLinks {
+    flex: none;
+    margin-block: var(--space-1);
+    padding-block: var(--space-2);
+    border-block: 1px solid var(--color-border);
+  }
+  .navigation[data-layout='side'] .item {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 6px;
+    padding-inline: var(--space-2);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+  .navigation[data-layout='side'] .item > span:not([aria-label]) {
+    display: inline;
+  }
+  .navigation[data-layout='side'] .item svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.75;
+    color: var(--color-muted);
+  }
+  .navigation[data-layout='side'] .item:hover {
+    background: var(--color-hover);
+  }
+  .navigation[data-layout='side'] .item[aria-current='page'] {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-text);
+    font-weight: 600;
+  }
+  .navigation[data-layout='side'] .item[aria-current='page']::before {
+    content: '';
+    position: absolute;
+    inset-block: 14px;
+    inset-inline-start: 2px;
+    width: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+  .navigation[data-layout='side'] .item[aria-current='page'] svg {
+    color: inherit;
+  }
+  .navigation[data-layout='side'] .account,
+  .navigation[data-layout='side'] .bottom {
+    margin: 0 var(--space-2);
+  }
+  .navigation[data-layout='side'] .account {
+    justify-self: start;
+  }
+  .navigation[data-layout='side'] .bottom {
+    justify-self: end;
   }
 }
 .brand {
@@ -385,6 +473,9 @@
   }
   .navigation .item > span:not([aria-label]) {
     display: inline;
+  }
+  .navigation[data-layout='side'] .item[data-sign-in-entry] > span + span {
+    display: none;
   }
   .navigation .desktopEntry {
     display: none;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import type { Book, ReaderSettings } from '@/domain/reader';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
@@ -25,6 +25,8 @@ export function ReaderBody({
   viewportRef,
   wordMode,
   paragraphs,
+  findOpen,
+  onCloseFind,
 }: {
   book: Book;
   settings: ReaderSettings;
@@ -34,6 +36,8 @@ export function ReaderBody({
   viewportRef: RefObject<HTMLDivElement | null>;
   wordMode: boolean;
   paragraphs: string[];
+  findOpen: boolean;
+  onCloseFind: () => void;
 }) {
   const chapter = book.chapters.find((chapter) => chapter.index === book.lastReadChapter);
   const speech = useSpeech(paragraphs, settings, enabled, onError);
@@ -41,6 +45,10 @@ export function ReaderBody({
   const lastPosition = useRef(book.lastReadPosition);
   const [query, setQuery] = useState('');
   const [found, setFound] = useState(0);
+  const findInput = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    if (findOpen) findInput.current?.focus({ preventScroll: true });
+  }, [findOpen]);
   const matches = query.trim()
     ? paragraphs.flatMap((text, index) =>
         text.toLowerCase().includes(query.toLowerCase()) ? [index] : [],
@@ -77,27 +85,39 @@ export function ReaderBody({
     scrollParagraph(viewportRef.current, matches[next]!);
   };
   return (
-    <>
-      <div className={styles.findBar} data-word-hidden={wordMode}>
-        <input
-          aria-label="当前章节搜索"
-          placeholder="搜索当前章节"
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setFound(0);
-          }}
-        />
-        <Button variant="secondary" disabled={!matches.length} onClick={() => locate(-1)}>
-          上处
-        </Button>
-        <Button variant="secondary" disabled={!matches.length} onClick={() => locate(1)}>
-          下处
-        </Button>
-        {query && <small>{matches.length} 处</small>}
+    <div className={styles.chapterBody}>
+      <div
+        hidden={!findOpen || wordMode}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && !event.nativeEvent.isComposing) {
+            event.preventDefault();
+            event.stopPropagation();
+            onCloseFind();
+          }
+        }}
+      >
+        <div className={styles.findBar}>
+          <input
+            ref={findInput}
+            aria-label="当前章节搜索"
+            placeholder="搜索当前章节"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setFound(0);
+            }}
+          />
+          <Button variant="secondary" disabled={!matches.length} onClick={() => locate(-1)}>
+            上处
+          </Button>
+          <Button variant="secondary" disabled={!matches.length} onClick={() => locate(1)}>
+            下处
+          </Button>
+          {query && <small>{matches.length} 处</small>}
+        </div>
       </div>
       {settings.ttsEnabled && (
-        <div className={styles.actions} data-word-hidden={wordMode}>
+        <div className={styles.speechControls} data-word-hidden={wordMode}>
           <Button
             variant="secondary"
             disabled={!enabled || !paragraphs.length}
@@ -132,7 +152,8 @@ export function ReaderBody({
                     data-paragraph={index}
                     data-highlight={
                       !wordMode &&
-                      (speech.highlight === index || (query && matches[found] === index))
+                      (speech.highlight === index ||
+                        (findOpen && query && matches[found] === index))
                         ? 'true'
                         : undefined
                     }
@@ -163,6 +184,6 @@ export function ReaderBody({
           </div>
         </ScrollArea>
       </div>
-    </>
+    </div>
   );
 }

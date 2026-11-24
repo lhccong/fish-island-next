@@ -16,11 +16,16 @@
     grid-row: 3;
   }
   .shell[data-presentation='classic'] {
-    grid-template-columns: minmax(20px, 1fr) minmax(240px, 320px) minmax(0, 1200px) minmax(
-        20px,
-        1fr
-      );
-    grid-template-rows: 52px minmax(0, 1fr) auto;
+    --classic-nav-column: minmax(20px, 1fr);
+    --classic-nav-row: 52px;
+    --classic-sidebar-column: minmax(240px, 320px);
+    --classic-content-column: minmax(0, 1200px);
+    --classic-wide-content-column: minmax(0, 1532px);
+    --classic-end-column: minmax(20px, 1fr);
+    grid-template-columns:
+      var(--classic-nav-column) var(--classic-sidebar-column) var(--classic-content-column)
+      var(--classic-end-column);
+    grid-template-rows: var(--classic-nav-row) minmax(0, 1fr) auto;
     column-gap: 12px;
   }
   .shell[data-presentation='classic'] .rail {
@@ -47,7 +52,7 @@
   }
   .shell[data-presentation='classic'][data-sidebar-hidden='true'] {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 52px minmax(0, 1fr);
+    grid-template-rows: var(--classic-nav-row) minmax(0, 1fr);
     gap: 0;
   }
   .shell[data-presentation='classic'][data-sidebar-hidden='true'] .workspace {
@@ -59,8 +64,10 @@
     background: var(--color-canvas);
   }
   .shell[data-presentation='classic'][data-sidebar-hidden='true'][data-content-centered='true'] {
-    grid-template-columns: minmax(20px, 1fr) minmax(0, 1532px) minmax(20px, 1fr);
-    grid-template-rows: 52px minmax(0, 1fr) auto;
+    grid-template-columns: var(--classic-nav-column) var(--classic-wide-content-column) var(
+        --classic-end-column
+      );
+    grid-template-rows: var(--classic-nav-row) minmax(0, 1fr) auto;
     column-gap: 12px;
   }
   .shell[data-presentation='classic'][data-sidebar-hidden='true'][data-content-centered='true']
@@ -93,7 +100,7 @@
     box-shadow: var(--shadow-panel);
   }
   .shell[data-presentation='classic'][data-sidebar-variant='chat'] {
-    grid-template-rows: 52px 32px minmax(0, 1fr) 80px;
+    grid-template-rows: var(--classic-nav-row) 32px minmax(0, 1fr) 80px;
   }
   .shell[data-presentation='classic'][data-sidebar-variant='chat'] .workspace {
     grid-row: 3;
@@ -108,10 +115,9 @@
   .shell[data-presentation='classic'][data-sidebar-variant='chat'][data-sidebar-position='right']:not(
       [data-sidebar-hidden='true']
     ) {
-    grid-template-columns: minmax(20px, 1fr) minmax(0, 1200px) minmax(240px, 320px) minmax(
-        20px,
-        1fr
-      );
+    grid-template-columns:
+      var(--classic-nav-column) var(--classic-content-column) var(--classic-sidebar-column)
+      var(--classic-end-column);
   }
   .shell[data-presentation='classic'][data-sidebar-variant='chat'][data-sidebar-position='right']
     .sidebar {
@@ -122,13 +128,45 @@
     grid-column: 2;
   }
   .shell[data-presentation='classic'][data-sidebar-variant='chat'][data-sidebar-hidden='true'] {
-    grid-template-columns: minmax(20px, 1fr) minmax(0, 1532px) minmax(20px, 1fr);
+    grid-template-columns: var(--classic-nav-column) var(--classic-wide-content-column) var(
+        --classic-end-column
+      );
     column-gap: 12px;
   }
   .shell[data-presentation='classic'][data-sidebar-variant='chat'][data-sidebar-hidden='true']
     .workspace,
   .shell[data-presentation='classic'][data-sidebar-variant='chat'][data-sidebar-hidden='true']
     .classicFooter {
+    grid-column: 2;
+  }
+  .shell[data-presentation='classic'][data-navigation-layout='side'] {
+    --classic-nav-column: 160px;
+    --classic-nav-row: 0px;
+    --classic-sidebar-column: clamp(220px, 25vw, 320px);
+    --classic-content-column: minmax(0, 1fr);
+    --classic-wide-content-column: var(--classic-content-column);
+    --classic-end-column: 20px;
+  }
+  .shell[data-presentation='classic'][data-navigation-layout='side'][data-sidebar-variant='chat']
+    .workspace {
+    container: classic-chat / inline-size;
+  }
+  .shell[data-presentation='classic'][data-navigation-layout='side'] .rail {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    border-inline-end: 1px solid var(--color-border);
+  }
+  .shell[data-presentation='classic'][data-navigation-layout='side'][data-sidebar-hidden='true']:not(
+      [data-content-centered='true'],
+      [data-sidebar-variant='chat']
+    ) {
+    grid-template-columns: var(--classic-nav-column) minmax(0, 1fr);
+  }
+  .shell[data-presentation='classic'][data-navigation-layout='side'][data-sidebar-hidden='true']:not(
+      [data-content-centered='true'],
+      [data-sidebar-variant='chat']
+    )
+    .workspace {
     grid-column: 2;
   }
 }

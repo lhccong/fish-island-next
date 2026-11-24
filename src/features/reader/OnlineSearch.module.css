@@ -25,7 +25,7 @@
 }
 .field:focus-within {
   border-color: var(--color-accent-text);
-  outline: 2px solid var(--color-accent-soft);
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-soft);
   outline-offset: 2px;
 }
 .field input {

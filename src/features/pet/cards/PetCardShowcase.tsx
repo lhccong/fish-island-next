@@ -1,7 +1,8 @@
 import { ArrowUp, GalleryVerticalEnd, Pin, PinOff, Sparkles } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   getPetCard,
+  petCardGrades,
   petCardStatEntries,
   petShowcaseLimit,
   summarizePetShowcase,
@@ -9,10 +10,18 @@ import {
   type PetCardOwned,
 } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
+import { Select } from '@/shared/ui/Select';
 import { describePetCardBattleEffect } from './card-battle-copy';
 import { usePetCardCatalog } from './catalog-context';
 import { PetCardFace } from './PetCardFace';
 import styles from './PetCards.module.css';
+
+const all = '__all__';
+const seriesPrefix = 'pool:';
+const gradeOptions = [
+  { value: all, label: '全部品质' },
+  ...Object.entries(petCardGrades).map(([value, { name: label }]) => ({ value, label })),
+];
 
 export function PetCardShowcase({
   cardIds,
@@ -37,6 +46,17 @@ export function PetCardShowcase({
   };
 }) {
   const catalog = usePetCardCatalog();
+  const [series, setSeries] = useState(all);
+  const [grade, setGrade] = useState(all);
+  const seriesCards =
+    series === all ? undefined : catalog.packs[series.slice(seriesPrefix.length)]?.ids;
+  const visibleCards = cardIds.filter(
+    (id) =>
+      (!seriesCards || seriesCards.includes(id)) &&
+      (grade === all || getPetCard(id, catalog).grade === grade),
+  );
+  const ownedCards = new Set(owned);
+  const visibleOwned = visibleCards.filter((id) => ownedCards.has(id)).length;
   const vacant = petShowcaseLimit - showcased.length;
   const stats = summarizePetShowcase(showcased, catalog, upgrades?.collection);
   const effects = showcased.flatMap((id) => {
@@ -91,17 +111,41 @@ export function PetCardShowcase({
         )}
       </section>
       <section aria-label="我的卡片">
+        <div className={styles.collectionFilters} role="group" aria-label="卡片筛选">
+          {upgrades && catalog.packIds.length > 1 && (
+            <Select
+              label="卡片系列"
+              value={series}
+              options={[
+                { value: all, label: '全部系列' },
+                ...catalog.packIds.map((id) => ({
+                  value: `${seriesPrefix}${id}`,
+                  label: catalog.packs[id]!.name,
+                })),
+              ]}
+              onValueChange={setSeries}
+            />
+          )}
+          <Select label="卡片品质" value={grade} options={gradeOptions} onValueChange={setGrade} />
+        </div>
         <div className={styles.resultHeading}>
           <h3>我的卡片</h3>
           <div className={styles.collectionHeadingActions}>
-            <span>{upgrades ? `${owned.length} 张` : `${owned.length} / ${cardIds.length}`}</span>
+            <span>
+              {upgrades ? `${visibleOwned} 张` : `${visibleOwned} / ${visibleCards.length}`}
+            </span>
             {bulkUpgrade}
           </div>
         </div>
         {owned.length === 0 && <p className={styles.emptyFeedback}>开包收藏第一张宠物卡。</p>}
+        {owned.length > 0 && visibleCards.length === 0 && (
+          <p className={styles.emptyFeedback} role="status">
+            没有符合筛选条件的卡片。
+          </p>
+        )}
         <ul className={styles.collectionGrid}>
-          {cardIds.map((id) => {
-            if (!owned.includes(id)) {
+          {visibleCards.map((id) => {
+            if (!ownedCards.has(id)) {
               return (
                 <li key={id} className={styles.collectionSlot}>
                   <div className={styles.collectionPlaceholder}>
