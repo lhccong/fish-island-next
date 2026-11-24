@@ -174,6 +174,7 @@ export const MessageRow = memo(function MessageRow({
                 name={message.senderName}
                 level={message.senderLevel}
                 titleId={message.senderTitleId}
+                titleIds={message.senderTitleIds}
                 region={message.senderRegion}
               />
             )}

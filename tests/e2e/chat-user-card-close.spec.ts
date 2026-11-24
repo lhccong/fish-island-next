@@ -9,6 +9,15 @@ for (const skin of builtinSkins)
       page,
     }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode, 'admin');
+      await page.route('https://menu.test/cover.png', (route) =>
+        route.fulfill({
+          path: 'public/skins/pixel-island/home-island.png',
+          contentType: 'image/png',
+        }),
+      );
+      await page.route('https://menu.test/cover-unavailable.png', (route) =>
+        route.fulfill({ status: 404, body: 'Synthetic missing cover' }),
+      );
       let state = 'loading';
       let pending: Route | undefined;
       await page.route('**/api/user/get/vo?*', (route) => {
@@ -26,11 +35,24 @@ for (const skin of builtinSkins)
                 : {
                     id: '456',
                     userName: '合成岛友',
+                    userAvatar: 'https://menu.test/image.png',
                     followingCount: '1',
                     followerCount: '8',
+                    level: 7,
+                    country: '合成国家',
+                    region: '合成省份',
+                    titleId: 2,
+                    titleIdList: '[1,2,7,11]',
                     userProfile:
                       state === 'long' ? '用于滚动的合成简介。'.repeat(80) : '在岛上摸鱼',
-                    ...(state === 'cover' ? { momentsBgUrl: 'https://menu.test/image.png' } : {}),
+                    ...(state.startsWith('cover')
+                      ? {
+                          momentsBgUrl:
+                            state === 'cover'
+                              ? 'https://menu.test/cover.png'
+                              : 'https://menu.test/cover-unavailable.png',
+                        }
+                      : {}),
                   },
           },
         });
@@ -49,7 +71,7 @@ for (const skin of builtinSkins)
         .getByRole('button', { name: '查看合成岛友的用户卡片' });
       const dialog = page.getByRole('dialog', { name: '用户卡片', exact: true });
       const dismiss = dialog.getByRole('button', { name: '关闭用户卡片', exact: true });
-      for (const stage of ['loading', 'empty', 'error', 'ready', 'long', 'cover']) {
+      for (const stage of ['loading', 'empty', 'error', 'ready', 'long', 'cover', 'cover-error']) {
         state = stage;
         await name.click();
         if (stage === 'loading') {
@@ -89,8 +111,29 @@ for (const skin of builtinSkins)
         expect(hit.width).toBeGreaterThanOrEqual(44);
         expect(hit.height).toBeGreaterThanOrEqual(44);
         expect(hit.reachable).toBe(true);
-        if (stage === 'ready')
-          await page.screenshot({ path: info.outputPath('compact-dismiss.png') });
+        if (stage === 'cover') {
+          await expect(dialog.getByText('正在加载封面…')).toBeHidden();
+          const details = dialog.locator('dl');
+          await expect(details.locator('dt')).toHaveText(['等级', '地区']);
+          const layout = await details.evaluate((row) => {
+            const rowBox = row.getBoundingClientRect();
+            const positions = Array.from(row.children, (item) => {
+              const { top, left } = item.getBoundingClientRect();
+              return { top, left, overflow: item.scrollWidth - item.clientWidth };
+            });
+            const first = row.firstElementChild!.getBoundingClientRect();
+            const last = row.lastElementChild!.getBoundingClientRect();
+            return { positions, balance: first.left - rowBox.left - (rowBox.right - last.right) };
+          });
+          expect(new Set(layout.positions.map(({ top }) => top)).size).toBe(1);
+          expect(layout.positions[0]!.left).toBeLessThan(layout.positions[1]!.left);
+          expect(layout.positions.every(({ overflow }) => overflow <= 1)).toBe(true);
+          expect(Math.abs(layout.balance)).toBeLessThanOrEqual(1);
+        }
+        if (stage === 'cover-error')
+          await expect(dialog.getByText('封面暂时无法显示')).toBeVisible();
+        if (stage === 'ready' || stage === 'cover')
+          await dialog.screenshot({ path: info.outputPath(`${stage}-dismiss.png`) });
         if (page.viewportSize()!.width <= 760) await dismiss.tap();
         else await dismiss.click();
         await expect(dialog).toHaveCount(0);

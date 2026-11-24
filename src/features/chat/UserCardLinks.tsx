@@ -11,30 +11,26 @@ const links = [
 ] as const;
 
 export function UserCardLinks({
-  iconOnly,
   onVisit,
   onCollection,
 }: {
-  iconOnly: boolean;
   onVisit: (kind: UserCardDestination) => void;
   onCollection: (trigger: HTMLButtonElement) => void;
 }) {
   return (
-    <div className={styles.links}>
+    <div className={styles.links} role="group" aria-label="用户空间">
       {links.map(({ kind, label, Icon }) => (
         <Button
           key={kind}
           variant="secondary"
-          className={iconOnly ? styles.iconAction : undefined}
-          aria-label={label}
-          title={`查看${label}`}
+          className={styles.shortcut}
           onClick={(event) => {
             if (kind === 'collection') onCollection(event.currentTarget);
             else onVisit(kind);
           }}
         >
           <Icon size={17} aria-hidden="true" />
-          {!iconOnly && label}
+          <span>{label}</span>
         </Button>
       ))}
     </div>

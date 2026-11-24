@@ -1,5 +1,6 @@
 import {
   chatImageUrl,
+  decodeTitleIds,
   parseBigFishEmoticonKeyword,
   parseBubbleStyle,
   type ChatRealtimeEvent,
@@ -121,6 +122,7 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
     .filter(Boolean)
     .join(' · ');
   const style = parseBubbleStyle(message.bubbleId, message.bubbleArtwork);
+  const senderTitleIds = decodeTitleIds(sender?.titleIdList);
   const bigFish = message.bigFish === true && senderId === '-2';
   const bigFishEmoticonUrl = bigFish ? chatImageUrl(message.bigFishEmoticonUrl) : null;
   const bigFishEmoticonKeyword = bigFish
@@ -162,6 +164,7 @@ export function decodeReceivedMessage(value: unknown): ReceivedMessage | null {
       ? { senderLevel: sender.level }
       : {}),
     ...(id(sender?.titleId) ? { senderTitleId: id(sender?.titleId)! } : {}),
+    ...(senderTitleIds !== undefined ? { senderTitleIds } : {}),
     ...(senderRegion ? { senderRegion } : {}),
     content: message.content,
     createdAt,

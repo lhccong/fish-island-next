@@ -53,6 +53,31 @@ const levelNames = [
   '摸鱼天尊',
   '摸鱼祖师',
 ];
+
+export function decodeTitleId(value: unknown): string | undefined {
+  if (typeof value === 'number' && Number.isSafeInteger(value)) return String(value);
+  if (typeof value === 'string' && /^(?:0|-?[1-9]\d{0,18})$/.test(value)) return value;
+  return undefined;
+}
+
+export function decodeTitleIds(value: unknown): readonly string[] | undefined {
+  let entries: unknown = value;
+  if (typeof value === 'string') {
+    try {
+      entries = JSON.parse(value);
+    } catch {
+      return undefined;
+    }
+  }
+  if (!Array.isArray(entries)) return undefined;
+  const titles = new Set<string>();
+  for (const entry of entries) {
+    const id = decodeTitleId(entry);
+    if (id && id !== '0') titles.add(id);
+  }
+  return [...titles];
+}
+
 // Legacy online-member badge artwork; absence of a level is not a default level.
 export function memberLevelEmoji(level: number | undefined): string | null {
   if (level === undefined) return null;

@@ -21,6 +21,7 @@ interface DialogProps {
   onOpenChange?: (open: boolean) => void;
   showCloseAction?: boolean;
   dismissLabel?: string;
+  dismissClassName?: string;
   illustration?: ReactNode;
   className?: string;
   title: string;
@@ -42,6 +43,7 @@ export function Dialog({
   onOpenChange,
   showCloseAction = true,
   dismissLabel,
+  dismissClassName = '',
   illustration,
   className = '',
 }: DialogProps) {
@@ -72,7 +74,11 @@ export function Dialog({
         >
           {dismissLabel && (
             <Primitive.Close asChild>
-              <button className={styles.dismiss} type="button" aria-label={dismissLabel}>
+              <button
+                className={`${styles.dismiss} ${dismissClassName}`}
+                type="button"
+                aria-label={dismissLabel}
+              >
                 <X size={19} aria-hidden="true" />
               </button>
             </Primitive.Close>

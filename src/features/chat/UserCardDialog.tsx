@@ -1,5 +1,7 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useStore } from 'zustand';
+import { ChartNoAxesColumnIncreasing, MapPin } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
 import type { FollowKind, UserCardPort } from '@/domain/account-tools';
 import { Dialog } from '@/shared/ui/Dialog';
@@ -19,7 +21,7 @@ import { UserCardMedia } from './UserCardMedia';
 import { UserCardModeration } from './UserCardModeration';
 import { UserCardCounts } from './UserCardCounts';
 import { UserCardLinks } from './UserCardLinks';
-import { SenderTitle } from './SenderTitle';
+import { UserCardTitles } from './UserCardTitles';
 import styles from './UserCard.module.css';
 
 export function UserCardDialog({
@@ -47,6 +49,12 @@ export function UserCardDialog({
   const remarks = useRemarks();
   const remarkRef = useRef<HTMLButtonElement>(null);
   const { blacklist, composerRef, controller, draft } = useChatRealtime();
+  const member = useStore(controller.members.store, ({ state: members }) =>
+    members.status === 'success'
+      ? members.members.find((entry) => entry.id === target.id)
+      : undefined,
+  );
+  const level = card?.level ?? target.level ?? member?.level;
   const blocked = useSyncExternalStore(blacklist.subscribe, () =>
     blacklist.read(user.id).some((v) => v.id === target.id),
   );
@@ -91,16 +99,22 @@ export function UserCardDialog({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      className={`${styles.dialog} ${list === 'collection' ? styles.collection : list ? styles.relationships : !card?.cover ? styles.compact : ''}`}
+      className={`${styles.dialog} ${list === 'collection' ? styles.collection : list ? styles.relationships : card?.cover ? styles.featured : ''}`}
       showCloseAction={false}
       dismissLabel="关闭用户卡片"
+      dismissClassName={!list && card?.cover ? (styles.coverDismiss ?? '') : ''}
     >
-      <div className={styles.content} data-cover={!!card?.cover} hidden={!!list}>
+      <div className={styles.content} hidden={!!list}>
+        {card?.cover && (
+          <div className={styles.coverPanel}>
+            <UserCardMedia key={card.cover} src={card.cover} name={name} />
+          </div>
+        )}
         <ScrollArea label="用户卡片内容" gutter="reserved" className={styles.scroll ?? ''}>
           <div className={styles.body}>
             {state.status === 'loading' && <LoadingIndicator>正在读取用户资料…</LoadingIndicator>}
             {state.status === 'error' && (
-              <div>
+              <div className={styles.state}>
                 <p role="alert">{state.message}</p>
                 <Button variant="secondary" onClick={resource.retry}>
                   重试资料
@@ -108,7 +122,7 @@ export function UserCardDialog({
               </div>
             )}
             {state.status === 'ready' && !card && (
-              <div>
+              <div className={styles.state}>
                 <p role="status">该用户资料暂不可用</p>
                 <Button variant="secondary" onClick={resource.retry}>
                   重新读取
@@ -116,24 +130,50 @@ export function UserCardDialog({
               </div>
             )}
             {card && (
-              <div className={styles.layout}>
-                <div className={styles.info}>
-                  <div className={styles.identity}>
-                    <div className={styles.avatar}>
-                      <SourceAvatar name={name} src={card.avatar} size="profile" />
-                      {card.frame && (
-                        <UserCardMedia key={card.frame} src={card.frame} name={name} frame />
-                      )}
-                    </div>
-                    <div className={styles.name}>
-                      <h3>
-                        {remark || name}
-                        {card.vip && <span className={styles.vip}>会员</span>}
-                      </h3>
-                      {remark && <p>{name}</p>}
-                    </div>
+              <div className={styles.info}>
+                <div className={styles.identity}>
+                  <div className={styles.avatar}>
+                    <SourceAvatar name={name} src={card.avatar} size="profile" />
+                    {card.frame && (
+                      <UserCardMedia key={card.frame} src={card.frame} name={name} frame />
+                    )}
                   </div>
+                  <div className={styles.name}>
+                    <h3>
+                      {remark || name}
+                      {card.vip && <span className={styles.vip}>会员</span>}
+                    </h3>
+                    {remark && <p>{name}</p>}
+                    <UserCardTitles
+                      current={card.titleId ?? target.titleId ?? member?.titleId}
+                      owned={card.titleIds ?? target.titleIds ?? member?.titleIds}
+                      level={level}
+                    />
+                  </div>
+                  {card.profile && <p className={styles.profile}>{card.profile}</p>}
+                </div>
+                <div className={styles.commands}>
+                  <UserCardCounts card={card} triggerRef={listTrigger} onSelect={setList} />
                   <div className={styles.actions}>
+                    {!self && (
+                      <Button
+                        variant={
+                          state.status === 'ready' && state.following ? 'secondary' : 'primary'
+                        }
+                        disabled={
+                          resource.busy || state.status !== 'ready' || state.following === null
+                        }
+                        onClick={() => void resource.toggleFollow()}
+                      >
+                        {resource.busy ? (
+                          <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
+                        ) : state.status === 'ready' && state.following ? (
+                          '取消关注'
+                        ) : (
+                          '关注'
+                        )}
+                      </Button>
+                    )}
                     <Button
                       ref={remarkRef}
                       variant="secondary"
@@ -158,83 +198,49 @@ export function UserCardDialog({
                         复制ID
                       </Button>
                     )}
-                    {!self && (
-                      <Button
-                        disabled={
-                          resource.busy || state.status !== 'ready' || state.following === null
-                        }
-                        onClick={() => void resource.toggleFollow()}
-                      >
-                        {resource.busy ? (
-                          <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
-                        ) : state.status === 'ready' && state.following ? (
-                          '取消关注'
-                        ) : (
-                          '关注'
-                        )}
-                      </Button>
-                    )}
                   </div>
-                  {state.status === 'ready' && state.followError && (
-                    <div>
-                      <p role="alert">{state.followError}</p>
-                      <Button variant="secondary" onClick={resource.retry}>
-                        重试关注状态
-                      </Button>
-                    </div>
-                  )}
-                  <UserCardCounts card={card} triggerRef={listTrigger} onSelect={setList} />
-                  {(card.titleId ||
-                    target.titleId ||
-                    card.level !== undefined ||
-                    target.level !== undefined) && (
-                    <SenderTitle
-                      titleId={card.titleId ?? target.titleId}
-                      level={card.level ?? target.level}
-                      preview
-                    />
-                  )}
-                  {card.profile && <p className={styles.profile}>{card.profile}</p>}
-                  <dl className={styles.details}>
-                    <div>
-                      <dt>等级</dt>
-                      <dd>{card.level ?? target.level ?? '未提供'}</dd>
-                    </div>
-                    <div>
-                      <dt>地区</dt>
-                      <dd>{card.region || target.region || '未提供'}</dd>
-                    </div>
-                    {user.role === 'admin' && (
-                      <div>
-                        <dt>管理员</dt>
-                        <dd>{card.admin ? '是' : '否'}</dd>
-                      </div>
-                    )}
-                  </dl>
-                  <UserCardLinks
-                    iconOnly={!!card.cover}
-                    onVisit={(kind) => {
-                      if (kind !== 'pet') onClose();
-                      onVisit(kind, target.id);
-                    }}
-                    onCollection={(trigger) => {
-                      listTrigger.current = trigger;
-                      setList('collection');
-                    }}
-                  />
-                  {user.role === 'admin' && !self && (
-                    <UserCardModeration port={port} id={target.id} />
-                  )}
                 </div>
+                {state.status === 'ready' && state.followError && (
+                  <div className={styles.followError}>
+                    <p role="alert">{state.followError}</p>
+                    <Button variant="secondary" onClick={resource.retry}>
+                      重试关注状态
+                    </Button>
+                  </div>
+                )}
+                <dl className={styles.details}>
+                  <div>
+                    <dt>
+                      <ChartNoAxesColumnIncreasing size={14} aria-hidden="true" />
+                      等级
+                    </dt>
+                    <dd>{level ?? '未提供'}</dd>
+                  </div>
+                  <div className={styles.region}>
+                    <dt>
+                      <MapPin size={14} aria-hidden="true" />
+                      地区
+                    </dt>
+                    <dd>{card.region || target.region || '未提供'}</dd>
+                  </div>
+                </dl>
+                <UserCardLinks
+                  onVisit={(kind) => {
+                    if (kind !== 'pet') onClose();
+                    onVisit(kind, target.id);
+                  }}
+                  onCollection={(trigger) => {
+                    listTrigger.current = trigger;
+                    setList('collection');
+                  }}
+                />
+                {user.role === 'admin' && !self && (
+                  <UserCardModeration port={port} id={target.id} />
+                )}
               </div>
             )}
           </div>
         </ScrollArea>
-        {card?.cover && (
-          <div className={styles.coverPanel}>
-            <UserCardMedia key={card.cover} src={card.cover} name={name} />
-          </div>
-        )}
       </div>
       <div className={styles.footer} hidden={!!list}>
         {feedback.message && <p role={feedback.error ? 'alert' : 'status'}>{feedback.message}</p>}

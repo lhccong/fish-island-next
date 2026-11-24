@@ -1,4 +1,5 @@
 import type { UserCard } from '@/domain/account-tools';
+import { decodeTitleId, decodeTitleIds } from '@/domain/chat';
 
 export function readNonNegativeInteger(raw: unknown): number | undefined {
   const value = typeof raw === 'string' && /^\d+$/.test(raw) ? Number(raw) : raw;
@@ -29,6 +30,7 @@ export function decodeUserCard(value: unknown): UserCard | null {
     region: [text('country').trim(), text('region').trim()].filter(Boolean).join(' · '),
     vip: v.vip === true || v.isVip === true,
     admin: v.userRole === 'admin' || v.isAdmin === true,
-    titleId: typeof v.titleId === 'number' ? String(v.titleId) : text('titleId') || undefined,
+    titleId: decodeTitleId(v.titleId),
+    titleIds: decodeTitleIds(v.titleIdList),
   };
 }

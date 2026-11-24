@@ -12,6 +12,7 @@ export interface UserCard {
   vip: boolean;
   admin: boolean;
   titleId: string | undefined;
+  titleIds: readonly string[] | undefined;
 }
 export interface UserMute {
   muted: boolean;

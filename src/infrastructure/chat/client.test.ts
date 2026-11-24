@@ -34,6 +34,12 @@ describe('online members adapter', () => {
     for (const data of [null, {}, [{ name: '无标识' }], [{ id: Number.MAX_SAFE_INTEGER + 1 }]])
       expect(() => decodeOnlineMembers(data)).toThrow('数据格式异常');
   });
+
+  it('keeps the title snapshot available to cards opened from the member list', () => {
+    expect(
+      decodeOnlineMembers([{ id: '1', name: '合成岛友', titleId: '7', titleIdList: '["7",2,2]' }]),
+    ).toMatchObject([{ id: '1', titleId: '7', titleIds: ['7', '2'] }]);
+  });
   it('passes credentials and cancellation and handles expiry and invalid payloads', async () => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
     const expired = vi.fn();

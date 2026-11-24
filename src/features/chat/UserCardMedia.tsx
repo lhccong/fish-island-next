@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import styles from './UserCard.module.css';
 export function UserCardMedia({
   src,
@@ -9,15 +10,28 @@ export function UserCardMedia({
   name: string;
   frame?: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) return frame ? null : <div className={styles.coverEmpty}>封面暂时无法显示</div>;
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   return (
-    <img
-      className={frame ? styles.frame : styles.cover}
-      src={src}
-      alt={frame ? '' : `${name}的封面`}
-      referrerPolicy="no-referrer"
-      onError={() => setFailed(true)}
-    />
+    <>
+      {status !== 'error' && (
+        <img
+          className={frame ? styles.frame : styles.cover}
+          src={src}
+          alt={frame ? '' : `${name}的封面`}
+          referrerPolicy="no-referrer"
+          onLoad={frame ? undefined : () => setStatus('ready')}
+          onError={() => setStatus('error')}
+        />
+      )}
+      {!frame && status !== 'ready' && (
+        <div className={styles.coverState}>
+          {status === 'loading' ? (
+            <LoadingIndicator compact>正在加载封面…</LoadingIndicator>
+          ) : (
+            <span role="status">封面暂时无法显示</span>
+          )}
+        </div>
+      )}
+    </>
   );
 }

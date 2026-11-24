@@ -87,7 +87,7 @@ it('validates unknown envelopes and normalizes safe IDs without parsing HTML', (
     data: {
       message: {
         id: 1,
-        sender: { id: '2', name: '合成用户', titleId: 7 },
+        sender: { id: '2', name: '合成用户', titleId: 7, titleIdList: '["7",2]' },
         timestamp: '2026-11-12T00:00:00Z',
         content: '<img onerror=alert(1)>',
       },
@@ -95,7 +95,12 @@ it('validates unknown envelopes and normalizes safe IDs without parsing HTML', (
   };
   expect(decodeChatEvent(JSON.stringify(frame))).toMatchObject({
     type: 'message',
-    message: { id: '1', senderTitleId: '7', content: '<img onerror=alert(1)>' },
+    message: {
+      id: '1',
+      senderTitleId: '7',
+      senderTitleIds: ['7', '2'],
+      content: '<img onerror=alert(1)>',
+    },
   });
   expect(decodeChatEvent(JSON.stringify({ type: 'userMessageRevoke', data: 1 }))).toEqual({
     type: 'revoke',

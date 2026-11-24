@@ -14,6 +14,7 @@ const data = {
   followerCount: '5',
   followingCount: '0',
   titleId: 1,
+  titleIdList: '[2,"1",7,"11",7,0,null]',
 };
 for (const skin of builtinSkins)
   for (const mode of ['light', 'dark']) {
@@ -46,7 +47,14 @@ for (const skin of builtinSkins)
       fixture.broadcast({
         id: '7001',
         content: '用户卡片验证',
-        sender: { id: '456', name: '合成岛友', country: '合成国家', region: '合成地区' },
+        sender: {
+          id: '456',
+          name: '合成岛友',
+          country: '合成国家',
+          region: '合成地区',
+          titleId: 3,
+          titleIdList: '["4",3]',
+        },
         timestamp: 1794441607001,
       });
       const input = page.getByRole('textbox', { name: '消息草稿', exact: true });
@@ -82,36 +90,56 @@ for (const skin of builtinSkins)
       const cover = card.getByRole('img', { name: '合成岛友的封面', exact: true });
       const coverBox = (await cover.boundingBox())!;
       const scrollBox = (await scroll.boundingBox())!;
+      const dialogBox = (await card.boundingBox())!;
       expect(await cover.evaluate((el) => getComputedStyle(el).objectFit)).toBe('cover');
-      if (page.viewportSize()!.width > 760) {
-        expect((await card.boundingBox())!.width).toBe(680);
-        const dialogBox = (await card.boundingBox())!;
-        expect(coverBox.width).toBeGreaterThanOrEqual(450);
-        expect(coverBox.width / dialogBox.width).toBeGreaterThan(0.66);
-        expect(
-          Math.abs(coverBox.x + coverBox.width - (dialogBox.x + dialogBox.width)),
-        ).toBeLessThanOrEqual(1);
-        expect(Math.abs(coverBox.height - scrollBox.height)).toBeLessThanOrEqual(1);
-        expect(Math.abs(coverBox.y - scrollBox.y)).toBeLessThanOrEqual(1);
-        expect(coverBox.x).toBeGreaterThanOrEqual(scrollBox.x + scrollBox.width);
-      } else {
-        expect(coverBox.height).toBe(140);
-        expect(scrollBox.y).toBeGreaterThanOrEqual(coverBox.y + coverBox.height);
-      }
+      const mobile = page.viewportSize()!.width <= 760;
+      expect(dialogBox.width).toBe(mobile ? page.viewportSize()!.width - 16 : 520);
+      expect(coverBox.width).toBe(dialogBox.width);
+      expect(coverBox.height).toBe(scrollBox.height);
+      expect(coverBox.y).toBe(scrollBox.y);
       const layout = await scroll.evaluate((el) => {
         const body = el.firstElementChild!.firstElementChild!;
         const a = el.getBoundingClientRect();
-        const b = body.firstElementChild!.getBoundingClientRect();
+        const panel = body.firstElementChild!;
+        const b = panel.getBoundingClientRect();
+        const avatar = panel.querySelector('img')!.getBoundingClientRect();
         return {
           gap: a.right - b.right,
           top: b.top - a.top,
+          avatarOverlap: b.top - avatar.top,
+          innerGap: a.right - panel.lastElementChild!.getBoundingClientRect().right,
           overflow: el.scrollWidth - el.clientWidth,
         };
       });
-      expect(layout.gap).toBeGreaterThanOrEqual(page.viewportSize()!.width <= 760 ? 20 : 24);
-      expect(layout.top).toBeGreaterThanOrEqual(4);
+      expect(layout.gap).toBeGreaterThanOrEqual(mobile ? 20 : 24);
+      expect(layout.innerGap).toBeGreaterThanOrEqual(mobile ? 20 : 24);
+      const height = page.viewportSize()!.height;
+      const reveal = mobile
+        ? Math.max(156, Math.min(height * 0.26, 226))
+        : Math.max(220, Math.min(height * 0.3, 276));
+      expect(Math.abs(layout.top - reveal)).toBeLessThanOrEqual(1);
+      expect(layout.avatarOverlap).toBeGreaterThan(16);
       expect(layout.overflow).toBeLessThanOrEqual(1);
+      const titles = card.getByRole('list', { name: '称号' });
+      const badges = titles.getByRole('img');
+      await expect(badges).toHaveCount(4);
+      await expect(badges.nth(0)).toHaveAccessibleName('天使投资人');
+      await expect(badges.nth(1)).toHaveAccessibleName('首席摸鱼官');
+      await expect(badges.nth(2)).toHaveAccessibleName('电玩少女');
+      await expect(badges.nth(3)).toHaveAccessibleName('汉堡大王');
+      await expect(titles).toHaveCSS('list-style-type', 'none');
+      const firstBadge = (await badges.nth(0).boundingBox())!;
+      const secondBadge = (await badges.nth(1).boundingBox())!;
+      expect(secondBadge.x).toBeGreaterThan(firstBadge.x + firstBadge.width);
+      expect(Math.abs(secondBadge.y - firstBadge.y)).toBeLessThanOrEqual(1);
+      if (!mobile) {
+        const lastBadge = (await badges.nth(3).boundingBox())!;
+        expect(Math.abs(lastBadge.y - firstBadge.y)).toBeLessThanOrEqual(1);
+      }
       await scroll.hover();
+      const scrollbar = scroll.locator('+ [data-orientation="vertical"]');
+      if (mobile) await expect(scrollbar).toHaveCSS('visibility', 'hidden');
+      else await expect(scrollbar).toHaveCSS('opacity', '1');
       await page.screenshot({ path: info.outputPath('user-card-top.png') });
       await card.getByRole('button', { name: '关注', exact: true }).click();
       const processing = page.getByRole('status').filter({ hasText: '处理中…' });
@@ -156,6 +184,16 @@ for (const skin of builtinSkins)
       await scroll.evaluate((el) => {
         el.scrollTop = el.scrollHeight;
       });
+      const shortcuts = card.getByRole('group', { name: '用户空间' }).getByRole('button');
+      await expect(shortcuts).toHaveText(['宠物', '农场', '卡片收藏', '动态']);
+      const boxes = await shortcuts.evaluateAll((buttons) =>
+        buttons.map((button) => {
+          const { width, height, top } = button.getBoundingClientRect();
+          return { width, height, top };
+        }),
+      );
+      expect(new Set(boxes.map((box) => box.top)).size).toBe(1);
+      expect(boxes.every(({ width, height }) => width >= 44 && height >= 44)).toBe(true);
       await card.getByRole('button', { name: '动态', exact: true }).focus();
       await expect(card.getByRole('button', { name: '动态', exact: true })).toBeInViewport();
       await page.screenshot({ path: info.outputPath('user-card-bottom.png') });
@@ -229,5 +267,12 @@ for (const skin of builtinSkins)
       if (page.viewportSize()!.width <= 760) await closeCard.tap();
       else await closeCard.click();
       await expect(name).toBeFocused();
+
+      await click();
+      await expect.poll(() => reads).toBe(7);
+      await read!.fulfill({ json: { code: 0, data: { id: '456', userName: '合成岛友' } } });
+      await expect(badges).toHaveCount(2);
+      await expect(badges.nth(0)).toHaveAccessibleName('白金摸鱼官');
+      await expect(badges.nth(1)).toHaveAccessibleName('梦幻摸鱼官');
     });
   }

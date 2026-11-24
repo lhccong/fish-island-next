@@ -14,6 +14,7 @@ export interface UserCardTarget {
   returnFocusRef: RefObject<HTMLElement | null>;
   level?: number | undefined;
   titleId?: string | undefined;
+  titleIds?: readonly string[] | undefined;
   region?: string | undefined;
 }
 export const UserCardContext = createContext<(target: UserCardTarget) => void>(() => {});

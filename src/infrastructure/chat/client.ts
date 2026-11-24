@@ -1,4 +1,10 @@
-import { chatImageUrl, type OnlineMember, type OnlineMembersPort } from '@/domain/chat';
+import {
+  chatImageUrl,
+  decodeTitleId,
+  decodeTitleIds,
+  type OnlineMember,
+  type OnlineMembersPort,
+} from '@/domain/chat';
 import type { SessionToken } from '@/domain/auth';
 
 function record(value: unknown): Record<string, unknown> {
@@ -27,10 +33,14 @@ export function decodeOnlineMembers(value: unknown): readonly OnlineMember[] {
         /* 非有效图片地址时使用姓名占位。 */
       }
     }
+    const titleId = decodeTitleId(data.titleId);
+    const titleIds = decodeTitleIds(data.titleIdList);
     members.set(String(data.id), {
       id: String(data.id),
       name: typeof data.name === 'string' && data.name.trim() ? data.name.trim() : '未命名岛友',
       avatar,
+      ...(titleId !== undefined ? { titleId } : {}),
+      ...(titleIds !== undefined ? { titleIds } : {}),
       ...(typeof data.level === 'number' && Number.isSafeInteger(data.level) && data.level >= 0
         ? { level: data.level }
         : {}),

@@ -19,7 +19,7 @@ export { parseEmojiText } from './emoji';
 export { parseInvitationText } from './game-invitation';
 export type { InvitationGame } from './game-invitation';
 export type { ChatImageUploadPort } from './image-upload';
-export { senderTitle, memberLevelEmoji } from './sender-title';
+export { decodeTitleId, decodeTitleIds, senderTitle, memberLevelEmoji } from './sender-title';
 export { sortMembersByLevel } from './member-order';
 export type { ChatEmoticon, ChatEmoticonPort } from './emoticons';
 export { parseBigFishEmoticonKeyword } from './big-fish-emoticon';
@@ -48,6 +48,7 @@ export interface ReceivedMessage {
   senderId: string;
   senderName: string;
   senderTitleId?: string;
+  senderTitleIds?: readonly string[];
   senderLevel?: number;
   senderRegion?: string;
   senderAvatar?: string | null;
@@ -104,6 +105,8 @@ export interface OnlineMember {
   avatar: string | null;
   avatarFrameUrl?: string | undefined;
   level?: number | undefined;
+  titleId?: string;
+  titleIds?: readonly string[];
 }
 
 export interface OnlineMembersPort {

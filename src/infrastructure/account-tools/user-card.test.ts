@@ -34,6 +34,21 @@ it('keeps unavailable profile fields unknown and rejects unsafe image sources', 
     region: '',
   });
 });
+it('reads ordered title IDs from legacy lists and distinguishes an empty list from a missing one', () => {
+  expect(
+    decodeUserCard({
+      id: '1',
+      titleId: '2',
+      titleIdList: '[4,"4",0,"2","90071992547409921",9007199254740992,null,"wrong"]',
+    }),
+  ).toMatchObject({ titleId: '2', titleIds: ['4', '2', '90071992547409921'] });
+  expect(decodeUserCard({ id: '1', titleId: 0, titleIdList: [] })).toMatchObject({
+    titleId: '0',
+    titleIds: [],
+  });
+  expect(decodeUserCard({ id: '1', titleIdList: '[invalid' })?.titleIds).toBeUndefined();
+  expect(decodeUserCard({ id: '1' })?.titleIds).toBeUndefined();
+});
 it('adapts follow and mute protocols and requires server confirmation', async () => {
   const fetcher = vi.fn();
   vi.stubGlobal('fetch', fetcher);

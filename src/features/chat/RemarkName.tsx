@@ -9,6 +9,7 @@ export function RemarkName({
   interactive = true,
   level,
   titleId,
+  titleIds,
   region,
   displayName,
 }: {
@@ -17,6 +18,7 @@ export function RemarkName({
   interactive?: boolean;
   level?: number | undefined;
   titleId?: string | undefined;
+  titleIds?: readonly string[] | undefined;
   region?: string | undefined;
   displayName?: string | undefined;
 }) {
@@ -32,7 +34,7 @@ export function RemarkName({
       className={styles.name}
       title={displayName || (remark ? `${remark}（${name}）` : name)}
       aria-label={`查看${displayName || name}的用户卡片`}
-      onClick={() => open({ id, name, level, titleId, region, returnFocusRef: ref })}
+      onClick={() => open({ id, name, level, titleId, titleIds, region, returnFocusRef: ref })}
     >
       {displayName || remark || name}
     </button>
