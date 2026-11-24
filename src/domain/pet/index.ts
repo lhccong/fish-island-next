@@ -291,6 +291,7 @@ export type {
   PetCardBatchResult,
   PetCardCollectionPort,
   PetCardHistoryPage,
+  PetCardLevelProgress,
   PetCardOpening,
   PetCardOwned,
   PetCardPlayAction,

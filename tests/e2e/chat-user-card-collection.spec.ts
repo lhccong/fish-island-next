@@ -15,6 +15,12 @@ const collectionNames: Partial<Record<number, string>> = {
   6: '用于检查窄屏自然换行的合成卡片名称',
   19: '超长卡片名称'.repeat(13),
 };
+const collectionProgress = {
+  ready: { level: 10, completed: 3, required: 6 },
+  empty: { level: 1, completed: 0, required: 3 },
+  max: { level: 60, completed: 0, required: 0 },
+  legacy: undefined,
+};
 
 async function scrollCollection(page: Page, list: Locator, mobile: boolean) {
   if (!mobile) {
@@ -78,7 +84,7 @@ for (const skin of builtinSkins)
         route.fulfill({ path: 'public/assets/pet/card-art-three-kingdoms-wei.jpg' }),
       );
       const initial = Promise.withResolvers<void>();
-      let phase: 'initial' | 'ready' | 'empty' = 'initial';
+      let phase: 'initial' | 'ready' | 'empty' | 'max' | 'legacy' = 'initial';
       let continuationRequests = 0;
       let requests = 0;
       await page.route('**/api/pet/cards/collection?*', async (route) => {
@@ -111,6 +117,7 @@ for (const skin of builtinSkins)
                       portrait: id === 5,
                     })),
               total: phase === 'empty' ? '0' : '21',
+              progress: current === '1' ? collectionProgress[phase] : undefined,
             },
           },
         });
@@ -135,10 +142,12 @@ for (const skin of builtinSkins)
         await page.keyboard.press('Enter');
       }
       const retry = dialog.getByRole('button', { name: '重试卡片收藏' });
+      const progress = dialog.getByRole('progressbar', { name: '抽卡升级进度' });
       await expect(dialog.getByRole('heading', { name: '合成岛友的卡片收藏' })).toBeVisible({
         timeout: 15_000,
       });
       await expect(dialog.getByText('正在读取卡片收藏…', { exact: true })).toBeVisible();
+      await expect(progress).toHaveCount(0);
       initial.resolve();
       await expect(dialog.getByRole('alert')).toHaveText('合成初始查询失败');
       phase = 'ready';
@@ -146,6 +155,17 @@ for (const skin of builtinSkins)
       else await retry.click();
       const list = dialog.getByRole('region', { name: '卡片收藏列表' });
       await expect(list.getByRole('listitem')).toHaveCount(20);
+      await expect(dialog.getByText('Lv.10', { exact: true })).toBeVisible();
+      await expect(dialog.getByText('3 / 6 包', { exact: true })).toBeVisible();
+      await expect(progress).toHaveAttribute('aria-valuetext', '本级已拆 3 包，共需 6 包');
+      await expect(progress).toHaveJSProperty('position', 0.5);
+      const bar = (await progress.boundingBox())!;
+      const viewport = (await list.boundingBox())!;
+      expect(bar.x).toBeGreaterThanOrEqual(viewport.x + 4);
+      expect(bar.x + bar.width).toBeLessThanOrEqual(
+        viewport.x + viewport.width - (mobile ? 20 : 24),
+      );
+      expect(bar.y + bar.height).toBeLessThan(viewport.y);
       const cards = list.getByRole('listitem');
       for (const [index, grade] of grades.entries()) {
         const card = cards.nth(index);
@@ -249,6 +269,8 @@ for (const skin of builtinSkins)
       await scrollCollection(page, list, mobile);
       await expect(list.getByText('已全部加载')).toBeInViewport();
       await expect(list.getByText('合成卡片 21', { exact: true })).toBeInViewport();
+      await expect(progress).toBeInViewport({ ratio: 1 });
+      await expect(progress).toHaveJSProperty('position', 0.5);
       expect(continuationRequests).toBe(2);
       const back = dialog.getByRole('button', { name: '返回用户卡片' });
       if (mobile) await back.tap();
@@ -262,6 +284,22 @@ for (const skin of builtinSkins)
       await expect(trigger).toHaveText('卡片收藏');
       await trigger.click();
       await expect(dialog.getByText('还没有收藏卡片')).toBeVisible();
+      await expect(dialog.getByText('Lv.1', { exact: true })).toBeVisible();
+      await expect(progress).toHaveJSProperty('position', 0);
+
+      await back.click();
+      phase = 'max';
+      await trigger.click();
+      await expect(dialog.getByText('Lv.60', { exact: true })).toBeVisible();
+      await expect(dialog.getByText('已满级', { exact: true })).toBeVisible();
+      await expect(progress).toHaveAttribute('aria-valuetext', '已满级');
+      await expect(progress).toHaveJSProperty('position', 1);
+
+      await back.click();
+      phase = 'legacy';
+      await trigger.click();
+      await expect(list.getByRole('listitem')).toHaveCount(20);
+      await expect(progress).toHaveCount(0);
       await dialog.getByRole('button', { name: '关闭用户卡片' }).click();
       await expect(sender).toBeFocused();
       expect(fixture.stats().connections).toBe(1);

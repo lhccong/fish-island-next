@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export interface ScrollPage<T> {
+export interface ScrollPage<T, TSummary = never> {
   items: T[];
   total: number;
+  summary?: TSummary;
 }
-type Result<T> =
+type Result<T, TSummary> =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; data: ScrollPage<T> };
+  | { status: 'ready'; data: ScrollPage<T, TSummary> };
 
-export function useInfinitePages<T extends { id: string }>(
-  load: (page: number, signal: AbortSignal) => Promise<ScrollPage<T>>,
+export function useInfinitePages<T extends { id: string }, TSummary = never>(
+  load: (page: number, signal: AbortSignal) => Promise<ScrollPage<T, TSummary>>,
 ) {
   const [revision, setRevision] = useState(0);
-  const [result, setResult] = useState<Result<T>>({ status: 'loading' });
+  const [result, setResult] = useState<Result<T, TSummary>>({ status: 'loading' });
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [hasMore, setHasMore] = useState(false);
@@ -29,6 +30,7 @@ export function useInfinitePages<T extends { id: string }>(
     let pending = false;
     let more = true;
     const items = new Map<string, T>();
+    let summary: TSummary | undefined;
     async function fetchPage() {
       if (pending || !more || controller.signal.aborted) return;
       pending = true;
@@ -45,10 +47,18 @@ export function useInfinitePages<T extends { id: string }>(
         if (controller.signal.aborted) return;
         const previousSize = items.size;
         for (const item of data.items) items.set(item.id, item);
+        if (!page) summary = data.summary;
         page += 1;
         more = items.size > previousSize && items.size < data.total;
         setHasMore(more);
-        setResult({ status: 'ready', data: { items: [...items.values()], total: data.total } });
+        setResult({
+          status: 'ready',
+          data: {
+            items: [...items.values()],
+            total: data.total,
+            ...(summary === undefined ? {} : { summary }),
+          },
+        });
       } catch (e) {
         if (controller.signal.aborted) return;
         const message = e instanceof Error ? e.message : '加载失败';

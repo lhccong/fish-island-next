@@ -26,6 +26,8 @@ export function UserPetCardCollection({
   );
   const pages = useInfinitePages(load);
   const { result } = pages;
+  const progress = result.status === 'ready' ? result.data.summary : undefined;
+  const maxLevel = progress?.required === 0;
   useEffect(() => back.current?.focus(), []);
 
   return (
@@ -37,6 +39,29 @@ export function UserPetCardCollection({
         </Button>
         <h3>{name}的卡片收藏</h3>
       </header>
+      {progress && (
+        <div className={styles.level}>
+          <div className={styles.levelDetails}>
+            <span>
+              抽卡等级 <strong>Lv.{progress.level}</strong>
+            </span>
+            <span className={styles.levelCount}>
+              {maxLevel ? '已满级' : `${progress.completed} / ${progress.required} 包`}
+            </span>
+          </div>
+          <progress
+            className={styles.levelBar}
+            aria-label="抽卡升级进度"
+            aria-valuetext={
+              maxLevel
+                ? '已满级'
+                : `本级已拆 ${progress.completed} 包，共需 ${progress.required} 包`
+            }
+            max={maxLevel ? 1 : progress.required}
+            value={maxLevel ? 1 : progress.completed}
+          />
+        </div>
+      )}
       {result.status === 'loading' && <LoadingIndicator>正在读取卡片收藏…</LoadingIndicator>}
       {result.status === 'error' && (
         <div className={styles.feedback}>

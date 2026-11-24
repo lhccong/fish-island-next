@@ -14,12 +14,18 @@ export interface CollectedPetCard {
   art: PetCardImage;
 }
 
+export interface PetCardLevelProgress {
+  level: number;
+  completed: number;
+  required: number;
+}
+
 export interface PetCardCollectionPort {
   collection(
     userId: string,
     page: number,
     signal: AbortSignal,
-  ): Promise<{ items: CollectedPetCard[]; total: number }>;
+  ): Promise<{ items: CollectedPetCard[]; total: number; summary?: PetCardLevelProgress }>;
 }
 
 export interface PetCardOwned {

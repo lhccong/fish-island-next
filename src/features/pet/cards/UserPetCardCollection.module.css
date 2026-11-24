@@ -18,6 +18,53 @@
   font-size: 1.0625rem;
   line-height: 1.35;
 }
+.level {
+  display: grid;
+  flex: none;
+  gap: 8px;
+  margin: 0 24px 12px 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.levelDetails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 12px;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.levelDetails strong,
+.levelCount {
+  font-variant-numeric: tabular-nums;
+}
+.levelCount {
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.levelBar {
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-border);
+  accent-color: var(--color-accent-text);
+}
+.levelBar::-webkit-progress-bar {
+  background: var(--color-border);
+}
+.levelBar::-webkit-progress-value {
+  background: var(--color-accent-text);
+}
+.levelBar::-moz-progress-bar {
+  background: var(--color-accent-text);
+}
 .feedback {
   flex: 1;
   display: flex;
@@ -235,6 +282,9 @@
   fill: var(--color-pet-enhance-gold);
 }
 @media (max-width: 760px) {
+  .level {
+    margin-inline-end: 20px;
+  }
   .cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

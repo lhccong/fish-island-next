@@ -2,6 +2,7 @@ import type { SessionToken } from '@/domain/auth';
 import type {
   PetCardCollectionPort,
   PetCardBatchResult,
+  PetCardLevelProgress,
   PetCardOpening,
   PetCardOwned,
   PetCardPlayPort,
@@ -84,6 +85,23 @@ function state(value: unknown): PetCardPlayState {
   };
 }
 
+function levelProgress(value: unknown): PetCardLevelProgress | null {
+  if (value == null) return null;
+  const data = record(value);
+  const level = number(data.level, -1);
+  const completed = number(data.completed, -1);
+  const required = number(data.required, -1);
+  if (
+    ![level, completed, required].every(Number.isSafeInteger) ||
+    level < 1 ||
+    completed < 0 ||
+    required < 0 ||
+    (required === 0 ? completed !== 0 : completed >= required)
+  )
+    throw new Error('抽卡等级进度数据无效');
+  return { level, completed, required };
+}
+
 export function createPetCardPlay(
   baseUrl: string,
   token: () => SessionToken | null,
@@ -130,7 +148,8 @@ export function createPetCardPlay(
           art: { url: petCardArtUrl(baseUrl, key), tile, portrait: card.portrait },
         };
       });
-      return { items, total };
+      const progress = levelProgress(data.progress);
+      return { items, total, ...(progress && { summary: progress }) };
     },
     async submit(action, requestId, signal) {
       return state(await request('pet/cards/actions', signal, { ...action, requestId }));
