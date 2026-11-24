@@ -1,16 +1,6 @@
-import { readFile, writeFile } from 'node:fs/promises';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
-
-async function controlled(page: Page) {
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-    if (navigator.serviceWorker.controller) return;
-    await new Promise<void>((resolve) =>
-      navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true }),
-    );
-  });
-}
+import { controlled, publishUpdate } from './helpers/pwa';
 
 test('install assets, cache isolation, offline deep links and safe updates', async ({
   page,
@@ -126,28 +116,18 @@ test('install assets, cache isolation, offline deep links and safe updates', asy
     ),
   ).toBe(false);
   await context.setOffline(false);
-  const workerPath = '.tmp-pwa-20261116/build/sw.js';
-  const original = await readFile(workerPath, 'utf8');
-  try {
+  await publishUpdate(async () => {
     await page.evaluate(async () => {
       await caches.open('unrelated-cache');
       await caches.open('fish-island-pwa-obsolete');
       sessionStorage.setItem('pwa-draft-probe', '草稿保持');
     });
-    await writeFile(
-      workerPath,
-      original.replace(
-        /const CACHE_NAME = CACHE_PREFIX \+ '[^']+';/,
-        "const CACHE_NAME = CACHE_PREFIX + 'update-test';",
-      ),
-    );
-    await page.evaluate(async () => {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.update();
-    });
+    await page.evaluate(() => window.dispatchEvent(new Event('online')));
     await expect
       .poll(() => page.evaluate(async () => !!(await navigator.serviceWorker.ready).waiting))
       .toBe(true);
+    const notice = page.getByRole('region', { name: '网站更新' });
+    await expect(notice).toBeVisible();
     expect(await page.evaluate(() => sessionStorage.getItem('pwa-draft-probe'))).toBe('草稿保持');
     await page.close();
     const next = await context.newPage();
@@ -160,9 +140,8 @@ test('install assets, cache isolation, offline deep links and safe updates', asy
     expect(names.filter((name) => name.startsWith('fish-island-pwa-'))).toEqual([
       'fish-island-pwa-update-test',
     ]);
-  } finally {
-    await writeFile(workerPath, original);
-  }
+    await expect(next.locator('meta[name="pwa-e2e-update"]')).toHaveCount(1);
+  });
 });
 
 for (const skin of builtinSkins) {

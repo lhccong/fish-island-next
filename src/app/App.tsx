@@ -13,6 +13,7 @@ import { trackFocusInput } from '@/shared/ui/FocusOutline';
 import { SiteFooter } from '@/app/components/SiteFooter';
 import { BroadcastSession } from '@/app/components/BroadcastSession';
 import { MobileViewport } from '@/app/components/MobileViewport';
+import { PwaUpdateNotice } from '@/app/pwa';
 
 export function App() {
   useEffect(() => trackFocusInput(document), []);
@@ -24,6 +25,7 @@ export function App() {
         <ChatConnectionProvider>
           <SkinProvider>
             <BroadcastSession />
+            <PwaUpdateNotice />
             <NotificationSessionProvider>
               <SignInSessionProvider>
                 <PageFooterProvider footer={<SiteFooter />}>

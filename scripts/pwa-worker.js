@@ -21,6 +21,10 @@ self.addEventListener('install', (event) => {
   );
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data === 'FISH_ISLAND_ACTIVATE_UPDATE') event.waitUntil(self.skipWaiting());
+});
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {

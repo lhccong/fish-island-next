@@ -91,7 +91,7 @@ export function UserCardDialog({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      className={`${styles.dialog} ${list ? styles.relationships : !card?.cover ? styles.compact : ''}`}
+      className={`${styles.dialog} ${list === 'collection' ? styles.collection : list ? styles.relationships : !card?.cover ? styles.compact : ''}`}
       showCloseAction={false}
       dismissLabel="关闭用户卡片"
     >

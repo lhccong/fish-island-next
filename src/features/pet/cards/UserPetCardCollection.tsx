@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles, Star } from 'lucide-react';
 import { petCardGrades, type PetCardCollectionPort } from '@/domain/pet';
 import { Button } from '@/shared/ui/Button';
 import { CardAtlasImage } from '@/shared/ui/CardAtlasImage';
@@ -31,9 +31,9 @@ export function UserPetCardCollection({
   return (
     <section className={styles.collection} aria-label="卡片收藏">
       <header className={styles.header}>
-        <Button ref={back} variant="secondary" onClick={onBack}>
+        <Button ref={back} variant="secondary" onClick={onBack} aria-label="返回用户卡片">
           <ArrowLeft size={16} aria-hidden="true" />
-          返回用户卡片
+          返回
         </Button>
         <h3>{name}的卡片收藏</h3>
       </header>
@@ -60,19 +60,29 @@ export function UserPetCardCollection({
           >
             <ul role="list" className={styles.cards}>
               {result.data.items.map(({ id, name, grade, stars, art }) => (
-                <li key={id} className={styles.card}>
-                  <CardAtlasImage
-                    className={styles.art ?? ''}
-                    src={art.url}
-                    alt=""
-                    tile={art.tile}
-                    portrait={art.portrait}
-                  />
-                  <div>
-                    <strong>{name}</strong>
-                    <p>
-                      {petCardGrades[grade].name} · {stars} 星
-                    </p>
+                <li key={id} className={styles.card} data-grade={grade}>
+                  <div className={styles.cardContent}>
+                    <CardAtlasImage
+                      className={styles.art ?? ''}
+                      src={art.url}
+                      alt=""
+                      tile={art.tile}
+                      portrait={art.portrait}
+                      showFullTile
+                    />
+                    <div className={styles.details}>
+                      <strong className={styles.name}>{name}</strong>
+                      <div className={styles.attributes}>
+                        <span className={styles.grade}>
+                          {grade === 'shiny' && <Sparkles size={12} aria-hidden="true" />}
+                          {petCardGrades[grade].name}
+                        </span>
+                        <span className={styles.stars}>
+                          <Star size={14} aria-hidden="true" />
+                          {stars} 星
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </li>
               ))}

@@ -4,6 +4,18 @@ import { setupChatMenu } from './chat-menu-fixture';
 
 test.setTimeout(60_000);
 
+const grades = [
+  { id: 'shiny', label: '闪耀' },
+  { id: 'legendary', label: '传说' },
+  { id: 'epic', label: '史诗' },
+  { id: 'fine', label: '精良' },
+  { id: 'common', label: '普通' },
+];
+const collectionNames: Partial<Record<number, string>> = {
+  6: '用于检查窄屏自然换行的合成卡片名称',
+  19: '超长卡片名称'.repeat(13),
+};
+
 async function scrollCollection(page: Page, list: Locator, mobile: boolean) {
   if (!mobile) {
     await list.focus();
@@ -57,12 +69,13 @@ for (const skin of builtinSkins)
       await page.route('**/api/follow/is-following?*', (route) =>
         route.fulfill({ json: { code: 0, data: false } }),
       );
-      const atlas = 'a'.repeat(64) + '.jpg';
-      await page.route('**/api/pet/cards/art/**', (route) =>
-        route.fulfill({
-          contentType: 'image/svg+xml',
-          body: '<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="2000"><rect width="1000" height="2000" fill="#268c83"/></svg>',
-        }),
+      const squareAtlas = 'a'.repeat(64) + '.jpg';
+      const portraitAtlas = 'b'.repeat(64) + '.jpg';
+      await page.route(`**/api/pet/cards/art/${squareAtlas}`, (route) =>
+        route.fulfill({ path: 'public/assets/pet/card-art-snowbay.jpg' }),
+      );
+      await page.route(`**/api/pet/cards/art/${portraitAtlas}`, (route) =>
+        route.fulfill({ path: 'public/assets/pet/card-art-three-kingdoms-wei.jpg' }),
       );
       const initial = Promise.withResolvers<void>();
       let phase: 'initial' | 'ready' | 'empty' = 'initial';
@@ -90,12 +103,12 @@ for (const skin of builtinSkins)
                   ? []
                   : ids.map((id) => ({
                       id: `card-${id}`,
-                      name: `合成卡片 ${id}`,
-                      grade: 'epic',
-                      stars: 3,
-                      artKey: atlas,
-                      artTile: 0,
-                      portrait: false,
+                      name: collectionNames[id] ?? `合成卡片 ${id}`,
+                      grade: grades[id - 1]?.id ?? 'common',
+                      stars: ((id + 1) % 5) + 1,
+                      artKey: id === 5 ? portraitAtlas : squareAtlas,
+                      artTile: id === 3 ? 5 : (id + 3) % 10,
+                      portrait: id === 5,
                     })),
               total: phase === 'empty' ? '0' : '21',
             },
@@ -122,7 +135,9 @@ for (const skin of builtinSkins)
         await page.keyboard.press('Enter');
       }
       const retry = dialog.getByRole('button', { name: '重试卡片收藏' });
-      await expect(dialog.getByRole('heading', { name: '合成岛友的卡片收藏' })).toBeVisible();
+      await expect(dialog.getByRole('heading', { name: '合成岛友的卡片收藏' })).toBeVisible({
+        timeout: 15_000,
+      });
       await expect(dialog.getByText('正在读取卡片收藏…', { exact: true })).toBeVisible();
       initial.resolve();
       await expect(dialog.getByRole('alert')).toHaveText('合成初始查询失败');
@@ -131,11 +146,37 @@ for (const skin of builtinSkins)
       else await retry.click();
       const list = dialog.getByRole('region', { name: '卡片收藏列表' });
       await expect(list.getByRole('listitem')).toHaveCount(20);
-      await expect(list.getByText('史诗 · 3 星').first()).toBeVisible();
+      const cards = list.getByRole('listitem');
+      for (const [index, grade] of grades.entries()) {
+        const card = cards.nth(index);
+        await expect(card).toHaveAttribute('data-grade', grade.id);
+        await expect(card.getByText(grade.label, { exact: true })).toBeVisible();
+        await expect(card.getByText(`${((index + 2) % 5) + 1} 星`, { exact: true })).toBeVisible();
+      }
+      const gradeBackgrounds = await Promise.all(
+        grades.map(({ label }) =>
+          list
+            .getByText(label, { exact: true })
+            .first()
+            .evaluate((badge) => getComputedStyle(badge).background),
+        ),
+      );
+      expect(new Set(gradeBackgrounds).size).toBe(grades.length);
+      const shiny = cards.first().getByText('闪耀', { exact: true });
+      expect(
+        await shiny.evaluate((badge) => getComputedStyle(badge, '::after').animationName),
+      ).not.toBe('none');
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      expect(
+        await shiny.evaluate((badge) => getComputedStyle(badge, '::after').animationName),
+      ).toBe('none');
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
       await expect(list.locator('img[data-loaded="true"]').first()).toBeVisible();
+      await expect(cards.nth(4).locator('img[data-loaded="true"]')).toBeVisible();
       const layout = await list.evaluate((viewport) => {
-        const first = viewport.querySelector('li')!.getBoundingClientRect();
-        const second = viewport.querySelectorAll('li')[1]!.getBoundingClientRect();
+        const tiles = [...viewport.querySelectorAll('li')];
+        const first = tiles[0]!.getBoundingClientRect();
+        const firstRow = tiles.filter((tile) => tile.getBoundingClientRect().top === first.top);
         const frame = viewport.getBoundingClientRect();
         const scrollbar = viewport.parentElement!.querySelector<HTMLElement>(
           '[data-orientation="vertical"]',
@@ -143,18 +184,46 @@ for (const skin of builtinSkins)
         return {
           start: first.left - frame.left,
           top: first.top - frame.top,
-          end: frame.right - Math.max(first.right, second.right),
-          columns: first.top === second.top ? 2 : 1,
+          end: frame.right - firstRow.at(-1)!.getBoundingClientRect().right,
+          columns: firstRow.length,
+          croppedArt: tiles
+            .filter((tile, index) => {
+              const img = tile.querySelector('img')!;
+              const art = img.parentElement!.getBoundingClientRect();
+              const atlas = img.getBoundingClientRect();
+              const ratio = index === 4 ? 4 / 5 : 1;
+              return (
+                Math.abs(art.width - art.height * ratio) > 1 ||
+                Math.abs(art.width - atlas.width / 5) > 1 ||
+                Math.abs(art.height - atlas.height / 2) > 1
+              );
+            })
+            .map((tile) => tile.innerText),
+          obstructedDetails: tiles
+            .filter((tile) => {
+              const content = tile.firstElementChild!;
+              const art = content.firstElementChild!.getBoundingClientRect();
+              const details = content.lastElementChild!.getBoundingClientRect();
+              return (
+                art.height <= 0 ||
+                details.top < art.bottom - 1 ||
+                details.bottom > tile.getBoundingClientRect().bottom + 1
+              );
+            })
+            .map((tile) => tile.innerText),
           scrollbarVisible:
             getComputedStyle(scrollbar).visibility === 'visible' &&
             Number(getComputedStyle(scrollbar).opacity) === 1,
           fits:
             viewport.scrollWidth <= viewport.clientWidth &&
+            tiles.every((tile) => tile.scrollWidth <= tile.clientWidth) &&
             document.documentElement.scrollWidth <= innerWidth,
         };
       });
       expect(layout).toMatchObject({
-        columns: mobile ? 1 : 2,
+        columns: mobile ? 2 : 3,
+        croppedArt: [],
+        obstructedDetails: [],
         scrollbarVisible: !mobile,
         fits: true,
       });
@@ -162,7 +231,10 @@ for (const skin of builtinSkins)
       expect(layout.top).toBeGreaterThanOrEqual(4);
       expect(layout.end).toBeGreaterThanOrEqual(mobile ? 20 : 24);
       if (skin.id === 'moyu-island')
-        await dialog.screenshot({ path: info.outputPath('collection.png') });
+        await dialog.screenshot({
+          path: info.outputPath('collection.png'),
+          animations: 'disabled',
+        });
       await scrollCollection(page, list, mobile);
       await expect(list.getByRole('alert')).toContainText('合成续载失败');
       await expect(list.getByRole('listitem')).toHaveCount(20);
@@ -173,6 +245,7 @@ for (const skin of builtinSkins)
         await retry.tap();
       } else await retry.click();
       await expect(list.getByRole('listitem')).toHaveCount(21);
+      await expect(cards.last()).toHaveAttribute('data-grade', 'common');
       await scrollCollection(page, list, mobile);
       await expect(list.getByText('已全部加载')).toBeInViewport();
       await expect(list.getByText('合成卡片 21', { exact: true })).toBeInViewport();

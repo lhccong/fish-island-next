@@ -9,19 +9,22 @@ export function CardAtlasImage({
   alt,
   tile,
   portrait,
+  showFullTile = false,
   className = '',
 }: {
   src: string | undefined;
   alt: string;
   tile: number;
   portrait: boolean;
+  showFullTile?: boolean;
   className?: string;
 }) {
   const [loaded, setLoaded] = useState('');
   const [failed, setFailed] = useState('');
-  const crop = cardAtlasCrop(tile, portrait);
+  const fullPortrait = portrait && showFullTile;
+  const crop = cardAtlasCrop(tile, portrait && !fullPortrait);
   return (
-    <div className={`${styles.frame} ${className}`}>
+    <div className={`${styles.frame} ${className}`} data-full-portrait={fullPortrait || undefined}>
       {!src || failed === src ? (
         <span className={styles.unavailable}>
           <ImageOff size={15} aria-hidden="true" />

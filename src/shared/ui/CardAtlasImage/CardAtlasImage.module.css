@@ -18,6 +18,9 @@
   max-height: none;
   object-fit: fill;
 }
+.frame[data-full-portrait='true'] {
+  aspect-ratio: 4 / 5;
+}
 .frame img:not([data-loaded='true']) {
   visibility: hidden;
 }

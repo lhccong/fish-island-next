@@ -17,10 +17,11 @@ cd /opt/fish-island-next
 bash scripts/deploy.sh
 ```
 
-脚本会拉取 master，执行一次 npm ci、npm run build，将同一份 dist **内容**依次发布到以下两个目录，不会生成额外的 dist 子目录：
+脚本会拉取 master，执行一次 npm ci、npm run build，将同一份 dist **内容**依次发布到以下目录，不会生成额外的 dist 子目录：
 
 - `/thome/1panel/1panel/www/sites/new.yucoder.cn/index`
 - `/thome/1panel/1panel/www/sites/app.yucoder.cn/index/new`
+- `/thome/1panel/1panel/www/sites/yucoder.cn/index/new`
 
 构建失败不会进入发布阶段。每个目录均先复制静态资源，再替换 index.html，最后替换 sw.js；旧哈希资源及服务器配置保留，可另行定期清理。任一目录发布失败时停止，已发布的目录不会回滚。源码工作区有未提交改动时停止，不覆盖本地修改。
 
@@ -32,7 +33,7 @@ VITE_API_BASE_URL=https://api.yucoder.cn
 
 修改后重新执行部署脚本。VITE 环境变量会公开到前端产物，不能存放密钥。
 
-两个域名的站点根目录分别指向上述对应目录；第二个目录的 `new` 是文件系统路径，当前构建仍按域名根路径访问。React Router 使用 history 路由，在各站点 Nginx/OpenResty 配置的 `location /` 中配置回退，避免直接打开登录或授权页时出现 404：
+各域名的站点根目录分别指向上述对应目录；目录末尾的 `new` 是文件系统路径，当前构建仍按域名根路径访问。React Router 使用 history 路由，在各站点 Nginx/OpenResty 配置的 `location /` 中配置回退，避免直接打开登录或授权页时出现 404：
 
 ```nginx
 location / {
@@ -63,7 +64,7 @@ location ^~ /pwa/ {
 }
 ```
 
-若已有对应规则，请合并。安装和离线范围见 [ADR-083](./decisions/ADR-083-pwa.md)。
+若已有对应规则，请合并。CDN 对 `/sw.js`、`/index.html` 和应用路由返回的 HTML 应遵循源站重新验证策略；如果配置了强制缓存，需对这些入口绕过缓存并清理旧缓存。每次发布后可保留一个旧页面，切回后等待更新公告，再点“刷新更新”核对新版本。首次引入公告时，旧页面需关闭同源全部标签页后重新打开或强制刷新一次。安装、离线和更新流程见 [ADR-083](./decisions/ADR-083-pwa.md)。
 
 聊天表情包搜索沿用 uTools 的百度图片接口，浏览器通过同源固定目标代理访问。在同一个站点 server 块添加以下配置并检查、重载 Nginx（开发和 preview 已配置 Vite 代理）：
 

@@ -8,13 +8,15 @@
 }
 .header {
   display: grid;
-  justify-items: start;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
   gap: 12px;
-  padding: 4px 4px 12px;
+  padding: 4px 44px 14px 4px;
 }
 .header h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.0625rem;
+  line-height: 1.35;
 }
 .feedback {
   flex: 1;
@@ -38,34 +40,202 @@
 }
 .cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 12px;
   margin: 0;
   padding-block: 4px;
   padding-inline-start: 4px;
   list-style: none;
 }
 .card {
+  --grade-color: var(--color-muted);
+  --card-panel: var(--color-surface);
+  --frame-cut: 11px;
+  --frame-dark: var(--color-pet-card-night);
+  --frame-steel: color-mix(in srgb, var(--frame-dark) 58%, var(--color-pet-enhance-silver));
+  --frame-highlight: var(--color-pet-enhance-silver);
+  --frame-corner: var(--color-pet-enhance-silver);
+  --frame-light: var(--frame-corner);
+  --frame-rail: linear-gradient(90deg, transparent, var(--frame-light) 12% 88%, transparent);
+  position: relative;
+  min-width: 0;
+  padding: 5px;
+  background: linear-gradient(
+    145deg,
+    var(--frame-highlight),
+    var(--frame-steel) 18%,
+    var(--frame-dark) 50%,
+    var(--frame-steel) 79%,
+    var(--frame-highlight)
+  );
+}
+.card,
+.cardContent,
+.grade {
+  clip-path: polygon(
+    var(--frame-cut) 0,
+    calc(100% - var(--frame-cut)) 0,
+    100% var(--frame-cut),
+    100% calc(100% - var(--frame-cut)),
+    calc(100% - var(--frame-cut)) 100%,
+    var(--frame-cut) 100%,
+    0 calc(100% - var(--frame-cut)),
+    0 var(--frame-cut)
+  );
+}
+.card::after {
+  --facet:
+    transparent 30%, var(--frame-dark) 32%, var(--frame-corner) 37%, var(--frame-light) 42%,
+    var(--frame-corner) 45%, var(--frame-dark) 47%, transparent 49%;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, var(--facet)) left top / 18px 18px,
+    linear-gradient(225deg, var(--facet)) right top / 18px 18px,
+    linear-gradient(315deg, var(--facet)) right bottom / 18px 18px,
+    linear-gradient(45deg, var(--facet)) left bottom / 18px 18px,
+    var(--frame-rail) center top 2px / 48% 1px,
+    var(--frame-rail) center bottom 2px / 48% 1px,
+    linear-gradient(transparent, var(--frame-light) 12% 88%, transparent) left 2px center / 1px 24%,
+    linear-gradient(transparent, var(--frame-light) 12% 88%, transparent) right 2px center / 1px 24%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  content: '';
+}
+.cardContent {
+  --frame-cut: 8px;
+  padding: 4px;
+  background: linear-gradient(150deg, var(--card-panel), var(--color-surface));
+  box-shadow: inset 0 0 0 1px var(--frame-dark);
+}
+.card:not([data-grade='common']) {
+  --card-panel: color-mix(in srgb, var(--grade-color) 14%, var(--color-surface));
+}
+.card[data-grade='fine'] {
+  --grade-color: var(--color-life-rare);
+  --frame-corner: var(--color-pet-enhance-blue);
+}
+.card[data-grade='epic'] {
+  --grade-color: var(--color-life-epic);
+  --frame-corner: var(--color-pet-enhance-violet);
+  --frame-light: color-mix(in srgb, var(--color-pet-enhance-blue) 60%, var(--color-pet-card-glint));
+}
+.card[data-grade='legendary'] {
+  --grade-color: var(--color-life-legendary);
+  --frame-corner: var(--color-pet-enhance-gold);
+  --frame-highlight: color-mix(in srgb, var(--frame-corner) 56%, var(--color-pet-enhance-silver));
+  --frame-steel: color-mix(in srgb, var(--frame-dark) 68%, var(--frame-corner));
+}
+.card[data-grade='shiny'] {
+  --grade-color: var(--color-pet-enhance-green);
+  --frame-corner: var(--color-pet-enhance-rose);
+  --frame-light: var(--color-pet-enhance-violet);
+  --frame-rail: linear-gradient(90deg, var(--color-pet-card-spectrum));
+}
+.cardContent .art {
+  border: 0;
+  border-radius: 0;
+}
+.details {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 6px 7px 7px;
+}
+.name {
+  padding-block-end: 3px;
+  border-block-end: 1px solid color-mix(in srgb, var(--grade-color) 28%, var(--color-border));
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+.attributes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.grade {
+  --frame-cut: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 2px 7px;
+  background: color-mix(in srgb, var(--grade-color) 15%, var(--color-surface));
+  color: color-mix(in srgb, var(--grade-color) 72%, var(--color-text));
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.grade::before {
+  flex: 0 0 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  background: currentColor;
+  content: '';
+}
+.card[data-grade='shiny'] .grade {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-pet-card-glint);
+  color: var(--color-pet-enhance-label-ink);
+}
+.card[data-grade='shiny'] .grade::after {
+  --foil-base: var(--color-pet-card-glint);
+  position: absolute;
+  z-index: -1;
+  inset: 0 -45%;
+  background: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--color-pet-enhance-rose) 62%, var(--foil-base)),
+    color-mix(in srgb, var(--color-pet-enhance-gold) 64%, var(--foil-base)) 22%,
+    color-mix(in srgb, var(--color-pet-enhance-green) 64%, var(--foil-base)) 42%,
+    color-mix(in srgb, var(--color-pet-enhance-blue) 62%, var(--foil-base)) 60%,
+    color-mix(in srgb, var(--color-pet-enhance-violet) 65%, var(--foil-base)) 80%,
+    color-mix(in srgb, var(--color-pet-enhance-rose) 62%, var(--foil-base))
+  );
+  animation: foilShimmer 3.6s ease-in-out infinite alternate;
+  content: '';
+}
+.card[data-grade='shiny'] .grade::before {
+  content: none;
+}
+.grade svg {
+  flex: none;
+}
+@keyframes foilShimmer {
+  from {
+    transform: translateX(-18%);
+  }
+  to {
+    transform: translateX(18%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card[data-grade='shiny'] .grade::after {
+    animation: none;
+  }
+}
+.stars {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 0;
-  padding: 8px;
-  background: var(--color-canvas);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  font-size: 0.875rem;
+  gap: 4px;
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.card .art {
-  flex: 0 0 56px;
-  height: 56px;
-}
-.card p {
-  margin: 4px 0 0;
-  color: var(--color-muted);
+.stars svg {
+  color: var(--color-life-legendary);
+  fill: var(--color-pet-enhance-gold);
 }
 @media (max-width: 760px) {
   .cards {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
