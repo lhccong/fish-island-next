@@ -12,6 +12,7 @@ import styles from './Dialog.module.css';
 
 interface DialogProps {
   modal?: boolean;
+  layer?: 'default' | 'nested';
   hideDescription?: boolean;
   hideTitle?: boolean;
   style?: CSSProperties;
@@ -31,6 +32,7 @@ interface DialogProps {
 
 export function Dialog({
   modal = true,
+  layer = 'default',
   hideDescription = false,
   hideTitle = false,
   style,
@@ -56,9 +58,10 @@ export function Dialog({
     >
       {trigger && <Primitive.Trigger asChild>{trigger}</Primitive.Trigger>}
       <Primitive.Portal>
-        {modal && <Primitive.Overlay className={styles.overlay} />}
+        {modal && <Primitive.Overlay className={styles.overlay} data-layer={layer} />}
         <Primitive.Content
           className={`${styles.content} ${className}`}
+          data-layer={layer}
           style={style}
           onOpenAutoFocus={() => {
             returnFocus.current =

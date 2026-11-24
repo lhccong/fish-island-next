@@ -104,6 +104,9 @@ export function UserCardDialog({
       dismissLabel="关闭用户卡片"
       dismissClassName={!list && card?.cover ? (styles.coverDismiss ?? '') : ''}
     >
+      {card && user.role === 'admin' && !self && (
+        <UserCardModeration port={port} id={target.id} hasCover={!!card.cover} hidden={!!list} />
+      )}
       <div className={styles.content} hidden={!!list}>
         {card?.cover && (
           <div className={styles.coverPanel}>
@@ -234,9 +237,6 @@ export function UserCardDialog({
                     setList('collection');
                   }}
                 />
-                {user.role === 'admin' && !self && (
-                  <UserCardModeration port={port} id={target.id} />
-                )}
               </div>
             )}
           </div>

@@ -71,6 +71,8 @@ for (const skin of builtinSkins)
         .getByRole('button', { name: '查看合成岛友的用户卡片' });
       const dialog = page.getByRole('dialog', { name: '用户卡片', exact: true });
       const dismiss = dialog.getByRole('button', { name: '关闭用户卡片', exact: true });
+      const gear = dialog.getByRole('button', { name: '管理员操作', exact: true });
+      const mobile = page.viewportSize()!.width <= 760;
       for (const stage of ['loading', 'empty', 'error', 'ready', 'long', 'cover', 'cover-error']) {
         state = stage;
         await name.click();
@@ -82,9 +84,8 @@ for (const skin of builtinSkins)
         else if (stage === 'error')
           await expect(dialog.getByRole('alert')).toHaveText('合成读取失败');
         else await expect(dialog.getByRole('heading', { name: '合成岛友' })).toBeVisible();
+        if (['loading', 'empty', 'error'].includes(stage)) await expect(gear).toHaveCount(0);
         if (stage === 'long') {
-          await dialog.getByRole('button', { name: '管理员操作', exact: true }).click();
-          await expect(dialog.getByRole('combobox', { name: '禁言时长' })).toBeVisible();
           await dialog.getByRole('region', { name: '用户卡片内容' }).evaluate((el) => {
             el.scrollTop = el.scrollHeight;
           });
@@ -134,7 +135,21 @@ for (const skin of builtinSkins)
           await expect(dialog.getByText('封面暂时无法显示')).toBeVisible();
         if (stage === 'ready' || stage === 'cover')
           await dialog.screenshot({ path: info.outputPath(`${stage}-dismiss.png`) });
-        if (page.viewportSize()!.width <= 760) await dismiss.tap();
+        if (stage === 'long' || stage.startsWith('cover')) {
+          const gearBox = (await gear.boundingBox())!;
+          const dismissBox = (await dismiss.boundingBox())!;
+          expect(gearBox.width).toBeGreaterThanOrEqual(44);
+          expect(gearBox.height).toBeGreaterThanOrEqual(44);
+          expect(gearBox.x + gearBox.width).toBeLessThan(dismissBox.x);
+          expect(gearBox.y).toBe(dismissBox.y);
+          if (mobile) await gear.tap();
+          else await gear.click();
+          const moderation = page.getByRole('dialog', { name: '管理员操作', exact: true });
+          await expect(moderation.getByRole('combobox', { name: '禁言时长' })).toBeVisible();
+          await page.keyboard.press('Escape');
+          await expect(gear).toBeFocused();
+        }
+        if (mobile) await dismiss.tap();
         else await dismiss.click();
         await expect(dialog).toHaveCount(0);
         if (pending) {

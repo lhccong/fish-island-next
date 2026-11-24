@@ -18,6 +18,12 @@
   background: var(--color-surface);
   box-shadow: var(--shadow-panel);
 }
+.overlay[data-layer='nested'] {
+  z-index: 88;
+}
+.content[data-layer='nested'] {
+  z-index: 89;
+}
 .title {
   margin-top: 0;
 }

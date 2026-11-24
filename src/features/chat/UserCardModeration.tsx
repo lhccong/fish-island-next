@@ -1,12 +1,25 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import { useEffect, useRef, useState, useId } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Settings } from 'lucide-react';
 import type { UserCardPort, UserMute } from '@/domain/account-tools';
 import { Button } from '@/shared/ui/Button';
+import { Dialog } from '@/shared/ui/Dialog';
+import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Select } from '@/shared/ui/Select';
 import styles from './UserCard.module.css';
 
-function ModerationControls({ port, id }: { port: UserCardPort; id: string }) {
+export function UserCardModeration({
+  port,
+  id,
+  hasCover,
+  hidden,
+}: {
+  port: UserCardPort;
+  id: string;
+  hasCover: boolean;
+  hidden: boolean;
+}) {
+  const [opened, setOpened] = useState(false);
   const [info, setInfo] = useState<UserMute | null>(null);
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -16,6 +29,7 @@ function ModerationControls({ port, id }: { port: UserCardPort; id: string }) {
   const [notice, setNotice] = useState('');
   const task = useRef<AbortController | null>(null);
   useEffect(() => {
+    if (!opened) return;
     const current = new AbortController();
     void Promise.resolve()
       .then(() => {
@@ -29,7 +43,7 @@ function ModerationControls({ port, id }: { port: UserCardPort; id: string }) {
         if (!current.signal.aborted) setError(e instanceof Error ? e.message : '禁言状态读取失败');
       });
     return () => current.abort();
-  }, [port, id, revision]);
+  }, [port, id, opened, revision]);
   useEffect(() => () => task.current?.abort(), []);
   async function submit() {
     if (!info || task.current) return;
@@ -54,91 +68,92 @@ function ModerationControls({ port, id }: { port: UserCardPort; id: string }) {
     }
   }
   return (
-    <div className={styles.moderationControls}>
-      {!info && !error && <LoadingIndicator>正在读取禁言状态…</LoadingIndicator>}
-      {error && <p role="alert">{error}</p>}
-      {notice && <p role="status">{notice}</p>}
-      {!info && error && (
+    <Dialog
+      layer="nested"
+      title="管理员操作"
+      description="管理这位岛友的禁言状态"
+      hideDescription
+      dismissLabel="关闭管理员操作"
+      showCloseAction={false}
+      className={styles.moderationDialog ?? ''}
+      trigger={
         <Button
           variant="secondary"
-          onClick={() => {
-            setError('');
-            setRevision((v) => v + 1);
-          }}
+          className={`${styles.moderationTrigger} ${hasCover ? styles.coverDismiss : ''}`}
+          hidden={hidden}
+          aria-label="管理员操作"
+          title="管理员操作"
         >
-          重试禁言状态
+          <Settings size={18} aria-hidden="true" />
         </Button>
-      )}
-      {info && (
-        <>
-          <p>
-            {info.muted ? `已禁言${info.remaining ? ` · 剩余 ${info.remaining}` : ''}` : '未禁言'}
-          </p>
-          {!info.muted && (
-            <Select
-              label="禁言时长"
-              value={duration}
-              onValueChange={setDuration}
-              disabled={busy}
-              options={[
-                { value: '60', label: '1 分钟' },
-                { value: '600', label: '10 分钟' },
-                { value: '3600', label: '1 小时' },
-                { value: '86400', label: '1 天' },
-              ]}
-            />
-          )}
-          {confirm ? (
+      }
+      onOpenChange={(open) => {
+        if (open) setOpened(true);
+      }}
+    >
+      <ScrollArea label="禁言设置" gutter="reserved" className={styles.moderationScroll ?? ''}>
+        <div className={styles.moderationBody}>
+          {!info && !error && <LoadingIndicator>正在读取禁言状态…</LoadingIndicator>}
+          {error && <p role="alert">{error}</p>}
+          {notice && <p role="status">{notice}</p>}
+          {info && (
             <>
               <p>
-                确认{info.muted ? '解除这位岛友的禁言' : `禁言 ${Number(duration) / 60} 分钟`}？
+                {info.muted
+                  ? `已禁言${info.remaining ? ` · 剩余 ${info.remaining}` : ''}`
+                  : '未禁言'}
               </p>
-              <div className={styles.actions}>
-                <Button variant="secondary" disabled={busy} onClick={() => setConfirm(false)}>
-                  取消
-                </Button>
-                <Button disabled={busy} onClick={() => void submit()}>
-                  {busy ? <LoadingIndicator compact>{'提交中…'}</LoadingIndicator> : '确认'}
-                </Button>
-              </div>
+              {!info.muted && (
+                <Select
+                  label="禁言时长"
+                  value={duration}
+                  onValueChange={setDuration}
+                  disabled={busy}
+                  options={[
+                    { value: '60', label: '1 分钟' },
+                    { value: '600', label: '10 分钟' },
+                    { value: '3600', label: '1 小时' },
+                    { value: '86400', label: '1 天' },
+                  ]}
+                />
+              )}
+              {confirm && (
+                <p>
+                  确认{info.muted ? '解除这位岛友的禁言' : `禁言 ${Number(duration) / 60} 分钟`}？
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </ScrollArea>
+      {(info || error) && (
+        <div className={`${styles.actions} ${styles.moderationFooter}`}>
+          {!info ? (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setError('');
+                setRevision((v) => v + 1);
+              }}
+            >
+              重试禁言状态
+            </Button>
+          ) : confirm ? (
+            <>
+              <Button variant="secondary" disabled={busy} onClick={() => setConfirm(false)}>
+                取消
+              </Button>
+              <Button disabled={busy} onClick={() => void submit()}>
+                {busy ? <LoadingIndicator compact>{'提交中…'}</LoadingIndicator> : '确认'}
+              </Button>
             </>
           ) : (
             <Button variant="secondary" onClick={() => setConfirm(true)}>
               {info.muted ? '解除禁言' : '禁言用户'}
             </Button>
           )}
-        </>
+        </div>
       )}
-    </div>
-  );
-}
-
-export function UserCardModeration({ port, id }: { port: UserCardPort; id: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const [opened, setOpened] = useState(false);
-  const panelId = useId();
-  return (
-    <section className={styles.moderation} aria-label="管理员操作">
-      <Button
-        variant="secondary"
-        aria-expanded={expanded}
-        aria-controls={panelId}
-        onClick={() => {
-          setOpened(true);
-          setExpanded((value) => !value);
-        }}
-      >
-        管理员操作
-        <ChevronDown
-          size={16}
-          aria-hidden="true"
-          className={styles.disclosureIcon}
-          data-expanded={expanded}
-        />
-      </Button>
-      <div id={panelId} hidden={!expanded}>
-        {opened && <ModerationControls port={port} id={id} />}
-      </div>
-    </section>
+    </Dialog>
   );
 }
