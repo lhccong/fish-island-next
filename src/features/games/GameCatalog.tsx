@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { WindowLauncher } from '@/shared/ui/WindowLauncher';
-import { Sparkles, Sprout, Sun, ChartCandlestick, Grid3X3, Flame } from 'lucide-react';
+import { Sparkles, Sprout, Sun, ChartCandlestick, Grid3X3, Flame, Milk } from 'lucide-react';
 import styles from './GameCatalog.module.css';
 import { RecentGames, type CatalogGame } from './RecentGames';
 import { DrawEntry } from './DrawEntry';
@@ -9,6 +9,7 @@ import { UndercoverEntry } from './UndercoverEntry';
 export function GameCatalog({
   onPlay,
   onDarkRoom,
+  onMilkyWayIdle,
   onStock,
   onFarm,
   onGomoku,
@@ -19,6 +20,7 @@ export function GameCatalog({
 }: {
   onPlay: () => void;
   onDarkRoom: () => void;
+  onMilkyWayIdle: () => void;
   onStock: () => void;
   onFarm: () => void;
   onGomoku: () => void;
@@ -39,6 +41,7 @@ export function GameCatalog({
       farm: read('farm'),
       life: read('life'),
       'dark-room': read('dark-room'),
+      'milky-way-idle': read('milky-way-idle'),
       stock: read('stock'),
       gomoku: read('gomoku'),
       undercover: read('undercover'),
@@ -60,6 +63,7 @@ export function GameCatalog({
       farm: onFarm,
       life: onPlay,
       'dark-room': onDarkRoom,
+      'milky-way-idle': onMilkyWayIdle,
       stock: onStock,
       gomoku: onGomoku,
       undercover: onUndercover,
@@ -83,6 +87,30 @@ export function GameCatalog({
           <span>发现另一种可能</span>
         </div>
         <div className={styles.cards}>
+          <div className={styles.entry}>
+            <button
+              type="button"
+              className={styles.stockCard}
+              onClick={() => playGame('milky-way-idle')}
+              aria-label="打开奶牛放置"
+            >
+              <div className={`${styles.stockArt} ${styles.milkyWayArt}`} aria-hidden="true">
+                <Milk size={84} strokeWidth={1.25} />
+                <span>Milky Way Idle</span>
+              </div>
+              <div className={styles.stockCaption}>
+                <div>
+                  <h3>奶牛放置</h3>
+                  <p>多人放置 RPG · 采集、制作与战斗</p>
+                </div>
+              </div>
+            </button>
+            <WindowLauncher
+              className={styles.windowLauncher ?? ''}
+              label="独立窗口打开奶牛放置"
+              onClick={() => openWindow('milky-way-idle')}
+            />
+          </div>
           <div className={styles.entry}>
             <button
               type="button"

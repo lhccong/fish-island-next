@@ -50,26 +50,29 @@ export function GameWindowsProvider({ children }: { children: ReactNode }) {
           onHide={() => setActive(null)}
           onClose={close}
         >
-          {opened.map((id) => (
-            <div key={id} hidden={id !== active} className={styles.pane}>
-              <ScrollArea
-                label={`${gameTitles[id]}内容`}
-                gutter="reserved"
-                fillContent={id === 'dark-room'}
-              >
-                <div className={styles.content} data-fill={id === 'dark-room'}>
-                  <GameErrorBoundary>
-                    <Suspense fallback={<LoadingIndicator>正在打开游戏…</LoadingIndicator>}>
-                      <GameWindowContent
-                        game={id}
-                        onEscape={() => setActive((current) => (current === id ? null : current))}
-                      />
-                    </Suspense>
-                  </GameErrorBoundary>
-                </div>
-              </ScrollArea>
-            </div>
-          ))}
+          {opened.map((id) => {
+            const fillContent = id === 'dark-room' || id === 'milky-way-idle';
+            return (
+              <div key={id} hidden={id !== active} className={styles.pane}>
+                <ScrollArea
+                  label={`${gameTitles[id]}内容`}
+                  gutter="reserved"
+                  fillContent={fillContent}
+                >
+                  <div className={styles.content} data-fill={fillContent}>
+                    <GameErrorBoundary>
+                      <Suspense fallback={<LoadingIndicator>正在打开游戏…</LoadingIndicator>}>
+                        <GameWindowContent
+                          game={id}
+                          onEscape={() => setActive((current) => (current === id ? null : current))}
+                        />
+                      </Suspense>
+                    </GameErrorBoundary>
+                  </div>
+                </ScrollArea>
+              </div>
+            );
+          })}
         </FloatingWindow>
       )}
       {opened.length > 0 && location.pathname !== '/user/login' && (

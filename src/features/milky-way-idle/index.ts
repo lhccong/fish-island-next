@@ -1,0 +1,1 @@
+export { MilkyWayIdle } from './MilkyWayIdle';
