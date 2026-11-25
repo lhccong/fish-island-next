@@ -17,12 +17,12 @@ const chanceLabels = {
 
 function triggerText({ trigger, outcome }: PetCardBattleEffect): string {
   if (trigger.kind === 'healthBelowAtTurnStart') {
-    return `下一回合开始时若生命低于 ${trigger.thresholdPercent}%`;
+    return `生效回合开始时若生命低于 ${trigger.thresholdPercent}%`;
   }
   if (trigger.kind === 'turnStart') {
-    return outcome.kind === 'heal' || outcome.kind === 'shield' ? '下一回合开始时' : '下一回合';
+    return outcome.kind === 'heal' || outcome.kind === 'shield' ? '生效回合开始时' : '生效回合内';
   }
-  return `下一回合${eventLabels[trigger.kind]}`;
+  return `生效回合${eventLabels[trigger.kind]}`;
 }
 
 function outcomeText(outcome: PetCardBattleEffect['outcome']): string {
@@ -35,7 +35,7 @@ function outcomeText(outcome: PetCardBattleEffect['outcome']): string {
     case 'accuracyBoost':
       return `${chanceLabels[outcome.kind]}提高 ${outcome.percentagePoints} 个百分点`;
     case 'outgoingDamageBoost':
-      return `该次伤害提高 ${outcome.percent}%`;
+      return `造成的伤害提高 ${outcome.percent}%`;
     case 'incomingDamageReduction':
       return `受到的伤害降低 ${outcome.percent}%`;
     case 'shield':

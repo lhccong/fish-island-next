@@ -1,13 +1,15 @@
-import type { PetPort, PetRank } from '@/domain/pet';
-import { roundNarration } from './battle-presentation';
+import type { BattlePreview, PetPort, PetRank } from '@/domain/pet';
+import { BattleRoundLog } from './BattleRoundLog';
 import styles from './Tournament.module.css';
 
 export function TournamentResult({
   target,
   result,
+  preview,
 }: {
   target: { rank: number; entry?: PetRank };
   result: Awaited<ReturnType<PetPort['compete']>>;
+  preview: BattlePreview | null;
 }) {
   return (
     <div className={styles.result}>
@@ -19,19 +21,12 @@ export function TournamentResult({
         <p>当前名次：{result.rank ?? '尚未上榜'}</p>
       </div>
       {result.rounds.length ? (
-        <details>
-          <summary>战斗回合记录 · {result.rounds.length} 回合</summary>
-          <ol className={styles.rounds}>
-            {result.rounds.map((round, i) => (
-              <li key={i}>
-                第 {i + 1} 回合 · {roundNarration(round, '我的伙伴', target.entry?.name || '对手')}
-                <small>
-                  我的生命 {round.selfHealth} · 对手生命 {round.opponentHealth}
-                </small>
-              </li>
-            ))}
-          </ol>
-        </details>
+        <BattleRoundLog
+          rounds={result.rounds}
+          selfName={preview?.self.name ?? '我的伙伴'}
+          opponentName={preview?.opponent.name ?? target.entry?.name ?? '对手'}
+          showHealth
+        />
       ) : (
         <p>本次结算未返回战斗回合，以服务端名次为准。</p>
       )}

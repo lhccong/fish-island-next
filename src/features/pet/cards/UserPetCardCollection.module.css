@@ -88,7 +88,6 @@
 .cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: start;
   gap: 12px;
   margin: 0;
   padding-block: 4px;
@@ -106,6 +105,7 @@
   --frame-light: var(--frame-corner);
   --frame-rail: linear-gradient(90deg, transparent, var(--frame-light) 12% 88%, transparent);
   position: relative;
+  display: grid;
   min-width: 0;
   padding: 5px;
   background: linear-gradient(
@@ -152,6 +152,8 @@
 }
 .cardContent {
   --frame-cut: 8px;
+  display: grid;
+  grid-template-rows: auto 1fr;
   padding: 4px;
   background: linear-gradient(150deg, var(--card-panel), var(--color-surface));
   box-shadow: inset 0 0 0 1px var(--frame-dark);
@@ -181,11 +183,18 @@
   --frame-rail: linear-gradient(90deg, var(--color-pet-card-spectrum));
 }
 .cardContent .art {
+  align-self: start;
+  width: 100%;
   border: 0;
   border-radius: 0;
 }
+.cardContent .art[data-full-portrait='true'] {
+  justify-self: center;
+  width: 80%;
+}
 .details {
   display: grid;
+  grid-template-rows: 1fr auto;
   gap: 5px;
   min-width: 0;
   padding: 6px 7px 7px;

@@ -10,6 +10,7 @@ import {
   Feather,
   Pencil,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import type { Companion, PetPort } from '@/domain/pet';
 import { boundedPercent, equipmentSlots, petCardGrades } from '@/domain/pet';
 import { CardAtlasImage } from '@/shared/ui/CardAtlasImage';
@@ -33,11 +34,13 @@ export function CompanionSummary({
   pet,
   service,
   onOpen,
+  headerAction,
   compact = false,
 }: {
   pet: Companion;
   service: PetPort;
   onOpen?: (panel: 'care' | 'bag') => void;
+  headerAction?: ReactNode;
   compact?: boolean;
 }) {
   const attributes = (
@@ -68,6 +71,7 @@ export function CompanionSummary({
             <Pencil size={16} aria-hidden="true" />
           </button>
         )}
+        {headerAction && <div className={styles.headerAction}>{headerAction}</div>}
       </header>
       <div className={styles.dressing}>
         <div className={styles.portrait}>

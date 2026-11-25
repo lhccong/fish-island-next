@@ -4,13 +4,14 @@ import type {
   PetSkin,
   Challenger,
   BattleRound,
+  BattleShowcaseCard,
   PetPage,
   AutoFeed,
   EquipmentForge,
   ForgeDetail,
   CollectedPetCard,
 } from '@/domain/pet';
-import { petCardGradeIds } from '@/domain/pet';
+import { petCardGradeIds, readPetCardBattleEffect } from '@/domain/pet';
 import { petCardArtUrl } from './card-catalog';
 
 export function record(value: unknown): Record<string, unknown> {
@@ -168,7 +169,23 @@ export function skin(value: unknown): PetSkin {
     points: number(data.points),
   };
 }
-export function challenger(value: unknown): Challenger {
+function battleShowcaseCard(value: unknown, baseUrl: string): BattleShowcaseCard {
+  const data = record(value);
+  const card = collectedCard(data.card, baseUrl);
+  const stats = record(data.stats);
+  return {
+    card,
+    stats: {
+      attack: number(stats.attack),
+      defense: number(stats.defense),
+      health: number(stats.health),
+      speed: number(stats.speed),
+    },
+    ...(data.effect == null ? {} : { effect: readPetCardBattleEffect(data.effect, card.grade) }),
+  };
+}
+
+export function challenger(value: unknown, baseUrl = ''): Challenger {
   const data = record(value);
   return {
     id: id(data.id ?? data.petId ?? data.floor),
@@ -178,6 +195,9 @@ export function challenger(value: unknown): Challenger {
     maxHealth: number(data.maxHealth ?? data.health ?? data.currentHealth),
     ...(data.level == null ? {} : { level: number(data.level) }),
     stats: stats(data),
+    ...(data.showcaseCards == null
+      ? {}
+      : { showcaseCards: list(data.showcaseCards, (value) => battleShowcaseCard(value, baseUrl)) }),
     ...(data.equippedItems == null
       ? {}
       : {
@@ -189,12 +209,16 @@ export function challenger(value: unknown): Challenger {
     reward: number(data.rewardPoints),
   };
 }
-export function round(value: unknown): BattleRound {
+export function round(value: unknown, baseUrl = ''): BattleRound {
   const data = record(value);
   if (!['PET', 'BOSS', 'MY_PET', 'OPPONENT_PET'].includes(text(data.attackerType)))
     throw new Error('未知的回合攻击方');
+  const roundNumber = data.roundNumber == null ? undefined : number(data.roundNumber);
+  if (roundNumber !== undefined && (!Number.isSafeInteger(roundNumber) || roundNumber < 1))
+    throw new Error('回合编号格式异常');
   return {
     attacker: ['PET', 'MY_PET'].includes(text(data.attackerType)) ? 'self' : 'opponent',
+    ...(roundNumber === undefined ? {} : { roundNumber }),
     damage: number(data.damage),
     selfHealth: number(data.petRemainingHealth ?? data.myPetRemainingHealth),
     opponentHealth: number(data.bossRemainingHealth ?? data.opponentPetRemainingHealth),
@@ -203,6 +227,18 @@ export function round(value: unknown): BattleRound {
     block: data.isBlock === true,
     combo: data.isCombo === true,
     lifesteal: number(data.lifestealHeal),
+    ...(data.cardActivations == null
+      ? {}
+      : {
+          cardActivations: list(data.cardActivations, (value) => {
+            const activation = record(value);
+            const { side } = activation;
+            const effectName = text(activation.effectName).trim();
+            if ((side !== 'self' && side !== 'opponent') || !effectName)
+              throw new Error('卡片生效记录格式异常');
+            return { side, card: collectedCard(activation.card, baseUrl), effectName };
+          }),
+        }),
   };
 }
 export function autoFeed(value: unknown): AutoFeed {

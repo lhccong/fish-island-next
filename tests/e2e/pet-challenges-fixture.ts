@@ -1,9 +1,55 @@
+export const petCardActivation = {
+  side: 'self',
+  card: {
+    id: 'battle-test-card',
+    name: '潮月守卫',
+    stars: 1,
+    grade: 'epic',
+    artKey: `${'a'.repeat(64)}.jpg`,
+    artTile: 5,
+    portrait: false,
+  },
+  effectName: '潮月护体',
+};
+
+export const opponentCardActivation = {
+  side: 'opponent',
+  card: { ...petCardActivation.card, id: 'opponent-test-card', name: '极光灵狐', artTile: 8 },
+  effectName: '极光锐爪',
+};
+
+const duelShowcase = [
+  {
+    card: petCardActivation.card,
+    stats: { health: 65, defense: 12 },
+    effect: {
+      kind: 'effect',
+      name: petCardActivation.effectName,
+      turnOffset: 1,
+      trigger: { kind: 'turnStart' },
+      outcome: { kind: 'shield', maxHealthPercent: 20 },
+    },
+  },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    card: {
+      ...petCardActivation.card,
+      id: `common-${index}`,
+      name: `苔光种子 ${index + 1}`,
+      grade: 'common',
+      artTile: index,
+      stars: 2,
+    },
+    stats: { health: 12, speed: 5 },
+  })),
+];
+
 export function createPetChallengeState() {
   return {
     battleCount: 0,
     failBattle: false,
     battleEmpty: false,
     battleEffects: false,
+    duelShowcase: false,
     bossHealth: 90,
     towerFloor: 2,
     towerCompleted: false,
@@ -74,6 +120,7 @@ export function petChallengeResponse(
         avatar: pet.petUrl,
         health: 120,
         equippedItems: pet.equippedItems,
+        ...(state.duelShowcase ? { showcaseCards: duelShowcase } : {}),
       },
       opponentPet: {
         petId: '18',
@@ -81,6 +128,23 @@ export function petChallengeResponse(
         avatar: pet.petUrl,
         health: 90,
         equippedItems: pet.equippedItems,
+        ...(state.duelShowcase
+          ? {
+              showcaseCards: [
+                {
+                  card: opponentCardActivation.card,
+                  stats: { attack: 20 },
+                  effect: {
+                    kind: 'effect',
+                    name: opponentCardActivation.effectName,
+                    turnOffset: 1,
+                    trigger: { kind: 'firstHit' },
+                    outcome: { kind: 'guaranteedCriticalHit' },
+                  },
+                },
+              ],
+            }
+          : {}),
       },
     };
   else if (['pet/battle/start', 'boss/battle', 'tower/challenge'].includes(path)) {
@@ -90,20 +154,28 @@ export function petChallengeResponse(
       ? [
           {
             attackerType: 'PET',
+            roundNumber: 1,
             damage: 0,
             petRemainingHealth: 120,
             bossRemainingHealth: 90,
             isDodge: true,
+            ...(path === 'tower/challenge' ? { cardActivations: [petCardActivation] } : {}),
           },
           {
             attackerType: 'BOSS',
+            roundNumber: 1,
             damage: 5,
             petRemainingHealth: 115,
             bossRemainingHealth: 90,
             isBlock: true,
+            cardActivations:
+              path === 'pet/battle/start'
+                ? [petCardActivation, opponentCardActivation]
+                : [petCardActivation],
           },
           {
             attackerType: 'PET',
+            roundNumber: 2,
             damage: 20,
             petRemainingHealth: 120,
             bossRemainingHealth: 70,
@@ -112,6 +184,7 @@ export function petChallengeResponse(
           },
           {
             attackerType: 'PET',
+            roundNumber: 2,
             damage: 70,
             petRemainingHealth: 120,
             bossRemainingHealth: 0,

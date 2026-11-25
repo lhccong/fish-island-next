@@ -60,6 +60,9 @@ for (const skin of builtinSkins)
         test.setTimeout(120000);
         await page.setViewportSize({ width, height: width > 760 ? 1000 : 844 });
         const state = await setupPet(page, skin.id, mode);
+        await page.route('**/api/pet/cards/art/*', (route) =>
+          route.fulfill({ path: 'public/assets/pet/card-art.jpg' }),
+        );
         state.pet.equippedItems.hand = {
           id: '508',
           quantity: 1,
@@ -242,13 +245,16 @@ for (const skin of builtinSkins)
           'aria-valuenow',
           '920',
         );
+        state.battleEffects = true;
         await dialog.getByRole('button', { name: '开始试炼', exact: true }).click();
+        await expect(dialog.locator('[data-card-activation="self"]')).toContainText('潮月守卫');
         await finishPetBattle(dialog);
         await expect(
           dialog.getByText('本次累计伤害 90 · 获得 10 积分', { exact: true }),
         ).toBeVisible();
         await dialog.getByRole('button', { name: '继续试炼' }).click();
         await expect(dialog.getByRole('region', { name: '第 4 层守卫状态' })).toBeVisible();
+        state.battleEffects = false;
         state.battleEmpty = true;
         await dialog.getByRole('button', { name: '开始试炼', exact: true }).click();
         await expect(dialog.getByRole('alert')).toContainText('未返回战斗回合');

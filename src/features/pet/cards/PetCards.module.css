@@ -925,6 +925,11 @@
   }
 }
 @media (max-width: 760px) {
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-items: start;
+  }
   .packCarousel > .packArrow {
     min-inline-size: 44px;
   }

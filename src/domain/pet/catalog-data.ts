@@ -8,6 +8,7 @@ import {
   type PetCardDefinition,
   type PetCardPoolDefinition,
 } from './catalog';
+import type { PetCardBattleEffect } from './card-battle';
 
 const code = /^[A-Za-z][A-Za-z0-9_-]{0,47}$/;
 const atlasKey = /^[a-f0-9]{64}\.(jpg|png)$/;
@@ -47,12 +48,20 @@ function bool(value: unknown): boolean {
 }
 
 function readBattle(value: unknown, grade: PetCardDefinition['grade']): PetCard['battle'] {
-  const battle = record(value);
   if (grade === 'common') {
+    const battle = record(value);
     check(battle.kind === 'action' && battle.phase === 'afterReveal');
     check(battle.action === 'attack' || battle.action === 'dodge');
     return { kind: 'action', phase: 'afterReveal', action: battle.action };
   }
+  return readPetCardBattleEffect(value, grade);
+}
+
+export function readPetCardBattleEffect(
+  value: unknown,
+  grade: PetCardDefinition['grade'],
+): PetCardBattleEffect {
+  const battle = record(value);
   const trigger = record(battle.trigger);
   const outcome = record(battle.outcome);
   check(
@@ -91,8 +100,9 @@ function readBattle(value: unknown, grade: PetCardDefinition['grade']): PetCard[
     default:
       check(false);
   }
+  check(grade !== 'common');
   check(grade !== 'fine' || (trigger.kind === 'turnStart' && outcome.kind === 'heal'));
-  return battle as unknown as PetCard['battle'];
+  return battle as unknown as PetCardBattleEffect;
 }
 
 export function readPetCardDefinition(value: unknown): PetCardDefinition {

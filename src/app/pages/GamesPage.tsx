@@ -26,7 +26,6 @@ export function GamesPage() {
           <GameCatalog
             onPlay={() => navigate('/game/life')}
             onDarkRoom={() => navigate('/game/darkRoom')}
-            onMilkyWayIdle={() => navigate('/game/milky-way-idle')}
             onStock={() => navigate('/game/stock')}
             onFarm={() => navigate('/game/farm')}
             onGomoku={() => navigate('/game/piece')}

@@ -6,33 +6,32 @@ import { Button } from '@/shared/ui/Button';
 import { usePetOperation, usePetResource } from './resource';
 import { ResourceView, OperationNotice } from './Feedback';
 import { BattleStage } from './BattleStage';
-import { battleOutcome, roundNarration } from './battle-presentation';
+import { BattleRoundLog } from './BattleRoundLog';
+import { battleFrameDuration, battleOutcome, roundNarration } from './battle-presentation';
 import styles from './PixelBattle.module.css';
+
+type BattleEncounter =
+  { target: BattleTarget; pet: Companion } | { target: { kind: 'pet'; id: string }; pet?: never };
 
 export function BattlePanel({
   service,
   pet,
   target,
   onChange,
-}: {
-  service: PetPort;
-  pet: Companion;
-  target: BattleTarget;
-  onChange: () => void;
-}) {
+}: BattleEncounter & { service: PetPort; onChange?: () => void }) {
   // Keep this encounter stable when the camp refreshes after server settlement.
   const [companion] = useState(pet);
-  const health = companionBattleHealth(companion);
-  const attack = companion.stats.find(([name]) => name === '攻击')?.[1] ?? 0;
   const load = useCallback(
     async (signal: AbortSignal): Promise<BattlePreview> => {
       if (target.kind !== 'tower') {
         const preview = await service.preview(target, signal);
+        if (preview.self.equipment || !companion) return preview;
         return {
           ...preview,
-          self: { ...preview.self, equipment: preview.self.equipment ?? companion.equipment },
+          self: { ...preview.self, equipment: companion.equipment },
         };
       }
+      if (!companion) throw new Error('请先领养伙伴再开始试炼');
       const progress = await service.tower(signal);
       if (!progress.next || progress.completed)
         throw new Error('当前没有可挑战的下一层，请返回列表查看最新进度');
@@ -42,15 +41,15 @@ export function BattlePanel({
           name: companion.name,
           url: companion.url,
           level: companion.level,
-          health,
-          attack,
+          health: companionBattleHealth(companion),
+          attack: companion.stats.find(([name]) => name === '攻击')?.[1] ?? 0,
           reward: 0,
           equipment: companion.equipment,
         },
         opponent: progress.next,
       };
     },
-    [service, companion, health, attack, target],
+    [service, companion, target],
   );
   const resource = usePetResource(load);
   return (
@@ -77,7 +76,7 @@ function BattlePlayback({
   service: PetPort;
   target: BattleTarget;
   preview: BattlePreview;
-  onChange: () => void;
+  onChange: (() => void) | undefined;
   onContinue: () => void;
 }) {
   const [result, setResult] = useState<BattleResult | null>(null);
@@ -85,12 +84,13 @@ function BattlePlayback({
   const [uncertain, setUncertain] = useState(false);
   const operation = usePetOperation();
   const playing = !!result && frame < result.rounds.length;
+  const current = result?.rounds[Math.min(frame, result.rounds.length - 1)];
+  const roundCount = result?.rounds.at(-1)?.roundNumber ?? result?.rounds.length;
   useEffect(() => {
     if (!playing) return;
-    const timer = setTimeout(() => setFrame((value) => value + 1), 900);
+    const timer = setTimeout(() => setFrame((value) => value + 1), battleFrameDuration(current));
     return () => clearTimeout(timer);
-  }, [playing, frame]);
-  const current = result?.rounds[Math.min(frame, result.rounds.length - 1)];
+  }, [playing, frame, current]);
   const done = !!result && !playing;
   const totalDamage =
     result?.rounds
@@ -104,7 +104,7 @@ function BattlePlayback({
         <h3>{title}</h3>
         <span>
           {playing
-            ? `回合 ${frame + 1} / ${result!.rounds.length}`
+            ? `回合 ${current?.roundNumber ?? frame + 1} / ${roundCount}`
             : done
               ? '战斗结束'
               : '准备就绪'}
@@ -132,6 +132,7 @@ function BattlePlayback({
           {!result && (
             <Button
               disabled={operation.pending || uncertain}
+              aria-label={operation.pending ? '正在提交挑战…' : undefined}
               onClick={() =>
                 void operation.run(
                   async (signal) => {
@@ -163,7 +164,7 @@ function BattlePlayback({
                   (value) => {
                     setResult(value);
                     setFrame(0);
-                    onChange();
+                    onChange?.();
                   },
                 )
               }
@@ -203,21 +204,18 @@ function BattlePlayback({
         </div>
       )}
       {result && (
-        <details className={styles.disclosure}>
-          <summary>战斗回合记录 · {Math.min(frame + 1, result.rounds.length)} 回合</summary>
-          <ol className={styles.log} aria-label="战斗回合记录">
-            {result.rounds.slice(0, frame + 1).map((round, index) => (
-              <li key={index}>
-                第 {index + 1} 回合 ·{' '}
-                {roundNarration(round, preview.self.name, preview.opponent.name)}
-              </li>
-            ))}
-          </ol>
-        </details>
+        <BattleRoundLog
+          rounds={result.rounds}
+          frame={frame}
+          selfName={preview.self.name}
+          opponentName={preview.opponent.name}
+        />
       )}
-      <p className={styles.note}>
-        开始挑战将使用每日挑战次数，关闭不会撤销。战斗自动进行，伤害与奖励以实际结算为准。
-      </p>
+      {target.kind !== 'pet' && (
+        <p className={styles.note}>
+          开始挑战将使用每日挑战次数，关闭不会撤销。战斗自动进行，伤害与奖励以实际结算为准。
+        </p>
+      )}
     </div>
   );
 }

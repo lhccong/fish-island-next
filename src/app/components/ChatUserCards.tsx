@@ -84,6 +84,7 @@ export function ChatUserCards({
           <OtherCompanionPanel
             service={petService}
             userId={pet}
+            viewerId={user?.id ?? ''}
             onClose={() => setPet('')}
             returnFocusRef={petReturnFocus}
           />

@@ -1,0 +1,121 @@
+.lineup {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.trigger {
+  --card-edge: var(--color-border);
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--card-edge);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+  cursor: pointer;
+}
+.trigger[data-grade='fine'] {
+  --card-edge: var(--color-life-rare);
+}
+.trigger[data-grade='epic'] {
+  --card-edge: var(--color-life-epic);
+}
+.trigger[data-grade='legendary'] {
+  --card-edge: var(--color-life-legendary);
+}
+.trigger[data-grade='shiny'] {
+  background: linear-gradient(125deg, var(--color-pet-card-spectrum));
+}
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  border-color: var(--color-action);
+  box-shadow: 0 0 0 1px var(--color-action);
+}
+.trigger:focus-visible {
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
+  outline-offset: 1px;
+  position: relative;
+  z-index: 1;
+}
+.trigger .art {
+  width: 18px;
+  border: 0;
+  border-radius: max(0px, calc(var(--radius-control) - 2px));
+}
+.art span {
+  font-size: 0.5rem;
+}
+.art [data-loading-indicator] {
+  gap: 0;
+  font: inherit;
+  line-height: 1;
+}
+.art svg {
+  width: 8px;
+  height: 8px;
+}
+.popover {
+  z-index: 90;
+  width: min(280px, calc(100vw - 24px));
+  --color-surface: var(--color-pixel-paper);
+  --color-border: var(--color-pixel-border);
+  --color-text: var(--color-pixel-ink);
+  --color-muted: var(--color-pixel-muted);
+}
+.scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 8px 0 8px 12px;
+}
+.name,
+.details {
+  overflow-wrap: anywhere;
+}
+.name {
+  font-size: 0.875rem;
+}
+.details {
+  display: grid;
+  gap: 6px;
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+.details p {
+  margin: 0;
+}
+.rarity {
+  color: var(--color-muted);
+}
+.bonuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  color: var(--color-accent-text);
+}
+@media (max-width: 760px) {
+  .lineup {
+    width: 100%;
+    gap: 4px;
+  }
+  .trigger {
+    width: 44px;
+    height: 44px;
+  }
+  .trigger .art {
+    width: 36px;
+  }
+  .art span {
+    font-size: 0.625rem;
+  }
+  .art svg {
+    width: 12px;
+    height: 12px;
+  }
+}

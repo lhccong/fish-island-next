@@ -10,6 +10,7 @@ export function CardAtlasImage({
   tile,
   portrait,
   showFullTile = false,
+  loadingLabel = '加载中',
   className = '',
 }: {
   src: string | undefined;
@@ -17,6 +18,7 @@ export function CardAtlasImage({
   tile: number;
   portrait: boolean;
   showFullTile?: boolean;
+  loadingLabel?: string;
   className?: string;
 }) {
   const [loaded, setLoaded] = useState('');
@@ -24,7 +26,7 @@ export function CardAtlasImage({
   const fullPortrait = portrait && showFullTile;
   const crop = cardAtlasCrop(tile, portrait && !fullPortrait);
   return (
-    <div className={`${styles.frame} ${className}`} data-full-portrait={fullPortrait || undefined}>
+    <span className={`${styles.frame} ${className}`} data-full-portrait={fullPortrait || undefined}>
       {!src || failed === src ? (
         <span className={styles.unavailable}>
           <ImageOff size={15} aria-hidden="true" />
@@ -32,7 +34,7 @@ export function CardAtlasImage({
         </span>
       ) : (
         <>
-          {loaded !== src && <LoadingIndicator compact>加载中</LoadingIndicator>}
+          {loaded !== src && <LoadingIndicator compact>{loadingLabel}</LoadingIndicator>}
           <img
             key={src}
             src={src}
@@ -51,6 +53,6 @@ export function CardAtlasImage({
           />
         </>
       )}
-    </div>
+    </span>
   );
 }

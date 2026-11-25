@@ -1,10 +1,23 @@
 .stage {
   position: relative;
-  height: 370px;
+  display: grid;
+  grid-template-columns: minmax(190px, 35.5%) minmax(0, 1fr) minmax(190px, 35.5%);
+  align-items: start;
+  min-height: 370px;
+  padding: 8px 5% 14px;
   isolation: isolate;
   overflow: hidden;
   border: 3px solid var(--color-pet-battle-ink);
   background: var(--color-pet-battle-sky);
+}
+.self {
+  grid-column: 1;
+  grid-row: 1;
+  margin-top: 28px;
+}
+.opponent {
+  grid-column: 3;
+  grid-row: 1;
 }
 .landscape {
   position: absolute;
@@ -13,26 +26,67 @@
   height: 100%;
   z-index: -1;
 }
-.healthPanel {
+.cardActivations {
   position: absolute;
-  width: 32%;
-  min-width: 190px;
+  inset: 12px auto auto 50%;
+  z-index: 3;
+  display: grid;
+  gap: 6px;
+  width: clamp(150px, calc(66% - 246px), 272px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.cardActivation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-action);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  animation: card-appear 160ms ease-out both;
+}
+.cardActivationArt {
+  width: 40px;
+}
+.cardActivationText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+.cardActivationText > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cardActivationText strong {
+  font-size: 0.875rem;
+}
+.cardActivationLabel {
+  color: var(--color-accent-text);
+}
+@keyframes card-appear {
+  from {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+}
+.healthPanel {
+  position: relative;
+  container-type: inline-size;
+  min-width: 0;
   padding: 12px 16px 8px;
   border: 2px solid var(--color-pet-battle-ink);
   background: var(--color-surface);
   color: var(--color-text);
   box-shadow: 4px 4px 0 var(--color-pet-shadow);
   z-index: 2;
-}
-.healthPanel[data-side='opponent'] {
-  left: auto;
-  right: 5%;
-  top: 194px;
-}
-.healthPanel[data-side='self'] {
-  right: auto;
-  left: 5%;
-  bottom: 14px;
+  margin-top: 12px;
 }
 .identity {
   display: flex;
@@ -86,19 +140,12 @@
     monospace;
 }
 .fighter {
-  position: absolute;
+  position: relative;
   display: grid;
   place-items: center;
-  width: 210px;
+  width: min(100%, 210px);
   height: 170px;
-}
-.fighter[data-side='self'] {
-  left: 9%;
-  bottom: 154px;
-}
-.fighter[data-side='opponent'] {
-  right: 12%;
-  top: 12px;
+  margin-inline: auto;
 }
 .platform {
   position: absolute;
@@ -363,6 +410,11 @@
   padding-left: 28px;
   font-size: 0.75rem;
   line-height: 2;
+  overflow-wrap: anywhere;
+}
+.roundHealth {
+  display: block;
+  color: var(--color-muted);
 }
 .note {
   margin: 0;
@@ -588,22 +640,35 @@
 }
 @media (max-width: 760px) {
   .stage {
-    height: 440px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    min-height: 440px;
+    padding: 8px 8px 12px;
+  }
+  .self {
+    margin-top: 114px;
+  }
+  .opponent {
+    grid-column: 2;
+  }
+  .cardActivations {
+    inset: 8px auto auto 8px;
+    width: calc(50% - 6px);
+    transform: none;
+  }
+  .cardActivation {
+    gap: 4px;
+    padding-inline: 4px;
+  }
+  .cardActivationArt {
+    width: 32px;
+  }
+  .cardActivationText strong {
+    font-size: 0.8125rem;
   }
   .healthPanel {
-    min-width: 0;
-    width: 46%;
     padding: 8px 8px 6px;
-  }
-  .healthPanel[data-side='opponent'] {
-    left: auto;
-    right: 8px;
-    top: 156px;
-  }
-  .healthPanel[data-side='self'] {
-    right: auto;
-    left: 8px;
-    bottom: 8px;
+    margin-top: 8px;
   }
   .identity {
     flex-wrap: wrap;
@@ -620,16 +685,8 @@
     margin-top: 6px;
   }
   .fighter {
-    width: 136px;
+    width: min(100%, 136px);
     height: 136px;
-  }
-  .fighter[data-side='opponent'] {
-    right: 4px;
-    top: 12px;
-  }
-  .fighter[data-side='self'] {
-    left: 4px;
-    bottom: 178px;
   }
   .fighter[data-side='self'] .sprite {
     zoom: 0.85;
@@ -701,6 +758,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .cardActivation {
+    animation: none;
+  }
   .healthTrack > span {
     transition: none;
   }
@@ -727,10 +787,19 @@
   }
 }
 
-.equipment {
+.loadout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
   margin-top: 10px;
   border-top: 1px solid var(--color-border);
-  padding-top: 10px;
+  padding-top: 8px;
+}
+.equipment {
+  grid-column: 2;
+  margin-inline-start: auto;
+  max-width: 100%;
   min-width: 0;
 }
 .equipment > small {
@@ -771,6 +840,17 @@
   background: var(--color-surface);
   transform: rotate(45deg);
 }
+@container (max-width: 205px) {
+  .loadout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .equipment {
+    grid-column: 1;
+  }
+  .gearGrid {
+    grid-template-columns: repeat(3, 24px);
+  }
+}
 @media (max-width: 760px) {
   .gearGrid {
     grid-template-columns: repeat(3, 24px);
@@ -778,8 +858,12 @@
     gap: 6px;
   }
   .equipment {
+    grid-column: 1;
+    margin-inline-start: 0;
+  }
+  .loadout {
+    grid-template-columns: minmax(0, 1fr);
     margin-top: 8px;
-    padding-top: 8px;
   }
 }
 

@@ -15,7 +15,7 @@ export function HoverPreview({
   content: ReactNode;
   children: (descriptionId: string | undefined) => ReactNode;
   disabled?: boolean;
-  size?: 'default' | 'compact';
+  size?: 'default' | 'compact' | 'detail';
   anchorRef?: RefObject<HTMLElement | null>;
   onOpenChange?: (open: boolean) => void;
 }) {
@@ -36,13 +36,17 @@ export function HoverPreview({
   const show = () => {
     clear();
     if (disabled) return;
-    if (!window.matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)').matches)
-      return;
+    const desktop =
+      size === 'detail'
+        ? '(min-width: 761px)'
+        : '(min-width: 761px) and (hover: hover) and (pointer: fine)';
+    if (!window.matchMedia(desktop).matches) return;
     timer.current = setTimeout(() => {
       const box = (anchorRef?.current ?? anchor.current)?.getBoundingClientRect();
       if (!box) return;
       const width = Math.min(size === 'compact' ? 248 : 280, innerWidth - 24);
-      const height = Math.min(size === 'compact' ? 144 : 300, innerHeight - 24);
+      const preferredHeight = size === 'compact' ? 144 : size === 'detail' ? 200 : 300;
+      const height = Math.min(preferredHeight, innerHeight - 24);
       const preferred =
         innerWidth - box.right >= width + 20 ? box.right + 12 : box.left - width - 12;
       setPosition({
@@ -87,8 +91,21 @@ export function HoverPreview({
       <span
         ref={anchor}
         className={styles.anchor}
+        onPointerEnter={(event) => {
+          if (
+            size === 'detail' &&
+            event.pointerType === 'mouse' &&
+            event.currentTarget.contains(event.target as Node)
+          )
+            show();
+        }}
         onMouseEnter={(event) => {
-          if (event.target instanceof Node && event.currentTarget.contains(event.target)) show();
+          if (
+            size !== 'detail' &&
+            event.target instanceof Node &&
+            event.currentTarget.contains(event.target)
+          )
+            show();
         }}
         onMouseLeave={leave}
         onFocusCapture={(event) => {
@@ -108,8 +125,13 @@ export function HoverPreview({
             id={id}
             role="tooltip"
             aria-label={label}
-            className={`${styles.preview} ${size === 'compact' ? styles.compact : ''}`}
-            style={position}
+            className={styles.preview}
+            data-size={size}
+            style={
+              size === 'detail'
+                ? { ...position, height: 'auto', maxHeight: position.height }
+                : position
+            }
             onMouseEnter={clear}
             onMouseLeave={leave}
           >

@@ -266,21 +266,6 @@
 .stockArt p {
   font-size: 0.75rem;
 }
-.milkyWayArt {
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: var(--space-4);
-}
-.milkyWayArt svg {
-  position: static;
-  opacity: 1;
-}
-.milkyWayArt > span {
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: 0;
-}
 .stockCaption {
   display: flex;
   justify-content: space-between;

@@ -47,6 +47,7 @@ function supply(value: unknown): Supply {
 }
 export function createPetActivities(
   request: Request,
+  baseUrl = '',
 ): Pick<PetPort, 'tournament' | 'compete' | 'supplies' | 'supply' | 'draw' | 'drawRecords'> {
   return {
     async tournament(signal) {
@@ -78,7 +79,7 @@ export function createPetActivities(
       return {
         win: data.isWin,
         rank: data.myRank === null ? null : number(data.myRank),
-        rounds: list(data.rounds ?? [], round),
+        rounds: list(data.rounds ?? [], (value) => round(value, baseUrl)),
       };
     },
     async supplies(signal) {

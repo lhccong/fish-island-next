@@ -30,9 +30,6 @@ const UndercoverGame = lazy(() =>
 const DarkRoomGame = lazy(() =>
   import('./DarkRoomGame').then((m) => ({ default: m.DarkRoomGame })),
 );
-const MilkyWayIdle = lazy(() =>
-  import('@/features/milky-way-idle').then((m) => ({ default: m.MilkyWayIdle })),
-);
 
 export function GameWindowContent({ game, onEscape }: { game: GameId; onEscape: () => void }) {
   const { session, restore, refreshUser } = useAuth();
@@ -42,7 +39,6 @@ export function GameWindowContent({ game, onEscape }: { game: GameId; onEscape: 
   const [detailCode, setDetailCode] = useState<string | null>(null);
   if (game === 'life') return <LifeGame />;
   if (game === 'dark-room') return <DarkRoomGame onEscape={onEscape} />;
-  if (game === 'milky-way-idle') return <MilkyWayIdle />;
   if (game === 'draw') return <DrawGame />;
   if (game === 'undercover') return <UndercoverGame />;
   if (session.status === 'checking') return <LoadingIndicator>正在恢复登录状态…</LoadingIndicator>;

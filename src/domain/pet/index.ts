@@ -1,5 +1,7 @@
 import type { CollectedPetCard } from './card-play';
+import type { BattleRound, BattleShowcaseCard } from './battle';
 import type { TreasurePort } from './treasure';
+export type { BattleCardActivation, BattleRound, BattleShowcaseCard } from './battle';
 export { treasureSites } from './treasure';
 export type { TreasureSiteId, TreasureState, TreasurePort } from './treasure';
 export { petCardActions, petCardRecoveryEffect } from './card-battle';
@@ -19,6 +21,7 @@ export type {
 export {
   readPetCardAtlas,
   readPetCardAtlases,
+  readPetCardBattleEffect,
   readPetCardCatalog,
   readPetCardPage,
   readPetCardPools,
@@ -110,19 +113,9 @@ export interface Challenger {
   level?: number;
   stats?: [string, number][];
   equipment?: Companion['equipment'];
+  showcaseCards?: BattleShowcaseCard[];
   attack: number;
   reward: number;
-}
-export interface BattleRound {
-  attacker: 'self' | 'opponent';
-  damage: number;
-  selfHealth: number;
-  opponentHealth: number;
-  critical: boolean;
-  dodge: boolean;
-  block: boolean;
-  combo?: boolean;
-  lifesteal?: number;
 }
 export interface BattlePreview {
   self: Challenger;

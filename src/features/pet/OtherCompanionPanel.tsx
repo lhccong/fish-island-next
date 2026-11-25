@@ -1,6 +1,8 @@
-import { useCallback, type RefObject } from 'react';
+import { useCallback, useRef, useState, type RefObject } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { equipmentSlots, type PetPort } from '@/domain/pet';
+import { Button } from '@/shared/ui/Button';
+import { BattlePanel } from './BattlePanel';
 import { usePetResource } from './resource';
 import { ResourceView } from './Feedback';
 import { CompanionSummary } from './CompanionSummary';
@@ -14,11 +16,13 @@ import styles from './Panels.module.css';
 export function OtherCompanionPanel({
   service,
   userId,
+  viewerId,
   onClose,
   returnFocusRef,
 }: {
   service: PetPort;
   userId: string;
+  viewerId: string;
   onClose: () => void;
   returnFocusRef?: RefObject<HTMLElement | null> | undefined;
 }) {
@@ -27,6 +31,8 @@ export function OtherCompanionPanel({
     [service, userId],
   );
   const resource = usePetResource(load);
+  const [duel, setDuel] = useState<{ kind: 'pet'; id: string } | null>(null);
+  const duelButton = useRef<HTMLButtonElement | null>(null);
   return (
     <PanelDialog
       title="伙伴资料"
@@ -38,7 +44,18 @@ export function OtherCompanionPanel({
         {(pet) =>
           pet ? (
             <>
-              <CompanionSummary pet={pet} service={service} />
+              <CompanionSummary
+                pet={pet}
+                service={service}
+                headerAction={
+                  viewerId &&
+                  viewerId !== userId && (
+                    <Button ref={duelButton} onClick={() => setDuel({ kind: 'pet', id: userId })}>
+                      宠物切磋
+                    </Button>
+                  )
+                }
+              />
               <div className={styles.columns}>
                 <section className={styles.section}>
                   <h3>能力属性</h3>
@@ -90,6 +107,18 @@ export function OtherCompanionPanel({
           )
         }
       </ResourceView>
+      {duel && (
+        <PanelDialog
+          title="宠物切磋"
+          description="与这位岛友的伙伴对战，查看战斗回放。"
+          appearance="pixel"
+          layer="nested"
+          onClose={() => setDuel(null)}
+          returnFocusRef={duelButton}
+        >
+          <BattlePanel service={service} target={duel} />
+        </PanelDialog>
+      )}
     </PanelDialog>
   );
 }

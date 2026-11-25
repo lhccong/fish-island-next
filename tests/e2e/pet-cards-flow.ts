@@ -27,7 +27,7 @@ export async function assertShowcaseEffect(showcase: Locator) {
   const effects = showcase.getByRole('region', { name: '对战效果预览' });
   await expect(stats).toContainText('攻击 +36');
   await expect(stats).not.toContainText('极光锐爪');
-  await expect(effects).toContainText('极光锐爪 下一回合首次攻击命中时，100% 暴击。');
+  await expect(effects).toContainText('极光锐爪 生效回合首次攻击命中时，100% 暴击。');
 }
 
 export async function choosePetCardPack(dialog: Locator, name: string, mobile: boolean) {

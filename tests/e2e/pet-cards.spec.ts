@@ -182,7 +182,7 @@ for (const skin of builtinSkins)
         await expect(dialog.getByText('重复卡已分解，获得 15 试玩积分')).toBeAttached();
         await expect(dialog.getByText('闪耀', { exact: true })).toBeAttached();
         await expect(dialog.getByText('攻击 +36', { exact: true })).toBeAttached();
-        await expect(dialog.getByText('下一回合首次攻击命中时，100% 暴击。')).toBeAttached();
+        await expect(dialog.getByText('生效回合首次攻击命中时，100% 暴击。')).toBeAttached();
         const backgrounds = await dialog
           .getByText('极光锐爪', { exact: true })
           .evaluate((label) => {
@@ -208,6 +208,8 @@ for (const skin of builtinSkins)
           await dialog.screenshot({ path: info.outputPath('opened-pack.png') });
         }
         await activate(button('完成开包'), mobile);
+        await activate(button('图鉴'), mobile);
+        await expect(dialog.getByText('已收集 2 / 100', { exact: true })).toBeVisible();
         await activate(button('展示柜'), mobile);
         await expect(showcase).toContainText('0 / 6');
         await assertCollectionSlots(collection, 2);

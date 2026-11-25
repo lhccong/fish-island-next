@@ -2,6 +2,7 @@ import type { Challenger } from '@/domain/pet';
 import { boundedPercent } from '@/domain/pet';
 import styles from './PixelBattle.module.css';
 import { BattleEquipment } from './BattleEquipment';
+import { BattleShowcase } from './BattleShowcase';
 
 export function CombatantStatus({
   fighter,
@@ -19,6 +20,7 @@ export function CombatantStatus({
     health ?? (fighter.health > 0 ? fighter.health : maximum ? fighter.health : undefined);
   const percent =
     value !== undefined && maximum > 0 ? boundedPercent((value / maximum) * 100) : null;
+  const cards = fighter.showcaseCards;
   return (
     <section className={styles.healthPanel} data-side={side} aria-label={`${fighter.name}状态`}>
       <div className={styles.identity}>
@@ -46,7 +48,12 @@ export function CombatantStatus({
       <small>
         {value === undefined ? '生命待结算' : `${value}${maximum > 0 ? ` / ${maximum}` : ''}`}
       </small>
-      {showEquipment && <BattleEquipment fighter={fighter} />}
+      {(showEquipment || !!cards?.length) && (
+        <div className={styles.loadout}>
+          {!!cards?.length && <BattleShowcase owner={fighter.name} cards={cards} />}
+          {showEquipment && <BattleEquipment fighter={fighter} />}
+        </div>
+      )}
     </section>
   );
 }

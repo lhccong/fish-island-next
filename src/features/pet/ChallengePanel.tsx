@@ -105,7 +105,12 @@ function RankList({
             ))}
           </ol>
           {other && (
-            <OtherCompanionPanel service={service} userId={other} onClose={() => setOther(null)} />
+            <OtherCompanionPanel
+              service={service}
+              userId={other}
+              viewerId={userId}
+              onClose={() => setOther(null)}
+            />
           )}
         </>
       )}

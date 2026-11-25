@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Disc3, GalleryVerticalEnd, PackageOpen } from 'lucide-react';
+import { Disc3 } from 'lucide-react';
 import {
   dailyPetPackLimit,
   getPetCard,
@@ -15,6 +15,8 @@ import { Button } from '@/shared/ui/Button';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { ConfirmAction } from './ConfirmAction';
+import { PetCardEncyclopedia } from './cards/PetCardEncyclopedia';
+import { PetCardNavigation, type PetCardView } from './cards/PetCardNavigation';
 import { PetCardShowcase } from './cards/PetCardShowcase';
 import { PetPackActions } from './cards/PetPackActions';
 import { PetPackCarousel } from './cards/PetPackCarousel';
@@ -38,7 +40,7 @@ export function PetCardsExperience({
     userId,
     catalog,
   );
-  const [view, setView] = useState<'pack' | 'showcase'>('pack');
+  const [view, setView] = useState<PetCardView>('pack');
   const [selection, setSelection] = useState<PetCardPackKind | null>(null);
   const [reveal, setReveal] = useState<{ id: number; positions: number[] }>({
     id: 0,
@@ -119,7 +121,7 @@ export function PetCardsExperience({
         }
       : undefined;
 
-  function switchView(next: 'pack' | 'showcase') {
+  function switchView(next: PetCardView) {
     if (next !== view) setSpotlight([]);
     if (next !== view && viewport.current) viewport.current.scrollTop = 0;
     setView(next);
@@ -154,6 +156,8 @@ export function PetCardsExperience({
   let primaryLabel = flipping ? '翻开下一张' : '完成开包';
   if (opening) primaryLabel = '正在拆封…';
   if (playingShiny) primaryLabel = '继续';
+  const packTip =
+    remaining || hasStock || result ? '待拆卡包可跨日保留。' : '北京时间 00:00 恢复领取次数。';
 
   function advance() {
     if (playingShiny) {
@@ -172,24 +176,21 @@ export function PetCardsExperience({
   return (
     <div className={styles.demo}>
       <header className={styles.toolbar}>
-        <div role="group" aria-label="卡包玩法" className={styles.tabs}>
-          <Button
-            variant="secondary"
-            aria-pressed={view === 'pack'}
-            onClick={() => switchView('pack')}
-          >
-            <PackageOpen size={16} aria-hidden="true" /> 开卡包
-          </Button>
-          <Button
-            variant="secondary"
-            aria-pressed={view === 'showcase'}
-            disabled={flipping || opening || playingShiny}
-            onClick={() => switchView('showcase')}
-          >
-            <GalleryVerticalEnd size={16} aria-hidden="true" /> 展示柜
-          </Button>
+        <PetCardNavigation
+          demo
+          view={view}
+          isDisabled={(id) =>
+            id !== 'pack' &&
+            (flipping ||
+              opening ||
+              playingShiny ||
+              (id === 'encyclopedia' && (!!result || pending)))
+          }
+          onChange={switchView}
+        />
+        {view !== 'encyclopedia' && (
           <PetPackCarousel name={pack.name} stock={stock} move={movePack} multiple={multiple} />
-        </div>
+        )}
         <div className={styles.counters}>
           <span>
             今日可领{' '}
@@ -216,7 +217,9 @@ export function PetCardsExperience({
           viewportRef={viewport}
         >
           <div className={styles.body}>
-            {view === 'pack' ? (
+            {view === 'encyclopedia' ? (
+              <PetCardEncyclopedia owned={owned} />
+            ) : view === 'pack' ? (
               <PetPackStage
                 pack={pack}
                 result={opening ? null : result}
@@ -250,18 +253,14 @@ export function PetCardsExperience({
       <footer className={styles.footer}>
         <div className={styles.feedback}>
           {error && <p role="alert">{error}</p>}
-          {view === 'showcase' && pending && <LoadingIndicator compact>正在保存…</LoadingIndicator>}
+          {view === 'collection' && pending && (
+            <LoadingIndicator compact>正在保存…</LoadingIndicator>
+          )}
           {resetNotice && initial ? (
             <p role="status">已恢复试玩初始状态。</p>
-          ) : (
-            <p>
-              {view === 'showcase'
-                ? '收藏的卡可上架展示。'
-                : remaining || hasStock || result
-                  ? '待拆卡包可跨日保留。'
-                  : '北京时间 00:00 恢复领取次数。'}
-            </p>
-          )}
+          ) : view !== 'encyclopedia' ? (
+            <p>{view === 'collection' ? '收藏的卡可上架展示。' : packTip}</p>
+          ) : null}
         </div>
         <div className={styles.actions}>
           <ConfirmAction

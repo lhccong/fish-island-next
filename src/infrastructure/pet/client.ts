@@ -47,7 +47,7 @@ export function createPetClient(
   }
   return {
     ...createTreasureClient(request),
-    ...createPetActivities(request),
+    ...createPetActivities(request, baseUrl),
     async other(userId, signal) {
       const data = await request(`pet/other?${query({ otherUserId: userId })}`, signal);
       return data === null ? null : companion(data);
@@ -157,8 +157,8 @@ export function createPetClient(
     async preview(target, signal) {
       const data = record(await request(battlePath(target, true), signal));
       return {
-        self: challenger(target.kind === 'boss' ? data.petInfo : data.myPet),
-        opponent: challenger(target.kind === 'boss' ? data.bossInfo : data.opponentPet),
+        self: challenger(target.kind === 'boss' ? data.petInfo : data.myPet, baseUrl),
+        opponent: challenger(target.kind === 'boss' ? data.bossInfo : data.opponentPet, baseUrl),
       };
     },
     async battle(target, signal) {
@@ -172,12 +172,12 @@ export function createPetClient(
         const result = record(data);
         if (typeof result.win !== 'boolean') throw new Error('挑战结果格式异常');
         return {
-          rounds: list(result.battleRounds, round),
+          rounds: list(result.battleRounds, (value) => round(value, baseUrl)),
           win: result.win,
           reward: number(result.rewardPoints),
         };
       }
-      return { rounds: list(data, round) };
+      return { rounds: list(data, (value) => round(value, baseUrl)) };
     },
     async tower(signal) {
       const data = record(await request('tower/progress', signal));

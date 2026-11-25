@@ -14,16 +14,18 @@ const cardAtlases: readonly { file: string; portrait?: boolean }[] = [
   { file: 'card-art-three-kingdoms-taoyuan.jpg', portrait: true },
 ];
 
+export function petCardImage(art: number | PetCardImage): PetCardImage {
+  if (typeof art !== 'number') return art;
+  const atlas = cardAtlases[Math.floor(art / 10)];
+  return {
+    tile: art % 10,
+    url: `/assets/pet/${atlas?.file ?? 'card-art.jpg'}`,
+    portrait: !!atlas?.portrait,
+  };
+}
+
 export function petCardArt(art: number | PetCardImage) {
-  const local = typeof art === 'number';
-  const atlas = local ? cardAtlases[Math.floor(art / 10)] : undefined;
-  const { tile, url, portrait } = local
-    ? {
-        tile: art % 10,
-        url: `/assets/pet/${atlas?.file ?? 'card-art.jpg'}`,
-        portrait: !!atlas?.portrait,
-      }
-    : art;
+  const { tile, url, portrait } = petCardImage(art);
   // Keep the top edge of each 4:5 portrait in the square card window.
   const { width, height, x, y } = cardAtlasCrop(tile, portrait);
   return {

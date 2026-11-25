@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
+import { expectCollectionLayout } from './chat-user-card-collection-layout';
 
 test.setTimeout(60_000);
 
@@ -193,63 +194,7 @@ for (const skin of builtinSkins)
       await page.emulateMedia({ reducedMotion: 'no-preference' });
       await expect(list.locator('img[data-loaded="true"]').first()).toBeVisible();
       await expect(cards.nth(4).locator('img[data-loaded="true"]')).toBeVisible();
-      const layout = await list.evaluate((viewport) => {
-        const tiles = [...viewport.querySelectorAll('li')];
-        const first = tiles[0]!.getBoundingClientRect();
-        const firstRow = tiles.filter((tile) => tile.getBoundingClientRect().top === first.top);
-        const frame = viewport.getBoundingClientRect();
-        const scrollbar = viewport.parentElement!.querySelector<HTMLElement>(
-          '[data-orientation="vertical"]',
-        )!;
-        return {
-          start: first.left - frame.left,
-          top: first.top - frame.top,
-          end: frame.right - firstRow.at(-1)!.getBoundingClientRect().right,
-          columns: firstRow.length,
-          croppedArt: tiles
-            .filter((tile, index) => {
-              const img = tile.querySelector('img')!;
-              const art = img.parentElement!.getBoundingClientRect();
-              const atlas = img.getBoundingClientRect();
-              const ratio = index === 4 ? 4 / 5 : 1;
-              return (
-                Math.abs(art.width - art.height * ratio) > 1 ||
-                Math.abs(art.width - atlas.width / 5) > 1 ||
-                Math.abs(art.height - atlas.height / 2) > 1
-              );
-            })
-            .map((tile) => tile.innerText),
-          obstructedDetails: tiles
-            .filter((tile) => {
-              const content = tile.firstElementChild!;
-              const art = content.firstElementChild!.getBoundingClientRect();
-              const details = content.lastElementChild!.getBoundingClientRect();
-              return (
-                art.height <= 0 ||
-                details.top < art.bottom - 1 ||
-                details.bottom > tile.getBoundingClientRect().bottom + 1
-              );
-            })
-            .map((tile) => tile.innerText),
-          scrollbarVisible:
-            getComputedStyle(scrollbar).visibility === 'visible' &&
-            Number(getComputedStyle(scrollbar).opacity) === 1,
-          fits:
-            viewport.scrollWidth <= viewport.clientWidth &&
-            tiles.every((tile) => tile.scrollWidth <= tile.clientWidth) &&
-            document.documentElement.scrollWidth <= innerWidth,
-        };
-      });
-      expect(layout).toMatchObject({
-        columns: mobile ? 2 : 3,
-        croppedArt: [],
-        obstructedDetails: [],
-        scrollbarVisible: !mobile,
-        fits: true,
-      });
-      expect(layout.start).toBeGreaterThanOrEqual(4);
-      expect(layout.top).toBeGreaterThanOrEqual(4);
-      expect(layout.end).toBeGreaterThanOrEqual(mobile ? 20 : 24);
+      await expectCollectionLayout(list, mobile);
       if (skin.id === 'moyu-island')
         await dialog.screenshot({
           path: info.outputPath('collection.png'),

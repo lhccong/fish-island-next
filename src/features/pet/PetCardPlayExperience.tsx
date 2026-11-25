@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { GalleryVerticalEnd, History, PackageOpen } from 'lucide-react';
 import {
   getPetCard,
   petCardRequiredLevel,
@@ -9,12 +8,13 @@ import {
   type PetCardPlayPort,
   type PetCardPlayState,
 } from '@/domain/pet';
-import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { usePetOperation } from './resource';
 import { PetCardBulkUpgrade } from './PetCardBulkUpgrade';
+import { PetCardEncyclopedia } from './cards/PetCardEncyclopedia';
 import { PetCardFeedback } from './cards/PetCardFeedback';
 import { PetCardHistory } from './cards/PetCardHistory';
+import { PetCardNavigation, type PetCardView } from './cards/PetCardNavigation';
 import { PetCardShowcase } from './cards/PetCardShowcase';
 import { PetPackRevealActions } from './cards/PetPackActions';
 import { PetPackCarousel } from './cards/PetPackCarousel';
@@ -24,13 +24,6 @@ import { ShinyCardReveal } from './cards/ShinyCardReveal';
 import { usePetCardActions } from './cards/use-pet-card-actions';
 import type { MovePack } from './cards/use-pack-swipe';
 import styles from './cards/PetCards.module.css';
-
-const views = [
-  { id: 'pack', label: '开卡包', Icon: PackageOpen },
-  { id: 'collection', label: '我的收藏', Icon: GalleryVerticalEnd },
-  { id: 'history', label: '开包记录', Icon: History },
-] as const;
-type View = (typeof views)[number]['id'];
 
 export function PetCardPlayExperience({
   port,
@@ -47,7 +40,7 @@ export function PetCardPlayExperience({
   onPurchased: ((signal: AbortSignal) => Promise<unknown>) | undefined;
   onShowcaseChanged: () => void;
 }) {
-  const [view, setView] = useState<View>('pack');
+  const [view, setView] = useState<PetCardView>('pack');
   const [selected, setSelected] = useState(catalog.packIds[0]!);
   const [reveals, setReveals] = useState<{ id: string; positions: number[] }>();
   const [spotlight, setSpotlight] = useState<PetCardId[]>([]);
@@ -95,7 +88,7 @@ export function PetCardPlayExperience({
     void perform((signal) => submit(action, signal), message);
   }
 
-  function switchView(next: View) {
+  function switchView(next: PetCardView) {
     if (view === next) return;
     setView(next);
     clearNotice();
@@ -144,19 +137,11 @@ export function PetCardPlayExperience({
   return (
     <div className={styles.demo}>
       <header className={styles.toolbar}>
-        <div role="group" aria-label="卡包功能" className={styles.tabs}>
-          {views.map(({ id, label, Icon }) => (
-            <Button
-              key={id}
-              variant="secondary"
-              aria-pressed={activeView === id}
-              disabled={id !== 'pack' && (!!result || opening || playingShiny || pending)}
-              onClick={() => switchView(id)}
-            >
-              <Icon size={16} aria-hidden="true" /> {label}
-            </Button>
-          ))}
-        </div>
+        <PetCardNavigation
+          view={activeView}
+          isDisabled={(id) => id !== 'pack' && (!!result || opening || playingShiny || pending)}
+          onChange={switchView}
+        />
         {activeView === 'pack' && (
           <PetPackCarousel
             name={pack.name}
@@ -211,6 +196,7 @@ export function PetCardPlayExperience({
                   }}
                 />
               )}
+              {activeView === 'encyclopedia' && <PetCardEncyclopedia owned={collected} />}
               {activeView === 'collection' && (
                 <PetCardShowcase
                   cardIds={collected}

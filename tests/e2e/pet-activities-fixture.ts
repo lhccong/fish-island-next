@@ -1,5 +1,13 @@
+import { opponentCardActivation, petCardActivation } from './pet-challenges-fixture';
+
 export function createActivityFixture() {
-  const state = { competitions: 0, draws: 0, drawCount: 0, rank: null as number | null };
+  const state = {
+    competitions: 0,
+    cardBattle: false,
+    draws: 0,
+    drawCount: 0,
+    rank: null as number | null,
+  };
   const prize = {
     id: '78',
     prizeId: '78',
@@ -33,7 +41,24 @@ export function createActivityFixture() {
     if (path === 'pet/tournament/challenge') {
       state.competitions++;
       state.rank = 1;
-      return { data: { isWin: true, myRank: 1, rounds: [] } };
+      return {
+        data: {
+          isWin: true,
+          myRank: 1,
+          rounds: state.cardBattle
+            ? [
+                {
+                  attackerType: 'MY_PET',
+                  roundNumber: 1,
+                  damage: 90,
+                  myPetRemainingHealth: 120,
+                  opponentPetRemainingHealth: 0,
+                  cardActivations: [petCardActivation, opponentCardActivation],
+                },
+              ]
+            : [],
+        },
+      };
     }
     if (path === 'turntable/list') return { data: [supply] };
     if (path === 'turntable/detail/3') return { data: supply };

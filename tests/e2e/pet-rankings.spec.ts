@@ -130,7 +130,13 @@ for (const skin of builtinSkins)
             await page.screenshot({ path: info.outputPath(`${kind}.png`), fullPage: true });
           if (kind === 'rank') {
             await panel.getByRole('button', { name: '资料', exact: true }).first().click();
-            await expect(page.getByRole('dialog', { name: '伙伴资料', exact: true })).toBeVisible();
+            const profile = page.getByRole('dialog', { name: '伙伴资料', exact: true });
+            const duelButton = profile.getByRole('button', { name: '宠物切磋', exact: true });
+            await duelButton.click();
+            const duel = page.getByRole('dialog', { name: '宠物切磋', exact: true });
+            await expect(duel.getByRole('button', { name: '开始挑战' })).toBeVisible();
+            await page.keyboard.press('Escape');
+            await expect(duelButton).toBeFocused();
             await page.keyboard.press('Escape');
             await expect(
               panel.getByRole('button', { name: '资料', exact: true }).first(),

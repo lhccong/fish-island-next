@@ -19,6 +19,11 @@
   color: var(--color-muted);
   white-space: nowrap;
 }
+.headerAction {
+  flex: none;
+  margin-block-end: 4px;
+  white-space: nowrap;
+}
 .edit {
   display: grid;
   place-items: center;

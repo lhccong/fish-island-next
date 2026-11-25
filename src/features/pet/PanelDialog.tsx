@@ -9,6 +9,7 @@ export function PanelDialog({
   onClose,
   children,
   appearance = 'default',
+  layer = 'default',
   followVisualViewport = false,
   returnFocusRef,
 }: {
@@ -17,12 +18,14 @@ export function PanelDialog({
   onClose: () => void;
   children: ReactNode;
   appearance?: 'default' | 'pixel';
+  layer?: 'default' | 'nested';
   followVisualViewport?: boolean;
   returnFocusRef?: RefObject<HTMLElement | null> | undefined;
 }) {
   return (
     <Dialog
       open
+      layer={layer}
       {...(returnFocusRef ? { returnFocusRef } : {})}
       onOpenChange={(open) => {
         if (!open) onClose();

@@ -6,7 +6,7 @@ import { PanelDialog } from './PanelDialog';
 import { BattleStage } from './BattleStage';
 import { OperationNotice } from './Feedback';
 import { TournamentResult } from './TournamentResult';
-import { roundNarration } from './battle-presentation';
+import { battleFrameDuration, roundNarration } from './battle-presentation';
 import styles from './PixelBattle.module.css';
 
 export function TournamentBattle({
@@ -33,9 +33,9 @@ export function TournamentBattle({
   const current = rounds[Math.min(frame, rounds.length - 1)];
   useEffect(() => {
     if (!playing) return;
-    const timer = setTimeout(() => setFrame((value) => value + 1), 900);
+    const timer = setTimeout(() => setFrame((value) => value + 1), battleFrameDuration(current));
     return () => clearTimeout(timer);
-  }, [playing, frame]);
+  }, [playing, frame, current]);
   return (
     <PanelDialog
       title="武道大会战斗"
@@ -49,7 +49,7 @@ export function TournamentBattle({
           <h3>排位对战</h3>
           <span>
             {playing
-              ? `回合 ${frame + 1} / ${rounds.length}`
+              ? `回合 ${current?.roundNumber ?? frame + 1} / ${rounds.at(-1)?.roundNumber ?? rounds.length}`
               : settlement
                 ? '战斗结束'
                 : pending
@@ -89,7 +89,7 @@ export function TournamentBattle({
           </div>
         )}
         <OperationNotice notice={notice} />
-        {settlement && !playing && <TournamentResult {...settlement} />}
+        {settlement && !playing && <TournamentResult {...settlement} preview={preview} />}
         <div className={styles.controls}>
           <Button variant="secondary" onClick={onClose}>
             返回榜单

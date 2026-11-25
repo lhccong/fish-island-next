@@ -1,16 +1,7 @@
 import { createContext, useContext } from 'react';
 
 export type GameId =
-  | 'farm'
-  | 'pet'
-  | 'life'
-  | 'stock'
-  | 'gomoku'
-  | 'undercover'
-  | 'draw'
-  | 'landlords'
-  | 'dark-room'
-  | 'milky-way-idle';
+  'farm' | 'pet' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords' | 'dark-room';
 export const gameTitles: Record<GameId, string> = {
   farm: '摸鱼农场',
   pet: '伙伴营地',
@@ -21,7 +12,6 @@ export const gameTitles: Record<GameId, string> = {
   draw: '你画我猜',
   landlords: '斗地主',
   'dark-room': '小黑屋模拟器',
-  'milky-way-idle': '奶牛放置',
 };
 export const GameWindowsContext = createContext<(id: GameId, origin?: HTMLElement) => void>(
   () => {},

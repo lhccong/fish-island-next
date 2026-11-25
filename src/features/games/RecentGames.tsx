@@ -7,25 +7,15 @@ import {
   Pencil,
   Spade,
   Flame,
-  Milk,
 } from 'lucide-react';
 import styles from './GameCatalog.module.css';
 
 export type CatalogGame =
-  | 'farm'
-  | 'life'
-  | 'stock'
-  | 'gomoku'
-  | 'undercover'
-  | 'draw'
-  | 'landlords'
-  | 'dark-room'
-  | 'milky-way-idle';
+  'farm' | 'life' | 'stock' | 'gomoku' | 'undercover' | 'draw' | 'landlords' | 'dark-room';
 const catalogGames = [
   'farm',
   'life',
   'dark-room',
-  'milky-way-idle',
   'stock',
   'gomoku',
   'undercover',
@@ -55,7 +45,6 @@ export function RecentGames({
                 farm: Sprout,
                 life: RotateCcw,
                 'dark-room': Flame,
-                'milky-way-idle': Milk,
                 stock: ChartCandlestick,
                 gomoku: Grid3X3,
                 undercover: ScanFace,
@@ -78,7 +67,6 @@ export function RecentGames({
                         farm: '摸鱼农场',
                         life: '人生重开模拟器',
                         'dark-room': '小黑屋模拟器',
-                        'milky-way-idle': '奶牛放置',
                         stock: '摸鱼股市',
                         gomoku: '五子棋',
                         undercover: '谁是卧底',

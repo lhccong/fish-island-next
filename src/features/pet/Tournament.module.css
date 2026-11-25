@@ -121,18 +121,6 @@
   border-radius: 8px;
   overflow-wrap: anywhere;
 }
-.rounds {
-  padding-left: 24px;
-  line-height: 1.8;
-}
-.rounds li {
-  padding: 8px 0;
-  overflow-wrap: anywhere;
-}
-.rounds small {
-  display: block;
-  color: var(--color-muted);
-}
 @container (max-width: 650px) {
   .list {
     display: flex;

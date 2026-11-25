@@ -218,6 +218,7 @@ export function TournamentPanel({
         <OtherCompanionPanel
           service={service}
           userId={other}
+          viewerId={userId}
           onClose={() => setOther(null)}
           returnFocusRef={returnFocus}
         />

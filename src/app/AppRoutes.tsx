@@ -74,9 +74,6 @@ const LifeGamePage = lazy(() =>
 const DarkRoomPage = lazy(() =>
   import('@/app/pages/DarkRoomPage').then((module) => ({ default: module.DarkRoomPage })),
 );
-const MilkyWayIdlePage = lazy(() =>
-  import('@/app/pages/MilkyWayIdlePage').then((module) => ({ default: module.MilkyWayIdlePage })),
-);
 const FishCirclePage = lazy(() =>
   import('@/app/pages/FishCirclePage').then((module) => ({ default: module.FishCirclePage })),
 );
@@ -91,14 +88,6 @@ const InitializationPage = lazy(() =>
     default: module.InitializationPage,
   })),
 );
-
-const publicGameRoutes = [
-  { path: '/game/milky-way-idle', Page: MilkyWayIdlePage },
-  { path: '/game/darkRoom', Page: DarkRoomPage },
-  { path: '/game/undercover', Page: UndercoverPage },
-  { path: '/game/draw/:roomId?', Page: DrawPage },
-  { path: '/game/life', Page: LifeGamePage },
-];
 
 export function AppRoutes() {
   const [readerEnabled, setReaderEnabled] = useState(false);
@@ -170,17 +159,30 @@ export function AppRoutes() {
             <Route path="/rank/welfare" element={<AboutPage section="welfare" />} />
             <Route path="/rank/other" element={<AboutPage section="other" />} />
             <Route path="/discover/games" element={<GamesPage />} />
-            {publicGameRoutes.map(({ path, Page }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <GameErrorBoundary>
-                    <Page />
-                  </GameErrorBoundary>
-                }
-              />
-            ))}
+            <Route
+              path="/game/darkRoom"
+              element={
+                <GameErrorBoundary>
+                  <DarkRoomPage />
+                </GameErrorBoundary>
+              }
+            />
+            <Route
+              path="/game/undercover"
+              element={
+                <GameErrorBoundary>
+                  <UndercoverPage />
+                </GameErrorBoundary>
+              }
+            />
+            <Route
+              path="/game/draw/:roomId?"
+              element={
+                <GameErrorBoundary>
+                  <DrawPage />
+                </GameErrorBoundary>
+              }
+            />
             <Route
               path="/game/piece"
               element={
@@ -225,6 +227,14 @@ export function AppRoutes() {
               element={<Navigate to="/pet?challenge=tournament" replace />}
             />
             <Route path="/reader" element={<ReaderPage onOpen={() => setReaderEnabled(true)} />} />
+            <Route
+              path="/game/life"
+              element={
+                <GameErrorBoundary>
+                  <LifeGamePage />
+                </GameErrorBoundary>
+              }
+            />
             <Route
               path="/oauth2/authorize"
               element={

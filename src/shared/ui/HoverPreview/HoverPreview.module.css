@@ -16,7 +16,11 @@
   color: var(--color-text);
   box-shadow: var(--shadow-panel);
 }
-.compact {
+.preview[data-size='compact'] {
   justify-content: center;
   pointer-events: auto;
+}
+.preview[data-size='detail'] {
+  z-index: 90;
+  overflow: hidden;
 }

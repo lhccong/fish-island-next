@@ -130,7 +130,13 @@ for (const skin of builtinSkins)
           .first()
           .getByRole('button', { name: '查看合成岛友 1的伙伴', exact: true })
           .click();
-        await expect(page.getByRole('dialog', { name: '伙伴资料', exact: true })).toBeVisible();
+        const profile = page.getByRole('dialog', { name: '伙伴资料', exact: true });
+        const duelButton = profile.getByRole('button', { name: '宠物切磋', exact: true });
+        await duelButton.click();
+        const duel = page.getByRole('dialog', { name: '宠物切磋', exact: true });
+        await expect(duel.getByRole('button', { name: '开始挑战' })).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(duelButton).toBeFocused();
         await assertPetLayout(page);
         await page.keyboard.press('Escape');
         await expect(
