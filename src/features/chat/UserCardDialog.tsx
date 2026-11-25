@@ -4,10 +4,13 @@ import { useStore } from 'zustand';
 import { ChartNoAxesColumnIncreasing, MapPin } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
 import type { FollowKind, UserCardPort } from '@/domain/account-tools';
-import { Dialog } from '@/shared/ui/Dialog';
 import { Button } from '@/shared/ui/Button';
-import { ScrollArea } from '@/shared/ui/ScrollArea';
-import { SourceAvatar } from '@/shared/ui/SourceAvatar';
+import {
+  ProfileCard,
+  ProfileCardDetails,
+  ProfileCardDialog,
+  ProfileCardStatus,
+} from '@/shared/ui/ProfileCard';
 import { useChatRealtime } from './realtime-context';
 import { useRemark, useRemarks } from './remarks-context';
 import type {
@@ -17,9 +20,7 @@ import type {
   UserCardTarget,
 } from './user-card-context';
 import { useUserCardResource } from './use-user-card';
-import { UserCardMedia } from './UserCardMedia';
 import { UserCardModeration } from './UserCardModeration';
-import { UserCardCounts } from './UserCardCounts';
 import { UserCardLinks } from './UserCardLinks';
 import { UserCardTitles } from './UserCardTitles';
 import styles from './UserCard.module.css';
@@ -86,175 +87,36 @@ export function UserCardDialog({
       setFeedback({ message: '无法保存黑名单，请检查浏览器存储权限后重试', error: true });
     }
   }
+  function openList(kind: FollowKind | 'collection', trigger: HTMLButtonElement) {
+    listTrigger.current = trigger;
+    setList(kind);
+  }
+
   return (
-    <Dialog
-      open
+    <ProfileCardDialog
       title="用户卡片"
-      hideTitle
-      description={`${name}的个人资料`}
-      hideDescription
+      name={name}
+      cover={card?.cover}
       returnFocusRef={
         target.returnFocusRef.current?.isConnected ? target.returnFocusRef : composerRef
       }
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-      className={`${styles.dialog} ${list === 'collection' ? styles.collection : list ? styles.relationships : card?.cover ? styles.featured : ''}`}
-      showCloseAction={false}
-      dismissLabel="关闭用户卡片"
-      dismissClassName={!list && card?.cover ? (styles.coverDismiss ?? '') : ''}
-    >
-      {card && user.role === 'admin' && !self && (
-        <UserCardModeration port={port} id={target.id} hasCover={!!card.cover} hidden={!!list} />
-      )}
-      <div className={styles.content} hidden={!!list}>
-        {card?.cover && (
-          <div className={styles.coverPanel}>
-            <UserCardMedia key={card.cover} src={card.cover} name={name} />
-          </div>
-        )}
-        <ScrollArea label="用户卡片内容" gutter="reserved" className={styles.scroll ?? ''}>
-          <div className={styles.body}>
-            {state.status === 'loading' && <LoadingIndicator>正在读取用户资料…</LoadingIndicator>}
-            {state.status === 'error' && (
-              <div className={styles.state}>
-                <p role="alert">{state.message}</p>
-                <Button variant="secondary" onClick={resource.retry}>
-                  重试资料
-                </Button>
-              </div>
-            )}
-            {state.status === 'ready' && !card && (
-              <div className={styles.state}>
-                <p role="status">该用户资料暂不可用</p>
-                <Button variant="secondary" onClick={resource.retry}>
-                  重新读取
-                </Button>
-              </div>
-            )}
-            {card && (
-              <div className={styles.info}>
-                <div className={styles.identity}>
-                  <div className={styles.avatar}>
-                    <SourceAvatar name={name} src={card.avatar} size="profile" />
-                    {card.frame && (
-                      <UserCardMedia key={card.frame} src={card.frame} name={name} frame />
-                    )}
-                  </div>
-                  <div className={styles.name}>
-                    <h3>
-                      {remark || name}
-                      {card.vip && <span className={styles.vip}>会员</span>}
-                    </h3>
-                    {remark && <p>{name}</p>}
-                    <UserCardTitles
-                      current={card.titleId ?? target.titleId ?? member?.titleId}
-                      owned={card.titleIds ?? target.titleIds ?? member?.titleIds}
-                      level={level}
-                    />
-                  </div>
-                  {card.profile && <p className={styles.profile}>{card.profile}</p>}
-                </div>
-                <div className={styles.commands}>
-                  <UserCardCounts card={card} triggerRef={listTrigger} onSelect={setList} />
-                  <div className={styles.actions}>
-                    {!self && (
-                      <Button
-                        variant={
-                          state.status === 'ready' && state.following ? 'secondary' : 'primary'
-                        }
-                        disabled={
-                          resource.busy || state.status !== 'ready' || state.following === null
-                        }
-                        onClick={() => void resource.toggleFollow()}
-                      >
-                        {resource.busy ? (
-                          <LoadingIndicator compact>{'处理中…'}</LoadingIndicator>
-                        ) : state.status === 'ready' && state.following ? (
-                          '取消关注'
-                        ) : (
-                          '关注'
-                        )}
-                      </Button>
-                    )}
-                    <Button
-                      ref={remarkRef}
-                      variant="secondary"
-                      onClick={() =>
-                        remarks.open({ id: target.id, name, returnFocusRef: remarkRef })
-                      }
-                    >
-                      {remark ? '修改备注' : '设置备注'}
-                    </Button>
-                    {user.role === 'admin' && (
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          void Promise.resolve()
-                            .then(() => navigator.clipboard.writeText(card.id))
-                            .then(() => setFeedback({ message: '用户 ID 已复制', error: false }))
-                            .catch(() =>
-                              setFeedback({ message: '复制失败，请手动复制 ID', error: true }),
-                            );
-                        }}
-                      >
-                        复制ID
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                {state.status === 'ready' && state.followError && (
-                  <div className={styles.followError}>
-                    <p role="alert">{state.followError}</p>
-                    <Button variant="secondary" onClick={resource.retry}>
-                      重试关注状态
-                    </Button>
-                  </div>
-                )}
-                <dl className={styles.details}>
-                  <div>
-                    <dt>
-                      <ChartNoAxesColumnIncreasing size={14} aria-hidden="true" />
-                      等级
-                    </dt>
-                    <dd>{level ?? '未提供'}</dd>
-                  </div>
-                  <div className={styles.region}>
-                    <dt>
-                      <MapPin size={14} aria-hidden="true" />
-                      地区
-                    </dt>
-                    <dd>{card.region || target.region || '未提供'}</dd>
-                  </div>
-                  {card.mbti && (
-                    <div>
-                      <dt>MBTI</dt>
-                      <dd className={styles.mbti} data-mbti={card.mbti}>
-                        {card.mbti}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-                <UserCardLinks
-                  onVisit={(kind) => {
-                    if (kind !== 'pet') onClose();
-                    onVisit(kind, target.id);
-                  }}
-                  onCollection={(trigger) => {
-                    listTrigger.current = trigger;
-                    setList('collection');
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </div>
-      <div className={styles.footer} hidden={!!list}>
-        {feedback.message && <p role={feedback.error ? 'alert' : 'status'}>{feedback.message}</p>}
-        {confirmBlock && <p>仅在此浏览器屏蔽该岛友的聊天消息，确认加入黑名单？</p>}
-        <div className={styles.actions}>
-          {card && (
+      onClose={onClose}
+      topAction={
+        card &&
+        user.role === 'admin' &&
+        !self && (
+          <UserCardModeration port={port} id={target.id} hasCover={!!card.cover} hidden={!!list} />
+        )
+      }
+      footerNotice={
+        <>
+          {feedback.message && <p role={feedback.error ? 'alert' : 'status'}>{feedback.message}</p>}
+          {confirmBlock && <p>仅在此浏览器屏蔽该岛友的聊天消息，确认加入黑名单？</p>}
+        </>
+      }
+      footerActions={
+        card && (
+          <>
             <Button
               variant="secondary"
               onClick={() => {
@@ -264,32 +126,162 @@ export function UserCardDialog({
             >
               戳一戳
             </Button>
-          )}
-          {!self &&
-            card &&
-            (confirmBlock ? (
-              <>
-                <Button variant="secondary" onClick={() => setConfirmBlock(false)}>
-                  取消
+            {!self &&
+              (confirmBlock ? (
+                <>
+                  <Button variant="secondary" onClick={() => setConfirmBlock(false)}>
+                    取消
+                  </Button>
+                  <Button onClick={toggleBlock}>确认加入</Button>
+                </>
+              ) : (
+                <Button
+                  variant="secondary"
+                  onClick={() => (blocked ? toggleBlock() : setConfirmBlock(true))}
+                >
+                  {blocked ? '移出黑名单' : '加入黑名单'}
                 </Button>
-                <Button onClick={toggleBlock}>确认加入</Button>
-              </>
-            ) : (
+              ))}
+          </>
+        )
+      }
+      alternateView={
+        list && {
+          wide: list === 'collection',
+          content:
+            list === 'collection'
+              ? renderCardCollection({ id: target.id, name }, () => setList(null))
+              : renderFollowList({ id: target.id, name, kind: list }, () => setList(null)),
+        }
+      }
+    >
+      {state.status === 'loading' && <LoadingIndicator>正在读取用户资料…</LoadingIndicator>}
+      {state.status === 'error' && (
+        <ProfileCardStatus
+          error
+          message={state.message}
+          retryLabel="重试资料"
+          onRetry={resource.retry}
+        />
+      )}
+      {state.status === 'ready' && !card && (
+        <ProfileCardStatus
+          message="该用户资料暂不可用"
+          retryLabel="重新读取"
+          onRetry={resource.retry}
+        />
+      )}
+      {state.status === 'ready' && card && (
+        <ProfileCard
+          name={name}
+          displayName={remark || name}
+          avatar={card.avatar}
+          frame={card.frame}
+          profile={card.profile}
+          subtitle={remark ? name : ''}
+          nameBadge={card.vip ? '会员' : undefined}
+          badges={
+            <UserCardTitles
+              current={card.titleId ?? target.titleId ?? member?.titleId}
+              owned={card.titleIds ?? target.titleIds ?? member?.titleIds}
+              level={level}
+            />
+          }
+          counts={[
+            {
+              label: '关注',
+              value: card.following,
+              onSelect: (trigger) => openList('following', trigger),
+            },
+            {
+              label: '粉丝',
+              value: card.followers,
+              onSelect: (trigger) => openList('followers', trigger),
+            },
+          ]}
+          actions={
+            <>
+              {!self && (
+                <Button
+                  variant={state.following ? 'secondary' : 'primary'}
+                  disabled={resource.busy || state.following === null}
+                  onClick={() => void resource.toggleFollow()}
+                >
+                  {resource.busy ? (
+                    <LoadingIndicator compact>处理中…</LoadingIndicator>
+                  ) : state.following ? (
+                    '取消关注'
+                  ) : (
+                    '关注'
+                  )}
+                </Button>
+              )}
               <Button
+                ref={remarkRef}
                 variant="secondary"
-                onClick={() => (blocked ? toggleBlock() : setConfirmBlock(true))}
+                onClick={() => remarks.open({ id: target.id, name, returnFocusRef: remarkRef })}
               >
-                {blocked ? '移出黑名单' : '加入黑名单'}
+                {remark ? '修改备注' : '设置备注'}
               </Button>
-            ))}
-          <Button variant="secondary" onClick={onClose}>
-            关闭
-          </Button>
-        </div>
-      </div>
-      {list === 'collection'
-        ? renderCardCollection({ id: target.id, name }, () => setList(null))
-        : list && renderFollowList({ id: target.id, name, kind: list }, () => setList(null))}
-    </Dialog>
+              {user.role === 'admin' && (
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    void Promise.resolve()
+                      .then(() => navigator.clipboard.writeText(card.id))
+                      .then(() => setFeedback({ message: '用户 ID 已复制', error: false }))
+                      .catch(() =>
+                        setFeedback({ message: '复制失败，请手动复制 ID', error: true }),
+                      );
+                  }}
+                >
+                  复制ID
+                </Button>
+              )}
+            </>
+          }
+        >
+          {state.followError && (
+            <div className={styles.followError}>
+              <p role="alert">{state.followError}</p>
+              <Button variant="secondary" onClick={resource.retry}>
+                重试关注状态
+              </Button>
+            </div>
+          )}
+          <ProfileCardDetails>
+            <div>
+              <dt>
+                <ChartNoAxesColumnIncreasing size={14} aria-hidden="true" />
+                等级
+              </dt>
+              <dd>{level ?? '未提供'}</dd>
+            </div>
+            <div data-wrap-value>
+              <dt>
+                <MapPin size={14} aria-hidden="true" />
+                地区
+              </dt>
+              <dd>{card.region || target.region || '未提供'}</dd>
+            </div>
+            {card.mbti && (
+              <div>
+                <dt>MBTI</dt>
+                <dd className={styles.mbti} data-mbti={card.mbti}>
+                  {card.mbti}
+                </dd>
+              </div>
+            )}
+          </ProfileCardDetails>
+          <UserCardLinks
+            onVisit={(kind) => {
+              if (kind !== 'pet') onClose();
+              onVisit(kind, target.id);
+            }}
+            onCollection={(trigger) => openList('collection', trigger)}
+          />
+        </ProfileCard>
+      )}
+    </ProfileCardDialog>
   );
 }

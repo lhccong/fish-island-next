@@ -1,28 +1,37 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { ChartNoAxesColumnIncreasing, Coins, MapPin } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
-import { SourceAvatar } from '@/shared/ui/SourceAvatar';
-import { ScrollArea } from '@/shared/ui/ScrollArea';
-import styles from './Tools.module.css';
-import { useEffect, useRef, useState } from 'react';
-import type { AccountToolsPort, PersonalStats } from '@/domain/account-tools';
-import { Button } from '@/shared/ui/Button';
+import { useEffect, useRef, useState, type RefObject } from 'react';
+import type { AccountToolsPort, FollowKind, PersonalStats } from '@/domain/account-tools';
+import {
+  ProfileCard,
+  ProfileCardDetails,
+  ProfileCardDialog,
+  ProfileCardStatus,
+} from '@/shared/ui/ProfileCard';
 import { FollowList } from './FollowList';
-import details from './Details.module.css';
 
-type ListKind = 'following' | 'followers';
 type CardResult =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'ready'; stats: PersonalStats };
 
-export function PersonalCard({ user, port }: { user: AuthUser; port: AccountToolsPort }) {
+export function PersonalCard({
+  user,
+  port,
+  returnFocusRef,
+  onClose,
+}: {
+  user: AuthUser;
+  port: AccountToolsPort;
+  returnFocusRef: RefObject<HTMLElement | null>;
+  onClose: () => void;
+}) {
   const [result, setResult] = useState<CardResult>({ status: 'loading' });
   const [revision, setRevision] = useState(0);
-  const [list, setList] = useState<ListKind | null>(null);
+  const [list, setList] = useState<FollowKind | null>(null);
   const changed = useRef(false);
-  const returnTo = useRef<ListKind | null>(null);
-  const followingButton = useRef<HTMLButtonElement>(null);
-  const followersButton = useRef<HTMLButtonElement>(null);
+  const listTrigger = useRef<HTMLButtonElement | null>(null);
   const stats = result.status === 'ready' ? result.stats : undefined;
 
   function refresh() {
@@ -48,89 +57,97 @@ export function PersonalCard({ user, port }: { user: AuthUser; port: AccountTool
   }, [port, user.id, revision]);
 
   useEffect(() => {
-    if (list || !returnTo.current) return;
-    const trigger = returnTo.current === 'following' ? followingButton : followersButton;
-    trigger.current?.focus();
-    returnTo.current = null;
+    if (!list && listTrigger.current) {
+      listTrigger.current.focus();
+      listTrigger.current = null;
+    }
   }, [list]);
 
-  if (list)
-    return (
-      <FollowList
-        port={port}
-        kind={list}
-        onChange={() => {
-          changed.current = true;
-        }}
-        onBack={() => {
-          returnTo.current = list;
-          setList(null);
-          if (changed.current) {
-            changed.current = false;
-            refresh();
-          }
-        }}
-      />
-    );
+  function openList(kind: FollowKind, trigger: HTMLButtonElement) {
+    listTrigger.current = trigger;
+    setList(kind);
+  }
+
   return (
-    <ScrollArea label="个人卡片内容" gutter="reserved" className={styles.scroll ?? ''}>
-      <div className={styles.fields}>
-        <article
-          className={details.card}
-          data-has-cover={!!user.coverUrl}
-          data-compact={!user.coverUrl && !user.createdAt && !user.vip && !stats?.region}
-        >
-          {user.coverUrl && <img className={details.cover} src={user.coverUrl} alt="个人封面" />}
-          <div className={details.identity}>
-            <SourceAvatar name={user.name} src={user.avatarUrl} size="profile" />
+    <ProfileCardDialog
+      title="我的卡片"
+      name={user.name}
+      cover={user.coverUrl}
+      returnFocusRef={returnFocusRef}
+      onClose={onClose}
+      alternateView={
+        list && {
+          content: (
+            <FollowList
+              port={port}
+              kind={list}
+              onChange={() => {
+                changed.current = true;
+              }}
+              onBack={() => {
+                setList(null);
+                if (changed.current) {
+                  changed.current = false;
+                  refresh();
+                }
+              }}
+            />
+          ),
+        }
+      }
+    >
+      <ProfileCard
+        name={user.name}
+        avatar={user.avatarUrl}
+        frame={user.avatarFrameUrl}
+        profile={user.profile || '还没有填写个人简介'}
+        subtitle={`ID：${user.id}${user.createdAt ? ` · 加入于 ${user.createdAt.slice(0, 10)}` : ''}`}
+        nameBadge={user.vip ? '会员' : undefined}
+        counts={[
+          {
+            label: '关注',
+            value: stats?.following,
+            onSelect: (trigger) => openList('following', trigger),
+          },
+          {
+            label: '粉丝',
+            value: stats?.followers,
+            onSelect: (trigger) => openList('followers', trigger),
+          },
+        ]}
+      >
+        {result.status === 'loading' && <LoadingIndicator>正在读取卡片…</LoadingIndicator>}
+        {result.status === 'error' && (
+          <ProfileCardStatus error message={result.message} retryLabel="重试" onRetry={refresh} />
+        )}
+        {stats && (
+          <ProfileCardDetails>
             <div>
-              <h3>{user.name}</h3>
-              <p>ID：{user.id}</p>
+              <dt>
+                <ChartNoAxesColumnIncreasing size={14} aria-hidden="true" />
+                等级
+              </dt>
+              <dd>{stats.level ?? '—'}</dd>
             </div>
-          </div>
-          <p className={details.profile}>{user.profile || '还没有填写个人简介'}</p>
-          {result.status === 'loading' && <LoadingIndicator>正在读取卡片…</LoadingIndicator>}
-          {result.status === 'error' && (
             <div>
-              <p role="alert">{result.message}</p>
-              <Button variant="secondary" onClick={refresh}>
-                重试
-              </Button>
+              <dt>
+                <Coins size={14} aria-hidden="true" />
+                积分
+              </dt>
+              <dd>{stats.points ?? '—'}</dd>
             </div>
-          )}
-          {stats && (
-            <dl className={details.stats}>
-              <div>
-                <dt>等级</dt>
-                <dd>{stats.level ?? '—'}</dd>
+            {stats.region && (
+              <div data-wrap-value>
+                <dt>
+                  <MapPin size={14} aria-hidden="true" />
+                  地区
+                </dt>
+                <dd>{stats.region}</dd>
               </div>
-              <div>
-                <dt>积分</dt>
-                <dd>{stats.points ?? '—'}</dd>
-              </div>
-            </dl>
-          )}
-          <div className={details.connections}>
-            <Button ref={followingButton} variant="secondary" onClick={() => setList('following')}>
-              {stats?.following === undefined ? '关注' : `关注 ${stats.following}`}
-            </Button>
-            <Button ref={followersButton} variant="secondary" onClick={() => setList('followers')}>
-              {stats?.followers === undefined ? '粉丝' : `粉丝 ${stats.followers}`}
-            </Button>
-          </div>
-          {(stats?.region || user.vip || user.createdAt) && (
-            <p className={details.meta}>
-              {[
-                stats?.region,
-                user.vip ? '会员' : '',
-                user.createdAt && `加入于 ${user.createdAt.slice(0, 10)}`,
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
-          )}
-        </article>
-      </div>
-    </ScrollArea>
+            )}
+          </ProfileCardDetails>
+        )}
+      </ProfileCard>
+    </ProfileCardDialog>
   );
 }

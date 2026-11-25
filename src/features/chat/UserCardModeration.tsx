@@ -79,7 +79,8 @@ export function UserCardModeration({
       trigger={
         <Button
           variant="secondary"
-          className={`${styles.moderationTrigger} ${hasCover ? styles.coverDismiss : ''}`}
+          className={styles.moderationTrigger}
+          data-cover={hasCover}
           hidden={hidden}
           aria-label="管理员操作"
           title="管理员操作"

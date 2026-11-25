@@ -34,16 +34,6 @@
 .tour {
   --tool-height: 360px;
 }
-.cardDialog {
-  --tool-height: 568px;
-  width: min(500px, calc(100% - 32px));
-}
-.cardDialog:has([data-compact='true']) {
-  --tool-height: 416px;
-}
-.cardDialog:has([data-has-cover='false'][data-compact='false']) {
-  --tool-height: 464px;
-}
 .apps {
   --tool-height: 660px;
   width: min(720px, calc(100% - 32px));

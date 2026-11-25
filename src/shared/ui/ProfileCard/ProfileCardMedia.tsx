@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
-import styles from './UserCard.module.css';
-export function UserCardMedia({
+import styles from './ProfileCard.module.css';
+export function ProfileCardMedia({
   src,
   name,
   frame = false,

@@ -4,6 +4,7 @@ import { capture, close, layout, open, scrollRegion } from './account-menu-layou
 
 const account = '90071992547409920';
 const fan = '90071992547409921';
+const coverUrl = 'https://images.example.test/profile-cover.svg';
 
 for (const width of [1280, 375, 390]) {
   const mobile = width < 760;
@@ -45,6 +46,12 @@ for (const width of [1280, 375, 390]) {
           );
           await page.routeWebSocket(/\/ws\//, (socket) => socket.onMessage(() => {}));
           await page.route('**/api/**', (route) => route.fulfill({ json: { code: 0, data: [] } }));
+          await page.route(coverUrl, (route) =>
+            route.fulfill({
+              contentType: 'image/svg+xml',
+              body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><rect width="320" height="180" fill="#647e9d"/><circle cx="160" cy="76" r="48" fill="#e5be81"/></svg>',
+            }),
+          );
           await page.route('**/api/user/get/login', async (route) => {
             accountReads++;
             if (failCard) {
@@ -57,6 +64,8 @@ for (const width of [1280, 375, 390]) {
                 data: {
                   id: account,
                   userName: '合成岛友',
+                  userProfile: '这是一条用于验证卡片正文滚动的简介。'.repeat(36),
+                  momentsBgUrl: coverUrl,
                   level: 6,
                   points: 271,
                   followingCount: following ? '1' : '0',
@@ -116,12 +125,36 @@ for (const width of [1280, 375, 390]) {
           await layout(page, mobile);
           releaseCard();
           await expect(dialog.getByRole('alert')).toHaveText('卡片读取失败');
-          await expect(dialog.getByRole('button', { name: '粉丝', exact: true })).toBeEnabled();
+          await expect(dialog.getByRole('button', { name: '粉丝人数未知' })).toBeEnabled();
           failCard = false;
           await press(dialog.getByRole('button', { name: '重试', exact: true }));
           const fans = dialog.getByRole('button', { name: '粉丝 12', exact: true });
           await expect(fans).toBeVisible();
           await expect(dialog.locator('dd')).toHaveText(['6', '271']);
+          const profile = dialog.getByRole('region', { name: '我的卡片内容' });
+          await profile.evaluate((el) => {
+            el.scrollTop = 0;
+          });
+          const cover = dialog.getByRole('img', { name: '合成岛友的封面' });
+          await expect(cover).toHaveCSS('object-fit', 'cover');
+          await expect(dialog.getByText('正在加载封面…')).toHaveCount(0);
+          const dialogBox = (await dialog.boundingBox())!;
+          const profileBox = (await profile.boundingBox())!;
+          const coverBox = (await cover.boundingBox())!;
+          const panelBox = (await profile.locator('article').boundingBox())!;
+          const reveal = mobile ? 208 : 240;
+          expect(dialogBox.width).toBe(mobile ? width - 16 : 520);
+          expect(coverBox).toEqual(profileBox);
+          expect(panelBox.y - profileBox.y).toBeCloseTo(reveal, 0);
+          expect(
+            profileBox.x + profileBox.width - panelBox.x - panelBox.width,
+          ).toBeGreaterThanOrEqual(mobile ? 20 : 24);
+          const cardTrack = profile.locator('+ [data-orientation="vertical"]');
+          if (mobile) await expect(cardTrack).toHaveCSS('visibility', 'hidden');
+          else {
+            await profile.hover();
+            await expect(cardTrack).toHaveCSS('opacity', '1');
+          }
           await layout(page, mobile);
 
           await press(fans);
@@ -179,7 +212,7 @@ for (const width of [1280, 375, 390]) {
           expect(appendedPages()).toEqual(['2']);
           failAppend = false;
           const retry = region.getByRole('button', { name: '重试粉丝列表' });
-          await retry.scrollIntoViewIfNeeded();
+          await retry.evaluate((button) => button.scrollIntoView({ block: 'center' }));
           await expect(retry).toBeInViewport({ ratio: 1 });
           await press(retry);
           await expect(region.getByRole('listitem')).toHaveCount(12);

@@ -11,7 +11,6 @@ import { SiteTour } from './SiteTour';
 import styles from './Tools.module.css';
 export type AccountTool = 'card' | 'blacklist' | 'password' | 'apps' | 'redeem' | 'tour';
 const titles = {
-  card: '我的卡片',
   blacklist: '我的黑名单',
   password: '找回密码',
   apps: '开放平台',
@@ -19,7 +18,6 @@ const titles = {
   tour: '网站引导',
 };
 const sizes = {
-  card: styles.cardDialog,
   blacklist: '',
   password: styles.password,
   apps: styles.apps,
@@ -27,7 +25,6 @@ const sizes = {
   tour: styles.tour,
 };
 const descriptions = {
-  card: '你的摸鱼岛个人名片。',
   blacklist: '仅在此浏览器屏蔽这些岛友的聊天消息，按账号保存。',
   password: '通过邮箱验证码重置密码，成功后需重新登录。',
   apps: '管理接入摸鱼岛登录的应用，请勿向他人提供应用密钥。',
@@ -51,6 +48,10 @@ export function AccountToolPanel({
   onClose: () => void;
   onReset: () => void;
 }) {
+  if (tool === 'card')
+    return (
+      <PersonalCard user={user} port={port} returnFocusRef={returnFocusRef} onClose={onClose} />
+    );
   return (
     <Dialog
       open
@@ -60,12 +61,11 @@ export function AccountToolPanel({
       returnFocusRef={returnFocusRef}
       title={titles[tool]}
       description={descriptions[tool]}
-      hideDescription={tool === 'card' || tool === 'tour'}
+      hideDescription={tool === 'tour'}
       className={`${styles.dialog} ${sizes[tool]}`}
       showCloseAction={false}
       dismissLabel={`关闭${titles[tool]}`}
     >
-      {tool === 'card' && <PersonalCard user={user} port={port} />}
       {tool === 'blacklist' && <BlacklistPanel port={blacklist} account={user.id} />}
       {tool === 'password' && (
         <PasswordForm port={port} email={user.email ?? ''} onReset={onReset} />
