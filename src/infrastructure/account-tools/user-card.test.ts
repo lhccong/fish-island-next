@@ -34,6 +34,11 @@ it('keeps unavailable profile fields unknown and rejects unsafe image sources', 
     region: '',
   });
 });
+it('reads a public MBTI type and treats unknown values as unfilled', () => {
+  expect(decodeUserCard({ id: '1', mbti: 'ESTP' })?.mbti).toBe('ESTP');
+  expect(decodeUserCard({ id: '1', mbti: 'ESTP-T' })?.mbti).toBe('');
+  expect(decodeUserCard({ id: '1' })?.mbti).toBe('');
+});
 it('reads ordered title IDs from legacy lists and distinguishes an empty list from a missing one', () => {
   expect(
     decodeUserCard({

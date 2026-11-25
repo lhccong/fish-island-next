@@ -46,6 +46,7 @@ export function createAuthClient(baseUrl: string): AuthPort {
     async register(values, signal) {
       const id = await request('/email/register', 'POST', signal, undefined, {
         userAccount: values.account,
+        userName: values.name.trim() || undefined,
         email: values.email,
         userPassword: values.password,
         checkPassword: values.confirmPassword,
@@ -108,6 +109,7 @@ export function createAuthClient(baseUrl: string): AuthPort {
         userAvatar: values.avatarUrl,
         momentsBgUrl: values.coverUrl,
         userProfile: values.profile,
+        mbti: values.mbti,
         pokeSuffix: values.pokeSuffix,
       });
       if (result !== true) throw new AuthError('rejected', '服务器未确认资料保存成功');

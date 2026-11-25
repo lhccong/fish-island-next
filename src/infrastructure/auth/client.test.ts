@@ -21,6 +21,13 @@ it('decodes authoritative rename availability without guessing from profile upda
   }
 });
 
+it('reads only supported MBTI values from account responses', () => {
+  expect(decodeUser({ ...user, mbti: 'INFP' }).mbti).toBe('INFP');
+  for (const mbti of [undefined, null, '', 'INFJ-A', 'XXXX', 123]) {
+    expect(decodeUser({ ...user, mbti }).mbti).toBe('');
+  }
+});
+
 it('uses legacy title, email and membership contracts and decodes their states', async () => {
   const request = vi.fn().mockImplementation((url: string) =>
     Promise.resolve(

@@ -6,17 +6,29 @@ import { useRegistration } from './use-registration';
 import { RegistrationPassword } from './ui/RegistrationPassword';
 import styles from './ui/LoginForm.module.css';
 
+function randomIslandName() {
+  return `岛民${1000 + Math.floor(Math.random() * 9000)}`;
+}
+
 export function RegisterForm({ onSuccess }: { onSuccess: (email: string) => void }) {
-  const [values, setValues] = useState({
+  const [values, setValues] = useState(() => ({
     account: '',
+    name: randomIslandName(),
     email: '',
     password: '',
     confirmPassword: '',
     code: '',
-  });
+  }));
   const { pending, error, notice, remaining, run } = useRegistration(onSuccess);
   const update = (name: keyof typeof values, value: string) =>
     setValues((old) => ({ ...old, [name]: value }));
+
+  function rerollName() {
+    let name = randomIslandName();
+    while (name === values.name) name = randomIslandName();
+    update('name', name);
+  }
+
   return (
     <form
       className={styles.registrationForm}
@@ -38,6 +50,22 @@ export function RegisterForm({ onSuccess }: { onSuccess: (email: string) => void
               onChange={(event) => update('account', event.target.value)}
               placeholder="不填也可使用邮箱登录"
             />
+          </div>
+          <label htmlFor="register-name">昵称（选填）</label>
+          <div className={styles.fieldRow}>
+            <div className={styles.field}>
+              <input
+                id="register-name"
+                autoComplete="nickname"
+                maxLength={10}
+                value={values.name}
+                disabled={!!pending}
+                onChange={(event) => update('name', event.target.value)}
+              />
+            </div>
+            <Button variant="secondary" disabled={!!pending} onClick={rerollName}>
+              随机生成
+            </Button>
           </div>
           <RegistrationPassword
             id="register-password"
@@ -68,7 +96,7 @@ export function RegisterForm({ onSuccess }: { onSuccess: (email: string) => void
             />
           </div>
           <label htmlFor="register-code">邮箱验证码</label>
-          <div className={styles.codeRow}>
+          <div className={styles.fieldRow}>
             <div className={styles.field}>
               <input
                 id="register-code"

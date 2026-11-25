@@ -1,6 +1,7 @@
 import { expect, test, type Route } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
+import { checkMbtiPalette, checkMbtiRow } from './user-card-mbti-layout';
 
 test.setTimeout(60_000);
 const data = {
@@ -9,6 +10,7 @@ const data = {
   userAvatar: 'https://menu.test/image.png',
   momentsBgUrl: 'https://menu.test/image.png',
   userProfile: '合成简介用于验证长内容。'.repeat(30),
+  mbti: 'INFP',
   points: 2769,
   level: 6,
   followerCount: '5',
@@ -65,7 +67,9 @@ for (const skin of builtinSkins)
       const click = async () => (page.viewportSize()!.width <= 760 ? name.tap() : name.click());
       await click();
       const card = page.getByRole('dialog', { name: '用户卡片', exact: true });
+      const mbti = card.locator('[data-mbti]');
       await expect(card.getByText('正在读取用户资料…')).toBeVisible();
+      await expect(mbti).toHaveCount(0);
       await expect.poll(() => Boolean(read)).toBe(true);
       await read!.fulfill({ json: { code: 50000, message: '合成读取失败' } });
       await expect(card.getByRole('alert')).toHaveText('合成读取失败');
@@ -73,10 +77,14 @@ for (const skin of builtinSkins)
       await expect.poll(() => reads).toBe(2);
       await read!.fulfill({ json: { code: 0, data: null } });
       await expect(card.getByText('该用户资料暂不可用')).toBeVisible();
+      await expect(mbti).toHaveCount(0);
       await card.getByRole('button', { name: '重新读取' }).click();
       await expect.poll(() => reads).toBe(3);
       await read!.fulfill({ json: { code: 0, data } });
       await expect(card.getByRole('heading', { name: '合成岛友' })).toBeVisible();
+      await expect(mbti).toHaveText('INFP');
+      await expect(card.getByRole('combobox', { name: 'MBTI' })).toHaveCount(0);
+      await checkMbtiPalette(mbti);
       await expect(card.getByRole('button', { name: '管理员操作', exact: true })).toHaveCount(0);
       await expect(card.getByText('0', { exact: true })).toBeVisible();
       await expect(card.getByText('5', { exact: true })).toBeVisible();
@@ -180,6 +188,8 @@ for (const skin of builtinSkins)
       await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
       await region.locator('dd').scrollIntoViewIfNeeded();
       await expect(region.locator('dd')).toBeInViewport();
+      await expect(mbti).toBeInViewport();
+      await checkMbtiRow(mbti);
       await page.screenshot({ path: info.outputPath('user-card-middle.png') });
       await scroll.evaluate((el) => {
         el.scrollTop = el.scrollHeight;
@@ -225,6 +235,7 @@ for (const skin of builtinSkins)
       await expect(card.getByRole('button', { name: '关注', exact: true })).toBeDisabled();
       await expect(card.getByRole('button', { name: '重试关注状态' })).toBeVisible();
       await expect(region.locator('dd')).toHaveText('未提供');
+      await expect(mbti).toHaveCount(0);
       await expect(card.getByText('未提供', { exact: true })).toHaveCount(2);
       await expect(card.getByText('积分', { exact: true })).toHaveCount(0);
       const compactBox = (await card.boundingBox())!;
@@ -261,8 +272,13 @@ for (const skin of builtinSkins)
 
       await click();
       await expect.poll(() => reads).toBe(6);
-      await read!.fulfill({ json: { code: 0, data: { ...data, region: '资料地区' } } });
-      await expect(region.locator('dd')).toHaveText('资料地区');
+      const longRegion = '资料地区'.repeat(10);
+      await read!.fulfill({
+        json: { code: 0, data: { ...data, region: longRegion, mbti: 'ENFP' } },
+      });
+      await expect(region.locator('dd')).toHaveText(longRegion);
+      await expect(mbti).toHaveText('ENFP');
+      await checkMbtiRow(mbti);
       const closeCard = card.getByRole('button', { name: '关闭用户卡片' });
       if (page.viewportSize()!.width <= 760) await closeCard.tap();
       else await closeCard.click();

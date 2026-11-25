@@ -86,16 +86,16 @@
   justify-content: flex-end;
   gap: 8px;
 }
-.codeRow {
+.fieldRow {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.codeRow > div {
+.fieldRow > div {
   flex: 1;
   min-width: 0;
 }
-.codeRow > button {
+.fieldRow > button {
   flex-shrink: 0;
 }
 .note {

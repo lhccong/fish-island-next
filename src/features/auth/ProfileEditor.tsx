@@ -1,8 +1,10 @@
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { ExternalLink } from 'lucide-react';
 import { useState } from 'react';
-import type { AuthUser } from '@/domain/auth';
+import { mbtiTypes, readMbti, type AuthUser } from '@/domain/auth';
 import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
+import { Select } from '@/shared/ui/Select';
 import { ProfileImageField } from './ProfileImageField';
 import { EmailBinding } from './EmailBinding';
 import { ProfileTitles } from './ProfileTitles';
@@ -10,6 +12,11 @@ import { ProfileMilestones } from './ProfileMilestones';
 import { useAuth } from './use-auth';
 import { formatNextRenameTime } from './profile-date';
 import styles from './ui/Profile.module.css';
+
+const mbtiOptions = [
+  { value: 'unset', label: '未填写' },
+  ...mbtiTypes.map((type) => ({ value: type, label: type })),
+];
 
 interface ProfileEditorProps {
   user: AuthUser;
@@ -21,6 +28,7 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
   const { updateProfile, pending } = useAuth();
   const [name, setName] = useState(user.name);
   const [profile, setProfile] = useState(user.profile ?? '');
+  const [mbti, setMbti] = useState(user.mbti ?? '');
   const [pokeSuffix, setPokeSuffix] = useState(user.pokeSuffix ?? '');
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '');
   const [coverUrl, setCoverUrl] = useState(user.coverUrl ?? '');
@@ -60,7 +68,8 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
         }
         setError('');
         try {
-          if (await updateProfile({ name, profile, avatarUrl, coverUrl, pokeSuffix })) onSaved();
+          if (await updateProfile({ name, profile, avatarUrl, coverUrl, pokeSuffix, mbti }))
+            onSaved();
         } catch (reason) {
           setError(reason instanceof Error ? reason.message : '保存失败，请重试');
         }
@@ -131,6 +140,28 @@ export function ProfileEditor({ user, onCancel, onSaved }: ProfileEditorProps) {
             />
             <span className={styles.counter}>{profile.length}/100</span>
           </label>
+          <div className={`${styles.label} ${styles.mbtiField}`}>
+            <span>MBTI</span>
+            <div className={styles.mbtiControls}>
+              <Select
+                label="MBTI"
+                value={mbti || 'unset'}
+                options={mbtiOptions}
+                disabled={busy}
+                onValueChange={(value) => setMbti(readMbti(value))}
+              />
+              <a
+                className={styles.mbtiTestLink}
+                href="https://www.16personalities.com/ch/%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="打开人格测试（新标签页）"
+                title="打开人格测试（新标签页）"
+              >
+                <ExternalLink size={18} aria-hidden="true" />
+              </a>
+            </div>
+          </div>
           <ProfileMilestones user={user} />
           <label className={styles.label}>
             被戳后缀

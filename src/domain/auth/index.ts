@@ -1,3 +1,27 @@
+export const mbtiTypes = [
+  'ISTJ',
+  'ISFJ',
+  'INFJ',
+  'INTJ',
+  'ISTP',
+  'ISFP',
+  'INFP',
+  'INTP',
+  'ESTP',
+  'ESFP',
+  'ENFP',
+  'ENTP',
+  'ESTJ',
+  'ESFJ',
+  'ENFJ',
+  'ENTJ',
+] as const;
+export type Mbti = (typeof mbtiTypes)[number];
+
+export function readMbti(value: unknown): Mbti | '' {
+  return mbtiTypes.find((type) => type === value) ?? '';
+}
+
 export interface AuthUser {
   id: string;
   name: string;
@@ -7,6 +31,7 @@ export interface AuthUser {
   usedPoints?: number;
   role: string;
   profile?: string;
+  mbti?: Mbti | '';
   pokeSuffix?: string;
   coverUrl?: string;
   email?: string;
@@ -35,6 +60,7 @@ export interface Membership {
 }
 export interface ProfileUpdate {
   pokeSuffix?: string;
+  mbti?: Mbti | '';
   name: string;
   avatarUrl: string;
   coverUrl: string;
@@ -50,6 +76,7 @@ export interface LoginCredentials {
 }
 export interface RegistrationValues {
   account: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;

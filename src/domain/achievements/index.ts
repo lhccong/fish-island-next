@@ -13,6 +13,7 @@ export interface Achievement {
   name: string;
   label: string;
   icon: string;
+  unit: '级' | '次';
   interval: number;
   points: number;
   tracks: AchievementTrack[];

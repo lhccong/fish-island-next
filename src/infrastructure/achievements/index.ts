@@ -33,11 +33,14 @@ function decode(value: unknown): AchievementSummary {
     awardedPoints: integer(summary.awardedPoints),
     achievements: array(summary.achievements).map((value) => {
       const item = object(value);
+      const unit = item.unit ?? '级';
+      if (unit !== '级' && unit !== '次') throw new Error('成就数据格式错误');
       return {
         id: text(item.id),
         name: text(item.name),
         label: text(item.label),
         icon: text(item.icon),
+        unit,
         interval: integer(item.interval),
         points: integer(item.points),
         tracks: array(item.tracks).map((value) => {

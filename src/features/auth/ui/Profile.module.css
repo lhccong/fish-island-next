@@ -56,6 +56,31 @@
   font-weight: 600;
   line-height: 1.5;
 }
+.mbtiField {
+  inline-size: min(100%, 18rem);
+}
+.mbtiControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: var(--space-2);
+}
+.mbtiTestLink {
+  display: grid;
+  place-items: center;
+  min-block-size: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-accent-text);
+}
+.mbtiTestLink:hover {
+  border-color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+.mbtiTestLink:focus-visible {
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
+  outline-offset: 2px;
+}
 .label input,
 .label textarea,
 .uploadRow > input,
@@ -565,6 +590,9 @@
   }
   .editorBody {
     gap: 22px;
+  }
+  .mbtiField {
+    inline-size: 100%;
   }
   .label input,
   .label textarea,

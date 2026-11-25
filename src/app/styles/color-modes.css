@@ -10,6 +10,8 @@
   --color-action: var(--color-accent-text);
   --color-action-hover: color-mix(in srgb, var(--color-accent-text) 90%, var(--color-text));
   --color-sso-placeholder-text: var(--color-sso-surface);
+  --mbti-surface-tone: 92% 0.065;
+  --mbti-text-tone: 39% 0.095;
 }
 
 :root[data-color-mode='dark'] {
@@ -29,6 +31,8 @@
   --color-profile-success-bg: #233326;
   --color-profile-success-border: #4b6d43;
   --color-profile-success-text: #a6d888;
+  --mbti-surface-tone: 34% 0.085;
+  --mbti-text-tone: 89% 0.085;
   color-scheme: dark;
   --color-canvas: #191a1c;
   --color-surface: #222427;

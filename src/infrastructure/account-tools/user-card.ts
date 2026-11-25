@@ -1,4 +1,5 @@
 import type { UserCard } from '@/domain/account-tools';
+import { readMbti } from '@/domain/auth';
 import { decodeTitleId, decodeTitleIds } from '@/domain/chat';
 
 export function readNonNegativeInteger(raw: unknown): number | undefined {
@@ -24,6 +25,7 @@ export function decodeUserCard(value: unknown): UserCard | null {
     frame: image('avatarFramerUrl'),
     cover: image('momentsBgUrl'),
     profile: text('userProfile'),
+    mbti: readMbti(v.mbti),
     level: readNonNegativeInteger(v.level),
     followers: readNonNegativeInteger(v.followerCount),
     following: readNonNegativeInteger(v.followingCount),

@@ -1,58 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
+import { achievements } from './achievement-fixtures';
 
 test.setTimeout(60_000);
-
-const tracks = [
-  { id: 1, label: '武器', level: 3, next: 4, claimedTiers: 0, claimablePoints: 300 },
-  { id: 2, label: '手套', level: 1, next: 2, claimedTiers: 0, claimablePoints: 100 },
-  { id: 3, label: '鞋子', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
-  { id: 4, label: '头盔', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
-  { id: 7, label: '项链', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
-  { id: 8, label: '翅膀', level: 0, next: 1, claimedTiers: 0, claimablePoints: 0 },
-].map((track) => ({ ...track, enabled: track.id !== 8 }));
-
-const achievements = [
-  {
-    id: 'farm-level',
-    name: '岛田丰章',
-    label: '农场等级',
-    icon: 'wheat',
-    interval: 10,
-    points: 200,
-    tracks: [{ id: 0, label: null, level: 21, next: 30, claimedTiers: 0, claimablePoints: 400 }],
-  },
-  {
-    id: 'card-level',
-    name: '百匣寻星',
-    label: '抽卡等级',
-    icon: 'cards',
-    interval: 1,
-    points: 200,
-    tracks: [{ id: 0, label: null, level: 3, next: 4, claimedTiers: 0, claimablePoints: 400 }],
-  },
-  {
-    id: 'equipment-level',
-    name: '百炼铸星',
-    label: '装备强化',
-    icon: 'forge',
-    interval: 1,
-    points: 100,
-    tracks,
-  },
-  {
-    id: 'pet-level',
-    name: '共赴山海',
-    label: '宠物等级',
-    icon: 'companion',
-    interval: 10,
-    points: 500,
-    tracks: [{ id: 0, label: null, level: 20, next: 30, claimedTiers: 0, claimablePoints: 1000 }],
-  },
-].map((item) => ({
-  ...item,
-  tracks: item.tracks.map((track) => ({ enabled: true, ...track })),
-}));
 
 for (const width of [1440, 375, 390]) {
   test.describe(`${width}px`, () => {
@@ -128,12 +78,12 @@ for (const width of [1440, 375, 390]) {
               await claiming;
               return route.fulfill({ status: 503 });
             }
-            user.usedPoints = -2200;
+            user.usedPoints = -3800;
             return route.fulfill({
               json: {
                 code: 0,
                 data: {
-                  awardedPoints: 2200,
+                  awardedPoints: 3800,
                   achievements: achievements.map((item) => ({
                     ...item,
                     tracks: item.tracks.map((track) => ({
@@ -173,6 +123,17 @@ for (const width of [1440, 375, 390]) {
           await page.reload({ waitUntil: 'domcontentloaded' });
           const list = page.getByRole('region', { name: '成就列表' });
           await expect(list.getByRole('heading', { name: '岛田丰章' })).toBeVisible();
+          const userLevel = list.locator('article').filter({ hasText: '用户成长' });
+          await expect(userLevel).toContainText('用户等级 · 每 1 级奖 200 积分');
+          await expect(userLevel.getByRole('listitem')).toContainText('下一档 5 级');
+          await expect(userLevel.getByRole('listitem')).toContainText('可领 600 积分');
+          const turntable = list.locator('article').filter({ hasText: '转盘抽奖' });
+          await expect(userLevel.getByRole('heading')).toBeInViewport();
+          await expect(turntable.getByRole('heading')).toBeInViewport();
+          await expect(turntable).toContainText('累计抽奖 · 每 100 次奖 500 积分');
+          await expect(turntable.getByRole('listitem')).toContainText('210 次');
+          await expect(turntable.getByRole('listitem')).toContainText('下一档 300 次');
+          await expect(turntable.getByRole('listitem')).toContainText('可领 1,000 积分');
           const equipment = list.locator('article').filter({ hasText: '百炼铸星' });
           await expect(equipment.getByRole('listitem')).toHaveCount(6);
           await expect(equipment.getByRole('listitem').filter({ hasText: '项链' })).toContainText(
@@ -181,12 +142,17 @@ for (const width of [1440, 375, 390]) {
           await expect(equipment.getByRole('listitem').filter({ hasText: '翅膀' })).toContainText(
             '强化暂未开放',
           );
-          await expect(list.locator('article svg')).toHaveCount(4);
+          await expect(list.locator('article svg')).toHaveCount(6);
           expect(
             await list
               .locator('article svg path')
               .evaluateAll((paths) => new Set(paths.map((path) => path.getAttribute('d'))).size),
-          ).toBe(4);
+          ).toBe(6);
+          expect(
+            await list
+              .locator('article')
+              .evaluateAll((cards) => cards.every((card) => card.scrollWidth <= card.clientWidth)),
+          ).toBe(true);
           expect(await list.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
           expect(
             await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -194,7 +160,7 @@ for (const width of [1440, 375, 390]) {
           expect(await list.evaluate((node) => getComputedStyle(node).paddingInlineEnd)).toBe(
             mobile ? '20px' : '24px',
           );
-          await expect(page.getByText('可领取 2,200 积分', { exact: true })).toBeVisible();
+          await expect(page.getByText('可领取 3,800 积分', { exact: true })).toBeVisible();
 
           const scrollbar = list.locator('..').locator('[data-orientation="vertical"]');
           if (mobile) {
@@ -204,24 +170,26 @@ for (const width of [1440, 375, 390]) {
             const x = area.x + area.width / 2;
             const y = area.y + area.height - 24;
             try {
-              await touch.send('Input.dispatchTouchEvent', {
-                type: 'touchStart',
-                touchPoints: [{ x, y }],
-              });
-              for (let step = 1; step <= 6; step++) {
+              for (let swipe = 0; swipe < 3; swipe++) {
                 await touch.send('Input.dispatchTouchEvent', {
-                  type: 'touchMove',
-                  touchPoints: [{ x, y: y - step * 65 }],
+                  type: 'touchStart',
+                  touchPoints: [{ x, y }],
                 });
+                for (let step = 1; step <= 6; step++) {
+                  await touch.send('Input.dispatchTouchEvent', {
+                    type: 'touchMove',
+                    touchPoints: [{ x, y: y - step * 65 }],
+                  });
+                }
+                // End a deliberate drag without flinging the content into the next tap.
+                await new Promise((resolve) => setTimeout(resolve, 150));
+                await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
               }
-              // End a deliberate drag without flinging the content into the next tap.
-              await new Promise((resolve) => setTimeout(resolve, 150));
-              await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
               await expect.poll(() => list.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
             } finally {
               await touch.detach();
             }
-            await expect(list.getByRole('heading', { name: '共赴山海' })).toBeInViewport();
+            await expect(equipment.getByRole('listitem').last()).toBeInViewport();
           } else {
             await page.setViewportSize({ width, height: 460 });
             await list.focus();
@@ -251,17 +219,20 @@ for (const width of [1440, 375, 390]) {
           await expect(claim).toBeDisabled();
           releaseClaim();
           await expect(page.getByRole('alert')).toContainText('成就服务暂不可用');
-          await expect(page.getByText('可领取 2,200 积分', { exact: true })).toBeVisible();
+          await expect(page.getByText('可领取 3,800 积分', { exact: true })).toBeVisible();
           await (mobile ? claim.tap() : claim.click());
           await expect(
-            page.getByRole('status').filter({ hasText: '已领取 2,200 积分' }),
+            page.getByRole('status').filter({ hasText: '已领取 3,800 积分' }),
           ).toBeVisible();
+          await expect(userLevel.getByRole('listitem')).toContainText('已领 600 积分');
+          await expect(turntable.getByRole('listitem')).toContainText('已领 1,000 积分');
           await expect(claim).toBeDisabled();
           expect(claims).toBe(2);
           if (
             skin.id === 'pixel-island' &&
             ((mode === 'dark' && width === 390) || (mode === 'light' && width === 1440))
           ) {
+            await list.evaluate((node) => node.scrollTo({ top: 0 }));
             await page.screenshot({ path: info.outputPath('achievements.png') });
           }
           if (skin.id === 'pixel-island' && mode === 'light' && width === 1440) {
@@ -274,7 +245,7 @@ for (const width of [1440, 375, 390]) {
             await expect(page.locator('html')).toHaveAttribute('data-skin', 'moyu-island');
             await expect(page.locator('html')).toHaveAttribute('data-color-mode', 'dark');
             await expect(
-              page.getByRole('status').filter({ hasText: '已领取 2,200 积分' }),
+              page.getByRole('status').filter({ hasText: '已领取 3,800 积分' }),
             ).toBeVisible();
             expect(listRequests).toBe(requests);
           }

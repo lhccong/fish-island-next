@@ -20,7 +20,7 @@ function AchievementCard({ item }: { item: Achievement }) {
         <div>
           <h2>{item.name}</h2>
           <p>
-            {item.label} · 每 {item.interval} 级奖 {formatPoints(item.points)} 积分
+            {item.label} · 每 {item.interval} {item.unit}奖 {formatPoints(item.points)} 积分
           </p>
         </div>
       </div>
@@ -29,13 +29,15 @@ function AchievementCard({ item }: { item: Achievement }) {
           <li key={track.id} className={styles.track}>
             <span>
               {track.label && <strong>{track.label} · </strong>}
-              {track.level > 0 ? `${track.level} 级` : '尚未开始'}
+              {track.level > 0 || item.unit === '次'
+                ? `${formatPoints(track.level)} ${item.unit}`
+                : '尚未开始'}
             </span>
             <span>
               {track.next === null
                 ? '全部达成'
                 : track.enabled
-                  ? `下一档 ${track.next} 级`
+                  ? `下一档 ${formatPoints(track.next)} ${item.unit}`
                   : '强化暂未开放'}
             </span>
             <span className={styles.reward} data-ready={track.claimablePoints > 0}>

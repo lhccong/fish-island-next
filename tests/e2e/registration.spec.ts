@@ -35,6 +35,7 @@ for (const skin of builtinSkins)
         registrations++;
         expect(route.request().postDataJSON()).toEqual({
           userAccount: '',
+          ...(registrations === 1 ? { userName: '岛上的鱼' } : {}),
           email: 'synthetic@example.com',
           userPassword: 'synthetic-password',
           checkPassword: 'synthetic-password',
@@ -48,10 +49,30 @@ for (const skin of builtinSkins)
       await page.goto('/user/login');
       const dialog = page.getByRole('dialog', { name: '摸鱼岛', exact: true });
       await dialog.getByRole('button', { name: '切换到注册', exact: true }).click();
+      await expect(page.locator('html')).toHaveAttribute('data-skin', skin.id);
+      await expect(page.locator('html')).toHaveAttribute('data-color-mode', mode);
       const form = dialog.locator('form').filter({ has: page.locator('#register-email') });
+      const name = form.getByLabel('昵称（选填）', { exact: true });
+      const randomize = form.getByRole('button', { name: '随机生成' });
+      const mobile = page.viewportSize()!.width <= 760;
       await expect(form.getByLabel('账号（选填）')).toHaveValue('');
+      await expect(name).toHaveValue(/^岛民\d{4}$/);
+      const initialName = await name.inputValue();
+      expect((await randomize.boundingBox())!.height).toBe(mobile ? 44 : 32);
+      if (mobile) {
+        await randomize.tap();
+      } else {
+        await randomize.hover();
+        await name.focus();
+        await page.keyboard.press('Tab');
+        await expect(randomize).toBeFocused();
+        await page.keyboard.press('Enter');
+      }
+      await expect(name).toHaveValue(/^岛民\d{4}$/);
+      await expect(name).not.toHaveValue(initialName);
       await form.getByRole('button', { name: '注册', exact: true }).click();
       expect(registrations).toBe(0);
+      await name.fill('  岛上的鱼  ');
       await form.getByLabel('密码', { exact: true }).fill('synthetic-password');
       await form.getByLabel('确认密码', { exact: true }).fill('different-password');
       await form.getByLabel('邮箱', { exact: true }).fill('synthetic@example.com');
@@ -67,9 +88,14 @@ for (const skin of builtinSkins)
       await form.getByLabel('确认密码', { exact: true }).fill('synthetic-password');
       await form.getByRole('button', { name: '注册', exact: true }).click();
       await expect(form.getByRole('status').filter({ hasText: '正在注册' })).toBeVisible();
+      await expect(name).toBeDisabled();
+      await expect(randomize).toBeDisabled();
       finishRegister();
       await expect(form.getByRole('alert')).toHaveText('验证码错误，请重试');
+      await expect(name).toHaveValue('  岛上的鱼  ');
       const region = dialog.getByRole('region', { name: '注册表单' });
+      const scrollbar = dialog.locator('[data-orientation="vertical"]');
+      await region.focus();
       await region.evaluate((element) => {
         element.scrollTop = 0;
       });
@@ -79,8 +105,13 @@ for (const skin of builtinSkins)
         return element.getBoundingClientRect().right - field.getBoundingClientRect().right;
       });
       expect(gap).toBeGreaterThanOrEqual(page.viewportSize()!.width <= 760 ? 20 : 24);
+      if (mobile) {
+        await expect(scrollbar).toBeHidden();
+      } else {
+        await expect(scrollbar).toHaveCSS('opacity', '1');
+      }
       await page.screenshot({ path: testInfo.outputPath('registration-top.png') });
-      if (page.viewportSize()!.width <= 760) {
+      if (mobile) {
         const box = await region.boundingBox();
         const touch = await page.context().newCDPSession(page);
         const x = box!.x + box!.width / 2;
@@ -97,6 +128,9 @@ for (const skin of builtinSkins)
         await expect.poll(() => region.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
         await touch.detach();
       }
+      const code = form.getByLabel('邮箱验证码', { exact: true });
+      await code.focus();
+      await expect(code).toBeInViewport({ ratio: 1 });
       await form.getByRole('button', { name: '注册', exact: true }).focus();
       await expect(form.getByRole('button', { name: '注册', exact: true })).toBeInViewport();
       expect(await region.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
@@ -107,6 +141,7 @@ for (const skin of builtinSkins)
       );
       await page.screenshot({ path: testInfo.outputPath('registration.png') });
       reject = false;
+      await name.fill('');
       await form.getByRole('button', { name: '注册', exact: true }).click();
       await expect(dialog.getByText('注册成功，请使用邮箱和密码登录。')).toBeVisible();
       await expect(dialog.getByLabel('账号或邮箱', { exact: true })).toHaveValue(

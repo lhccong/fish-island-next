@@ -10,8 +10,8 @@ import {
 const defaults = (): LuckyBagFormValues => ({
   name: '快来参与福袋吧',
   type: 1,
-  totalAmount: '50',
-  winnerCount: '5',
+  totalAmount: '100',
+  winnerCount: '10',
   durationSeconds: '180',
 });
 interface CreationState {

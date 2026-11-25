@@ -226,6 +226,14 @@ export function UserCardDialog({
                     </dt>
                     <dd>{card.region || target.region || '未提供'}</dd>
                   </div>
+                  {card.mbti && (
+                    <div>
+                      <dt>MBTI</dt>
+                      <dd className={styles.mbti} data-mbti={card.mbti}>
+                        {card.mbti}
+                      </dd>
+                    </div>
+                  )}
                 </dl>
                 <UserCardLinks
                   onVisit={(kind) => {

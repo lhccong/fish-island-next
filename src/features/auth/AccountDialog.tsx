@@ -139,6 +139,10 @@ export function AccountDialog({
                 <dd>{user.profile || '还没有填写个人简介'}</dd>
               </div>
               <div>
+                <dt>MBTI</dt>
+                <dd>{user.mbti || '未填写'}</dd>
+              </div>
+              <div>
                 <dt>绑定邮箱</dt>
                 <dd>{user.email || '暂未绑定'}</dd>
               </div>

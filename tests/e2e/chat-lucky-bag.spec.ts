@@ -21,8 +21,8 @@ for (const skin of builtinSkins)
         id: 'lb_synthetic',
         name: '合成摸鱼福袋',
         creatorName: '合成岛友',
-        totalAmount: 50,
-        winnerCount: 5,
+        totalAmount: 100,
+        winnerCount: 10,
         participantCount: 2,
         type: 1,
         status: 0,
@@ -51,8 +51,8 @@ for (const skin of builtinSkins)
         expect(route.request().method()).toBe('POST');
         expect(input).toMatchObject({
           type: 2,
-          totalAmount: 50,
-          winnerCount: 5,
+          totalAmount: 100,
+          winnerCount: 10,
           durationSeconds: 180,
         });
         if (creates === 1)
@@ -119,11 +119,15 @@ for (const skin of builtinSkins)
       const sendDialog = page.getByRole('dialog', { name: '发送福袋', exact: true });
       const formScroll = sendDialog.getByRole('region', { name: '发送福袋表单' });
       const send = sendDialog.getByRole('button', { name: '发送福袋', exact: true });
-      await sendDialog.getByRole('textbox', { name: '总积分', exact: true }).fill('0');
+      const totalAmount = sendDialog.getByRole('textbox', { name: '总积分', exact: true });
+      const winnerCount = sendDialog.getByRole('textbox', { name: '中奖人数', exact: true });
+      await expect(totalAmount).toHaveValue('100');
+      await expect(winnerCount).toHaveValue('10');
+      await totalAmount.fill('0');
       await act(send);
       await expect(sendDialog.getByRole('alert')).toContainText('总积分请输入');
       expect(creates).toBe(0);
-      await sendDialog.getByRole('textbox', { name: '总积分', exact: true }).fill('50');
+      await totalAmount.fill('100');
       await act(sendDialog.getByRole('combobox', { name: '福袋分配方式' }));
       await expect(page.getByRole('listbox')).toBeVisible();
       const bounds = (await page.getByRole('listbox').boundingBox())!;

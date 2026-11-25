@@ -4,6 +4,7 @@ import { createAuthClient } from './client';
 afterEach(() => vi.unstubAllGlobals());
 const values = {
   account: '',
+  name: '  岛上的鱼  ',
   email: 'synthetic@example.com',
   password: 'synthetic-password',
   confirmPassword: 'synthetic-password',
@@ -24,6 +25,7 @@ it('uses anonymous legacy email registration contracts without creating a sessio
   expect(fetcher.mock.calls[1]?.[0]).toBe('https://example.com/api/user/email/register');
   expect(JSON.parse(fetcher.mock.calls[1]?.[1].body as string)).toEqual({
     userAccount: '',
+    userName: '岛上的鱼',
     email: values.email,
     userPassword: values.password,
     checkPassword: values.confirmPassword,
@@ -31,6 +33,13 @@ it('uses anonymous legacy email registration contracts without creating a sessio
   });
   expect(fetcher.mock.calls[1]?.[1].headers.get('Content-Type')).toBe('application/json');
   expect(fetcher.mock.calls[1]?.[1].headers.has('satoken')).toBe(false);
+});
+
+it('omits a blank nickname so the server can assign one', async () => {
+  const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 0, data: '123' })));
+  vi.stubGlobal('fetch', fetcher);
+  await createAuthClient('').register({ ...values, name: ' 　' }, new AbortController().signal);
+  expect(JSON.parse(fetcher.mock.calls[0]?.[1].body as string)).not.toHaveProperty('userName');
 });
 
 it.each([null, false, 0, -1, {}, '', '0'])(

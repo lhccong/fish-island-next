@@ -198,7 +198,7 @@
 }
 .details {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: center;
   margin: 0;
   padding-block: var(--space-2);
@@ -224,6 +224,7 @@
 }
 .details > .region {
   flex: 0 1 auto;
+  flex-wrap: nowrap;
 }
 .details dt {
   display: flex;
@@ -237,6 +238,67 @@
   min-width: 0;
   margin: 0;
   font-weight: 500;
+}
+.region dt {
+  flex: none;
+}
+.details .mbti {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-control);
+  background: oklch(var(--mbti-surface-tone) var(--mbti-hue));
+  color: oklch(var(--mbti-text-tone) var(--mbti-hue));
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.mbti[data-mbti='ISTJ'] {
+  --mbti-hue: 250;
+}
+.mbti[data-mbti='ISFJ'] {
+  --mbti-hue: 158;
+}
+.mbti[data-mbti='INFJ'] {
+  --mbti-hue: 294;
+}
+.mbti[data-mbti='INTJ'] {
+  --mbti-hue: 316;
+}
+.mbti[data-mbti='ISTP'] {
+  --mbti-hue: 204;
+}
+.mbti[data-mbti='ISFP'] {
+  --mbti-hue: 338;
+}
+.mbti[data-mbti='INFP'] {
+  --mbti-hue: 0;
+}
+.mbti[data-mbti='INTP'] {
+  --mbti-hue: 272;
+}
+.mbti[data-mbti='ESTP'] {
+  --mbti-hue: 48;
+}
+.mbti[data-mbti='ESFP'] {
+  --mbti-hue: 24;
+}
+.mbti[data-mbti='ENFP'] {
+  --mbti-hue: 90;
+}
+.mbti[data-mbti='ENTP'] {
+  --mbti-hue: 70;
+}
+.mbti[data-mbti='ESTJ'] {
+  --mbti-hue: 228;
+}
+.mbti[data-mbti='ESFJ'] {
+  --mbti-hue: 112;
+}
+.mbti[data-mbti='ENFJ'] {
+  --mbti-hue: 135;
+}
+.mbti[data-mbti='ENTJ'] {
+  --mbti-hue: 180;
 }
 .links {
   display: grid;

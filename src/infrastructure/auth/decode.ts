@@ -1,4 +1,4 @@
-import { AuthError, type AuthUser, type SessionToken } from '@/domain/auth';
+import { AuthError, readMbti, type AuthUser, type SessionToken } from '@/domain/auth';
 
 export function asRecord(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -51,6 +51,7 @@ export function decodeUser(value: unknown): AuthUser {
       typeof user.usedPoints === 'number' && Number.isFinite(user.usedPoints) ? user.usedPoints : 0,
     role: typeof user.userRole === 'string' ? user.userRole : 'user',
     profile: typeof user.userProfile === 'string' ? user.userProfile : '',
+    mbti: readMbti(user.mbti),
     pokeSuffix: typeof user.pokeSuffix === 'string' ? user.pokeSuffix.slice(0, 30) : '',
     coverUrl: safeImageUrl(user.momentsBgUrl),
     email: typeof user.email === 'string' ? user.email : '',

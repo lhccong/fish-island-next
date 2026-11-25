@@ -1,3 +1,5 @@
+import type { Mbti } from '@/domain/auth';
+
 export interface UserCard {
   id: string;
   name: string;
@@ -5,6 +7,7 @@ export interface UserCard {
   frame: string | null;
   cover: string | null;
   profile: string;
+  mbti?: Mbti | '';
   level: number | undefined;
   followers: number | undefined;
   following: number | undefined;
