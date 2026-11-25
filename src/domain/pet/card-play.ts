@@ -41,7 +41,7 @@ export interface PetCardOpening {
   poolId: string;
   poolName: string;
   openedAt: string;
-  cards: { cardId: PetCardId; name: string; duplicate: boolean }[];
+  cards: { cardId: PetCardId; name: string; duplicate: boolean; grade?: PetCardGrade }[];
 }
 
 export const petBatchPackLimit = 10;
@@ -76,6 +76,7 @@ export type PetCardPlayAction =
   | { type: 'finish'; openingId: string }
   | { type: 'upgrade'; cardId: string; stars: number }
   | { type: 'upgradeAll' }
+  | { type: 'removeAll' }
   | { type: 'display' | 'remove'; cardId: string };
 
 export interface PetCardHistoryPage {

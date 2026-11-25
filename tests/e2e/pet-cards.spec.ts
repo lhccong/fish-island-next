@@ -209,7 +209,7 @@ for (const skin of builtinSkins)
         }
         await activate(button('完成开包'), mobile);
         await activate(button('展示柜'), mobile);
-        await expect(showcase).toContainText('0 / 3');
+        await expect(showcase).toContainText('0 / 6');
         await assertCollectionSlots(collection, 2);
         const slots = collection.getByRole('list').first().locator(':scope > li');
         await expect(slots.nth(0)).toContainText('拾贝萝卜');
@@ -238,8 +238,8 @@ for (const skin of builtinSkins)
         }
         await activate(button('上架拾贝萝卜'), mobile);
         await expect(showcase).toContainText('拾贝萝卜');
-        await activate(button('撤下拾贝萝卜'), mobile);
-        await expect(showcase).toContainText('0 / 3');
+        await activate(showcase.getByRole('button', { name: '下架拾贝萝卜' }), mobile);
+        await expect(showcase).toContainText('0 / 6');
         await activate(button('上架极光灵狐'), mobile);
         await expect(showcase).toContainText('极光灵狐');
         await assertShowcaseEffect(showcase);
@@ -247,6 +247,9 @@ for (const skin of builtinSkins)
         await page.reload({ waitUntil: 'domcontentloaded' });
         await activate(button('展示柜'), mobile);
         await expect(showcase).toContainText('极光灵狐');
+        await activate(showcase.getByRole('button', { name: '一键下架' }), mobile);
+        await expect(showcase).toContainText('0 / 6');
+        await expect(button('上架极光灵狐')).toBeEnabled();
         await activate(button('开卡包'), mobile);
         await expect(dialog.getByText(/今日可领 0 \/ 2/)).toBeVisible();
         await assertPackStock(dialog, 1);
@@ -276,7 +279,7 @@ for (const skin of builtinSkins)
         await expect(dialog.getByText(/试玩积分 0/)).toBeVisible();
         await expect(dialog.getByText('首包必有闪耀卡')).toBeVisible();
         await activate(button('展示柜'), mobile);
-        await expect(showcase).toContainText('0 / 3');
+        await expect(showcase).toContainText('0 / 6');
         await expect(dialog.getByText('开包收藏第一张宠物卡。')).toBeVisible();
         await assertCollectionSlots(collection, 0);
         const captureKingdoms =

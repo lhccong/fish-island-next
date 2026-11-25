@@ -1,4 +1,5 @@
 import type { SessionToken } from '@/domain/auth';
+import { petCardGradeIds } from '@/domain/pet';
 import type {
   PetCardCollectionPort,
   PetCardBatchResult,
@@ -8,9 +9,8 @@ import type {
   PetCardPlayPort,
   PetCardPlayState,
 } from '@/domain/pet';
-import { petCardGradeIds } from '@/domain/pet';
-import { createPetCardCatalogLoader, petCardArtUrl } from './card-catalog';
-import { id, list, number, record, text } from './decode';
+import { createPetCardCatalogLoader } from './card-catalog';
+import { collectedCard, id, list, number, record, text } from './decode';
 import { createPetRequest } from './request';
 
 function opening(value: unknown): PetCardOpening {
@@ -22,10 +22,12 @@ function opening(value: unknown): PetCardOpening {
     openedAt: text(data.openedAt),
     cards: list(data.cards, (item) => {
       const pull = record(item);
+      const grade = petCardGradeIds.find((value) => value === pull.grade);
       return {
         cardId: text(pull.cardId),
         name: text(pull.name),
         duplicate: pull.duplicate === true,
+        ...(grade && { grade }),
       };
     }),
   };
@@ -118,36 +120,7 @@ export function createPetCardPlay(
       const data = record(await request(`pet/cards/collection?${query}`, signal));
       const total = number(data.total, -1);
       if (!Number.isSafeInteger(total) || total < 0) throw new Error('卡片收藏总数无效');
-      const items = list(data.items, (item) => {
-        const card = record(item);
-        const id = text(card.id);
-        const name = text(card.name);
-        const grade = petCardGradeIds.find((grade) => grade === card.grade);
-        const key = text(card.artKey);
-        const tile = number(card.artTile, -1);
-        const stars = number(card.stars);
-        if (
-          !id ||
-          !name ||
-          !grade ||
-          !/^[a-f0-9]{64}\.(jpg|png)$/.test(key) ||
-          !Number.isInteger(tile) ||
-          tile < 0 ||
-          tile > 9 ||
-          !Number.isInteger(stars) ||
-          stars < 1 ||
-          stars > 5 ||
-          typeof card.portrait !== 'boolean'
-        )
-          throw new Error('卡片收藏数据格式异常');
-        return {
-          id,
-          name,
-          grade,
-          stars,
-          art: { url: petCardArtUrl(baseUrl, key), tile, portrait: card.portrait },
-        };
-      });
+      const items = list(data.items, (item) => collectedCard(item, baseUrl));
       const progress = levelProgress(data.progress);
       return { items, total, ...(progress && { summary: progress }) };
     },

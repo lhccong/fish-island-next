@@ -1,3 +1,4 @@
+import type { CollectedPetCard } from './card-play';
 import type { TreasurePort } from './treasure';
 export { treasureSites } from './treasure';
 export type { TreasureSiteId, TreasureState, TreasurePort } from './treasure';
@@ -84,6 +85,7 @@ export interface Companion {
   mood: number;
   stats: [string, number][];
   equipment: { slot: string; item: PetItem }[];
+  showcaseCards: CollectedPetCard[];
 }
 export interface PetPage<T> {
   records: T[];

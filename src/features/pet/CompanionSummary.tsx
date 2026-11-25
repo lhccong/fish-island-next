@@ -11,7 +11,8 @@ import {
   Pencil,
 } from 'lucide-react';
 import type { Companion, PetPort } from '@/domain/pet';
-import { boundedPercent, equipmentSlots } from '@/domain/pet';
+import { boundedPercent, equipmentSlots, petCardGrades } from '@/domain/pet';
+import { CardAtlasImage } from '@/shared/ui/CardAtlasImage';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { PetSprite } from './PetSprite';
 import { ItemIcon } from './ItemIcon';
@@ -107,6 +108,24 @@ export function CompanionSummary({
           );
         })}
       </div>
+      {pet.showcaseCards.length > 0 && (
+        <ul aria-label="上架宠物卡片" role="list" className={styles.showcase}>
+          {pet.showcaseCards.map(({ id, name, grade, stars, art }) => {
+            const label = `${name} · ${petCardGrades[grade].name} · ${stars} 星`;
+            return (
+              <li key={id} data-grade={grade} aria-label={label} title={label}>
+                <CardAtlasImage
+                  className={styles.showcaseArt ?? ''}
+                  src={art.url}
+                  alt=""
+                  tile={art.tile}
+                  portrait={art.portrait}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <div className={styles.vitals}>
         {[
           { name: '心情', value: pet.mood, icon: Heart },

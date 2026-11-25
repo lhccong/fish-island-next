@@ -192,21 +192,26 @@ describe('pet card pack', () => {
     expect(restored.points).toBe(15);
   });
 
-  it('limits the display cabinet to three distinct collected cards', () => {
-    const progress: PetCardsProgress = { ...emptyPetCards(), owned: petCardIds.slice(0, 4) };
-    const displayed = progress.owned
-      .slice(0, 3)
-      .reduce((album, id) => updatePetCards(album, { type: 'display', id }, day), progress);
+  it('allows six distinct collected cards and frees a slot when one is removed', () => {
+    const progress: PetCardsProgress = { ...emptyPetCards(), owned: petCardIds.slice(0, 7) };
+    const firstSix = progress.owned.slice(0, 6);
+    const seventh = progress.owned[6]!;
+    const displayed = firstSix.reduce(
+      (album, id) => updatePetCards(album, { type: 'display', id }, day),
+      progress,
+    );
+    expect(displayed.showcased).toEqual(firstSix);
     expect(updatePetCards(displayed, { type: 'display', id: 'radish' }, day)).toBe(displayed);
-    expect(() => updatePetCards(displayed, { type: 'display', id: 'seal' }, day)).toThrow(
+    expect(() => updatePetCards(displayed, { type: 'display', id: seventh }, day)).toThrow(
       '展示柜已满',
     );
     expect(() => updatePetCards(displayed, { type: 'display', id: 'fox' }, day)).toThrow(
       '请先收藏',
     );
-    expect(updatePetCards(displayed, { type: 'remove', id: 'crab' }, day).showcased).toEqual([
-      'radish',
-      'raincoat',
+    const removed = updatePetCards(displayed, { type: 'remove', id: 'crab' }, day);
+    expect(updatePetCards(removed, { type: 'display', id: seventh }, day).showcased).toEqual([
+      ...firstSix.filter((id) => id !== 'crab'),
+      seventh,
     ]);
   });
 

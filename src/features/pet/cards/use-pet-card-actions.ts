@@ -11,6 +11,7 @@ export function usePetCardActions(
   state: PetCardPlayState,
   accept: (state: PetCardPlayState) => void,
   onPurchased: ((signal: AbortSignal) => Promise<unknown>) | undefined,
+  onShowcaseChanged: () => void,
 ) {
   const request = useRef<AbortSignal | null>(null);
   const refresh = useRef<AbortController | null>(null);
@@ -59,6 +60,18 @@ export function usePetCardActions(
       if (signal.aborted) return;
       accept(result);
       if (action.type === 'buy' && onPurchased) void onPurchased(signal).catch(() => {});
+      if (action.type === 'display' || action.type === 'remove' || action.type === 'removeAll')
+        onShowcaseChanged();
+      if (action.type === 'upgrade' || action.type === 'upgradeAll') {
+        const showcasedUpgraded = state.collection.some(
+          (card) =>
+            card.showcased &&
+            result.collection.some(
+              ({ cardId, stars }) => cardId === card.cardId && stars !== card.stars,
+            ),
+        );
+        if (showcasedUpgraded) onShowcaseChanged();
+      }
     } finally {
       request.current = null;
     }

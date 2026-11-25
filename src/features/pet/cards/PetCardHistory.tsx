@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { PetCardOpening, PetCardPlayPort } from '@/domain/pet';
+import { petCardGrades, type PetCardOpening, type PetCardPlayPort } from '@/domain/pet';
 import { InfiniteScroll } from '@/shared/ui/InfiniteScroll';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { usePetCardCatalog } from './catalog-context';
 import styles from './PetCards.module.css';
 
 const openingTime = new Intl.DateTimeFormat('zh-CN', {
@@ -11,6 +12,7 @@ const openingTime = new Intl.DateTimeFormat('zh-CN', {
 });
 
 export function PetCardHistory({ port }: { port: PetCardPlayPort }) {
+  const catalog = usePetCardCatalog();
   const requestNext = useRef<() => void>(() => {});
   const [items, setItems] = useState<PetCardOpening[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,12 +70,20 @@ export function PetCardHistory({ port }: { port: PetCardPlayPort }) {
               <time dateTime={item.openedAt}>{openingTime.format(new Date(item.openedAt))}</time>
             </div>
             <ul className={styles.historyPulls}>
-              {item.cards.map((card, index) => (
-                <li key={index}>
-                  {card.name}
-                  {card.duplicate && '（重复）'}
-                </li>
-              ))}
+              {item.cards.map((card, index) => {
+                const grade = card.grade ?? catalog.cards[card.cardId]?.grade;
+                return (
+                  <li key={index}>
+                    <span>
+                      {card.name}
+                      {card.duplicate && '（重复）'}
+                    </span>
+                    <span className={styles.historyGrade} data-card-grade={grade}>
+                      {grade ? petCardGrades[grade].name : '品质未知'}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </li>
         ))}

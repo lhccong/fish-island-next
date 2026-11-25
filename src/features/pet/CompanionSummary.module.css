@@ -107,6 +107,38 @@
 .slot > span {
   border-radius: 2px;
 }
+.showcase {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 2px;
+  list-style: none;
+}
+.showcase > li {
+  flex: 0 1 44px;
+  min-width: 0;
+  padding: 2px;
+  border-radius: var(--radius-control);
+  background: var(--color-border);
+}
+.showcase > li[data-grade='fine'] {
+  background: var(--color-life-rare);
+}
+.showcase > li[data-grade='epic'] {
+  background: var(--color-life-epic);
+}
+.showcase > li[data-grade='legendary'] {
+  background: var(--color-life-legendary);
+}
+.showcase > li[data-grade='shiny'] {
+  background: linear-gradient(125deg, var(--color-pet-card-spectrum));
+}
+.showcase .showcaseArt {
+  border: 0;
+  border-radius: max(0px, calc(var(--radius-control) - 2px));
+}
 .vitals {
   display: grid;
   gap: 10px;
@@ -260,6 +292,12 @@
   }
 }
 @media (max-width: 760px) {
+  .showcase {
+    justify-content: flex-start;
+  }
+  .showcase > li {
+    flex-basis: 38px;
+  }
   .dressing {
     grid-template-rows: repeat(3, 60px);
     margin-block: 10px;

@@ -13,11 +13,13 @@ export function PetCardsDialog({
   onClose,
   returnFocusRef,
   onPurchased,
+  onShowcaseChanged,
 }: {
   port: PetCardPlayPort;
   onClose: () => void;
   returnFocusRef: RefObject<HTMLElement | null>;
   onPurchased: ((signal: AbortSignal) => Promise<unknown>) | undefined;
+  onShowcaseChanged: () => void;
 }) {
   const load = useCallback(
     async (signal: AbortSignal) => {
@@ -73,6 +75,7 @@ export function PetCardsDialog({
               state={state.data.progress}
               accept={acceptProgress}
               onPurchased={onPurchased}
+              onShowcaseChanged={onShowcaseChanged}
             />
           </PetCardCatalogContext.Provider>
         ))}

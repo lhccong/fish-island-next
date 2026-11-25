@@ -38,12 +38,14 @@ export function PetCardPlayExperience({
   state,
   accept,
   onPurchased,
+  onShowcaseChanged,
 }: {
   port: PetCardPlayPort;
   catalog: PetCardCatalog;
   state: PetCardPlayState;
   accept: (state: PetCardPlayState) => void;
   onPurchased: ((signal: AbortSignal) => Promise<unknown>) | undefined;
+  onShowcaseChanged: () => void;
 }) {
   const [view, setView] = useState<View>('pack');
   const [selected, setSelected] = useState(catalog.packIds[0]!);
@@ -51,7 +53,7 @@ export function PetCardPlayExperience({
   const [spotlight, setSpotlight] = useState<PetCardId[]>([]);
   const [opening, setOpening] = useState(false);
   const { pending, notice, clearNotice, run: perform } = usePetOperation();
-  const submit = usePetCardActions(port, state, accept, onPurchased);
+  const submit = usePetCardActions(port, state, accept, onPurchased, onShowcaseChanged);
   const viewport = useRef<HTMLDivElement>(null);
   const primary = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -76,13 +78,9 @@ export function PetCardPlayExperience({
   const activeView = result || opening ? 'pack' : view;
   const batchView = state.batch?.type === 'upgrade' ? 'collection' : 'pack';
   const batch = activeView === batchView ? state.batch : null;
-  const collection = new Map(
-    state.collection
-      .filter((card) => catalog.cards[card.cardId])
-      .map((card) => [card.cardId, card]),
-  );
-  const collected = [...collection.keys()];
-  const showcased = collected.filter((id) => collection.get(id)?.showcased);
+  const collection = new Map(state.collection.map((card) => [card.cardId, card]));
+  const collected = [...collection.keys()].filter((id) => catalog.cards[id]);
+  const showcased = state.collection.filter((card) => card.showcased).map(({ cardId }) => cardId);
   const move: MovePack | undefined =
     multiple && !result && !opening && !pending && !playingShiny
       ? (direction, preserveScroll) => {
@@ -230,9 +228,10 @@ export function PetCardPlayExperience({
                   onDisplay={(cardId, displayed) =>
                     run(
                       { type: displayed ? 'remove' : 'display', cardId },
-                      displayed ? '已撤下卡片' : '已上架卡片',
+                      displayed ? '已下架卡片' : '已上架卡片',
                     )
                   }
+                  onRemoveAll={() => run({ type: 'removeAll' }, '已下架全部卡片')}
                   upgrades={{
                     collection,
                     onUpgrade: (card) =>

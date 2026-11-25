@@ -300,7 +300,7 @@
   height: 44px;
   padding: 0;
   border: 0;
-  background: transparent;
+  background: var(--color-canvas);
   color: var(--color-muted);
 }
 .dialog .moderationTrigger:hover {

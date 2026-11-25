@@ -75,7 +75,7 @@ export function createPetClient(
     },
     async mine(signal) {
       const data = await request('pet/my/get', signal);
-      return data === null ? null : companion(data);
+      return data === null ? null : companion(data, baseUrl);
     },
     async create(name, signal) {
       id(await request('pet/create', signal, { name }));

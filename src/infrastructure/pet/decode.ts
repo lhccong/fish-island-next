@@ -8,7 +8,10 @@ import type {
   AutoFeed,
   EquipmentForge,
   ForgeDetail,
+  CollectedPetCard,
 } from '@/domain/pet';
+import { petCardGradeIds } from '@/domain/pet';
+import { petCardArtUrl } from './card-catalog';
 
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -103,7 +106,37 @@ export function item(value: unknown, instance = false): PetItem {
     stats: stats(template),
   };
 }
-export function companion(value: unknown): Companion {
+export function collectedCard(value: unknown, baseUrl: string): CollectedPetCard {
+  const card = record(value);
+  const id = text(card.id);
+  const name = text(card.name);
+  const grade = petCardGradeIds.find((grade) => grade === card.grade);
+  const key = text(card.artKey);
+  const tile = number(card.artTile, -1);
+  const stars = number(card.stars);
+  if (
+    !id ||
+    !name ||
+    !grade ||
+    !/^[a-f0-9]{64}\.(jpg|png)$/.test(key) ||
+    !Number.isInteger(tile) ||
+    tile < 0 ||
+    tile > 9 ||
+    !Number.isInteger(stars) ||
+    stars < 1 ||
+    stars > 5 ||
+    typeof card.portrait !== 'boolean'
+  )
+    throw new Error('卡片收藏数据格式异常');
+  return {
+    id,
+    name,
+    grade,
+    stars,
+    art: { url: petCardArtUrl(baseUrl, key), tile, portrait: card.portrait },
+  };
+}
+export function companion(value: unknown, baseUrl = ''): Companion {
   const data = record(value);
   return {
     id: id(data.petId),
@@ -114,6 +147,9 @@ export function companion(value: unknown): Companion {
     hunger: number(data.hunger),
     mood: number(data.mood),
     stats: data.equipStats ? stats(record(data.equipStats)) : [],
+    showcaseCards: data.showcaseCards
+      ? list(data.showcaseCards, (value) => collectedCard(value, baseUrl))
+      : [],
     equipment: data.equippedItems
       ? Object.entries(record(data.equippedItems))
           .filter(([, value]) => value !== null)

@@ -10,6 +10,34 @@ for (const skin of builtinSkins)
       const fixture = await setupChatMenu(page, skin.id, mode, 'admin');
       const mobile = page.viewportSize()!.width <= 760;
       const activate = (control: Locator) => (mobile ? control.tap() : control.click());
+      async function scrollDown(region: Locator) {
+        const scrollbar = region.locator('..').locator('[data-orientation="vertical"]');
+        if (mobile) {
+          await expect(scrollbar).toHaveCSS('visibility', 'hidden');
+          const rect = (await region.boundingBox())!;
+          const client = await page.context().newCDPSession(page);
+          const x = rect.x + rect.width / 2;
+          const y = rect.y + rect.height - 20;
+          await client.send('Input.dispatchTouchEvent', {
+            type: 'touchStart',
+            touchPoints: [{ x, y }],
+          });
+          for (let step = 1; step <= 10; step++) {
+            await client.send('Input.dispatchTouchEvent', {
+              type: 'touchMove',
+              touchPoints: [{ x, y: y - step * 25 }],
+            });
+            await page.evaluate(() => new Promise(requestAnimationFrame));
+          }
+          await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+          await client.detach();
+        } else {
+          await region.hover();
+          await expect(scrollbar).toHaveCSS('opacity', '1');
+          await page.mouse.wheel(0, 600);
+        }
+        await expect.poll(() => region.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+      }
       let muted = false;
       let firstRead: Route | undefined;
       let firstWrite: Route | undefined;
@@ -76,41 +104,20 @@ for (const skin of builtinSkins)
       await dialog.getByRole('button', { name: '复制ID' }).click();
       expect(await fixture.clipboardText()).toBe('456');
       const gearAtTop = await gear.boundingBox();
-      const scrollbar = region.locator('..').locator('[data-orientation="vertical"]');
-      if (mobile) {
-        await expect(scrollbar).toHaveCSS('visibility', 'hidden');
-        const rect = (await region.boundingBox())!;
-        const client = await page.context().newCDPSession(page);
-        const x = rect.x + rect.width / 2;
-        const y = rect.y + rect.height - 20;
-        await client.send('Input.dispatchTouchEvent', {
-          type: 'touchStart',
-          touchPoints: [{ x, y }],
-        });
-        for (let step = 1; step <= 10; step++) {
-          await client.send('Input.dispatchTouchEvent', {
-            type: 'touchMove',
-            touchPoints: [{ x, y: y - step * 25 }],
-          });
-          await page.evaluate(() => new Promise(requestAnimationFrame));
-        }
-        await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-        await client.detach();
-      } else {
-        await region.hover();
-        await expect(scrollbar).toHaveCSS('opacity', '1');
-        await page.mouse.wheel(0, 600);
-      }
-      await expect.poll(() => region.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+      await scrollDown(region);
       expect(await gear.boundingBox()).toEqual(gearAtTop);
 
       await activate(gear);
+      const body = moderation.getByRole('region', { name: '禁言设置', exact: true });
       const loading = moderation.getByText('正在读取禁言状态…');
       await expect(loading).toBeVisible();
       await expect.poll(() => !!firstRead).toBe(true);
-      await firstRead!.fulfill({ json: { code: 50000, message: '合成状态读取失败' } });
+      await firstRead!.fulfill({
+        json: { code: 50000, message: '用于滚动验收的合成状态读取失败。'.repeat(110) },
+      });
       const retry = moderation.getByRole('button', { name: '重试禁言状态' });
       await expect(retry).toBeVisible();
+      await scrollDown(body);
       await activate(dismiss);
       await expect(moderation).toHaveCount(0);
       await expect(gear).toBeFocused();
@@ -120,7 +127,6 @@ for (const skin of builtinSkins)
       await expect(retry).toBeVisible();
       expect(muteReads).toBe(1);
       await activate(retry);
-      const body = moderation.getByRole('region', { name: '禁言设置', exact: true });
       const select = moderation.getByRole('combobox', { name: '禁言时长' });
       await expect(body).toHaveCSS('padding-right', mobile ? '20px' : '24px');
       await activate(select);

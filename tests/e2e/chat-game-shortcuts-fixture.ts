@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { makeLands } from './farm-fixture';
 
-export async function shortcutFixture(page: Page) {
+export async function shortcutFixture(page: Page, showcaseCards?: () => unknown[]) {
   const state = {
     farm: 'ready',
     pet: 'ready',
@@ -42,7 +42,10 @@ export async function shortcutFixture(page: Page) {
       await new Promise((resolve) => setTimeout(resolve, 50));
     await route.fulfill({
       status: state.pet === 'error' ? 503 : 200,
-      json: { code: 0, data: state.pet === 'empty' ? null : pet },
+      json: {
+        code: 0,
+        data: state.pet === 'empty' ? null : { ...pet, showcaseCards: showcaseCards?.() },
+      },
     });
   });
   await page.route('**/api/pet/feed?*', (route) => {

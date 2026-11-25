@@ -190,8 +190,8 @@ for (const skin of builtinSkins)
         await expect(upgrade(1)).toContainText('1');
         await expect(upgrade(1).getByText('升星', { exact: true })).toBeVisible();
         await expect(upgrade(1)).toHaveAttribute('title', /消耗 1 张重复卡/);
-        const unpin = radish.getByRole('button', { name: '撤下拾贝萝卜' });
-        await expect(unpin).toHaveText('撤下');
+        const unpin = radish.getByRole('button', { name: '下架拾贝萝卜' });
+        await expect(unpin).toHaveText('下架');
         await expect(unpin).toHaveCSS('border-top-width', '0px');
         await expect(unpin).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
         if (mobile) await unpin.tap();
@@ -246,6 +246,8 @@ for (const skin of builtinSkins)
         await activate(button('开包记录'), mobile);
         const list = cards.getByRole('region', { name: '宠物卡包内容' });
         await expect(list.getByText('拾贝萝卜（重复）').first()).toBeVisible();
+        await expect(list.locator('[data-card-grade="common"]').first()).toHaveText('普通');
+        await expect(list.locator('[data-card-grade="shiny"]').first()).toHaveText('闪耀');
         const layout = await list.evaluate((el) => ({
           overflow: el.scrollWidth - el.clientWidth,
           gutter: getComputedStyle(el).paddingInlineEnd,
@@ -263,6 +265,7 @@ for (const skin of builtinSkins)
         }
         await reachOlderRecords(page, list, mobile);
         await expect(list.getByText('海岛篇旧记录')).toBeAttached();
+        await expect(list.getByText('品质未知')).toBeAttached();
         await expect(list.getByText('已全部加载')).toBeAttached();
         expect(await list.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
         expect(fixture?.historyRequests).toEqual(['', '', '3']);

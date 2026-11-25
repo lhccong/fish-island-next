@@ -381,11 +381,31 @@
   border-radius: var(--radius-panel);
   background: var(--color-canvas);
 }
+.shelfHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.shelfHeading h3 {
+  margin: 0;
+}
 .shelfGrid {
   grid-template-columns: repeat(3, minmax(0, 140px));
 }
+@container pet-cards (min-width: 740px) {
+  .shelfGrid {
+    grid-template-columns: repeat(6, minmax(0, 140px));
+  }
+}
 .shelfGrid > li:not(.emptyShelf) {
   display: grid;
+  align-content: start;
+  gap: 6px;
+}
+.shelfGrid > li > button {
+  justify-self: center;
 }
 .drawGrid {
   grid-auto-rows: 1fr;
@@ -888,6 +908,15 @@
   .shelfGrid {
     gap: 6px;
   }
+  .shelfGrid .cardHeader {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .shelfGrid .rarity {
+    gap: 2px;
+    padding-inline: 4px;
+    white-space: nowrap;
+  }
   .shelf {
     padding: 8px;
   }
@@ -938,6 +967,10 @@
   overflow-wrap: anywhere;
 }
 
+.history .resultHeading {
+  flex-wrap: wrap;
+}
+
 .history time {
   font-size: 0.8125rem;
   color: var(--color-muted);
@@ -948,6 +981,43 @@
   flex-wrap: wrap;
   gap: 4px 12px;
   margin-top: 8px;
+}
+
+.historyPulls > li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 5px;
+  min-width: 0;
+}
+
+.historyGrade {
+  --grade-color: var(--color-muted);
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--grade-color) 36%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--grade-color) 12%, var(--color-surface));
+  color: color-mix(in srgb, var(--grade-color) 42%, var(--color-text));
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.historyGrade[data-card-grade='fine'] {
+  --grade-color: var(--color-life-rare);
+}
+.historyGrade[data-card-grade='epic'] {
+  --grade-color: var(--color-life-epic);
+}
+.historyGrade[data-card-grade='legendary'] {
+  --grade-color: var(--color-life-legendary);
+}
+.historyGrade[data-card-grade='shiny'] {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(115deg, var(--color-pet-card-spectrum)) border-box;
+  color: var(--color-text);
 }
 
 .actions > p {

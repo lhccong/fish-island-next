@@ -46,7 +46,7 @@ export const petCards = { ...islandCards, ...kingdomsCards };
 export const petCardIds = Object.keys(petCards) as (keyof typeof petCards)[];
 export const dailyPetPackLimit = 2;
 export const petPackSize = 5;
-export const petShowcaseLimit = 3;
+export const petShowcaseLimit = 6;
 
 export const demoPetCardCatalog = createPetCardCatalog(petCards, [
   {
@@ -122,6 +122,7 @@ export type PetCardsAction =
   | { type: 'reset' }
   | { type: 'open'; pack: PetCardPackKind; packId: number }
   | { type: 'finish'; packId: number }
+  | { type: 'removeAll' }
   | { type: 'display' | 'remove'; id: PetCardId };
 
 export interface PetCardsPort {
@@ -254,9 +255,11 @@ export function updatePetCards(
       if (!progress.owned.includes(action.id)) throw new Error('请先收藏这张卡。');
       if (progress.showcased.includes(action.id)) return progress;
       if (progress.showcased.length >= petShowcaseLimit)
-        throw new Error('展示柜已满，请先撤下一张。');
+        throw new Error('展示柜已满，请先下架一张。');
       return { ...progress, showcased: [...progress.showcased, action.id] };
     case 'remove':
       return { ...progress, showcased: progress.showcased.filter((id) => id !== action.id) };
+    case 'removeAll':
+      return { ...progress, showcased: [] };
   }
 }

@@ -234,12 +234,13 @@ export function PetCardsExperience({
               <PetCardShowcase
                 cardIds={cardIds}
                 owned={packOwned}
-                showcased={showcased.filter((id) => !!catalog.cards[id])}
+                showcased={showcased}
                 pending={pending}
                 onReplay={(id) => setSpotlight([id])}
                 onDisplay={(id, displayed) =>
                   void run({ type: displayed ? 'remove' : 'display', id })
                 }
+                onRemoveAll={() => void run({ type: 'removeAll' })}
               />
             )}
           </div>
@@ -249,12 +250,13 @@ export function PetCardsExperience({
       <footer className={styles.footer}>
         <div className={styles.feedback}>
           {error && <p role="alert">{error}</p>}
+          {view === 'showcase' && pending && <LoadingIndicator compact>正在保存…</LoadingIndicator>}
           {resetNotice && initial ? (
             <p role="status">已恢复试玩初始状态。</p>
           ) : (
             <p>
               {view === 'showcase'
-                ? '收藏的卡可上架，展位最多 3 张。'
+                ? '收藏的卡可上架展示。'
                 : remaining || hasStock || result
                   ? '待拆卡包可跨日保留。'
                   : '北京时间 00:00 恢复领取次数。'}

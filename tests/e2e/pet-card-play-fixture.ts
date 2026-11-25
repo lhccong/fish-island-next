@@ -37,6 +37,11 @@ export async function setupPetCardPlay(
   const requestIds: string[] = [];
   const batchIds: string[] = [];
   const historyRequests: string[] = [];
+  const removeAllIds: string[] = [];
+  let releaseRemoveAll!: () => void;
+  const firstRemoveAll = new Promise<void>((resolve) => {
+    releaseRemoveAll = resolve;
+  });
   const openings: PetCardOpening[] = [];
   await page.route('**/api/pet/cards/state', async (route) => {
     if (stateFails) {
@@ -59,7 +64,14 @@ export async function setupPetCardPlay(
       });
     }
     if (openings.length && before) {
-      const items = [{ ...openings[0], id: '1', poolName: '海岛篇旧记录' }];
+      const items = [
+        {
+          ...openings[0],
+          id: '1',
+          poolName: '海岛篇旧记录',
+          cards: [{ cardId: 'retired', name: '旧版卡片', duplicate: false }],
+        },
+      ];
       return route.fulfill({ json: { code: 0, data: { items, nextCursor: null } } });
     }
     const items = openings.length
@@ -72,7 +84,7 @@ export async function setupPetCardPlay(
       json: { code: 0, data: { items, nextCursor: items.length ? '3' : null } },
     });
   });
-  await page.route('**/api/pet/cards/actions', (route) => {
+  await page.route('**/api/pet/cards/actions', async (route) => {
     const request = route.request();
     expect(request.headers()['synthetic-session']).toBe('synthetic-value');
     const action = request.postDataJSON() as PetCardPlayAction & { requestId: string };
@@ -161,7 +173,7 @@ export async function setupPetCardPlay(
               name: '拾贝萝卜',
               duplicate: i > 0,
             })),
-            { cardId: 'fox', name: '极光灵狐', duplicate: false },
+            { cardId: 'fox', name: '极光灵狐', duplicate: false, grade: 'shiny' },
           ],
         };
         state.collection = [
@@ -170,6 +182,13 @@ export async function setupPetCardPlay(
         ];
         openings.push(state.pending);
       }
+    } else if (action.type === 'removeAll') {
+      removeAllIds.push(action.requestId);
+      if (removeAllIds.length === 1) {
+        await firstRemoveAll;
+        return route.fulfill({ status: 503 });
+      }
+      for (const card of state.collection) card.showcased = false;
     } else if (action.type === 'upgradeAll') {
       const result = {
         type: 'upgrade' as const,
@@ -209,5 +228,14 @@ export async function setupPetCardPlay(
     state.level = 59;
     state.xpToNext = 1;
   }
-  return { requestIds, batchIds, historyRequests, releaseState, prepareLastLevel };
+  return {
+    requestIds,
+    batchIds,
+    historyRequests,
+    removeAllIds,
+    releaseRemoveAll,
+    releaseState,
+    prepareLastLevel,
+    showcasedCards: () => state.collection.filter((card) => card.showcased),
+  };
 }

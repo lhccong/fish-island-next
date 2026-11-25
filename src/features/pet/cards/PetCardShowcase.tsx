@@ -1,5 +1,5 @@
 import { ArrowUp, GalleryVerticalEnd, Pin, PinOff, Sparkles } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import {
   getPetCard,
   petCardGrades,
@@ -29,6 +29,7 @@ export function PetCardShowcase({
   showcased,
   pending,
   onDisplay,
+  onRemoveAll,
   onReplay,
   upgrades,
   bulkUpgrade,
@@ -38,6 +39,7 @@ export function PetCardShowcase({
   showcased: PetCardId[];
   pending: boolean;
   onDisplay: (id: PetCardId, displayed: boolean) => void;
+  onRemoveAll: () => void;
   onReplay: (id: PetCardId) => void;
   bulkUpgrade?: ReactNode;
   upgrades?: {
@@ -46,6 +48,7 @@ export function PetCardShowcase({
   };
 }) {
   const catalog = usePetCardCatalog();
+  const shelfHeading = useRef<HTMLHeadingElement>(null);
   const [series, setSeries] = useState(all);
   const [grade, setGrade] = useState(all);
   const seriesCards =
@@ -57,37 +60,64 @@ export function PetCardShowcase({
   );
   const ownedCards = new Set(owned);
   const visibleOwned = visibleCards.filter((id) => ownedCards.has(id)).length;
-  const vacant = petShowcaseLimit - showcased.length;
-  const stats = summarizePetShowcase(showcased, catalog, upgrades?.collection);
-  const effects = showcased.flatMap((id) => {
+  const visibleShowcased = showcased.filter((id) => !!catalog.cards[id]);
+  const vacant = petShowcaseLimit - visibleShowcased.length;
+  const stats = summarizePetShowcase(visibleShowcased, catalog, upgrades?.collection);
+  const bonusLabel = upgrades ? '宠物战斗属性加成' : '宠物属性加成预览';
+  const effects = visibleShowcased.flatMap((id) => {
     const battle = getPetCard(id, catalog).battle;
     return battle.kind === 'effect' ? [{ id, effect: battle }] : [];
   });
   return (
     <div className={styles.album}>
       <section aria-label="宠物卡片展示柜" className={styles.shelf}>
-        <div className={styles.resultHeading}>
-          <h3>宠物卡片展示柜</h3>
-          <span>
-            {showcased.length} / {petShowcaseLimit}
-          </span>
+        <div className={styles.shelfHeading}>
+          <h3 ref={shelfHeading} tabIndex={-1}>
+            宠物卡片展示柜
+          </h3>
+          <div className={styles.collectionHeadingActions}>
+            <span aria-live="polite">
+              {visibleShowcased.length} / {petShowcaseLimit}
+            </span>
+            <Button
+              variant="secondary"
+              disabled={pending || !showcased.length}
+              onClick={(event) => {
+                if (event.detail === 0) shelfHeading.current?.focus();
+                onRemoveAll();
+              }}
+            >
+              一键下架
+            </Button>
+          </div>
         </div>
         <ul className={styles.shelfGrid}>
-          {showcased.map((id) => (
+          {visibleShowcased.map((id) => (
             <li key={id}>
               <PetCardFace id={id} compact stars={upgrades?.collection.get(id)?.stars} />
+              <Button
+                variant="secondary"
+                disabled={pending}
+                aria-label={`下架${getPetCard(id, catalog).name}`}
+                onClick={(event) => {
+                  if (event.detail === 0) shelfHeading.current?.focus();
+                  onDisplay(id, true);
+                }}
+              >
+                下架
+              </Button>
             </li>
           ))}
           {Array.from({ length: vacant }, (_, index) => (
-            <li key={`vacant-${index + showcased.length}`} className={styles.emptyShelf}>
+            <li key={`vacant-${index + visibleShowcased.length}`} className={styles.emptyShelf}>
               <GalleryVerticalEnd size={22} aria-hidden="true" />
               <span>空位</span>
             </li>
           ))}
         </ul>
-        {showcased.length > 0 && (
-          <section className={styles.bonus} aria-label="宠物属性加成预览">
-            <h4>宠物属性加成预览</h4>
+        {visibleShowcased.length > 0 && (
+          <section className={styles.bonus} aria-label={bonusLabel}>
+            <h4>{bonusLabel}</h4>
             <ul className={styles.cardStats}>
               {petCardStatEntries(stats).map(({ stat, label, value }) => (
                 <li key={stat}>
@@ -158,7 +188,7 @@ export function PetCardShowcase({
             const card = getPetCard(id, catalog);
             const progress = upgrades?.collection.get(id);
             const displayed = showcased.includes(id);
-            const displayLabel = displayed ? '撤下' : '上架';
+            const displayLabel = displayed ? '下架' : '上架';
             const DisplayIcon = displayed ? PinOff : Pin;
             return (
               <li key={id} className={styles.collectionSlot}>
@@ -189,7 +219,7 @@ export function PetCardShowcase({
                   <Button
                     className={styles.collectionAction ?? ''}
                     variant="secondary"
-                    disabled={pending || (!displayed && !vacant)}
+                    disabled={pending || (!displayed && showcased.length >= petShowcaseLimit)}
                     aria-label={`${displayLabel}${card.name}`}
                     title={`${displayLabel}展示柜`}
                     data-showcased={displayed || undefined}

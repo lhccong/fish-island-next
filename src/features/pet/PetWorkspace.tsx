@@ -211,6 +211,7 @@ export function PetWorkspace({
         <PetCardsDialog
           port={cardCollection}
           onPurchased={onBalanceChanged}
+          onShowcaseChanged={onChange}
           onClose={closePanel}
           returnFocusRef={returnFocusRef}
         />
