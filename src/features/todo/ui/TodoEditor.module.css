@@ -1,0 +1,104 @@
+.dialog {
+  --scroll-area-reserved-gutter: 24px;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--color-text);
+}
+.dialog h2 {
+  margin: 0 var(--space-8) var(--space-4) 4px;
+  font-size: 1.125rem;
+}
+.form {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+}
+.fields {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 4px 0 4px 4px;
+  border: 0;
+}
+.field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: 0.875rem;
+}
+.field input,
+.field textarea {
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+.field textarea {
+  resize: vertical;
+}
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px var(--focus-outline-style, solid) var(--color-accent-text);
+  outline-offset: 2px;
+}
+.field :is(input, textarea):disabled {
+  opacity: 0.6;
+}
+.paired {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.footer {
+  padding: var(--space-3) 4px 4px;
+}
+.colorTrigger {
+  justify-self: start;
+  min-height: 44px;
+}
+.swatch {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-canvas);
+}
+.colorPanel {
+  max-width: 360px;
+  padding: 4px 8px 4px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+.footer p {
+  margin: 0 0 var(--space-2);
+  color: var(--color-danger);
+  font-size: 0.875rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+@media (max-width: 760px) {
+  .dialog {
+    --scroll-area-reserved-gutter: 20px;
+
+    top: calc(var(--visual-viewport-top, 0px) + var(--visual-viewport-height, 100dvh) / 2);
+    width: min(540px, calc(100% - 16px));
+    max-height: calc(var(--visual-viewport-height, 100dvh) - 16px - env(safe-area-inset-bottom));
+    padding: var(--space-3);
+  }
+  .field input,
+  .field textarea {
+    font-size: max(16px, 1rem);
+  }
+}

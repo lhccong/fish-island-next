@@ -22,11 +22,13 @@ export function createChatEmoticons(
       body: typeof body === 'string' ? body : JSON.stringify(body),
       signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
     });
+    signal.throwIfAborted();
     if (response.status === 401) {
       onExpired();
       throw new Error('登录已过期，请重新登录');
     }
     const payload = record(await response.json());
+    signal.throwIfAborted();
     if (payload.code === 40100) {
       onExpired();
       throw new Error('登录已过期，请重新登录');

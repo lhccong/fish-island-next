@@ -8,7 +8,7 @@ import { RequireAdmin } from '@/app/components/RequireAdmin';
 import { adminSections } from '@/app/components/admin-sections';
 import { PageLoading } from '@/app/components/PageLoading';
 import { ToolsRoute } from '@/app/pages/ToolsRoute';
-import { defaultToolPath, tools } from '@/app/config/tools';
+import { defaultToolPath, findTool, tools } from '@/app/config/tools';
 import { AuthNotice } from '@/features/auth';
 import styles from './AppRoutes.module.css';
 import { GameErrorBoundary } from '@/app/components/GameErrorBoundary';
@@ -101,7 +101,7 @@ export function AppRoutes() {
       : { ...location, pathname: '/', search: '', hash: '', state: null }
     : location;
   return (
-    <GameWindowsProvider>
+    <GameWindowsProvider pageTool={findTool(displayLocation.pathname)?.path}>
       <div className={styles.page} aria-hidden={isLogin ? true : undefined}>
         <ChatPageHost
           active={displayLocation.pathname === '/chat' || displayLocation.pathname === '/chat/mini'}
@@ -141,6 +141,7 @@ export function AppRoutes() {
             ))}
             <Route path="/avatarFrames" element={<Navigate to="/utils/avatar-frames" replace />} />
             <Route path="/utils" element={<Navigate to={defaultToolPath} replace />} />
+            <Route path="/todo" element={<Navigate to="/utils/todo" replace />} />
             {tools.map((tool) => (
               <Route key={tool.path} path={tool.path} element={<ToolsRoute tool={tool} />} />
             ))}

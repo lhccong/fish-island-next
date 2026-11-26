@@ -63,7 +63,7 @@ for (const skin of builtinSkins)
       await press(page, panel.getByRole('button', { name: '清空搜索' }));
       await expect(filter).toBeFocused();
       await expect(tiles).toHaveCount(1);
-      expect(query.requests.at(-1)).toEqual(['', 1]);
+      expect(query.requests.filter(([keyword]) => !keyword)).toEqual([['', 1]]);
       await page.keyboard.press('Escape');
       await expect(open).toBeFocused();
       await expect(draft).toHaveText('保留草稿');
@@ -114,6 +114,11 @@ for (const skin of builtinSkins)
       await expect(panel).toBeHidden();
       await expect(section.getByRole('img', { name: '评论附件 1' })).toBeVisible();
       await expect(editor).toHaveValue('保留草稿');
+      await press(page, trigger);
+      await expect(tile).toBeVisible();
+      expect(query.requests.filter(([keyword]) => !keyword)).toEqual([['', 1]]);
+      await press(page, panel.getByRole('button', { name: '关闭评论表情包' }));
+      await expect(trigger).toBeFocused();
     });
   }
 

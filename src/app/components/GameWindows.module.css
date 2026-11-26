@@ -16,6 +16,27 @@
 .content[data-fill='true'] > [data-loading-indicator='region'] {
   height: 100%;
 }
+.toolSurface {
+  container: tool-surface / inline-size;
+  min-width: 0;
+}
+.toolSlot {
+  min-width: 0;
+  padding: 4px 0 16px 4px;
+}
+.toolScroll {
+  --scroll-area-reserved-gutter: 24px;
+}
+.toolLoading {
+  display: flex;
+  min-height: min(420px, 50dvh);
+}
+.toolLoading[role='alert'] {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 .dock {
   position: fixed;
   z-index: 59;
@@ -34,7 +55,16 @@
 .dock[hidden] {
   display: none;
 }
+.dockGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
 @media (max-width: 760px) {
+  .toolScroll {
+    --scroll-area-reserved-gutter: 20px;
+  }
   .dock {
     bottom: calc(72px + env(safe-area-inset-bottom));
   }

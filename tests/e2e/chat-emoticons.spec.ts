@@ -1,8 +1,8 @@
-import { test, expect, type Route, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Route } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { openMessageActions } from './chat-message-actions';
-import { verifyEmoticonPreview, openEmoticonActions } from './emoticon-actions';
+import { verifyEmoticonPreview, openEmoticonActions, scrollToEnd } from './emoticon-actions';
 import { verifyChatImagePreview } from './chat-image-preview-actions';
 
 test.setTimeout(60000);
@@ -12,6 +12,7 @@ for (const skin of builtinSkins)
       page,
     }, info) => {
       const fixture = await setupChatMenu(page, skin.id, mode);
+      const mobile = page.viewportSize()!.width <= 760;
       let saved = false;
       let listFail = false;
       let held: Route | undefined;
@@ -71,6 +72,7 @@ for (const skin of builtinSkins)
       expect(saved).toBe(true);
       await openMessageActions(page, '1794530000001');
       await page.getByRole('menuitem', { name: '引用', exact: true }).click();
+      await verifyChatImagePreview(page, info);
       listFail = true;
       await open.click();
       await page.getByRole('button', { name: '我的收藏', exact: true }).click();
@@ -86,7 +88,7 @@ for (const skin of builtinSkins)
       held = undefined;
       const scroll = dialog.getByRole('region', { name: '表情包列表' });
       await expect(dialog.getByRole('button', { name: '使用表情包 1', exact: true })).toBeVisible();
-      await scrollToEnd(page, scroll);
+      await scrollToEnd(page, scroll, mobile);
       await expect.poll(() => !!held).toBe(true);
       await held!.fulfill({ json: { code: 50001, message: '合成追加失败' } });
       held = undefined;
@@ -171,12 +173,15 @@ for (const skin of builtinSkins)
         .toBe(1);
       expect(sentIds).toHaveLength(2);
       expect(sentIds[0]).toBe(sentIds[1]);
-      await verifyChatImagePreview(page, info);
       await open.click();
       await page.getByRole('button', { name: '我的收藏', exact: true }).click();
-      await expect.poll(() => !!held).toBe(true);
-      await held!.fulfill({ json: { code: 0, data: { records: [records[0]], total: '1' } } });
-      held = undefined;
+      await expect(dialog.getByRole('button', { name: /^使用表情包 / })).toHaveCount(24);
+      await scrollToEnd(page, dialog.getByRole('region', { name: '表情包列表' }), mobile);
+      await expect(dialog.getByRole('button', { name: /^使用表情包 / })).toHaveCount(25);
+      expect(listRequests).toBe(count);
+      await dialog
+        .getByRole('button', { name: '使用表情包 1', exact: true })
+        .scrollIntoViewIfNeeded();
       await verifyEmoticonPreview(page, info);
       await openEmoticonActions(page);
       await page.getByRole('menuitem', { name: '移除表情包', exact: true }).click();
@@ -190,11 +195,13 @@ for (const skin of builtinSkins)
       await expect(dialog.getByText(/还没有收藏/)).toBeVisible();
       expect(saved).toBe(false);
       let searchFail = true;
+      const searchOffsets: number[] = [];
       await page.route('**/emoticon-search?**', (route) => {
         expect(route.request().headers()['synthetic-session']).toBeUndefined();
         const url = new URL(route.request().url());
         expect(url.searchParams.get('word')).toBe('开心表情');
         const offset = Number(url.searchParams.get('pn'));
+        searchOffsets.push(offset);
         expect([0, 30]).toContain(offset);
         return route.fulfill({
           json: searchFail
@@ -214,9 +221,20 @@ for (const skin of builtinSkins)
       searchFail = false;
       await dialog.getByRole('button', { name: '重试表情包' }).click();
       await expect(dialog.getByRole('button', { name: '使用表情包 1', exact: true })).toBeVisible();
-      await scrollToEnd(page, dialog.getByRole('region', { name: '表情包列表' }));
+      await scrollToEnd(page, dialog.getByRole('region', { name: '表情包列表' }), mobile);
       await expect(dialog.getByText('已全部加载')).toBeVisible();
       await expect(dialog.getByRole('button', { name: /^使用表情包 / })).toHaveCount(31);
+      await dialog.getByRole('button', { name: '我的收藏', exact: true }).click();
+      await expect(dialog.getByText(/还没有收藏/)).toBeVisible();
+      expect(listRequests).toBe(count + 1);
+      await dialog.getByRole('button', { name: '搜索表情', exact: true }).click();
+      await dialog.getByRole('textbox', { name: '搜索表情包' }).fill('开心表情');
+      await dialog.getByRole('button', { name: '搜索', exact: true }).click();
+      await expect(dialog.getByRole('button', { name: '使用表情包 1', exact: true })).toBeVisible();
+      await scrollToEnd(page, dialog.getByRole('region', { name: '表情包列表' }), mobile);
+      await expect(dialog.getByText('已全部加载')).toBeVisible();
+      await expect(dialog.getByRole('button', { name: /^使用表情包 / })).toHaveCount(31);
+      expect(searchOffsets).toEqual([0, 0, 30]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
@@ -227,9 +245,3 @@ for (const skin of builtinSkins)
       expect(fixture.stats().connections).toBe(1);
     });
   }
-
-async function scrollToEnd(page: Page, scroll: Locator) {
-  await scroll.hover();
-  await page.mouse.wheel(0, 5000);
-  await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
-}

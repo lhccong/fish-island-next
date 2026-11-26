@@ -113,7 +113,7 @@
 .error {
   color: var(--color-danger);
 }
-@media (max-width: 920px) {
+@container tool-surface (max-width: 920px) {
   .editor {
     grid-template-columns: minmax(0, 1fr);
   }

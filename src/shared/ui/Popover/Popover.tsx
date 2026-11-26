@@ -10,6 +10,7 @@ export function Popover({
   label,
   children,
   className = '',
+  side = 'top',
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -17,6 +18,7 @@ export function Popover({
   label: string;
   children: ReactNode;
   className?: string;
+  side?: 'top' | 'bottom';
 }) {
   return (
     <Primitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
@@ -24,7 +26,7 @@ export function Popover({
       <Primitive.Portal>
         <Primitive.Content
           aria-label={label}
-          side="top"
+          side={side}
           align="start"
           sideOffset={8}
           collisionPadding={12}

@@ -20,6 +20,7 @@ interface DialogProps {
   returnFocusRef?: RefObject<HTMLElement | null>;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   showCloseAction?: boolean;
   dismissLabel?: string;
   dismissClassName?: string;
@@ -43,6 +44,7 @@ export function Dialog({
   children,
   open,
   onOpenChange,
+  onEscapeKeyDown,
   showCloseAction = true,
   dismissLabel,
   dismissClassName = '',
@@ -63,6 +65,7 @@ export function Dialog({
           className={`${styles.content} ${className}`}
           data-layer={layer}
           style={style}
+          {...(onEscapeKeyDown ? { onEscapeKeyDown } : {})}
           onOpenAutoFocus={() => {
             returnFocus.current =
               document.activeElement instanceof HTMLElement ? document.activeElement : null;

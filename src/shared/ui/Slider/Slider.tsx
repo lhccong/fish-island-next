@@ -8,6 +8,7 @@ interface SliderProps {
   step?: number;
   disabled?: boolean;
   valueText?: string;
+  appearance?: 'default' | 'hue';
   onValueChange: (value: number) => void;
 }
 export function Slider({
@@ -18,12 +19,13 @@ export function Slider({
   step = 1,
   disabled = false,
   valueText = String(value),
+  appearance = 'default',
   onValueChange,
 }: SliderProps) {
   const id = useId();
   const progress = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
   return (
-    <div className={styles.root} data-disabled={disabled}>
+    <div className={styles.root} data-disabled={disabled} data-appearance={appearance}>
       <div className={styles.heading}>
         <label htmlFor={id}>{label}</label>
         <output htmlFor={id} aria-hidden="true">

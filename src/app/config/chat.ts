@@ -10,6 +10,7 @@ import {
   createRedPacketClient,
   createLuckyBagClient,
   createChatEmoticons,
+  createCachedChatEmoticons,
   createChatImageUpload,
 } from '@/infrastructure/chat';
 import { createChatRealtimeController } from '@/features/chat';
@@ -51,13 +52,27 @@ export const chatImageUpload = createChatImageUpload(
     void authController.restore(true);
   },
 );
-export const chatEmoticons = createChatEmoticons(
-  apiBaseUrl,
-  () => vault.read(),
-  () => {
-    void authController.restore(true);
-  },
+const emoticonCache = createCachedChatEmoticons(
+  createChatEmoticons(
+    apiBaseUrl,
+    () => vault.read(),
+    () => {
+      void authController.restore(true);
+    },
+  ),
 );
+export const chatEmoticons = emoticonCache.port;
+const syncEmoticonOwner = () => {
+  const { session } = authController.store.getState();
+  emoticonCache.setOwner(session.status === 'authenticated' ? session.user.id : '');
+};
+syncEmoticonOwner();
+const unsubscribeEmoticonOwner = authController.store.subscribe(syncEmoticonOwner);
+if (import.meta.hot)
+  import.meta.hot.dispose(() => {
+    unsubscribeEmoticonOwner();
+    emoticonCache.setOwner('');
+  });
 export const chatRedPackets = createRedPacketClient(
   apiBaseUrl,
   () => vault.read(),

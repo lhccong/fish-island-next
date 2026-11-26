@@ -90,6 +90,23 @@
 .input:disabled {
   cursor: not-allowed;
 }
+.root[data-appearance='hue'] {
+  --slider-hue-track: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+}
+.root[data-appearance='hue'] .input::-webkit-slider-runnable-track {
+  height: 12px;
+  background: var(--slider-hue-track);
+}
+.root[data-appearance='hue'] .input::-webkit-slider-thumb {
+  margin-top: -2px;
+}
+.root[data-appearance='hue'] .input::-moz-range-track {
+  height: 12px;
+  background: var(--slider-hue-track);
+}
+.root[data-appearance='hue'] .input::-moz-range-progress {
+  background: transparent;
+}
 @media (max-width: 760px) {
   .input {
     height: 44px;

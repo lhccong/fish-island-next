@@ -58,7 +58,8 @@ for (const skin of builtinSkins) {
         release();
       }
       await expect(page).toHaveURL('/utils/json');
-      await expect(tablist.getByRole('tab')).toHaveCount(1);
+      const todoTab = tablist.getByRole('tab', { name: '待办', exact: true });
+      await expect(todoTab).toBeVisible();
       await expect(jsonTab).toHaveAttribute('aria-selected', 'true');
       await expect(toolPanel).toHaveAttribute('id', (await jsonTab.getAttribute('aria-controls'))!);
       expect((await jsonTab.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -68,6 +69,8 @@ for (const skin of builtinSkins) {
       }
       await jsonTab.focus();
       await jsonTab.press('ArrowRight');
+      await expect(todoTab).toBeFocused();
+      await todoTab.press('ArrowLeft');
       await expect(jsonTab).toBeFocused();
       await expect(jsonTab).toHaveCSS('outline-style', 'solid');
       await activate(jsonTab);
@@ -272,17 +275,9 @@ test('theme and mode changes retain the editor draft and output', async ({ page 
 });
 
 test('switches registered tools by keyboard, pointer and browser history', async ({ page }) => {
-  await page.route('**/src/app/config/tools.ts*', async (route) => {
-    const response = await route.fetch();
-    const original = await response.text();
-    await route.fulfill({
-      response,
-      body: `${original}\ntools.push({ path: '/utils/test-only', label: '测试工具', Panel: () => '测试工具正文' });`,
-    });
-  });
   await page.goto('/utils/json');
   const json = page.getByRole('tab', { name: 'JSON 格式化' });
-  const second = page.getByRole('tab', { name: '测试工具' });
+  const second = page.getByRole('tab', { name: '待办' });
   await json.focus();
   await json.press('End');
   await expect(second).toBeFocused();
@@ -292,10 +287,12 @@ test('switches registered tools by keyboard, pointer and browser history', async
   await json.press('ArrowLeft');
   await expect(second).toBeFocused();
   await second.press('Enter');
-  await expect(page).toHaveURL('/utils/test-only');
+  await expect(page).toHaveURL('/utils/todo');
   await expect(second).toBeFocused();
   await expect(second).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('tabpanel', { name: '测试工具' })).toHaveText('测试工具正文');
+  await expect(page.getByRole('tabpanel', { name: '待办' })).toContainText(
+    '登录后查看和管理账号待办',
+  );
   await expect(page.getByRole('tabpanel', { name: 'JSON 格式化' })).toHaveCount(0);
   await second.press('ArrowRight');
   await expect(json).toBeFocused();

@@ -123,6 +123,8 @@ for (const skin of builtinSkins)
       await expect(last).toBeInViewport();
       await add.focus();
       await expect(add).toBeInViewport();
+      await page.mouse.move(0, 0);
+      await expect(page.getByRole('tooltip')).toHaveCount(0);
       await page.keyboard.press('Escape');
       await expect(panel).not.toBeVisible();
       await expect(open).toBeFocused();

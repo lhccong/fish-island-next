@@ -8,5 +8,6 @@ export { createChatHistory } from './history';
 export { createChatSender } from './send';
 export { createRedPacketClient } from './red-packet';
 export { createChatEmoticons } from './emoticons';
+export { createCachedChatEmoticons } from './emoticon-cache';
 export { createChatRemarks } from './remarks';
 export { createLuckyBagClient } from './lucky-bag';
