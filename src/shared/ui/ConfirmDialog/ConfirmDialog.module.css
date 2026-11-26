@@ -1,0 +1,15 @@
+.dialog {
+  width: min(420px, calc(100% - 32px));
+  overflow-wrap: anywhere;
+}
+.error {
+  color: var(--color-danger);
+  font-size: 0.875rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: var(--space-4);
+}

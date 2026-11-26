@@ -6,12 +6,14 @@ import type { AuthUser } from '@/domain/auth';
 import type { CircleReminder, FishCirclePort } from '@/domain/fish-circle';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { ReminderDetail } from './ReminderDetail';
+import type { ReminderActions } from './reminder-actions';
 import { MomentCard } from './MomentCard';
 import { MomentEditor } from './MomentEditor';
 import { Camera, RefreshCw, Images, UserRound } from 'lucide-react';
 import { CircleNotifications } from './CircleNotifications';
 import { CircleCover } from './CircleCover';
 import { PinnedMoments } from './PinnedMoments';
+import { CircleBackToTop } from './CircleBackToTop';
 import { usePage } from './use-page';
 import styles from './Circle.module.css';
 interface Props {
@@ -26,6 +28,7 @@ interface Props {
   name: string;
   onExit: () => void;
   onViewUser: (id: string, name: string) => void;
+  reminderActions: ReminderActions;
 }
 export function CircleFeed({
   service,
@@ -35,6 +38,7 @@ export function CircleFeed({
   onViewUser,
   renderLayout,
   onExit,
+  reminderActions,
 }: Props) {
   const load = useCallback(
     (p: number, signal: AbortSignal) => service.list(p, userId, signal),
@@ -44,7 +48,9 @@ export function CircleFeed({
   const [publishing, setPublishing] = useState(false);
   const [notice, setNotice] = useState('');
   const [selected, setSelected] = useState<CircleReminder | null>(null);
+  const feedViewport = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLButtonElement | null>(null);
+  const hasMoments = result.status === 'ready' && result.data.items.length > 0;
   useLayoutEffect(() => {
     if (!selected) returnFocus.current?.focus({ preventScroll: true });
   }, [selected]);
@@ -183,19 +189,22 @@ export function CircleFeed({
     contentScroll: false,
     content: (
       <div className={styles.workspace}>
-        <div className={styles.feedPane} hidden={selected !== null}>
-          <ScrollArea label="鱼小圈列表滚动区">
+        <div className={styles.feedPane} hidden={selected !== null} data-has-moments={hasMoments}>
+          {!selected && hasMoments && <CircleBackToTop viewportRef={feedViewport} />}
+          <ScrollArea label="鱼小圈列表滚动区" viewportRef={feedViewport}>
             {content}
             <PageFooterOutlet />
           </ScrollArea>
         </div>
         {selected && (
           <ReminderDetail
+            key={selected.id}
             reminder={selected}
             service={service}
             user={user}
             onClose={() => setSelected(null)}
             onViewUser={onViewUser}
+            reminderActions={reminderActions}
           />
         )}
       </div>

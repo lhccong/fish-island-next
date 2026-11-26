@@ -1,4 +1,4 @@
-export type { UserCard, UserCardPort, UserMute } from './user-card';
+export type { FollowRelationship, UserCard, UserCardPort, UserMute } from './user-card';
 export type FollowKind = 'following' | 'followers';
 export interface FollowListTarget {
   id: string;
@@ -66,6 +66,18 @@ export interface BlacklistPort {
   write(account: string, users: readonly BlockedUser[]): void;
   subscribe(listener: () => void): () => void;
 }
+
+export function setUserBlocked(
+  port: BlacklistPort,
+  account: string,
+  user: BlockedUser,
+  blocked: boolean,
+) {
+  const users = port.read(account);
+  if (users.some(({ id }) => id === user.id) === blocked) return;
+  port.write(account, blocked ? [...users, user] : users.filter(({ id }) => id !== user.id));
+}
+
 export function safeRedirect(value: string): boolean {
   try {
     return ['https:', 'http:'].includes(new URL(value).protocol);

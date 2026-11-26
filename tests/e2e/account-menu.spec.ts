@@ -268,6 +268,10 @@ for (const width of [1280, 375, 390]) {
           await expect(page.getByText('合成可屏蔽正文', { exact: true })).toBeVisible();
           const actions = await openMessageActions(page, 'synthetic-block-message');
           await actions.getByRole('menuitem', { name: '加入黑名单' }).click();
+          await page
+            .getByRole('dialog', { name: '加入黑名单', exact: true })
+            .getByRole('button', { name: '确认加入', exact: true })
+            .click();
           await expect(draft).toBeFocused();
           await expect(page.getByText('合成可屏蔽正文', { exact: true })).toHaveCount(0);
           await open(page, '我的黑名单');

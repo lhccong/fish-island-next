@@ -27,6 +27,8 @@ for (const skin of builtinSkins)
         releaseLoading = resolve;
       });
       await page.route('**/api/event_remind/**', async (route) => {
+        if (route.request().url().endsWith('/count'))
+          return route.fulfill({ json: { code: 0, data: 10 } });
         if (!route.request().url().endsWith('/page')) {
           await new Promise((resolve) => setTimeout(resolve, 700));
           return route.fulfill({

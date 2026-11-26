@@ -1,16 +1,24 @@
-import { useState, useSyncExternalStore } from 'react';
-import type { BlacklistPort } from '@/domain/account-tools';
+import { useRef, useState, useSyncExternalStore } from 'react';
+import { setUserBlocked, type BlacklistPort, type BlockedUser } from '@/domain/account-tools';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { Button } from '@/shared/ui/Button';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { SourceAvatar } from '@/shared/ui/SourceAvatar';
 import styles from './Tools.module.css';
 export function BlacklistPanel({ port, account }: { port: BlacklistPort; account: string }) {
   const users = useSyncExternalStore(port.subscribe, () => port.read(account));
-  const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState('');
+  const [target, setTarget] = useState<{ user: BlockedUser; trigger: HTMLButtonElement } | null>(
+    null,
+  );
+  const viewport = useRef<HTMLDivElement>(null);
   return (
     <div className={styles.body}>
-      <ScrollArea label="黑名单内容" gutter="reserved" className={styles.scroll ?? ''}>
+      <ScrollArea
+        label="黑名单内容"
+        gutter="reserved"
+        className={styles.scroll ?? ''}
+        viewportRef={viewport}
+      >
         <div className={styles.fields}>
           {users.length === 0 && (
             <div className={styles.empty}>
@@ -26,38 +34,32 @@ export function BlacklistPanel({ port, account }: { port: BlacklistPort; account
                 {user.name}
                 <p>ID：{user.id}</p>
               </div>
-              {confirm === user.id ? (
-                <div className={styles.actions}>
-                  <Button variant="secondary" onClick={() => setConfirm('')}>
-                    取消
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      try {
-                        port.write(
-                          account,
-                          users.filter((v) => v.id !== user.id),
-                        );
-                        setConfirm('');
-                        setError('');
-                      } catch {
-                        setError('无法保存，请检查浏览器存储权限后重试');
-                      }
-                    }}
-                  >
-                    确认移除
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="secondary" onClick={() => setConfirm(user.id)}>
-                  移除
-                </Button>
-              )}
+              <Button
+                variant="secondary"
+                onClick={(event) => setTarget({ user, trigger: event.currentTarget })}
+              >
+                移除
+              </Button>
             </div>
           ))}
         </div>
       </ScrollArea>
-      {error && <p role="alert">{error}</p>}
+      {target && (
+        <ConfirmDialog
+          layer="nested"
+          title="移出黑名单"
+          description={`移出后，「${target.user.name}」的聊天消息将在此浏览器恢复显示。`}
+          confirmLabel="确认移除"
+          errorMessage="无法保存黑名单，请检查浏览器存储权限后重试。"
+          returnFocusRef={{
+            get current() {
+              return target.trigger.isConnected ? target.trigger : viewport.current;
+            },
+          }}
+          onClose={() => setTarget(null)}
+          onConfirm={() => setUserBlocked(port, account, target.user, false)}
+        />
+      )}
     </div>
   );
 }

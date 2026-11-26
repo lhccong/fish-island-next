@@ -58,6 +58,8 @@ export interface CircleReminder {
   read: boolean;
   momentId: string;
   commentId?: string;
+  followUserId?: string;
+  scriptUserId?: string;
 }
 export interface FishCirclePort {
   unreadReminderCount(signal: AbortSignal): Promise<number>;

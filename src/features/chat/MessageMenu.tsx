@@ -23,6 +23,7 @@ import { useChatRealtime } from './realtime-context';
 import { useRemarks } from './remarks-context';
 import { ContextMenu } from '@/shared/ui/ContextMenu';
 import { MessageActionBar, type MessageAction } from './MessageActionBar';
+import { useBlacklistConfirmation } from './blacklist-confirmation-context';
 
 interface Props {
   message: ReceivedMessage;
@@ -44,19 +45,21 @@ export function MessageMenu({
   onRevoke,
   returnFocusRef,
 }: Props) {
-  const { controller, user, userId, draft, composerRef, emoticons, navigation, blacklist } =
-    useChatRealtime();
+  const { controller, user, draft, composerRef, emoticons, navigation } = useChatRealtime();
   const remarks = useRemarks();
   const report = useChatReport();
+  const confirmBlacklist = useBlacklistConfirmation();
   const reward = !message.bigFish && hasRewardMessageContent(message.content);
-  const focusDraft = useRef(false);
+  const nextFocus = useRef<'draft' | 'dialog' | null>(null);
   const closeFocus = () => {
-    const target = focusDraft.current ? composerRef.current : returnFocusRef.current;
-    focusDraft.current = false;
+    const destination = nextFocus.current;
+    nextFocus.current = null;
+    if (destination === 'dialog') return;
+    const target = destination === 'draft' ? composerRef.current : returnFocusRef.current;
     if (target?.isConnected) target.focus({ preventScroll: true });
   };
   const prepare = (action: () => void) => {
-    focusDraft.current = true;
+    nextFocus.current = 'draft';
     action();
     composerRef.current?.focus({ preventScroll: true });
   };
@@ -98,20 +101,11 @@ export function MessageMenu({
             label: '加入黑名单',
             icon: <Ban size={16} aria-hidden="true" />,
             onSelect: () => {
-              focusDraft.current = true;
-              composerRef.current?.focus({ preventScroll: true });
-              try {
-                blacklist.write(
-                  userId,
-                  [
-                    ...blacklist.read(userId),
-                    { id: message.senderId, name: message.senderName },
-                  ].filter((item, index, all) => all.findIndex((v) => v.id === item.id) === index),
-                );
-                draft.notify('已屏蔽，可在我的黑名单中移除');
-              } catch {
-                draft.notify('无法保存黑名单，请检查浏览器存储权限', 'error');
-              }
+              nextFocus.current = 'dialog';
+              confirmBlacklist({
+                user: { id: message.senderId, name: message.senderName },
+                returnFocusRef,
+              });
             },
           },
         ]
@@ -217,7 +211,7 @@ export function MessageMenu({
       onCloseFocus={closeFocus}
       onAction={(item) => {
         item.onSelect();
-        focusDraft.current = false;
+        nextFocus.current = null;
       }}
     />
   );

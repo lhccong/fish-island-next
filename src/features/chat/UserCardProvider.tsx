@@ -35,7 +35,10 @@ export function UserCardProvider({
           target={target}
           user={user}
           port={port}
-          onClose={() => setTarget(null)}
+          onClose={() => {
+            setTarget(null);
+            target.onClose?.();
+          }}
           onVisit={onVisit}
           renderFollowList={renderFollowList}
           renderCardCollection={renderCardCollection}

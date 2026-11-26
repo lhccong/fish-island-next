@@ -50,13 +50,27 @@ export function createAccountToolsClient(
       if (card && card.id !== id) throw new Error('服务器返回的用户资料不匹配，请重试');
       return card;
     },
-    async followingState(id, signal) {
+    async followRelationship(id, signal) {
       const value = await request(
-        `follow/is-following?followUserId=${encodeURIComponent(id)}`,
+        `follow/is-following?followUserId=${encodeURIComponent(id)}&includeIncoming=true`,
         signal,
       );
-      if (typeof value !== 'boolean') throw new Error('未取得关注状态，请重试');
-      return value;
+      if (typeof value === 'boolean') return { following: value };
+      const relationship = record(value);
+      if (
+        typeof relationship.following !== 'boolean' ||
+        typeof relationship.followedBy !== 'boolean'
+      )
+        throw new Error('未取得关注状态，请重试');
+      return { following: relationship.following, followedBy: relationship.followedBy };
+    },
+    async addFollow(id, signal) {
+      const value = await request(
+        `follow/add?followUserId=${encodeURIComponent(id)}`,
+        signal,
+        'POST',
+      );
+      if (value !== true) throw new Error('服务器未确认关注成功，请重试');
     },
     async muteInfo(id, signal) {
       const value = record(

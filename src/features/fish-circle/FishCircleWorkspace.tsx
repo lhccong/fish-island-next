@@ -3,6 +3,7 @@ import { Aperture } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
 import type { FishCirclePort } from '@/domain/fish-circle';
 import { CircleFeed } from './CircleFeed';
+import type { ReminderActions } from './reminder-actions';
 import { CircleAvatar } from './CircleAvatar';
 import styles from './Circle.module.css';
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
   user: AuthUser;
   service: FishCirclePort;
   onExit: () => void;
+  reminderActions: ReminderActions;
   renderDiscoveryNavigation: (circleEntry: ReactNode) => ReactNode;
   renderLayout: (slots: {
     sidebar: ReactNode;
@@ -25,6 +27,7 @@ export function FishCircleWorkspace({
   renderLayout,
   renderDiscoveryNavigation,
   onExit,
+  reminderActions,
   initialUserId = '',
 }: Props) {
   const [view, setView] = useState({ id: initialUserId, name: initialUserId ? '岛友' : '' });
@@ -34,6 +37,7 @@ export function FishCircleWorkspace({
       service={service}
       user={user}
       onExit={onExit}
+      reminderActions={reminderActions}
       userId={view.id}
       name={view.name}
       onViewUser={(id, name) => setView({ id, name })}

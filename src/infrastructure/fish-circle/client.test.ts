@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createFishCircleClient } from './index';
-import { moment, page, comment } from './decode';
+import { moment, page, comment, reminder } from './decode';
 const signal = () => new AbortController().signal;
 const token = () => ({ name: 'test-session', value: 'synthetic-value' });
 afterEach(() => vi.unstubAllGlobals());
@@ -12,6 +12,35 @@ function respond(data: unknown, code = 0) {
   return fetcher;
 }
 describe('fish circle compatibility', () => {
+  it('extracts actionable user IDs only from recognized follow and script notices', () => {
+    const id = '90071992547409921';
+    const system = {
+      id: '1',
+      state: 1,
+      sourceType: 0,
+      senderId: '-1',
+      sourceId: '-1',
+      action: 'system',
+      sourceContent: `检测到用户 合成岛友:${id} 今日快速抢包次数达到 6 次，已标记为脚本用户`,
+    };
+    expect(reminder(system).scriptUserId).toBe(id);
+    expect(
+      reminder({ ...system, action: 'script_detection', sourceId: id, sourceContent: '检测通知' })
+        .scriptUserId,
+    ).toBe(id);
+    expect(reminder({ ...system, senderId: '123' }).scriptUserId).toBeUndefined();
+    expect(reminder({ ...system, sourceContent: '已标记为脚本用户' }).scriptUserId).toBeUndefined();
+    expect(
+      reminder({ ...system, action: 'script_detection', sourceId: '9223372036854775808' })
+        .scriptUserId,
+    ).toBeUndefined();
+    expect(
+      reminder({ ...system, sourceType: 3, action: 'follow', senderId: id, sourceId: '123' })
+        .followUserId,
+    ).toBe(id);
+    expect(reminder({ ...system, sourceType: 3, action: 'follow', url: id }).followUserId).toBe(id);
+    expect(reminder({ ...system, action: 'follow' }).followUserId).toBeUndefined();
+  });
   it('validates identities and strips unsafe media URLs', () => {
     expect(() => moment({ id: 1 })).toThrow();
     const decoded = moment({

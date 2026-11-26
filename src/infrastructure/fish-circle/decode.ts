@@ -115,6 +115,24 @@ export function page<T>(value: unknown, decode: (v: unknown) => T): Page<T> {
   return { items: p.records.map((item: unknown) => decode(item)), total };
 }
 
+function positiveLong(value: unknown): string | undefined {
+  const candidate =
+    typeof value === 'number' && Number.isSafeInteger(value) ? String(value) : text(value);
+  if (/^[1-9]\d{0,18}$/.test(candidate) && BigInt(candidate) <= 9223372036854775807n)
+    return candidate;
+}
+
+function scriptTarget(r: Record<string, unknown>, content: string): string | undefined {
+  if (r.sourceType !== 0 || String(r.senderId) !== '-1') return undefined;
+  if (r.action === 'script_detection') return positiveLong(r.sourceId);
+  if (r.action !== 'system' || String(r.sourceId) !== '-1') return undefined;
+  const legacy =
+    /^检测到用户 (?:[^\r\n]+:)?([1-9]\d{0,18}) (?:今日快速抢包次数达到 \d+ 次|[^\r\n]+间隔高度一致（标准差 \d+ms）)，已标记为脚本用户$/.exec(
+      content,
+    );
+  return positiveLong(legacy?.[1]);
+}
+
 export function reminder(value: unknown): CircleReminder {
   const r = record(value);
   const sender = r.senderUser == null ? {} : record(r.senderUser);
@@ -122,6 +140,11 @@ export function reminder(value: unknown): CircleReminder {
   const imageMatch = /\[img\]([^[]+)\[\/img\]|\[img:([^\]]+)\]/.exec(raw);
   const isCommentLike = r.sourceType === 7 && r.action === 'like';
   const relatedMoment = text(r.url);
+  const followUserId =
+    r.action === 'follow' && (r.sourceType === 3 || r.sourceType === 0)
+      ? (positiveLong(r.senderId) ?? positiveLong(sender.id) ?? positiveLong(r.url))
+      : undefined;
+  const scriptUserId = scriptTarget(r, raw);
   if (r.state !== 0 && r.state !== 1) throw new CircleError('通知已读状态异常');
   return {
     id: id(r.id),
@@ -141,5 +164,7 @@ export function reminder(value: unknown): CircleReminder {
         ? id(r.sourceId)
         : '',
     ...(isCommentLike && r.sourceId != null ? { commentId: id(r.sourceId) } : {}),
+    ...(followUserId ? { followUserId } : {}),
+    ...(scriptUserId ? { scriptUserId } : {}),
   };
 }

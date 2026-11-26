@@ -21,9 +21,14 @@ export interface UserMute {
   muted: boolean;
   remaining: string;
 }
+export interface FollowRelationship {
+  following: boolean;
+  followedBy?: boolean;
+}
 export interface UserCardPort {
   userCard(id: string, signal: AbortSignal): Promise<UserCard | null>;
-  followingState(id: string, signal: AbortSignal): Promise<boolean>;
+  followRelationship(id: string, signal: AbortSignal): Promise<FollowRelationship>;
+  addFollow(id: string, signal: AbortSignal): Promise<void>;
   toggleFollow(id: string, signal: AbortSignal): Promise<boolean>;
   muteInfo(id: string, signal: AbortSignal): Promise<UserMute>;
   mute(id: string, duration: number | null, signal: AbortSignal): Promise<void>;

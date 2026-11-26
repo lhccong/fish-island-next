@@ -12,6 +12,7 @@ export interface UserCardTarget {
   id: string;
   name: string;
   returnFocusRef: RefObject<HTMLElement | null>;
+  onClose?: () => void;
   level?: number | undefined;
   titleId?: string | undefined;
   titleIds?: readonly string[] | undefined;

@@ -7,6 +7,9 @@ import { Button } from '@/shared/ui/Button';
 import { ScrollArea } from '@/shared/ui/ScrollArea';
 import { ChevronLeft } from 'lucide-react';
 import { MomentCard } from './MomentCard';
+import { FollowReminderActions } from './FollowReminderActions';
+import { ScriptReminderAction } from './ScriptReminderAction';
+import type { ReminderActions } from './reminder-actions';
 import { usePage } from './use-page';
 import styles from './ReminderDetail.module.css';
 interface Props {
@@ -15,8 +18,16 @@ interface Props {
   user: AuthUser;
   onClose: () => void;
   onViewUser: (id: string, name: string) => void;
+  reminderActions: ReminderActions;
 }
-export function ReminderDetail({ reminder, service, user, onClose, onViewUser }: Props) {
+export function ReminderDetail({
+  reminder,
+  service,
+  user,
+  onClose,
+  onViewUser,
+  reminderActions,
+}: Props) {
   const load = useCallback(
     async (_page: number, signal: AbortSignal) => ({
       items: reminder.momentId ? [await service.detail(reminder.momentId, signal)] : [],
@@ -25,6 +36,7 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
     [service, reminder.momentId],
   );
   const { result, refresh } = usePage(load);
+  const followUserId = reminder.followUserId === user.id ? undefined : reminder.followUserId;
   const back = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const frame = requestAnimationFrame(() => back.current?.focus({ preventScroll: true }));
@@ -44,9 +56,15 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
         </button>
         <h2>详情</h2>
       </div>
-      <ScrollArea label="动态详情内容" gutter="reserved" className={styles.scroll || ''}>
+      <ScrollArea
+        label={reminder.momentId ? '动态详情内容' : '通知详情内容'}
+        gutter="reserved"
+        className={styles.scroll || ''}
+      >
         <div className={styles.content}>
-          {result.status === 'loading' && <LoadingIndicator>正在加载动态详情…</LoadingIndicator>}
+          {reminder.momentId && result.status === 'loading' && (
+            <LoadingIndicator>正在加载动态详情…</LoadingIndicator>
+          )}
           {result.status === 'error' && (
             <div className={styles.state} role="alert">
               <p>{result.message}</p>
@@ -72,7 +90,26 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
             ))}
           {!reminder.momentId && (
             <div className={styles.state}>
-              <p>{reminder.content || '收到一条互动通知'}</p>
+              <div className={styles.message}>
+                <p>{reminder.content || '收到一条互动通知'}</p>
+                {followUserId && (
+                  <div className={styles.actionRegion}>
+                    <FollowReminderActions
+                      id={followUserId}
+                      name={reminder.senderName}
+                      actions={reminderActions}
+                    />
+                  </div>
+                )}
+                {reminder.scriptUserId && user.role === 'admin' && (
+                  <div className={`${styles.actionRegion} ${styles.moderationRegion}`}>
+                    <ScriptReminderAction
+                      id={reminder.scriptUserId}
+                      release={reminderActions.releaseScriptMark}
+                    />
+                  </div>
+                )}
+              </div>
               {reminder.image && (
                 <img
                   src={reminder.image}
@@ -81,7 +118,7 @@ export function ReminderDetail({ reminder, service, user, onClose, onViewUser }:
                   referrerPolicy="no-referrer"
                 />
               )}
-              <p>此类消息的关联详情尚未迁移。</p>
+              {!followUserId && !reminder.scriptUserId && <p>此类消息的关联详情尚未迁移。</p>}
             </div>
           )}
         </div>

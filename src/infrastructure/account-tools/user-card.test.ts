@@ -66,8 +66,10 @@ it('adapts follow and mute protocols and requires server confirmation', async ()
   const reply = (data: unknown) =>
     fetcher.mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data })));
   reply(false);
-  expect(await client.followingState('1 &', signal)).toBe(false);
-  expect(fetcher.mock.calls[0]?.[0]).toContain('follow/is-following?followUserId=1%20%26');
+  expect(await client.followRelationship('1 &', signal)).toEqual({ following: false });
+  expect(fetcher.mock.calls[0]?.[0]).toContain(
+    'follow/is-following?followUserId=1%20%26&includeIncoming=true',
+  );
   reply({ isMuted: true, remainingTime: '1分钟' });
   expect(await client.muteInfo('1', signal)).toEqual({ muted: true, remaining: '1分钟' });
   reply(true);
@@ -79,6 +81,32 @@ it('adapts follow and mute protocols and requires server confirmation', async ()
   reply(false);
   await expect(client.mute('1 &', null, signal)).rejects.toThrow('未确认');
   expect(fetcher.mock.calls[3]?.[0]).toContain('user/mute/remove?userId=1%20%26');
+});
+
+it('decodes both follow directions and adds a follow without toggling it', async () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal('fetch', fetcher);
+  const client = createAccountToolsClient(
+    'https://example.test',
+    () => ({ name: 'synthetic', value: 'synthetic' }),
+    vi.fn(),
+  );
+  const signal = new AbortController().signal;
+  const reply = (data: unknown) =>
+    fetcher.mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data })));
+  reply({ following: false, followedBy: true });
+  expect(await client.followRelationship('456', signal)).toEqual({
+    following: false,
+    followedBy: true,
+  });
+  reply({ following: false, followedBy: 'true' });
+  await expect(client.followRelationship('456', signal)).rejects.toThrow('未取得关注状态');
+  reply(true);
+  await client.addFollow('456', signal);
+  expect(fetcher.mock.calls[2]?.[0]).toContain('follow/add?followUserId=456');
+  expect(fetcher.mock.calls[2]?.[1]).toMatchObject({ method: 'POST' });
+  reply(false);
+  await expect(client.addFollow('456', signal)).rejects.toThrow('未确认关注成功');
 });
 
 it('reads the private card stats and falls back only for missing relationship counts', async () => {

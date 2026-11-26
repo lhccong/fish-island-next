@@ -4,7 +4,13 @@ import type { UserCard, UserCardPort } from '@/domain/account-tools';
 type State =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; card: UserCard | null; following: boolean | null; followError: string };
+  | {
+      status: 'ready';
+      card: UserCard | null;
+      following: boolean | null;
+      followedBy: boolean;
+      followError: string;
+    };
 export function useUserCardResource(port: UserCardPort, id: string, self: boolean) {
   const [state, setState] = useState<State>({ status: 'loading' });
   const [revision, setRevision] = useState(0);
@@ -20,16 +26,17 @@ export function useUserCardResource(port: UserCardPort, id: string, self: boolea
         const [card, follow] = await Promise.all([
           port.userCard(id, current.signal),
           self
-            ? Promise.resolve(false)
+            ? Promise.resolve({ following: false, followedBy: false })
             : port
-                .followingState(id, current.signal)
+                .followRelationship(id, current.signal)
                 .catch((e: unknown) => (e instanceof Error ? e.message : '关注状态读取失败')),
         ]);
         if (!current.signal.aborted)
           setState({
             status: 'ready',
             card,
-            following: typeof follow === 'boolean' ? follow : null,
+            following: typeof follow === 'string' ? null : follow.following,
+            followedBy: typeof follow !== 'string' && follow.followedBy === true,
             followError: typeof follow === 'string' ? follow : '',
           });
       } catch (e) {
@@ -54,7 +61,10 @@ export function useUserCardResource(port: UserCardPort, id: string, self: boolea
     setBusy(true);
     setFeedback({ message: '', error: false });
     try {
-      const following = await port.toggleFollow(id, current.signal);
+      const following =
+        state.followedBy && !state.following
+          ? await port.addFollow(id, current.signal).then(() => true)
+          : await port.toggleFollow(id, current.signal);
       if (!current.signal.aborted) {
         setState((old) =>
           old.status === 'ready' && old.card

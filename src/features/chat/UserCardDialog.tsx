@@ -3,8 +3,9 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useStore } from 'zustand';
 import { ChartNoAxesColumnIncreasing, MapPin } from 'lucide-react';
 import type { AuthUser } from '@/domain/auth';
-import type { FollowKind, UserCardPort } from '@/domain/account-tools';
+import { setUserBlocked, type FollowKind, type UserCardPort } from '@/domain/account-tools';
 import { Button } from '@/shared/ui/Button';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import {
   ProfileCard,
   ProfileCardDetails,
@@ -59,7 +60,8 @@ export function UserCardDialog({
   const blocked = useSyncExternalStore(blacklist.subscribe, () =>
     blacklist.read(user.id).some((v) => v.id === target.id),
   );
-  const [confirmBlock, setConfirmBlock] = useState(false);
+  const blockTrigger = useRef<HTMLButtonElement>(null);
+  const [blockAction, setBlockAction] = useState<'add' | 'remove' | null>(null);
   const [list, setList] = useState<FollowKind | 'collection' | null>(null);
   const listTrigger = useRef<HTMLButtonElement | null>(null);
   const name = card?.name || target.name;
@@ -69,24 +71,6 @@ export function UserCardDialog({
       listTrigger.current = null;
     }
   }, [list]);
-  function toggleBlock() {
-    try {
-      const old = blacklist.read(user.id).filter((v) => v.id !== target.id);
-      blacklist.write(
-        user.id,
-        blocked
-          ? old
-          : [...old, { id: target.id, name, ...(card?.avatar ? { avatar: card.avatar } : {}) }],
-      );
-      setConfirmBlock(false);
-      setFeedback({
-        message: blocked ? '已移出黑名单' : '已在此浏览器屏蔽该岛友的聊天消息',
-        error: false,
-      });
-    } catch {
-      setFeedback({ message: '无法保存黑名单，请检查浏览器存储权限后重试', error: true });
-    }
-  }
   function openList(kind: FollowKind | 'collection', trigger: HTMLButtonElement) {
     listTrigger.current = trigger;
     setList(kind);
@@ -111,7 +95,34 @@ export function UserCardDialog({
       footerNotice={
         <>
           {feedback.message && <p role={feedback.error ? 'alert' : 'status'}>{feedback.message}</p>}
-          {confirmBlock && <p>仅在此浏览器屏蔽该岛友的聊天消息，确认加入黑名单？</p>}
+          {blockAction && (
+            <ConfirmDialog
+              layer="nested"
+              title={blockAction === 'add' ? '加入黑名单' : '移出黑名单'}
+              description={
+                blockAction === 'add'
+                  ? `加入后，将在此浏览器屏蔽「${name}」的聊天消息。`
+                  : `移出后，「${name}」的聊天消息将在此浏览器恢复显示。`
+              }
+              confirmLabel={blockAction === 'add' ? '确认加入' : '确认移除'}
+              errorMessage="无法保存黑名单，请检查浏览器存储权限后重试。"
+              returnFocusRef={blockTrigger}
+              onClose={() => setBlockAction(null)}
+              onConfirm={() => {
+                const add = blockAction === 'add';
+                setUserBlocked(
+                  blacklist,
+                  user.id,
+                  { id: target.id, name, avatar: card?.avatar || undefined },
+                  add,
+                );
+                setFeedback({
+                  message: add ? '已在此浏览器屏蔽该岛友的聊天消息' : '已移出黑名单',
+                  error: false,
+                });
+              }}
+            />
+          )}
         </>
       }
       footerActions={
@@ -126,22 +137,15 @@ export function UserCardDialog({
             >
               戳一戳
             </Button>
-            {!self &&
-              (confirmBlock ? (
-                <>
-                  <Button variant="secondary" onClick={() => setConfirmBlock(false)}>
-                    取消
-                  </Button>
-                  <Button onClick={toggleBlock}>确认加入</Button>
-                </>
-              ) : (
-                <Button
-                  variant="secondary"
-                  onClick={() => (blocked ? toggleBlock() : setConfirmBlock(true))}
-                >
-                  {blocked ? '移出黑名单' : '加入黑名单'}
-                </Button>
-              ))}
+            {!self && (
+              <Button
+                ref={blockTrigger}
+                variant="secondary"
+                onClick={() => setBlockAction(blocked ? 'remove' : 'add')}
+              >
+                {blocked ? '移出黑名单' : '加入黑名单'}
+              </Button>
+            )}
           </>
         )
       }
@@ -211,6 +215,8 @@ export function UserCardDialog({
                     <LoadingIndicator compact>处理中…</LoadingIndicator>
                   ) : state.following ? (
                     '取消关注'
+                  ) : state.followedBy ? (
+                    '回关'
                   ) : (
                     '关注'
                   )}

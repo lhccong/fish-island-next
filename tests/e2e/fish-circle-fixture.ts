@@ -21,6 +21,7 @@ export async function setup(
     brokenCover?: boolean;
     commentTotal?: number;
     paginate?: boolean;
+    role?: 'admin' | 'user';
   } = {},
 ) {
   const state = {
@@ -63,6 +64,7 @@ export async function setup(
         code: state.expired ? 40100 : 0,
         data: {
           ...owner,
+          userRole: options.role ?? owner.userRole,
           userAvatar: state.visual ? 'https://circle.test/avatar.svg' : null,
           momentsBgUrl: state.brokenCover
             ? 'https://circle.test/broken.svg'

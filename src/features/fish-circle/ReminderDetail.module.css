@@ -72,6 +72,51 @@
 .state[role='alert'] {
   color: var(--color-danger);
 }
+.message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 20px;
+}
+.message > p {
+  flex: 0 1 auto;
+  margin: 0;
+  min-block-size: 32px;
+  align-content: center;
+  color: var(--color-circle-text);
+}
+.actionRegion {
+  min-width: 0;
+}
+.moderationRegion {
+  margin-inline-start: auto;
+}
+.actionRegion > p[role='alert'] {
+  margin: 8px 0 0;
+  color: var(--color-danger);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.actions > button[aria-disabled='true'] {
+  color: var(--color-muted);
+  cursor: default;
+}
+.actions > button[aria-disabled='true']:hover {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+.screenReaderOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .image {
   max-width: 100%;
   max-height: 320px;
@@ -87,5 +132,14 @@
   }
   .content {
     padding: 16px 0 20px 16px;
+  }
+  .message {
+    flex-direction: column;
+  }
+  .message > p {
+    min-block-size: auto;
+  }
+  .moderationRegion {
+    margin-inline-start: 0;
   }
 }

@@ -7,6 +7,7 @@ import {
   RemarksProvider,
   ChatWindowProvider,
   ChatReportProvider,
+  ChatBlacklistProvider,
 } from '@/features/chat';
 import { ChatUserCards } from '@/app/components/ChatUserCards';
 import { MusicSession } from '@/app/components/MusicSession';
@@ -50,18 +51,20 @@ export function ChatConnectionProvider({ children }: { children: ReactNode }) {
       imageUploadPort={chatImageUpload}
     >
       <ChatReportProvider key={userId} port={chatReport}>
-        <RemarksProvider key={userId} port={chatRemarks} userId={userId}>
-          <ChatUserCards user={session.status === 'authenticated' ? session.user : undefined}>
-            <ChatWindowProvider
-              key={userId}
-              suspended={location.pathname === '/user/login'}
-              onOpen={() => void navigate('/')}
-              onRestore={() => void navigate('/chat')}
-            >
-              <MusicSession>{children}</MusicSession>
-            </ChatWindowProvider>
-          </ChatUserCards>
-        </RemarksProvider>
+        <ChatBlacklistProvider>
+          <RemarksProvider key={userId} port={chatRemarks} userId={userId}>
+            <ChatUserCards user={session.status === 'authenticated' ? session.user : undefined}>
+              <ChatWindowProvider
+                key={userId}
+                suspended={location.pathname === '/user/login'}
+                onOpen={() => void navigate('/')}
+                onRestore={() => void navigate('/chat')}
+              >
+                <MusicSession>{children}</MusicSession>
+              </ChatWindowProvider>
+            </ChatUserCards>
+          </RemarksProvider>
+        </ChatBlacklistProvider>
       </ChatReportProvider>
     </ChatRealtimeProvider>
   );

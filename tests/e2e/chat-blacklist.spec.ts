@@ -81,9 +81,47 @@ for (const skin of builtinSkins)
         sender: { id: '789', name: '合成另一位岛友' },
         timestamp: 1794441600004,
       });
-      const menu = await openMessageActions(page, '4');
-      await activate(menu.getByRole('menuitem', { name: '加入黑名单', exact: true }));
-      await expect(page.locator('[data-message-id="4"]')).toHaveCount(0);
+      const message = page.locator('[data-message-id="4"]');
+      const openConfirmation = async () => {
+        const menu = await openMessageActions(page, '4');
+        await activate(menu.getByRole('menuitem', { name: '加入黑名单', exact: true }));
+      };
+      const confirm = page.getByRole('dialog', { name: '加入黑名单', exact: true });
+      const cancel = confirm.getByRole('button', { name: '取消', exact: true });
+      const add = confirm.getByRole('button', { name: '确认加入', exact: true });
+      await openConfirmation();
+      await expect(confirm).toHaveAccessibleDescription(/合成另一位岛友/);
+      await expect(cancel).toBeFocused();
+      await expect(message).toBeVisible();
+      const box = (await confirm.boundingBox())!;
+      expect(box.x).toBeGreaterThan(0);
+      expect(box.x + box.width).toBeLessThan(page.viewportSize()!.width);
+      expect(await confirm.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+      await expect(add).toHaveCSS('height', mobile ? '44px' : '32px');
+      await page.screenshot({ path: info.outputPath('blacklist-confirmation.png') });
+      if (mobile) await activate(cancel);
+      else await page.keyboard.press('Escape');
+      await expect(confirm).toHaveCount(0);
+      await expect(message.getByRole('group')).toBeFocused();
+      await expect(message).toBeVisible();
+
+      await openConfirmation();
+      await page.evaluate(() => {
+        const write = Storage.prototype.setItem;
+        Storage.prototype.setItem = function (key, value) {
+          if (key === 'fish-island:blacklist:123') {
+            Storage.prototype.setItem = write;
+            throw new DOMException('Synthetic storage failure', 'QuotaExceededError');
+          }
+          write.call(this, key, value);
+        };
+      });
+      await activate(add);
+      await expect(confirm.getByRole('alert')).toContainText('无法保存黑名单');
+      await expect(message).toBeVisible();
+      await activate(add);
+      await expect(confirm).toHaveCount(0);
+      await expect(message).toHaveCount(0);
       await expect(draft).toBeFocused();
       await expect(draft).toHaveText('屏蔽操作保留草稿');
       await expect(page.getByText('已屏蔽该岛友的消息')).toHaveCount(0);
@@ -125,9 +163,19 @@ for (const skin of builtinSkins)
       await expect(page.locator('[data-message-id]')).toHaveCount(3);
       expect(attempts).toBe(2);
 
-      const dialog = await open(page, '我的黑名单');
-      await activate(dialog.getByRole('button', { name: '移除', exact: true }));
-      await activate(dialog.getByRole('button', { name: '确认移除', exact: true }));
+      await open(page, '我的黑名单');
+      const dialog = page.getByRole('dialog', { name: '我的黑名单', exact: true });
+      const remove = dialog.getByRole('button', { name: '移除', exact: true });
+      const removal = page.getByRole('dialog', { name: '移出黑名单', exact: true });
+      const cancelRemoval = removal.getByRole('button', { name: '取消', exact: true });
+      await activate(remove);
+      await expect(removal).toHaveAccessibleDescription(/合成另一位岛友/);
+      await expect(cancelRemoval).toBeFocused();
+      await activate(cancelRemoval);
+      await expect(remove).toBeFocused();
+      await activate(remove);
+      await activate(removal.getByRole('button', { name: '确认移除', exact: true }));
+      await expect(dialog.getByRole('region', { name: '黑名单内容' })).toBeFocused();
       await expect(dialog.getByText('暂无黑名单用户。可在聊天消息菜单中屏蔽岛友。')).toBeVisible();
       await page.keyboard.press('Escape');
       if (mobile) await page.getByRole('link', { name: /聊天/ }).first().tap();
