@@ -151,6 +151,13 @@ export function companion(value: unknown, baseUrl = ''): Companion {
     showcaseCards: data.showcaseCards
       ? list(data.showcaseCards, (value) => collectedCard(value, baseUrl))
       : [],
+    ...(data.showcaseDetails == null
+      ? {}
+      : {
+          showcaseDetails: list(data.showcaseDetails, (value) =>
+            battleShowcaseCard(value, baseUrl),
+          ),
+        }),
     equipment: data.equippedItems
       ? Object.entries(record(data.equippedItems))
           .filter(([, value]) => value !== null)

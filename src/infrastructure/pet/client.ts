@@ -50,7 +50,7 @@ export function createPetClient(
     ...createPetActivities(request, baseUrl),
     async other(userId, signal) {
       const data = await request(`pet/other?${query({ otherUserId: userId })}`, signal);
-      return data === null ? null : companion(data);
+      return data === null ? null : companion(data, baseUrl);
     },
     async bossRanks(bossId, signal) {
       return list(

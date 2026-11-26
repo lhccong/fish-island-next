@@ -11,6 +11,7 @@ function formatPoints(points: number) {
 }
 
 function AchievementCard({ item }: { item: Achievement }) {
+  const sponsorship = item.id === 'island-sponsor' || item.id === 'island-major-sponsor';
   return (
     <article className={styles.card}>
       <div className={styles.cardHeading}>
@@ -20,7 +21,8 @@ function AchievementCard({ item }: { item: Achievement }) {
         <div>
           <h2>{item.name}</h2>
           <p>
-            {item.label} · 每 {item.interval} {item.unit}奖 {formatPoints(item.points)} 积分
+            {item.label} · {sponsorship ? '奖励' : `每 ${item.interval} ${item.unit}奖`}{' '}
+            {formatPoints(item.points)} 积分
           </p>
         </div>
       </div>
@@ -29,17 +31,23 @@ function AchievementCard({ item }: { item: Achievement }) {
           <li key={track.id} className={styles.track}>
             <span>
               {track.label && <strong>{track.label} · </strong>}
-              {track.level > 0 || item.unit === '次'
-                ? `${formatPoints(track.level)} ${item.unit}`
-                : '尚未开始'}
+              {sponsorship
+                ? track.next === null
+                  ? '已达成'
+                  : '待达成'
+                : track.level > 0 || item.unit === '次'
+                  ? `${formatPoints(track.level)} ${item.unit}`
+                  : '尚未开始'}
             </span>
-            <span>
-              {track.next === null
-                ? '全部达成'
-                : track.enabled
-                  ? `下一档 ${formatPoints(track.next)} ${item.unit}`
-                  : '强化暂未开放'}
-            </span>
+            {!sponsorship && (
+              <span>
+                {track.next === null
+                  ? '全部达成'
+                  : track.enabled
+                    ? `下一档 ${formatPoints(track.next)} ${item.unit}`
+                    : '强化暂未开放'}
+              </span>
+            )}
             <span className={styles.reward} data-ready={track.claimablePoints > 0}>
               {track.claimablePoints > 0
                 ? `可领 ${formatPoints(track.claimablePoints)} 积分`

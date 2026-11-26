@@ -6,6 +6,34 @@ const token = () => ({ name: 'synthetic-session', value: 'synthetic-value' });
 const pet = { petId: '17', name: '测试伙伴', petUrl: '', level: 2, hunger: 60, mood: 70 };
 afterEach(() => vi.unstubAllGlobals());
 describe('pet protocol migration', () => {
+  it('reads other companions’ showcase details from the configured pet service', async () => {
+    const artKey = `${'a'.repeat(64)}.jpg`;
+    const card = {
+      id: 'fox',
+      name: '灵狐',
+      grade: 'fine',
+      stars: 4,
+      artKey,
+      artTile: 0,
+      portrait: true,
+    };
+    const fetcher = vi.fn().mockResolvedValue(
+      Response.json({
+        code: 0,
+        data: { ...pet, showcaseDetails: [{ card, stats: { speed: 8 } }] },
+      }),
+    );
+    vi.stubGlobal('fetch', fetcher);
+    const client = createPetClient('https://api.example.test', token, vi.fn());
+    const profile = await client.other('124', new AbortController().signal);
+    expect(profile?.showcaseDetails).toMatchObject([
+      { card: { stars: 4, art: { url: `https://api.example.test/api/pet/cards/art/${artKey}` } } },
+    ]);
+    expect(profile?.showcaseDetails?.[0]?.stats.speed).toBe(8);
+    expect(companion(pet).showcaseDetails).toBeUndefined();
+    expect(companion({ ...pet, showcaseDetails: [] }).showcaseDetails).toEqual([]);
+  });
+
   it('queries consumables without losing food subtype or template code', async () => {
     const fetcher = vi.fn().mockResolvedValue(
       new Response(

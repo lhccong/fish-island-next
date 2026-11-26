@@ -91,6 +91,7 @@ export interface Companion {
   stats: [string, number][];
   equipment: { slot: string; item: PetItem }[];
   showcaseCards: CollectedPetCard[];
+  showcaseDetails?: BattleShowcaseCard[];
 }
 export interface PetPage<T> {
   records: T[];

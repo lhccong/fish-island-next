@@ -1,4 +1,23 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
+
+export async function swipePetContent(page: Page, viewport: Locator) {
+  const session = await page.context().newCDPSession(page);
+  const { x, y, width, height } = (await viewport.boundingBox())!;
+  const touch = { x: x + width / 2, y: y + height - 40 };
+  try {
+    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [touch] });
+    for (let step = 1; step <= 5; step++) {
+      await session.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ ...touch, y: touch.y - step * 44 }],
+      });
+      await page.waitForTimeout(40);
+    }
+    await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  } finally {
+    await session.detach();
+  }
+}
 export async function assertPetLayout(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const dialog = page.getByRole('dialog').last();

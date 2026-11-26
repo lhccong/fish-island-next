@@ -93,12 +93,6 @@
 .rarity {
   color: var(--color-muted);
 }
-.bonuses {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 10px;
-  color: var(--color-accent-text);
-}
 @media (max-width: 760px) {
   .lineup {
     width: 100%;

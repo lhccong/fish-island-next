@@ -2,9 +2,7 @@ import { expect, test, type Locator } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { setupChatMenu } from './chat-menu-fixture';
 import { petCardActivation } from './pet-challenges-fixture';
-import { assertPetLayout } from './pet-layout';
-
-test.use({ hasTouch: true });
+import { assertPetLayout, swipePetContent } from './pet-layout';
 
 const portrait = '/assets/pet/villain-idle-still.webp';
 const opponent = { petId: '18', name: '合成对手', avatar: portrait, health: 90 };
@@ -22,14 +20,41 @@ const profile = {
     ]),
   ),
 };
+const showcaseDetails = [
+  {
+    card: { ...petCardActivation.card, stars: 3 },
+    stats: { attack: 14, health: 35 },
+    effect: {
+      kind: 'effect',
+      name: petCardActivation.effectName,
+      turnOffset: 1,
+      trigger: { kind: 'turnStart' },
+      outcome: { kind: 'shield', maxHealthPercent: 20 },
+    },
+  },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    card: {
+      ...petCardActivation.card,
+      id: `profile-card-${index}`,
+      name: `合成卡片 ${index + 1}`,
+      grade: 'common',
+      stars: 5,
+      artTile: index,
+    },
+    stats: { speed: 5 },
+  })),
+];
 
+const modesAndWidths = ['light', 'dark'].flatMap((mode) =>
+  [1440, 375, 390].map((width) => ({ mode, width })),
+);
 for (const skin of builtinSkins)
-  for (const mode of ['light', 'dark'])
-    for (const width of [1440, 375, 390]) {
-      test(`${skin.id} ${mode} ${width}: duel from a chat user's companion profile`, async ({
-        page,
-      }) => {
-        const mobile = width <= 760;
+  for (const { mode, width } of modesAndWidths)
+    test.describe(`${skin.id} ${mode} ${width}`, () => {
+      const mobile = width <= 760;
+      test.describe.configure({ timeout: 90_000 });
+      test.use({ hasTouch: mobile, isMobile: mobile });
+      test(`cards and duel from a chat user's companion profile`, async ({ page }, info) => {
         const activate = (button: Locator) => (mobile ? button.tap() : button.click());
         await page.setViewportSize({ width, height: mobile ? 844 : 900 });
         const fixture = await setupChatMenu(page, skin.id, mode);
@@ -49,7 +74,15 @@ for (const skin of builtinSkins)
             await profileLoading.promise;
             return route.fulfill({ json: { code: 40000, message: '伙伴资料读取失败' } });
           }
-          return route.fulfill({ json: { code: 0, data: profileRequests === 2 ? null : profile } });
+          return route.fulfill({
+            json: {
+              code: 0,
+              data:
+                profileRequests === 2
+                  ? null
+                  : { ...profile, showcaseDetails: profileRequests === 3 ? [] : showcaseDetails },
+            },
+          });
         });
 
         const previewLoading = Promise.withResolvers<void>();
@@ -106,8 +139,17 @@ for (const skin of builtinSkins)
         const petLink = userCard.getByRole('button', { name: '宠物', exact: true });
         const pet = page.getByRole('dialog', { name: '伙伴资料', exact: true });
         const openDuel = pet.getByRole('button', { name: '宠物切磋', exact: true });
+        const viewport = pet.getByRole('region', { name: '伙伴资料内容' });
         await activate(petLink);
-        await expect(pet.getByRole('status').filter({ hasText: '正在整理营地资料' })).toBeVisible();
+        const loading = pet.getByRole('status').filter({ hasText: '正在整理营地资料' });
+        await expect(loading.locator('svg')).toBeVisible();
+        const contentBox = (await viewport.boundingBox())!;
+        const indicatorBox = (await loading.boundingBox())!;
+        expect(
+          Math.abs(
+            indicatorBox.y + indicatorBox.height / 2 - (contentBox.y + contentBox.height / 2),
+          ),
+        ).toBeLessThan(12);
         await expect(openDuel).toHaveCount(0);
         profileLoading.resolve();
         await expect(pet.getByRole('alert')).toContainText('伙伴资料读取失败');
@@ -119,14 +161,73 @@ for (const skin of builtinSkins)
         await activate(pet.getByRole('button', { name: '关闭面板' }));
         await expect(petLink).toBeFocused();
         await activate(petLink);
+        await expect(pet.getByText('尚未上架卡片。')).toBeVisible();
+        await assertPetLayout(page);
+        await activate(pet.getByRole('button', { name: '关闭面板' }));
+        await expect(petLink).toBeFocused();
+        await activate(petLink);
         await expect(openDuel).toBeVisible();
         expect((await openDuel.boundingBox())!.height).toBe(mobile ? 44 : 32);
         expect(previews).toBe(0);
         await assertPetLayout(page);
-        const viewport = pet.getByRole('region', { name: '伙伴资料内容' });
         const scrollbar = pet.locator('[data-orientation="vertical"][data-state]');
+        const cards = pet.getByRole('list', { name: '上架卡片' });
+        await expect(cards.getByRole('listitem')).toHaveCount(6);
+        const first = cards.getByRole('button', { name: '查看潮月守卫效果，3 星' });
+        const last = cards.getByRole('button', { name: '查看合成卡片 5效果，5 星' });
+        await expect(first.locator('svg.lucide-star')).toHaveCount(3);
+        await expect(last.locator('svg.lucide-star')).toHaveCount(5);
+        await expect(first.locator('img')).toBeVisible();
+        const headings = await pet.getByRole('heading', { level: 3 }).evaluateAll((elements) =>
+          elements.map((element) => {
+            const { x, y } = element.getBoundingClientRect();
+            return { x, y };
+          }),
+        );
+        if (mobile) {
+          expect(headings.map(({ x }) => x)).toEqual(Array(3).fill(headings[0]!.x));
+          expect(headings[2]!.y).toBeGreaterThan(headings[1]!.y);
+          expect(headings[1]!.y).toBeGreaterThan(headings[0]!.y);
+          expect((await first.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+        } else {
+          expect(headings.map(({ y }) => y)).toEqual(Array(3).fill(headings[0]!.y));
+          expect(headings[2]!.x).toBeGreaterThan(headings[1]!.x);
+          expect(headings[1]!.x).toBeGreaterThan(headings[0]!.x);
+          await first.scrollIntoViewIfNeeded();
+          await first.hover();
+          await expect(first).toHaveCSS('outline-style', 'none');
+          await first.focus();
+        }
+        if (mobile) {
+          await swipePetContent(page, viewport);
+          await expect
+            .poll(() => viewport.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+          await first.tap();
+        } else await page.keyboard.press('Enter');
+        const details = page.getByRole('dialog', { name: '潮月守卫', exact: true });
+        await expect(details).toContainText('史诗 · 3 星');
+        await expect(details).toContainText('攻击 +14');
+        await expect(details).toContainText('生命 +35');
+        await expect(details).toContainText('潮月护体');
+        await expect(details).toContainText('最大生命 20% 的护盾');
+        await assertPetLayout(page);
+        if (skin.id === 'wechat')
+          await page.screenshot({ path: info.outputPath('card-details.png') });
+        if (mobile) await details.getByRole('button', { name: '关闭卡片详情' }).tap();
+        else await page.keyboard.press('Escape');
+        await expect(details).toHaveCount(0);
+        await expect(first).toBeFocused();
+        if (!mobile)
+          expect(
+            await first.evaluate((element) => getComputedStyle(element).outlineStyle),
+          ).not.toBe('none');
+        await assertPetLayout(page);
+        if (skin.id === 'wechat')
+          await page.screenshot({ path: info.outputPath('card-column.png') });
+
         await viewport.press('End');
-        await expect(pet.getByRole('button', { name: '查看合成装备 6词条' })).toBeInViewport();
+        await expect(last).toBeInViewport();
         await expect
           .poll(() => viewport.evaluate((element) => element.scrollTop))
           .toBeGreaterThan(0);
@@ -135,6 +236,12 @@ for (const skin of builtinSkins)
           await expect(scrollbar).toBeVisible();
           await expect(scrollbar).toHaveCSS('opacity', '1');
         }
+        await activate(last);
+        const common = page.getByRole('dialog', { name: '合成卡片 5', exact: true });
+        await expect(common).toContainText('速度 +5');
+        await expect(common).toContainText('无战斗被动');
+        await activate(common.getByRole('button', { name: '关闭卡片详情' }));
+        await expect(last).toBeFocused();
         await viewport.press('Home');
         await expect.poll(() => viewport.evaluate((element) => element.scrollTop)).toBe(0);
 
@@ -185,8 +292,8 @@ for (const skin of builtinSkins)
         await expect(duel).toHaveCount(0);
         await expect(openDuel).toBeFocused();
         await expect(page).toHaveURL(/\/chat$/);
-        expect(profileRequests).toBe(3);
+        expect(profileRequests).toBe(4);
         expect(previews).toBe(2);
         expect(fixture.stats().connections).toBe(1);
       });
-    }
+    });

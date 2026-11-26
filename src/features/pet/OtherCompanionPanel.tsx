@@ -10,6 +10,7 @@ import { PanelDialog } from './PanelDialog';
 import { formatPetStat } from './format-stat';
 import { ItemIcon } from './ItemIcon';
 import { EquipmentAffixes } from './EquipmentAffixes';
+import { CompanionCards } from './CompanionCards';
 import equipmentStyles from './EquipmentAffixes.module.css';
 import styles from './Panels.module.css';
 
@@ -36,7 +37,8 @@ export function OtherCompanionPanel({
   return (
     <PanelDialog
       title="伙伴资料"
-      description="查看这位岛友的伙伴与装备属性。"
+      description="查看岛友伙伴的属性、装备和上架卡片。"
+      loading={resource.state.status === 'loading'}
       onClose={onClose}
       returnFocusRef={returnFocusRef}
     >
@@ -100,6 +102,7 @@ export function OtherCompanionPanel({
                     )}
                   </div>
                 </section>
+                <CompanionCards cards={pet.showcaseDetails} />
               </div>
             </>
           ) : (

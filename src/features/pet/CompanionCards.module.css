@@ -1,0 +1,78 @@
+.list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px;
+  list-style: none;
+}
+.empty {
+  margin: 0;
+  padding: 12px 14px;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-text);
+  text-align: start;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.row:hover,
+.row[aria-expanded='true'] {
+  border-color: var(--color-border);
+  background: var(--color-accent-soft);
+}
+.row > svg {
+  color: var(--color-muted);
+}
+.art {
+  width: 46px;
+}
+.identity {
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+.stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  color: var(--color-pet-enhance-gold);
+}
+.stars svg {
+  fill: currentColor;
+  stroke: var(--color-text);
+  stroke-width: 1;
+}
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(400px, calc(100% - 32px));
+  overflow: hidden;
+}
+.dialog > h2 {
+  margin: 0 36px 4px 0;
+  font-size: 1.125rem;
+  overflow-wrap: anywhere;
+}
+.dialog > p {
+  margin: 0 0 8px;
+}
+.scroll {
+  height: auto;
+}
+.scroll [data-radix-scroll-area-viewport] {
+  max-height: min(24rem, 60dvh);
+}
+.body {
+  padding: 4px;
+}

@@ -60,6 +60,11 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.body[data-loading='true'] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
 .confirmation {
   display: flex;
   flex-direction: column;

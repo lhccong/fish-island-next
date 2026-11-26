@@ -11,6 +11,7 @@ export function PanelDialog({
   appearance = 'default',
   layer = 'default',
   followVisualViewport = false,
+  loading = false,
   returnFocusRef,
 }: {
   title: string;
@@ -20,6 +21,7 @@ export function PanelDialog({
   appearance?: 'default' | 'pixel';
   layer?: 'default' | 'nested';
   followVisualViewport?: boolean;
+  loading?: boolean;
   returnFocusRef?: RefObject<HTMLElement | null> | undefined;
 }) {
   return (
@@ -37,7 +39,9 @@ export function PanelDialog({
       className={`${styles.dialog} ${appearance === 'pixel' ? styles.pixelDialog : ''} ${followVisualViewport ? styles.visualViewport : ''}`}
     >
       <ScrollArea label={`${title}内容`} gutter="reserved" className={styles.scroll ?? ''}>
-        <div className={styles.body}>{children}</div>
+        <div className={styles.body} data-loading={loading || undefined}>
+          {children}
+        </div>
       </ScrollArea>
     </Dialog>
   );
