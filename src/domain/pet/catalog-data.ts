@@ -9,6 +9,7 @@ import {
   type PetCardPoolDefinition,
 } from './catalog';
 import type { PetCardBattleEffect } from './card-battle';
+import { petCardBondAttributeLabels, type PetCardBondBonus } from './card-bonds';
 
 const code = /^[A-Za-z][A-Za-z0-9_-]{0,47}$/;
 const atlasKey = /^[a-f0-9]{64}\.(jpg|png)$/;
@@ -173,6 +174,20 @@ export function readPetCardPage(value: unknown) {
   return { items: list(page.items).map(readPetCardDefinition), total: integer(total) };
 }
 
+function readBondBonuses(value: unknown): PetCardBondBonus[] {
+  const bonuses = list(value).map((value) => {
+    const bonus = record(value);
+    const attribute = string(bonus.attribute) as keyof typeof petCardBondAttributeLabels;
+    check(Object.hasOwn(petCardBondAttributeLabels, attribute));
+    return { attribute, percentagePoints: integer(bonus.percentagePoints, 1, 100) };
+  });
+  check(
+    bonuses.length > 0 &&
+      new Set(bonuses.map(({ attribute }) => attribute)).size === bonuses.length,
+  );
+  return bonuses;
+}
+
 export function readPetCardCatalog(value: unknown, imageUrl: (key: string) => string) {
   const catalog = record(value);
   const cards = list(catalog.cards).map(readPetCardDefinition);
@@ -194,8 +209,26 @@ export function readPetCardCatalog(value: unknown, imageUrl: (key: string) => st
       poolCards.set(poolId, ids);
     }
   }
+  const assigned = new Set<string>();
+  const bonds = list(catalog.factionBonds ?? []).flatMap((value) => {
+    const bond = record(value);
+    const cardIds = list(bond.cardIds).map((value) => string(value, code));
+    check(cardIds.length >= 6);
+    for (const id of cardIds) {
+      check(!assigned.has(id));
+      assigned.add(id);
+    }
+    const id = string(bond.id, code);
+    const name = string(bond.name);
+    const three = readBondBonuses(bond.three);
+    const six = readBondBonuses(bond.six);
+    const available = cardIds.filter((id) => definitions[id]);
+    return available.length >= 3 ? [{ id, name, cardIds: available, three, six }] : [];
+  });
+  check(new Set(bonds.map(({ id }) => id)).size === bonds.length);
   return createPetCardCatalog(
     definitions,
     readPetCardPools(catalog.pools).map((pool) => ({ ...pool, ids: poolCards.get(pool.id) ?? [] })),
+    bonds,
   );
 }

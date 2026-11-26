@@ -13,11 +13,13 @@ import { Button } from '@/shared/ui/Button';
 import { Select } from '@/shared/ui/Select';
 import { describePetCardBattleEffect } from './card-battle-copy';
 import { usePetCardCatalog } from './catalog-context';
+import { PetCardBonds } from './PetCardBonds';
 import { PetCardFace } from './PetCardFace';
 import styles from './PetCards.module.css';
 
 const all = '__all__';
 const seriesPrefix = 'pool:';
+const factionPrefix = 'faction:';
 const gradeOptions = [
   { value: all, label: '全部品质' },
   ...Object.entries(petCardGrades).map(([value, { name: label }]) => ({ value, label })),
@@ -51,8 +53,12 @@ export function PetCardShowcase({
   const shelfHeading = useRef<HTMLHeadingElement>(null);
   const [series, setSeries] = useState(all);
   const [grade, setGrade] = useState(all);
-  const seriesCards =
-    series === all ? undefined : catalog.packs[series.slice(seriesPrefix.length)]?.ids;
+  const seriesCards = series.startsWith(factionPrefix)
+    ? catalog.bonds.find(({ id }) => id === series.slice(factionPrefix.length))?.cardIds
+    : catalog.packs[series.slice(seriesPrefix.length)]?.ids;
+  const factions = new Map(
+    catalog.bonds.flatMap(({ name, cardIds }) => cardIds.map((id) => [id, name] as const)),
+  );
   const visibleCards = cardIds.filter(
     (id) =>
       (!seriesCards || seriesCards.includes(id)) &&
@@ -94,7 +100,12 @@ export function PetCardShowcase({
         <ul className={styles.shelfGrid}>
           {visibleShowcased.map((id) => (
             <li key={id}>
-              <PetCardFace id={id} compact stars={upgrades?.collection.get(id)?.stars} />
+              <PetCardFace
+                id={id}
+                compact
+                stars={upgrades?.collection.get(id)?.stars}
+                faction={factions.get(id)}
+              />
               <Button
                 variant="secondary"
                 disabled={pending}
@@ -127,6 +138,7 @@ export function PetCardShowcase({
             </ul>
           </section>
         )}
+        <PetCardBonds catalog={catalog} showcased={visibleShowcased} preview={!upgrades} />
         {effects.length > 0 && (
           <section className={styles.bonus} aria-label="对战效果预览">
             <h4>对战效果预览</h4>
@@ -142,15 +154,19 @@ export function PetCardShowcase({
       </section>
       <section aria-label="我的卡片">
         <div className={styles.collectionFilters} role="group" aria-label="卡片筛选">
-          {upgrades && catalog.packIds.length > 1 && (
+          {upgrades && (catalog.packIds.length > 1 || catalog.bonds.length > 0) && (
             <Select
               label="卡片系列"
               value={series}
               options={[
                 { value: all, label: '全部系列' },
-                ...catalog.packIds.map((id) => ({
+                ...(upgrades ? catalog.packIds : []).map((id) => ({
                   value: `${seriesPrefix}${id}`,
                   label: catalog.packs[id]!.name,
+                })),
+                ...catalog.bonds.map(({ id, name }) => ({
+                  value: `${factionPrefix}${id}`,
+                  label: `${name}（势力）`,
                 })),
               ]}
               onValueChange={setSeries}
@@ -192,7 +208,7 @@ export function PetCardShowcase({
             const DisplayIcon = displayed ? PinOff : Pin;
             return (
               <li key={id} className={styles.collectionSlot}>
-                <PetCardFace id={id} stars={progress?.stars} />
+                <PetCardFace id={id} stars={progress?.stars} faction={factions.get(id)} />
                 <div className={styles.collectionActions}>
                   {progress && (
                     <p className={styles.materials}>

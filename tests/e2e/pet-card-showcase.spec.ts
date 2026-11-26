@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
 import { shortcutFixture } from './chat-game-shortcuts-fixture';
 import { setupChatMenu } from './chat-menu-fixture';
-import { fixtureCards, setupPetCardCatalog } from './pet-card-catalog-fixture';
+import { fixtureBonds, fixtureCards, setupPetCardCatalog } from './pet-card-catalog-fixture';
 import { setupPetCardPlay } from './pet-card-play-fixture';
 import { activate } from './pet-cards-flow';
 import { assertPetLayout } from './pet-layout';
@@ -10,11 +10,9 @@ import { assertPetLayout } from './pet-layout';
 test.use({ hasTouch: true, reducedMotion: 'reduce' });
 test.setTimeout(90_000);
 
-const candidates = [
-  ...fixtureCards.slice(0, 5),
-  fixtureCards.find(({ id }) => id === 'fox')!,
-  fixtureCards[5]!,
-];
+const candidates = ['radish', 'seahorse', 'frog', 'penguin', 'cloudbird', 'manta', 'jianYong'].map(
+  (id) => fixtureCards.find((card) => card.id === id)!,
+);
 const missingArtKey = `${'f'.repeat(64)}.png`;
 
 for (const skin of builtinSkins)
@@ -43,7 +41,7 @@ for (const skin of builtinSkins)
               };
             }),
           );
-          await setupPetCardCatalog(page);
+          await setupPetCardCatalog(page, fixtureBonds);
           await page.route(`**/api/pet/cards/art/${missingArtKey}`, async (route) => {
             await holdArt;
             await route.fulfill({ status: 503 });
@@ -71,6 +69,8 @@ for (const skin of builtinSkins)
         const grid = shelf.getByRole('list').first();
         const slots = grid.locator(':scope > li');
         const bonus = shelf.getByRole('region', { name: '宠物战斗属性加成' });
+        const bondPanel = shelf.getByRole('region', { name: '卡牌羁绊' });
+        const island = bondPanel.getByRole('region', { name: '鱼岛', exact: true });
         const strip = page.locator('ul[aria-label="上架宠物卡片"]');
         const button = (name: string) => dialog.getByRole('button', { name, exact: true });
         const removeAll = shelf.getByRole('button', { name: '一键下架' });
@@ -78,15 +78,47 @@ for (const skin of builtinSkins)
         await expect(shelf).toContainText('0 / 6');
         await expect(shelf.getByText('空位')).toHaveCount(6);
         await expect(bonus).toHaveCount(0);
+        await expect(island).toContainText('0/3');
+        await expect(island).toContainText('0/6');
+        await expect(island.getByText('吸血率 +4%', { exact: true })).toBeVisible();
+        await expect(bondPanel.getByText('已激活', { exact: false })).toHaveCount(0);
         await expect.poll(() => pet.petRequests).toBeGreaterThan(0);
         await expect(strip).toHaveCount(0);
         const before = pet.petRequests;
+        const series = dialog.getByRole('combobox', { name: '卡片系列' });
+        await activate(series, mobile);
+        await activate(page.getByRole('option', { name: '鱼岛（势力）', exact: true }), mobile);
+        await expect(series).toHaveText('鱼岛（势力）');
+        await expect(button(`上架${last.name}`)).toHaveCount(0);
+        if (!mobile) {
+          await expect(series).toBeFocused();
+          await series.press('Enter');
+          await expect(page.getByRole('option', { name: '鱼岛（势力）' })).toHaveAttribute(
+            'data-state',
+            'checked',
+          );
+          await page.keyboard.press('Escape');
+          await expect(series).toBeFocused();
+        }
+        await activate(series, mobile);
+        await activate(page.getByRole('option', { name: '全部系列', exact: true }), mobile);
 
         const placed = candidates.slice(0, 6);
         for (const [index, { name }] of placed.entries()) {
           await activate(button(`上架${name}`), mobile);
           await expect(shelf).toContainText(`${index + 1} / 6`);
+          const count = index + 1;
+          await expect(island).toContainText(count >= 3 ? '3/3 · 已激活' : `${count}/3`);
+          await expect(island).toContainText(count === 6 ? '6/6 · 已激活' : `${count}/6`);
         }
+        await expect(grid.getByText('鱼岛', { exact: true })).toHaveCount(6);
+        await expect(island.getByText('抗吸血 +5%', { exact: true })).toBeVisible();
+        await expect(bondPanel.getByRole('region', { name: '吴', exact: true })).toContainText(
+          '0/3',
+        );
+        await expect(bondPanel.getByRole('region', { name: '魏', exact: true })).toContainText(
+          '0/3',
+        );
         await expect(button(`上架${last.name}`)).toBeDisabled();
         await expect(slots.locator('[data-grade]')).toHaveCount(6);
         const health = placed.reduce((total, card) => total + (card.stats.health ?? 0), 0);
@@ -96,10 +128,34 @@ for (const skin of builtinSkins)
           await slots.evaluateAll((items) => new Set(items.map((li) => li.offsetTop)).size),
         ).toBe(mobile ? 2 : 1);
         await grid.scrollIntoViewIfNeeded();
+        const view = dialog.getByRole('region', { name: '宠物卡包内容' });
+        await island.scrollIntoViewIfNeeded();
+        const groups = await bondPanel.getByRole('region').evaluateAll((elements) =>
+          elements.map((item) => ({
+            top: item.getBoundingClientRect().top,
+            overflow: item.scrollWidth - item.clientWidth,
+          })),
+        );
+        expect(new Set(groups.map(({ top }) => top)).size).toBe(mobile ? 5 : 2);
+        expect(Math.max(...groups.map(({ overflow }) => overflow))).toBeLessThanOrEqual(1);
+        const scrollbar = view.locator('..').locator('[data-orientation="vertical"]');
+        if (mobile) await expect(scrollbar).toHaveCSS('visibility', 'hidden');
+        else {
+          await island.hover();
+          await expect(scrollbar).toHaveCSS('opacity', '1');
+        }
         if (skin.id === 'pixel-island' && (width === 375 || width === 1440)) {
-          await grid.screenshot({ path: info.outputPath('six-card-showcase.png') });
+          await island.screenshot({ path: info.outputPath('card-bond.png') });
         }
         await assertPetLayout(page);
+
+        const extra = placed[5]!;
+        await activate(shelf.getByRole('button', { name: `下架${extra.name}` }), mobile);
+        await expect(island).toContainText('3/3 · 已激活');
+        await expect(island).toContainText('5/6');
+        await expect(island).not.toContainText('6/6 · 已激活');
+        await activate(button(`上架${extra.name}`), mobile);
+        await expect(island).toContainText('6/6 · 已激活');
 
         const first = placed[0]!;
         const upgrade = button(`升星${first.name}，消耗 1 张`);
@@ -121,9 +177,16 @@ for (const skin of builtinSkins)
           await expect(shelf.getByRole('heading', { name: '宠物卡片展示柜' })).toBeFocused();
         }
         await expect(shelf).toContainText('5 / 6');
+        await expect(island).toContainText('3/3 · 已激活');
+        await expect(island).toContainText('5/6');
+        await expect(island).not.toContainText('6/6 · 已激活');
         await activate(button(`上架${last.name}`), mobile);
         await expect(shelf).toContainText('6 / 6');
+        await expect(island).toContainText('5/6');
         await expect(shelf.getByText(last.name, { exact: true })).toBeVisible();
+        await expect(bondPanel.getByRole('region', { name: '蜀', exact: true })).toContainText(
+          '1/3',
+        );
         if (mobile) await activate(button('关闭宠物卡包'), mobile);
         else await page.keyboard.press('Escape');
         await expect(dialog).toBeHidden();
@@ -135,6 +198,7 @@ for (const skin of builtinSkins)
         await expect(lastThumbnail.getByText('缺图')).toBeVisible();
         missingArt = false;
         await page.goto('/pet', { waitUntil: 'domcontentloaded' });
+        await strip.scrollIntoViewIfNeeded();
         await expect(strip.locator('img[data-loaded="true"]')).toHaveCount(6);
         const geometry = await strip.evaluate(
           (element, cardSize) => {
@@ -184,6 +248,7 @@ for (const skin of builtinSkins)
         await expect(shelf).toContainText('0 / 6');
         await expect(shelf.getByText('空位')).toHaveCount(6);
         await expect(bonus).toHaveCount(0);
+        await expect(island).toContainText('0/6');
         await expect(removeAll).toBeDisabled();
         expect(fixture.removeAllIds).toHaveLength(2);
         expect(new Set(fixture.removeAllIds).size).toBe(1);
@@ -195,5 +260,33 @@ for (const skin of builtinSkins)
           .filter({ has: page.getByRole('button', { name: `上架${first.name}`, exact: true }) });
         await expect(firstOwned.locator('[data-card-stars] svg')).toHaveCount(2);
         await assertPetLayout(page);
+        await view.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        if (mobile) {
+          const box = (await view.boundingBox())!;
+          const x = Math.round(box.x + box.width / 2);
+          const y = Math.round(box.y + box.height / 2);
+          const touch = await page.context().newCDPSession(page);
+          try {
+            await touch.send('Input.dispatchTouchEvent', {
+              type: 'touchStart',
+              touchPoints: [{ x, y }],
+            });
+            for (const offset of [40, 80, 120, 160]) {
+              await touch.send('Input.dispatchTouchEvent', {
+                type: 'touchMove',
+                touchPoints: [{ x, y: y - offset }],
+              });
+            }
+            await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+          } finally {
+            await touch.detach();
+          }
+        } else {
+          await view.hover({ position: { x: 90, y: 150 } });
+          await page.mouse.wheel(0, 160);
+        }
+        await expect.poll(() => view.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
       });
     }

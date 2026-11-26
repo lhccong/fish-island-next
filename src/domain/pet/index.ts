@@ -6,6 +6,8 @@ export { treasureSites } from './treasure';
 export type { TreasureSiteId, TreasureState, TreasurePort } from './treasure';
 export { petCardActions, petCardRecoveryEffect } from './card-battle';
 export type { PetCardBattleAction, PetCardBattleEffect } from './card-battle';
+export { petCardBondAttributeLabels } from './card-bonds';
+export type { PetCardBondBonus } from './card-bonds';
 export { defaultPetCardWeights, petCardGradeIds, petCardStatLabels } from './catalog';
 export type {
   PetCardAtlasDefinition,

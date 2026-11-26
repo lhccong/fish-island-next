@@ -1,6 +1,11 @@
 import { createHash } from 'node:crypto';
 import type { Page } from '@playwright/test';
-import { defaultPetCardWeights, petCardPacks, petCards } from '../../src/domain/pet';
+import {
+  defaultPetCardWeights,
+  petCardPacks,
+  petCards,
+  type PetCardCatalog,
+} from '../../src/domain/pet';
 
 const assets = [
   'card-art.jpg',
@@ -42,11 +47,68 @@ export const fixtureCards = Object.entries(petCards).map(([id, { art, ...card }]
     .map(({ id }) => id),
 }));
 
-export async function setupPetCardCatalog(page: Page) {
+const members = (...atlases: number[]) =>
+  fixtureCards
+    .filter(({ sortOrder }) => atlases.includes(Math.floor(sortOrder / 10)))
+    .map(({ id }) => id);
+
+export const fixtureBonds = [
+  {
+    id: 'island',
+    name: '鱼岛',
+    cardIds: members(0, 1, 2, 3, 4),
+    three: [
+      { attribute: 'lifesteal', percentagePoints: 4 },
+      { attribute: 'dodgeRate', percentagePoints: 4 },
+    ],
+    six: [
+      { attribute: 'lifestealResistance', percentagePoints: 5 },
+      { attribute: 'dodgeResistance', percentagePoints: 5 },
+    ],
+  },
+  {
+    id: 'shu',
+    name: '蜀',
+    cardIds: members(5, 9),
+    three: [
+      { attribute: 'comboRate', percentagePoints: 5 },
+      { attribute: 'critRate', percentagePoints: 4 },
+    ],
+    six: [
+      { attribute: 'comboResistance', percentagePoints: 6 },
+      { attribute: 'critResistance', percentagePoints: 6 },
+    ],
+  },
+  {
+    id: 'wu',
+    name: '吴',
+    cardIds: members(7),
+    three: [{ attribute: 'dodgeRate', percentagePoints: 5 }],
+    six: [{ attribute: 'dodgeResistance', percentagePoints: 6 }],
+  },
+  {
+    id: 'wei',
+    name: '魏',
+    cardIds: members(6),
+    three: [{ attribute: 'lifesteal', percentagePoints: 5 }],
+    six: [{ attribute: 'lifestealResistance', percentagePoints: 6 }],
+  },
+  {
+    id: 'warlords',
+    name: '群雄',
+    cardIds: members(8),
+    three: [{ attribute: 'critRate', percentagePoints: 5 }],
+    six: [{ attribute: 'comboResistance', percentagePoints: 6 }],
+  },
+] as const satisfies PetCardCatalog['bonds'];
+
+export async function setupPetCardCatalog(page: Page, bonds?: PetCardCatalog['bonds']) {
   const requests: string[] = [];
   await page.route('**/api/pet/cards/catalog', (route) => {
     requests.push(route.request().url());
-    return route.fulfill({ json: { code: 0, data: { cards: fixtureCards, pools: fixturePools } } });
+    return route.fulfill({
+      json: { code: 0, data: { cards: fixtureCards, pools: fixturePools, factionBonds: bonds } },
+    });
   });
   await page.route('**/api/pet/cards/art/*', (route) => {
     const atlas = fixtureAtlases.find(({ id }) => route.request().url().endsWith(`/${id}`));

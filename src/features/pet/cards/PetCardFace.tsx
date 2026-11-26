@@ -20,10 +20,12 @@ export function PetCardFace({
   id,
   compact = false,
   stars,
+  faction,
 }: {
   id: PetCardId;
   compact?: boolean;
   stars?: number | undefined;
+  faction?: string | undefined;
 }) {
   const card = getPetCard(id, usePetCardCatalog());
   const stats = petCardStarStats(card.stats, stars ?? 1);
@@ -53,6 +55,7 @@ export function PetCardFace({
         <GradeIcon size={11} aria-hidden="true" /> {petCardGrades[card.grade].name}
         {stars && ` · ${stars} 星`}
       </div>
+      {faction && <div className={styles.cardFaction}>{faction}</div>}
       {!compact && (
         <div className={styles.cardAbilities}>
           {action && (

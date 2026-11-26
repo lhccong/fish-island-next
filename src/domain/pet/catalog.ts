@@ -1,4 +1,5 @@
 import type { PetCardBattleAction, PetCardBattleEffect } from './card-battle';
+import type { PetCardBond } from './card-bonds';
 
 export const petCardGrades = {
   common: { name: '普通', weight: 46, points: 5 },
@@ -41,6 +42,7 @@ export interface PetCardCatalog {
   cards: Readonly<Record<PetCardId, PetCard>>;
   packs: Readonly<Record<PetCardPackKind, PetCardPack>>;
   packIds: readonly PetCardPackKind[];
+  bonds: readonly PetCardBond[];
 }
 
 export interface PetCardPoolDefinition {
@@ -83,6 +85,7 @@ export function createPetCardCatalog(
     unitPrice?: number;
     ids: PetCardId[];
   })[],
+  bonds: readonly PetCardBond[] = [],
 ): PetCardCatalog {
   const packs = Object.create(null) as Record<PetCardPackKind, PetCardPack>;
   const packIds = [];
@@ -107,7 +110,7 @@ export function createPetCardCatalog(
     };
     packIds.push(id);
   }
-  return { cards, packs, packIds };
+  return { cards, packs, packIds, bonds };
 }
 
 export function defaultPetCardPrice(id: string) {
