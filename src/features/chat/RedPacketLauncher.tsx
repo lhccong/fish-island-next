@@ -3,10 +3,12 @@ import { lazy, Suspense, useRef, useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
+import { useChatRealtime } from './realtime-context';
 import styles from './SendRedPacket.module.css';
 
 const Form = lazy(() => import('./SendRedPacketForm'));
 export function RedPacketLauncher() {
+  const { packetCreation } = useChatRealtime();
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   return (
@@ -15,7 +17,10 @@ export function RedPacketLauncher() {
       description="积分红包发送到当前群聊。"
       hideDescription
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(next) => {
+        if (next) packetCreation.reset();
+        setOpen(next);
+      }}
       returnFocusRef={trigger}
       className={styles.dialog ?? ''}
       dismissLabel="关闭发送红包"

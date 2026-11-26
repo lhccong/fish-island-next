@@ -69,13 +69,27 @@ for (const skin of builtinSkins)
       });
       const draft = page.getByRole('textbox', { name: '消息草稿' });
       await draft.fill('保留原有聊天草稿');
-      if (mobile) await page.getByRole('button', { name: '更多聊天工具' }).tap();
-      const launcher = page.getByRole('button', { name: '发红包', exact: true });
-      await expect(launcher).toHaveCSS('width', '44px');
-      await act(launcher);
+      const moreTools = page.getByRole('button', { name: '更多聊天工具', exact: true });
+      const inlineLauncher = page.getByRole('button', { name: '发红包', exact: true });
+      const openSend = async () => {
+        if (
+          (await moreTools.isVisible()) &&
+          (await moreTools.getAttribute('aria-haspopup')) === 'menu'
+        ) {
+          await act(moreTools);
+          await act(page.getByRole('menuitem', { name: '发红包', exact: true }));
+          return moreTools;
+        }
+        if (!(await inlineLauncher.isVisible())) await act(moreTools);
+        await expect(inlineLauncher).toHaveCSS('width', '44px');
+        await act(inlineLauncher);
+        return inlineLauncher;
+      };
+      const launcher = await openSend();
       const dialog = page.getByRole('dialog', { name: '发送红包', exact: true });
       const scroll = dialog.getByRole('region', { name: '发送红包表单' });
       const send = dialog.getByRole('button', { name: '发送红包', exact: true });
+      const creating = dialog.getByRole('button').filter({ hasText: '创建中…' });
       await expect(dialog).toBeVisible();
       await expect(dialog.getByRole('textbox', { name: '总积分', exact: true })).toHaveValue('100');
       await expect(dialog.getByRole('textbox', { name: '红包个数', exact: true })).toHaveValue(
@@ -92,29 +106,28 @@ for (const skin of builtinSkins)
       await act(send);
       await expect(dialog.getByRole('alert')).toContainText('积分不足');
       await act(send);
-      await expect(dialog.getByRole('button', { name: '创建中…' })).toBeDisabled();
+      await expect(creating).toBeDisabled();
       await expect(dialog.getByRole('textbox', { name: '总积分', exact: true })).toBeDisabled();
       await act(dialog.getByRole('button', { name: '关闭发送红包' }));
       await expect(launcher).toBeFocused();
-      await act(launcher);
-      await expect(dialog.getByRole('button', { name: '创建中…' })).toBeDisabled();
+      await openSend();
+      await expect(creating).toBeDisabled();
       expect(creates).toHaveLength(2);
       release();
       await expect(dialog.getByRole('alert')).toContainText('红包已创建，消息发布失败');
       await act(dialog.getByRole('button', { name: '重试发布' }));
-      await expect(dialog.getByRole('status')).toHaveText('红包发送成功');
+      await expect(dialog).toBeHidden();
+      await expect(launcher).toBeFocused();
       expect(creates).toHaveLength(2);
       expect(publications[0]).toEqual(publications[1]);
       expect(creates[1]).toEqual({ type: 1, totalAmount: 10, count: 1, name: '合成祝福' });
       await page.screenshot({ path: info.outputPath('sent.png') });
-      await act(dialog.getByRole('button', { name: '完成', exact: true }));
-      await expect(launcher).toBeFocused();
-      await expect(page.locator('[data-message-id="102"]').getByRole('group')).toHaveCSS(
-        'background-color',
-        'rgba(0, 0, 0, 0)',
+      await expect(page.locator('[data-message-id="102"] [data-red-packet]')).toBeVisible();
+      await openSend();
+      await expect(dialog.getByRole('textbox', { name: '总积分', exact: true })).toHaveValue('100');
+      await expect(dialog.getByRole('textbox', { name: '红包个数', exact: true })).toHaveValue(
+        '10',
       );
-      await act(launcher);
-      await act(dialog.getByRole('button', { name: '再发一个' }));
       const choose = async (label: string) => {
         const select = dialog.getByRole('combobox', { name: '红包类型' });
         await act(select);
@@ -129,10 +142,10 @@ for (const skin of builtinSkins)
       await dialog.getByRole('textbox', { name: '总积分', exact: true }).fill('20');
       await dialog.getByRole('textbox', { name: '红包个数', exact: true }).fill('2');
       await act(send);
-      await expect(dialog.getByRole('status')).toHaveText('红包发送成功');
+      await expect(dialog).toBeHidden();
       expect(creates[2]).toMatchObject({ type: 2, totalAmount: 20, count: 2 });
       expect(creates[2]).not.toHaveProperty('answer');
-      await act(dialog.getByRole('button', { name: '再发一个' }));
+      await openSend();
       await choose('答题红包');
       await dialog.getByRole('textbox', { name: '题目', exact: true }).fill('');
       await act(send);
@@ -211,7 +224,7 @@ for (const skin of builtinSkins)
           .click();
         await page.keyboard.press('Escape');
       }
-      await act(launcher);
+      await openSend();
       await expect(dialog.getByRole('textbox', { name: '正确答案', exact: true })).toHaveValue(
         '合成答案',
       );
@@ -223,10 +236,10 @@ for (const skin of builtinSkins)
           .getByRole('button', { name: mode === 'light' ? '明亮模式' : '暗夜模式', exact: true })
           .click();
         await page.keyboard.press('Escape');
-        await act(launcher);
+        await openSend();
       }
       await act(send);
-      await expect(dialog.getByRole('status')).toHaveText('红包发送成功');
+      await expect(dialog).toBeHidden();
       expect(creates[3]).toMatchObject({ type: 3, answer: '合成答案' });
       expect(publications).toHaveLength(4);
       expect(
@@ -234,12 +247,12 @@ for (const skin of builtinSkins)
           /^\[redpacket\]rpc_created_\d+\[\/redpacket\]$/.test(input.content),
         ),
       ).toBe(true);
-      await act(dialog.getByRole('button', { name: '再发一个' }));
+      await openSend();
       await act(send);
       await expect(dialog.getByRole('alert')).toContainText('红包创建结果未确认');
       await expect(dialog.getByRole('button', { name: '等待确认' })).toBeDisabled();
       await page.keyboard.press('Escape');
-      await act(launcher);
+      await openSend();
       await expect(dialog.getByRole('button', { name: '等待确认' })).toBeDisabled();
       expect(creates).toHaveLength(5);
       expect(fixture.stats().connections).toBe(1);

@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { DropdownMenu, type DropdownMenuItem } from '@/shared/ui/DropdownMenu';
 import { Dialog } from '@/shared/ui/Dialog';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
+import { useChatRealtime } from './realtime-context';
 import styles from './SendRedPacket.module.css';
 
 const RedPacket = lazy(() => import('./SendRedPacketForm'));
@@ -25,9 +26,12 @@ export function ChatToolsMenu({
   imageDisabled: boolean;
   triggerLabel?: string;
 }) {
+  const { packetCreation, luckyBagCreation } = useChatRealtime();
   const trigger = useRef<HTMLButtonElement>(null);
   const [panel, setPanel] = useState<Panel>(null);
   const openPanel = (next: Panel) => {
+    if (next === 'red-packet') packetCreation.reset();
+    if (next === 'lucky-bag') luckyBagCreation.reset();
     setPanel(next);
   };
   const items: DropdownMenuItem[] = [

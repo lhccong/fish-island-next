@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -9,6 +10,9 @@ import styles from './SendRedPacket.module.css';
 export default function SendLuckyBagForm({ onClose }: { onClose: () => void }) {
   const { luckyBagCreation: creation, user } = useChatRealtime();
   const { values, phase, error } = useStore(creation.store);
+  useEffect(() => {
+    if (phase === 'success') onClose();
+  }, [phase, onClose]);
   const editing = phase === 'editing';
   return (
     <form
@@ -104,33 +108,20 @@ export default function SendLuckyBagForm({ onClose }: { onClose: () => void }) {
       <div className={styles.feedback}>
         {error && <p role="alert">{error}</p>}
         {phase === 'creating' && <LoadingIndicator compact>正在发送福袋，请稍候…</LoadingIndicator>}
-        {phase === 'success' && <p role="status">福袋发送成功，消息由系统发布到群聊</p>}
       </div>
       <div className={styles.actions}>
         <Button variant="secondary" onClick={onClose}>
-          {phase === 'success' ? '完成' : '关闭'}
+          关闭
         </Button>
-        {phase === 'success' ? (
-          <Button
-            key="new"
-            onClick={(event) => {
-              event.preventDefault();
-              creation.reset();
-            }}
-          >
-            再发一个
-          </Button>
-        ) : (
-          <Button key="submit" type="submit" disabled={!editing || !user}>
-            {phase === 'creating' ? (
-              <LoadingIndicator compact>{'发送中…'}</LoadingIndicator>
-            ) : phase === 'uncertain' ? (
-              '等待确认'
-            ) : (
-              '发送福袋'
-            )}
-          </Button>
-        )}
+        <Button type="submit" disabled={!editing || !user}>
+          {phase === 'creating' ? (
+            <LoadingIndicator compact>{'发送中…'}</LoadingIndicator>
+          ) : phase === 'uncertain' ? (
+            '等待确认'
+          ) : (
+            '发送福袋'
+          )}
+        </Button>
       </div>
     </form>
   );

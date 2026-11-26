@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { LoadingIndicator } from '@/shared/ui/LoadingIndicator';
 import { useStore } from 'zustand';
 import { Button } from '@/shared/ui/Button';
@@ -14,6 +15,9 @@ const types = [
 export default function SendRedPacketForm({ onClose }: { onClose: () => void }) {
   const { packetCreation: creation, user } = useChatRealtime();
   const { values, phase, error } = useStore(creation.store);
+  useEffect(() => {
+    if (phase === 'success') onClose();
+  }, [phase, onClose]);
   const editing = phase === 'editing';
   const quiz = values.type === 3;
   const total = values.totalAmount.trim();
@@ -119,23 +123,12 @@ export default function SendRedPacketForm({ onClose }: { onClose: () => void }) 
         {phase === 'publishing' && (
           <LoadingIndicator compact>红包已创建，正在发布到群聊…</LoadingIndicator>
         )}
-        {phase === 'success' && <p role="status">红包发送成功</p>}
       </div>
       <div className={styles.actions}>
         <Button variant="secondary" onClick={onClose}>
-          {phase === 'success' ? '完成' : '关闭'}
+          关闭
         </Button>
-        {phase === 'success' ? (
-          <Button
-            key="new"
-            onClick={(event) => {
-              event.preventDefault();
-              creation.reset();
-            }}
-          >
-            再发一个
-          </Button>
-        ) : phase === 'publish-error' ? (
+        {phase === 'publish-error' ? (
           <Button
             key="retry"
             onClick={(event) => {

@@ -3,10 +3,12 @@ import { lazy, Suspense, useRef, useState } from 'react';
 import { Gift } from 'lucide-react';
 import { Button } from '@/shared/ui/Button';
 import { Dialog } from '@/shared/ui/Dialog';
+import { useChatRealtime } from './realtime-context';
 import styles from './SendRedPacket.module.css';
 
 const Form = lazy(() => import('./SendLuckyBagForm'));
 export function LuckyBagLauncher() {
+  const { luckyBagCreation } = useChatRealtime();
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   return (
@@ -15,7 +17,10 @@ export function LuckyBagLauncher() {
       description="到期由系统随机开奖"
       hideDescription
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(next) => {
+        if (next) luckyBagCreation.reset();
+        setOpen(next);
+      }}
       returnFocusRef={trigger}
       className={styles.dialog ?? ''}
       dismissLabel="关闭福袋面板"

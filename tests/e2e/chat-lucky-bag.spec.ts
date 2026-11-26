@@ -146,15 +146,13 @@ for (const skin of builtinSkins)
       await expect(sendTrigger).toBeFocused();
       await openSend();
       await expect(sending).toBeDisabled();
-      release();
-      await expect(
-        sendDialog.getByRole('status').filter({ hasText: '福袋发送成功' }),
-      ).toBeVisible();
-      expect(creates).toBe(2);
-      expect(sends).toBe(0);
       await assertArea(formScroll, mobile);
       await page.screenshot({ path: info.outputPath('send.png') });
-      await act(sendDialog.getByRole('button', { name: '完成', exact: true }));
+      release();
+      await expect(sendDialog).toBeHidden();
+      await expect(sendTrigger).toBeFocused();
+      expect(creates).toBe(2);
+      expect(sends).toBe(0);
       const card = page
         .locator('[data-message-id="901"]')
         .getByRole('button', { name: '查看福袋：合成摸鱼福袋' });
@@ -278,8 +276,10 @@ for (const skin of builtinSkins)
       }
       expect({ details, active, creates }).toEqual(counts);
       await openSend();
-      await act(sendDialog.getByRole('button', { name: '再发一个' }));
-      expect(creates).toBe(2);
+      await expect(sendDialog.getByRole('textbox', { name: '福袋名称' })).toHaveValue(
+        '快来参与福袋吧',
+      );
+      await expect(sendDialog.getByRole('combobox')).toContainText('随机分配');
       await act(sendDialog.getByRole('combobox'));
       await act(page.getByRole('option', { name: '平均分配' }));
       await act(send);
