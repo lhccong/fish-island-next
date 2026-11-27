@@ -13,8 +13,37 @@ for (const width of [1280, 375, 390])
           const errors: string[] = [];
           page.on('pageerror', (error) => errors.push(error.message));
           state.status = 'loading';
-          await page.goto('/post');
+          const primary = page.getByRole('navigation', { name: '主要功能', exact: true });
+          const discovery = page.getByRole('navigation', { name: '发现菜单', exact: true });
+          const desktopClassic = width > 760 && skin.id === 'moyu-island';
+          if (width < 760) {
+            await page.goto('/');
+            await primary.getByRole('link', { name: '发现', exact: true }).tap();
+          } else if (desktopClassic) {
+            await page.goto('/');
+          } else {
+            await page.goto('/moments/fish-circle');
+          }
+          const article = (desktopClassic ? primary : discovery).getByRole('link', {
+            name: '文章',
+            exact: true,
+          });
+          await expect(article).toBeInViewport({ ratio: 1 });
+          expect((await article.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+          if (width < 760) {
+            await article.tap();
+          } else {
+            await article.hover();
+            await page.keyboard.press('Tab');
+            await article.focus();
+            await expect(article).toBeFocused();
+            await article.press('Enter');
+          }
+          await expect(page).toHaveURL('/post');
           await expect(page.getByText('正在加载帖子…'), errors.join('\n')).toBeVisible();
+          if (width > 760) await expect(article).toHaveAttribute('aria-current', 'page');
+          if (desktopClassic)
+            await page.screenshot({ path: info.outputPath('moyu-topbar.png'), scale: 'css' });
           state.status = 'ready';
           const scroll = page.getByRole('region', { name: '论坛帖子', exact: true });
           await expect(
@@ -121,6 +150,36 @@ for (const width of [1280, 375, 390])
           ).toBe(true);
           if (skin.id === 'pixel-island')
             await page.screenshot({ path: info.outputPath('forum.png') });
+          if (width < 760) {
+            await page.getByRole('link', { name: '返回发现', exact: true }).tap();
+            await expect(article).toBeInViewport({ ratio: 1 });
+          }
         });
       }
   });
+
+for (const mode of ['light', 'dark']) {
+  test(`moyu-island ${mode} 侧边菜单直达文章`, async ({ page, isMobile }, info) => {
+    test.skip(isMobile, '手机使用底部发现入口');
+    await page.setViewportSize({ width: 800, height: 530 });
+    await forumFixture(page, 'moyu-island', mode);
+    await page.addInitScript(() => {
+      localStorage.setItem('fish-island:tab-identity', JSON.stringify({ menuPosition: 'side' }));
+    });
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: '主要功能', exact: true });
+    const article = nav.getByRole('link', { name: '文章', exact: true });
+    await expect(article).toBeInViewport({ ratio: 1 });
+    await article.click();
+    await expect(page).toHaveURL('/post');
+    await expect(article).toHaveAttribute('aria-current', 'page');
+    await expect(
+      page.getByRole('heading', { name: '岛上的第 1 个话题', exact: true }),
+    ).toBeVisible();
+    expect(await nav.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    await page.screenshot({ path: info.outputPath('moyu-side.png'), scale: 'css' });
+  });
+}

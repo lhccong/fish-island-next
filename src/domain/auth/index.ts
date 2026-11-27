@@ -81,12 +81,15 @@ export interface RegistrationValues {
   password: string;
   confirmPassword: string;
   code: string;
+  inviteCode?: string;
 }
+export const invitationCodePattern = /^(?:[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}|[0-9A-F]{16})$/i;
 export interface AuthResult {
   user: AuthUser;
   token: SessionToken;
 }
 export interface AuthPort {
+  invitation(token: SessionToken, signal: AbortSignal): Promise<string>;
   register(values: RegistrationValues, signal: AbortSignal): Promise<void>;
   sendRegistrationCode(email: string, signal: AbortSignal): Promise<void>;
   avatarFrames(

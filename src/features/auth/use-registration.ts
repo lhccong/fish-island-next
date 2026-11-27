@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { RegistrationValues } from '@/domain/auth';
+import { invitationCodePattern, type RegistrationValues } from '@/domain/auth';
 import { useAuth } from './use-auth';
 
 export function useRegistration(onSuccess: (email: string) => void) {
@@ -29,6 +29,11 @@ export function useRegistration(onSuccess: (email: string) => void) {
     }
     if (kind === 'register' && values.password !== values.confirmPassword) {
       setError('两次输入的密码不一致');
+      return;
+    }
+    const inviteCode = values.inviteCode?.trim() ?? '';
+    if (kind === 'register' && inviteCode && !invitationCodePattern.test(inviteCode)) {
+      setError('请输入有效的邀请码，或清空后继续注册');
       return;
     }
     const controller = new AbortController();

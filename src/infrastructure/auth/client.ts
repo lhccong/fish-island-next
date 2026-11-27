@@ -1,4 +1,4 @@
-import { AuthError, type AuthPort, type SessionToken } from '@/domain/auth';
+import { AuthError, invitationCodePattern, type AuthPort, type SessionToken } from '@/domain/auth';
 import { asRecord, decodeToken, decodeUser, safeImageUrl, unwrap } from './decode';
 import { avatarFrameMethods } from './avatar-frames';
 
@@ -39,6 +39,12 @@ export function createAuthClient(baseUrl: string): AuthPort {
     }
   }
   return {
+    async invitation(token, signal) {
+      const code = await request('/invitation', 'POST', signal, token);
+      if (typeof code !== 'string' || !invitationCodePattern.test(code))
+        throw new AuthError('invalid-response', '未收到有效的邀请码，请重试');
+      return code;
+    },
     async sendRegistrationCode(email, signal) {
       if ((await request('/email/send', 'POST', signal, undefined, { email })) !== true)
         throw new AuthError('rejected', '服务器未确认验证码发送成功');
@@ -51,6 +57,7 @@ export function createAuthClient(baseUrl: string): AuthPort {
         userPassword: values.password,
         checkPassword: values.confirmPassword,
         code: values.code,
+        inviteCode: values.inviteCode?.trim().toUpperCase() || undefined,
       });
       if (!(
         (typeof id === 'number' && Number.isFinite(id) && id > 0) ||

@@ -1,6 +1,7 @@
 import {
   Compass,
   MessageCircle,
+  MessagesSquare,
   ContactRound,
   BookOpen,
   Heart,
@@ -98,6 +99,7 @@ export function WorkspaceNavigation({
       {shellId === 'moyu-island' && (
         <div className={styles.classicLinks}>
           {[
+            { to: '/post', name: '文章', icon: MessagesSquare },
             { to: '/reader', name: '阅读', icon: BookOpen },
             { to: '/pet', name: '宠物', icon: Heart },
             { to: '/discover/games', name: '游戏', icon: Gamepad2 },

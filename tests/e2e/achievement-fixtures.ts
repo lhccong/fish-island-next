@@ -49,6 +49,16 @@ export const achievements = [
     tracks: [{ id: 0, label: null, level: 1, next: null, claimedTiers: 0, claimablePoints: 2000 }],
   },
   {
+    id: 'invited-friends',
+    name: '邀请好友',
+    label: '好友成功注册',
+    icon: 'invitation',
+    unit: '人',
+    interval: 1,
+    points: 100,
+    tracks: [{ id: 0, label: null, level: 2, next: 3, claimedTiers: 0, claimablePoints: 200 }],
+  },
+  {
     id: 'farm-level',
     name: '岛田丰章',
     label: '农场等级',

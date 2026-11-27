@@ -9,11 +9,13 @@ import styles from './ui/LoginDialog.module.css';
 export function LoginDialog({
   onClose,
   onSuccess,
+  inviteCode = '',
 }: {
   onClose: () => void;
   onSuccess: () => void;
+  inviteCode?: string;
 }) {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register'>(inviteCode ? 'register' : 'login');
   const [registeredEmail, setRegisteredEmail] = useState('');
   return (
     <Dialog
@@ -25,7 +27,7 @@ export function LoginDialog({
       description="加入摸鱼岛一起来摸吧"
       showCloseAction={false}
       dismissLabel="关闭登录弹窗"
-      className={styles.modal ?? ''}
+      className={`${styles.modal} ${mode === 'register' ? styles.registerModal : ''}`}
       illustration={<img className={styles.logo} src="/moyu.png" alt="" aria-hidden="true" />}
     >
       <div className={styles.tabs} role="group" aria-label="账号操作">
@@ -64,6 +66,7 @@ export function LoginDialog({
         </div>
         {mode === 'register' && (
           <RegisterForm
+            initialInviteCode={inviteCode}
             onSuccess={(email) => {
               setRegisteredEmail(email);
               setMode('login');

@@ -28,6 +28,7 @@
     "dompurify": "3.4.17",
     "lucide-react": "1.72.0",
     "marked": "18.2.0",
+    "qrcode.react": "4.2.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-router": "7.18.5",

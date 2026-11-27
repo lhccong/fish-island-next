@@ -9,6 +9,7 @@ import {
   type ProfileUpdate,
   type AvatarFrame,
 } from '@/domain/auth';
+import { createInvitationController } from './invitation-controller';
 
 type Session =
   | { status: 'checking' }
@@ -22,7 +23,6 @@ interface AuthState {
   session: Session;
   pending: 'login' | 'logout' | 'profile' | null;
 }
-
 export function createAuthController(service: AuthPort, vault: SessionVault) {
   const store = createStore<AuthState>(() => ({
     emailCodeRetryAt: 0,
@@ -31,6 +31,9 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
     pending: null,
     notice: null,
   }));
+  const invitation = createInvitationController((signal) =>
+    withCredential((token) => service.invitation(token, signal)),
+  );
   let epoch = 0;
   let credential: SessionToken | null = null;
   let request: AbortController | null = null;
@@ -39,6 +42,7 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   function restore(force = false): Promise<void> {
     if (restoreTask && !force) return restoreTask;
     const version = ++epoch;
+    invitation.reset();
     request?.abort();
     const controller = new AbortController();
     request = controller;
@@ -90,6 +94,7 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   async function login(values: LoginCredentials, remember: boolean): Promise<boolean> {
     if (store.getState().pending) return false;
     const version = ++epoch;
+    invitation.reset();
     request?.abort();
     restoreTask = null;
     const controller = new AbortController();
@@ -117,6 +122,7 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
   async function logout(): Promise<boolean> {
     if (store.getState().pending) return false;
     const version = ++epoch;
+    invitation.reset();
     request?.abort();
     restoreTask = null;
     const token = credential;
@@ -229,6 +235,10 @@ export function createAuthController(service: AuthPort, vault: SessionVault) {
 
   return {
     register: service.register,
+    invitationStore: invitation.store,
+    loadInvitation: async () => {
+      if (store.getState().session.status === 'authenticated') await invitation.load();
+    },
     sendRegistrationCode: service.sendRegistrationCode,
     refreshUser: async (signal: AbortSignal) => {
       const version = epoch;

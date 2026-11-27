@@ -11,7 +11,12 @@ export function LoginPage() {
   const background = (location.state as { backgroundLocation?: unknown } | null)
     ?.backgroundLocation;
   const hasBackground = !!background;
-  const target = params.has('redirect') ? safeLoginRedirect(params.get('redirect')) : null;
+  const inviteCode = params.get('invite')?.trim() ?? '';
+  const target = params.has('redirect')
+    ? safeLoginRedirect(params.get('redirect'))
+    : inviteCode
+      ? '/chat'
+      : null;
   const finished = useRef(false);
   const close = useCallback(() => {
     if (hasBackground) navigate(-1);
@@ -27,6 +32,6 @@ export function LoginPage() {
     if (session.status === 'authenticated') complete();
   }, [session.status, complete]);
   return session.status === 'authenticated' ? null : (
-    <LoginDialog onClose={close} onSuccess={complete} />
+    <LoginDialog key={inviteCode} inviteCode={inviteCode} onClose={close} onSuccess={complete} />
   );
 }

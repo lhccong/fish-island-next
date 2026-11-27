@@ -7,6 +7,8 @@ const artwork: Readonly<Record<string, string>> = {
   forge: 'M6 12h20l-3 4-5 2v4l3 2H11l3-2v-4l-5-2-3-4Zm12-9v6m-3-3h6m3 1 2-2',
   companion: 'M4 24l7-9 4 5 5-7 8 11H4Zm7-14C8 6 4 10 8 13l3 2 3-2c4-3 0-7-3-3Zm12-4v5m-2.5-2.5h5',
   turntable: 'M16 5a11 11 0 1 0 0 22 11 11 0 0 0 0-22Zm0 0v11l9.5 5.5M16 16l-9.5 5.5',
+  invitation:
+    'M14 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM5 25v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2M25 9v8m-4-4h8',
   sponsor: 'M16 25 7 16a6 6 0 0 1 9-8 6 6 0 0 1 9 8l-9 9Z',
   'major-sponsor': 'M6 11l5 4 5-8 5 8 5-4-3 12H9L6 11Zm4 15h12',
 };

@@ -12,6 +12,13 @@ function formatPoints(points: number) {
 
 function AchievementCard({ item }: { item: Achievement }) {
   const sponsorship = item.id === 'island-sponsor' || item.id === 'island-major-sponsor';
+  const invitation = item.id === 'invited-friends';
+  const points = formatPoints(item.points);
+  const rewardDescription = sponsorship
+    ? `奖励 ${points} 积分（每个账号限领一次）`
+    : invitation
+      ? `每人奖 ${points} 积分`
+      : `每 ${item.interval} ${item.unit}奖 ${points} 积分`;
   return (
     <article className={styles.card}>
       <div className={styles.cardHeading}>
@@ -21,8 +28,7 @@ function AchievementCard({ item }: { item: Achievement }) {
         <div>
           <h2>{item.name}</h2>
           <p>
-            {item.label} · {sponsorship ? '奖励' : `每 ${item.interval} ${item.unit}奖`}{' '}
-            {formatPoints(item.points)} 积分
+            {item.label} · {rewardDescription}
           </p>
         </div>
       </div>
@@ -35,11 +41,13 @@ function AchievementCard({ item }: { item: Achievement }) {
                 ? track.next === null
                   ? '已达成'
                   : '待达成'
-                : track.level > 0 || item.unit === '次'
-                  ? `${formatPoints(track.level)} ${item.unit}`
-                  : '尚未开始'}
+                : invitation
+                  ? `已邀请 ${formatPoints(track.level)} 人`
+                  : track.level > 0 || item.unit === '次'
+                    ? `${formatPoints(track.level)} ${item.unit}`
+                    : '尚未开始'}
             </span>
-            {!sponsorship && (
+            {!sponsorship && !invitation && (
               <span>
                 {track.next === null
                   ? '全部达成'

@@ -12,6 +12,7 @@
   min-height: 0;
 }
 .registrationFields {
+  --scroll-area-reserved-gutter: 24px;
   flex: 1;
   height: 0;
 }
@@ -106,6 +107,9 @@
   margin: var(--space-1) 0 0;
 }
 @media (max-width: 760px) {
+  .registrationFields {
+    --scroll-area-reserved-gutter: 20px;
+  }
   .field > input {
     font-size: max(16px, 1rem);
   }

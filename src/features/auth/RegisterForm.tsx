@@ -10,7 +10,13 @@ function randomIslandName() {
   return `岛民${1000 + Math.floor(Math.random() * 9000)}`;
 }
 
-export function RegisterForm({ onSuccess }: { onSuccess: (email: string) => void }) {
+export function RegisterForm({
+  initialInviteCode,
+  onSuccess,
+}: {
+  initialInviteCode: string;
+  onSuccess: (email: string) => void;
+}) {
   const [values, setValues] = useState(() => ({
     account: '',
     name: randomIslandName(),
@@ -18,6 +24,7 @@ export function RegisterForm({ onSuccess }: { onSuccess: (email: string) => void
     password: '',
     confirmPassword: '',
     code: '',
+    inviteCode: initialInviteCode,
   }));
   const { pending, error, notice, remaining, run } = useRegistration(onSuccess);
   const update = (name: keyof typeof values, value: string) =>
@@ -121,6 +128,19 @@ export function RegisterForm({ onSuccess }: { onSuccess: (email: string) => void
                 '获取验证码'
               )}
             </Button>
+          </div>
+          <label htmlFor="register-invitation">邀请码（选填）</label>
+          <div className={styles.field}>
+            <input
+              id="register-invitation"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              maxLength={16}
+              value={values.inviteCode}
+              disabled={!!pending}
+              onChange={(event) => update('inviteCode', event.target.value)}
+            />
           </div>
         </div>
       </ScrollArea>

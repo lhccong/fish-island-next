@@ -34,7 +34,7 @@ function decode(value: unknown): AchievementSummary {
     achievements: array(summary.achievements).map((value) => {
       const item = object(value);
       const unit = item.unit ?? '级';
-      if (unit !== '级' && unit !== '次') throw new Error('成就数据格式错误');
+      if (unit !== '级' && unit !== '次' && unit !== '人') throw new Error('成就数据格式错误');
       return {
         id: text(item.id),
         name: text(item.name),

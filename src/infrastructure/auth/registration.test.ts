@@ -42,6 +42,25 @@ it('omits a blank nickname so the server can assign one', async () => {
   expect(JSON.parse(fetcher.mock.calls[0]?.[1].body as string)).not.toHaveProperty('userName');
 });
 
+it.each(['K7M4X9', '89ABCDEF01234567'])('supports invitation %s during rollout', async (code) => {
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data: code })))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data: '123' })))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ code: 0, data: '' })));
+  vi.stubGlobal('fetch', fetcher);
+  const client = createAuthClient('https://example.test');
+  const signal = new AbortController().signal;
+  const token = { name: 'synthetic-session', value: 'synthetic' };
+  expect(await client.invitation(token, signal)).toBe(code);
+  expect(fetcher.mock.calls[0]?.[0]).toBe('https://example.test/api/user/invitation');
+  expect(fetcher.mock.calls[0]?.[1].method).toBe('POST');
+  expect(fetcher.mock.calls[0]?.[1].headers.get(token.name)).toBe(token.value);
+  await client.register({ ...values, inviteCode: ` ${code.toLowerCase()} ` }, signal);
+  expect(JSON.parse(fetcher.mock.calls[1]?.[1].body as string).inviteCode).toBe(code);
+  await expect(client.invitation(token, signal)).rejects.toThrow('未收到有效的邀请码');
+});
+
 it.each([null, false, 0, -1, {}, '', '0'])(
   'rejects unconfirmed registration response %j',
   async (data) => {

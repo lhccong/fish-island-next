@@ -11,6 +11,54 @@ const profileUpdate = {
   profile: '新的简介',
 };
 
+it('shares the request and keeps the invitation ready until the session changes', async () => {
+  const { controller, service } = setup();
+  await controller.restore();
+  let finish!: (code: string) => void;
+  vi.mocked(service.invitation).mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const pending = controller.loadInvitation();
+  await controller.loadInvitation();
+  expect(service.invitation).toHaveBeenCalledTimes(1);
+  expect(controller.invitationStore.getState()).toEqual({ kind: 'loading' });
+  finish('K7M4X9');
+  await pending;
+  await controller.loadInvitation();
+  expect(controller.invitationStore.getState()).toEqual({ kind: 'ready', code: 'K7M4X9' });
+  expect(service.invitation).toHaveBeenCalledTimes(1);
+  await controller.logout();
+  expect(controller.invitationStore.getState()).toEqual({ kind: 'idle' });
+});
+
+it('aborts the previous account lookup and ignores a late invitation response', async () => {
+  const { controller, service, vault } = setup();
+  await controller.restore();
+  let finish!: (code: string) => void;
+  vi.mocked(service.invitation).mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const pending = controller.loadInvitation();
+  const oldSignal = vi.mocked(service.invitation).mock.calls[0]?.[1];
+  const nextToken = { name: token.name, value: 'another-synthetic-test-value' };
+  vault.write(nextToken, false);
+  vi.mocked(service.current).mockResolvedValueOnce({ ...user, id: '456' });
+  await controller.restore(true);
+  expect(oldSignal?.aborted).toBe(true);
+  vi.mocked(service.invitation).mockResolvedValueOnce('A6J4X7');
+  await controller.loadInvitation();
+  finish('K7M4X9');
+  await pending;
+  expect(service.invitation).toHaveBeenLastCalledWith(nextToken, expect.any(AbortSignal));
+  expect(controller.invitationStore.getState()).toEqual({ kind: 'ready', code: 'A6J4X7' });
+});
+
 it('refreshes shop balance without checking or reviving a logged-out account', async () => {
   const { controller, service } = setup();
   await controller.restore();
@@ -106,6 +154,7 @@ function setup(initial: SessionToken | null = token) {
     subscribe: () => () => {},
   };
   const service: AuthPort = {
+    invitation: vi.fn().mockResolvedValue('89ABCDEF01234567'),
     register: vi.fn().mockResolvedValue(undefined),
     sendRegistrationCode: vi.fn().mockResolvedValue(undefined),
     avatarFrames: vi.fn().mockResolvedValue({ items: [], total: 0 }),

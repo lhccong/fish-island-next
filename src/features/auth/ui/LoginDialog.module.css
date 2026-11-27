@@ -75,4 +75,11 @@
   .modal > h2 {
     font-size: 1.6875rem;
   }
+  .registerModal {
+    top: calc(var(--visual-viewport-top, 0px) + var(--visual-viewport-height, 100dvh) / 2);
+    max-height: calc(var(--visual-viewport-height, 100dvh) - 24px - env(safe-area-inset-bottom));
+  }
+  .registerModal .logo {
+    display: none;
+  }
 }

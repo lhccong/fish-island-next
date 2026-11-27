@@ -70,7 +70,8 @@ for (const width of [1440, 375, 390]) {
                     catalogState === 'empty'
                       ? []
                       : achievements.map((item) =>
-                          catalogState === 'locked' && item.id.endsWith('-sponsor')
+                          catalogState === 'locked' &&
+                          (item.id.endsWith('-sponsor') || item.id === 'invited-friends')
                             ? {
                                 ...item,
                                 tracks: item.tracks.map((track) => ({
@@ -93,12 +94,12 @@ for (const width of [1440, 375, 390]) {
               await claiming;
               return route.fulfill({ status: 503 });
             }
-            user.usedPoints = -6800;
+            user.usedPoints = -7000;
             return route.fulfill({
               json: {
                 code: 0,
                 data: {
-                  awardedPoints: 6800,
+                  awardedPoints: 7000,
                   achievements: achievements.map((item) => ({
                     ...item,
                     tracks: item.tracks.map((track) => ({
@@ -141,12 +142,18 @@ for (const width of [1440, 375, 390]) {
           const list = page.getByRole('region', { name: '成就列表' });
           const sponsor = list.locator('article').filter({ hasText: '海岛同行' });
           const majorSponsor = list.locator('article').filter({ hasText: '大金主' });
-          await expect(sponsor).toContainText('单笔赞助满 1 · 奖励 1,000 积分');
-          await expect(majorSponsor).toContainText('单笔赞助满 100 · 奖励 2,000 积分');
+          const invitation = list.locator('article').filter({ hasText: '邀请好友' });
+          await expect(invitation).toContainText('好友成功注册 · 每人奖 100 积分');
+          await expect(invitation.getByRole('listitem')).toContainText('已邀请 0 人');
+          await expect(invitation.getByRole('listitem')).toContainText('暂无可领取奖励');
+          await expect(sponsor).toContainText('单笔赞助满 1 · 奖励 1,000 积分（每个账号限领一次）');
+          await expect(majorSponsor).toContainText(
+            '单笔赞助满 100 · 奖励 2,000 积分（每个账号限领一次）',
+          );
           for (const card of [sponsor, majorSponsor]) {
             await expect(card.getByRole('listitem')).toContainText('待达成');
             await expect(card.getByRole('listitem')).toContainText('暂无可领取奖励');
-            await expect(card).not.toContainText(/人民币|元/);
+            await expect(card).not.toContainText(/人民币|元|每 1 次奖/);
           }
           await expect(page.getByText('可领取 3,800 积分', { exact: true })).toBeVisible();
           expect(claims).toBe(0);
@@ -158,6 +165,8 @@ for (const width of [1440, 375, 390]) {
           await expect(sponsor.getByRole('listitem')).toContainText('可领 1,000 积分');
           await expect(majorSponsor.getByRole('listitem')).toContainText('已达成');
           await expect(majorSponsor.getByRole('listitem')).toContainText('可领 2,000 积分');
+          await expect(invitation.getByRole('listitem')).toContainText('已邀请 2 人');
+          await expect(invitation.getByRole('listitem')).toContainText('可领 200 积分');
           expect(claims).toBe(0);
           await expect(list.getByRole('heading', { name: '岛田丰章' })).toBeVisible();
           const userLevel = list.locator('article').filter({ hasText: '用户成长' });
@@ -179,12 +188,12 @@ for (const width of [1440, 375, 390]) {
           await expect(equipment.getByRole('listitem').filter({ hasText: '翅膀' })).toContainText(
             '强化暂未开放',
           );
-          await expect(list.locator('article svg')).toHaveCount(8);
+          await expect(list.locator('article svg')).toHaveCount(9);
           expect(
             await list
               .locator('article svg path')
               .evaluateAll((paths) => new Set(paths.map((path) => path.getAttribute('d'))).size),
-          ).toBe(8);
+          ).toBe(9);
           expect(
             await list
               .locator('article')
@@ -197,7 +206,7 @@ for (const width of [1440, 375, 390]) {
           expect(await list.evaluate((node) => getComputedStyle(node).paddingInlineEnd)).toBe(
             mobile ? '20px' : '24px',
           );
-          await expect(page.getByText('可领取 6,800 积分', { exact: true })).toBeVisible();
+          await expect(page.getByText('可领取 7,000 积分', { exact: true })).toBeVisible();
 
           const scrollbar = list.locator('..').locator('[data-orientation="vertical"]');
           if (mobile) {
@@ -206,8 +215,12 @@ for (const width of [1440, 375, 390]) {
             const touch = await page.context().newCDPSession(page);
             const x = area.x + area.width / 2;
             const y = area.y + area.height - 24;
+            const lastTrack = equipment.getByRole('listitem').last();
+            const stepDistance = Math.min(390, area.height - 48) / 6;
             try {
-              for (let swipe = 0; swipe < 3; swipe++) {
+              for (let swipe = 0; swipe < 8; swipe++) {
+                const last = (await lastTrack.boundingBox())!;
+                if (last.y >= area.y && last.y + last.height <= area.y + area.height) break;
                 await touch.send('Input.dispatchTouchEvent', {
                   type: 'touchStart',
                   touchPoints: [{ x, y }],
@@ -215,7 +228,7 @@ for (const width of [1440, 375, 390]) {
                 for (let step = 1; step <= 6; step++) {
                   await touch.send('Input.dispatchTouchEvent', {
                     type: 'touchMove',
-                    touchPoints: [{ x, y: y - step * 65 }],
+                    touchPoints: [{ x, y: y - step * stepDistance }],
                   });
                 }
                 // End a deliberate drag without flinging the content into the next tap.
@@ -226,7 +239,7 @@ for (const width of [1440, 375, 390]) {
             } finally {
               await touch.detach();
             }
-            await expect(equipment.getByRole('listitem').last()).toBeInViewport();
+            await expect(lastTrack).toBeInViewport({ ratio: 1 });
           } else {
             await page.setViewportSize({ width, height: 460 });
             await list.focus();
@@ -256,23 +269,23 @@ for (const width of [1440, 375, 390]) {
           await expect(claim).toBeDisabled();
           releaseClaim();
           await expect(page.getByRole('alert')).toContainText('成就服务暂不可用');
-          await expect(page.getByText('可领取 6,800 积分', { exact: true })).toBeVisible();
+          await expect(page.getByText('可领取 7,000 积分', { exact: true })).toBeVisible();
           await (mobile ? claim.tap() : claim.click());
           await expect(
-            page.getByRole('status').filter({ hasText: '已领取 6,800 积分' }),
+            page.getByRole('status').filter({ hasText: '已领取 7,000 积分' }),
           ).toBeVisible();
           await expect(userLevel.getByRole('listitem')).toContainText('已领 600 积分');
           await expect(turntable.getByRole('listitem')).toContainText('已领 1,000 积分');
           await expect(sponsor.getByRole('listitem')).toContainText('已领 1,000 积分');
           await expect(majorSponsor.getByRole('listitem')).toContainText('已领 2,000 积分');
+          await expect(invitation.getByRole('listitem')).toContainText('已领 200 积分');
           await expect(claim).toBeDisabled();
           expect(claims).toBe(2);
           if (
             skin.id === 'pixel-island' &&
             ((mode === 'dark' && width === 390) || (mode === 'light' && width === 1440))
           ) {
-            await sponsor.scrollIntoViewIfNeeded();
-            await majorSponsor.scrollIntoViewIfNeeded();
+            await invitation.scrollIntoViewIfNeeded();
             await page.screenshot({ path: info.outputPath('achievements.png') });
           }
           if (skin.id === 'pixel-island' && mode === 'light' && width === 1440) {
@@ -285,7 +298,7 @@ for (const width of [1440, 375, 390]) {
             await expect(page.locator('html')).toHaveAttribute('data-skin', 'moyu-island');
             await expect(page.locator('html')).toHaveAttribute('data-color-mode', 'dark');
             await expect(
-              page.getByRole('status').filter({ hasText: '已领取 6,800 积分' }),
+              page.getByRole('status').filter({ hasText: '已领取 7,000 积分' }),
             ).toBeVisible();
             expect(listRequests).toBe(requests);
           }

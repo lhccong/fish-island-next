@@ -42,6 +42,9 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .navigation[data-layout='topbar'] .classicLinks {
+    flex-shrink: 0;
+  }
   .navigation[data-layout='topbar'] .items,
   .navigation[data-layout='topbar'] .classicLinks {
     display: flex;
