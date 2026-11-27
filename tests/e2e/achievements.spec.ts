@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { builtinSkins } from '../../src/skins/builtin';
-import { achievements } from './achievement-fixtures';
+import { achievements, lockedAchievements } from './achievement-fixtures';
 
 test.setTimeout(60_000);
 
@@ -69,20 +69,9 @@ for (const width of [1440, 375, 390]) {
                   achievements:
                     catalogState === 'empty'
                       ? []
-                      : achievements.map((item) =>
-                          catalogState === 'locked' &&
-                          (item.id.endsWith('-sponsor') || item.id === 'invited-friends')
-                            ? {
-                                ...item,
-                                tracks: item.tracks.map((track) => ({
-                                  ...track,
-                                  level: 0,
-                                  next: 1,
-                                  claimablePoints: 0,
-                                })),
-                              }
-                            : item,
-                        ),
+                      : catalogState === 'locked'
+                        ? lockedAchievements
+                        : achievements,
                 },
               },
             });
@@ -94,12 +83,12 @@ for (const width of [1440, 375, 390]) {
               await claiming;
               return route.fulfill({ status: 503 });
             }
-            user.usedPoints = -7000;
+            user.usedPoints = -9000;
             return route.fulfill({
               json: {
                 code: 0,
                 data: {
-                  awardedPoints: 7000,
+                  awardedPoints: 9000,
                   achievements: achievements.map((item) => ({
                     ...item,
                     tracks: item.tracks.map((track) => ({
@@ -143,12 +132,17 @@ for (const width of [1440, 375, 390]) {
           const sponsor = list.locator('article').filter({ hasText: '海岛同行' });
           const majorSponsor = list.locator('article').filter({ hasText: '大金主' });
           const invitation = list.locator('article').filter({ hasText: '邀请好友' });
+          const forge = list.locator('article').filter({ hasText: '词条锻造' });
+          await expect(forge).toContainText('累计刷新词条 · 每 10 次奖 200 积分');
+          await expect(forge.getByRole('listitem')).toContainText('0 次');
+          await expect(forge.getByRole('listitem')).toContainText('下一档 10 次');
+          await expect(forge.getByRole('listitem')).toContainText('暂无可领取奖励');
           await expect(invitation).toContainText('好友成功注册 · 每人奖 100 积分');
           await expect(invitation.getByRole('listitem')).toContainText('已邀请 0 人');
           await expect(invitation.getByRole('listitem')).toContainText('暂无可领取奖励');
           await expect(sponsor).toContainText('单笔赞助满 1 · 奖励 1,000 积分（每个账号限领一次）');
           await expect(majorSponsor).toContainText(
-            '单笔赞助满 100 · 奖励 2,000 积分（每个账号限领一次）',
+            '累计赞助满 100 · 奖励 2,000 积分（每个账号限领一次）',
           );
           for (const card of [sponsor, majorSponsor]) {
             await expect(card.getByRole('listitem')).toContainText('待达成');
@@ -156,7 +150,6 @@ for (const width of [1440, 375, 390]) {
             await expect(card).not.toContainText(/人民币|元|每 1 次奖/);
           }
           await expect(page.getByText('可领取 3,800 积分', { exact: true })).toBeVisible();
-          expect(claims).toBe(0);
 
           catalogState = 'ready';
           await page.goBack();
@@ -180,6 +173,9 @@ for (const width of [1440, 375, 390]) {
           await expect(turntable.getByRole('listitem')).toContainText('210 次');
           await expect(turntable.getByRole('listitem')).toContainText('下一档 300 次');
           await expect(turntable.getByRole('listitem')).toContainText('可领 1,000 积分');
+          await expect(forge.getByRole('listitem')).toContainText('100 次');
+          await expect(forge.getByRole('listitem')).toContainText('全部达成');
+          await expect(forge.getByRole('listitem')).toContainText('可领 2,000 积分');
           const equipment = list.locator('article').filter({ hasText: '百炼铸星' });
           await expect(equipment.getByRole('listitem')).toHaveCount(6);
           await expect(equipment.getByRole('listitem').filter({ hasText: '项链' })).toContainText(
@@ -188,12 +184,12 @@ for (const width of [1440, 375, 390]) {
           await expect(equipment.getByRole('listitem').filter({ hasText: '翅膀' })).toContainText(
             '强化暂未开放',
           );
-          await expect(list.locator('article svg')).toHaveCount(9);
+          await expect(list.locator('article svg')).toHaveCount(10);
           expect(
             await list
               .locator('article svg path')
               .evaluateAll((paths) => new Set(paths.map((path) => path.getAttribute('d'))).size),
-          ).toBe(9);
+          ).toBe(10);
           expect(
             await list
               .locator('article')
@@ -206,7 +202,7 @@ for (const width of [1440, 375, 390]) {
           expect(await list.evaluate((node) => getComputedStyle(node).paddingInlineEnd)).toBe(
             mobile ? '20px' : '24px',
           );
-          await expect(page.getByText('可领取 7,000 积分', { exact: true })).toBeVisible();
+          await expect(page.getByText('可领取 9,000 积分', { exact: true })).toBeVisible();
 
           const scrollbar = list.locator('..').locator('[data-orientation="vertical"]');
           if (mobile) {
@@ -269,23 +265,24 @@ for (const width of [1440, 375, 390]) {
           await expect(claim).toBeDisabled();
           releaseClaim();
           await expect(page.getByRole('alert')).toContainText('成就服务暂不可用');
-          await expect(page.getByText('可领取 7,000 积分', { exact: true })).toBeVisible();
+          await expect(page.getByText('可领取 9,000 积分', { exact: true })).toBeVisible();
           await (mobile ? claim.tap() : claim.click());
           await expect(
-            page.getByRole('status').filter({ hasText: '已领取 7,000 积分' }),
+            page.getByRole('status').filter({ hasText: '已领取 9,000 积分' }),
           ).toBeVisible();
           await expect(userLevel.getByRole('listitem')).toContainText('已领 600 积分');
           await expect(turntable.getByRole('listitem')).toContainText('已领 1,000 积分');
           await expect(sponsor.getByRole('listitem')).toContainText('已领 1,000 积分');
           await expect(majorSponsor.getByRole('listitem')).toContainText('已领 2,000 积分');
           await expect(invitation.getByRole('listitem')).toContainText('已领 200 积分');
+          await expect(forge.getByRole('listitem')).toContainText('已领 2,000 积分');
           await expect(claim).toBeDisabled();
           expect(claims).toBe(2);
           if (
             skin.id === 'pixel-island' &&
             ((mode === 'dark' && width === 390) || (mode === 'light' && width === 1440))
           ) {
-            await invitation.scrollIntoViewIfNeeded();
+            await forge.scrollIntoViewIfNeeded();
             await page.screenshot({ path: info.outputPath('achievements.png') });
           }
           if (skin.id === 'pixel-island' && mode === 'light' && width === 1440) {
@@ -298,7 +295,7 @@ for (const width of [1440, 375, 390]) {
             await expect(page.locator('html')).toHaveAttribute('data-skin', 'moyu-island');
             await expect(page.locator('html')).toHaveAttribute('data-color-mode', 'dark');
             await expect(
-              page.getByRole('status').filter({ hasText: '已领取 7,000 积分' }),
+              page.getByRole('status').filter({ hasText: '已领取 9,000 积分' }),
             ).toBeVisible();
             expect(listRequests).toBe(requests);
           }

@@ -232,7 +232,7 @@ export function MomentCard({
           onDone={() => setNotice('操作成功')}
           onClose={() => {
             setAction(null);
-            onRefresh();
+            if (action !== 'reward') onRefresh();
           }}
         />
       )}

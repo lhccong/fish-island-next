@@ -41,7 +41,7 @@ export const achievements = [
   {
     id: 'island-major-sponsor',
     name: '大金主',
-    label: '单笔赞助满 100',
+    label: '累计赞助满 100',
     icon: 'major-sponsor',
     unit: '次',
     interval: 1,
@@ -86,6 +86,18 @@ export const achievements = [
     tracks: [{ id: 0, label: null, level: 20, next: 30, claimedTiers: 0, claimablePoints: 1000 }],
   },
   {
+    id: 'equipment-forge-count',
+    name: '词条锻造',
+    label: '累计刷新词条',
+    icon: 'equipment-forge',
+    unit: '次',
+    interval: 10,
+    points: 200,
+    tracks: [
+      { id: 0, label: null, level: 100, next: null, claimedTiers: 0, claimablePoints: 2000 },
+    ],
+  },
+  {
     id: 'equipment-level',
     name: '百炼铸星',
     label: '装备强化',
@@ -98,3 +110,24 @@ export const achievements = [
   ...item,
   tracks: item.tracks.map((track) => ({ enabled: true, ...track })),
 }));
+
+const lockedIds = new Set([
+  'island-sponsor',
+  'island-major-sponsor',
+  'invited-friends',
+  'equipment-forge-count',
+]);
+
+export const lockedAchievements = achievements.map((item) =>
+  lockedIds.has(item.id)
+    ? {
+        ...item,
+        tracks: item.tracks.map((track) => ({
+          ...track,
+          level: 0,
+          next: item.interval,
+          claimablePoints: 0,
+        })),
+      }
+    : item,
+);

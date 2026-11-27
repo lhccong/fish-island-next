@@ -43,7 +43,8 @@
 
 - 未发现应用实现中的 datalist、optgroup 或原生 date/time/month/week/color 选择器，也未发现用于业务交互的 alert/confirm/prompt 调用；安全解码测试里的 javascript:alert 字符串不是实际调用。
 - 保持登录、热榜来源设置、通知未读筛选使用 checkbox 和主题 accent-color；人生重开部分 radio 已使用自定义外观。它们不属于截图中的原生展开面板，本次没有修改这些控件或补做其全部平台的视觉验收。
-- 人生重开/修仙的属性分配、动态打赏和抽奖人数使用 number 输入框，平台数字步进按钮保留为后续视觉复查项。
+- 人生重开/修仙的属性分配使用 number 输入框，平台数字步进按钮保留为后续视觉复查项。
+- 鱼小圈 → 动态更多操作 → 打赏、发起抽奖：`src/features/fish-circle/MomentActionDialog.tsx` 和 `MomentActionDialog.module.css` 已统一数字输入外观，隐藏平台步进按钮，保留键盘步进与手机数字键盘。常用积分和确认操作使用共享 Button，正文采用 reserved ScrollArea。
 - 头像/背景图及发布图片已有自定义上传入口，系统文件选择窗口属于需保留的系统能力。
 - 动态更多操作使用 shared/ui/DropdownMenu，编辑/删除确认使用统一 Dialog。
 

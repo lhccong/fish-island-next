@@ -140,7 +140,7 @@ test('image upload, preview, image comment, reward and follow', async ({ page },
   await page.getByRole('button', { name: '更多动态操作' }).click();
   await page.getByRole('menuitem', { name: '打赏', exact: true }).click();
   await dialog.getByLabel('打赏积分').fill('5');
-  await dialog.getByRole('button', { name: '确认' }).click();
+  await dialog.getByRole('button', { name: '确认打赏', exact: true }).click();
   await expect(dialog.getByRole('status')).toContainText('操作成功');
   await dialog.getByRole('button', { name: '完成' }).click();
   await page.getByRole('button', { name: '查看合成岛友的鱼小圈' }).click();
